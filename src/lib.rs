@@ -3,6 +3,7 @@ use std::collections::HashMap;
 
 pub mod input {
 
+    /// https://github.com/hasura/v3-experiments/blob/gdc-spec/crates/gdc-client/src/models.rs#L237
     /// This is the request body of the query POST endpoint
     pub struct QueryRequest {
         /// The name of a root field
@@ -21,6 +22,7 @@ pub mod output {
     use serde_json::Value;
     use std::collections::HashMap;
 
+    /// https://github.com/hasura/v3-experiments/blob/gdc-spec/crates/gdc-client/src/models.rs#L516
     /// Query responses may return multiple RowSets when using foreach queries
     /// Else, there should always be exactly one RowSet
     pub struct QueryResponse(pub Vec<RowSet>);
@@ -39,8 +41,6 @@ pub mod output {
 }
 
 pub mod translation {
-    ////////////////
-
     pub struct ExecutionPlan {
         pub root_field: String,
         pub pre: Vec<DDL>,
