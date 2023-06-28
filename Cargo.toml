@@ -7,6 +7,9 @@ edition = "2021"
 
 [dependencies]
 axum = "0.6.18"
+schemars = { version = "0.8.12", features = ["smol_str"] }
 serde = { version = "1.0.164", features = ["derive"] }
+serde_derive = "^1.0"
 serde_json = "1.0.99"
+serde_with = "^2.0"
 tokio = { version = "1.28.2", features = ["full"] }

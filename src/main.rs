@@ -29,6 +29,8 @@ async fn main() {
     server.await.unwrap();
 }
 
+// routes
+
 async fn root() -> &'static str {
     "hi"
 }
@@ -48,11 +50,31 @@ async fn json(Json(payload): Json<serde_json::Value>) -> Json<Value> {
     Json(payload)
 }
 
-async fn select() -> Json<Vec<output::RowSet>> {
-    let plan = translate(input::QueryRequest {
-        root_field: "bamba".to_string(),
-        query: input::Query::Raw("my query".to_string()),
-    });
-    let output::QueryResponse(results) = execute(plan);
+async fn select() -> Json<Vec<types::output::RowSet>> {
+    let plan = translate::translate(empty_query_request());
+    let types::output::QueryResponse(results) = execute::execute(plan);
     Json(results)
+}
+
+// utils
+
+fn empty_query_request() -> types::input::QueryRequest {
+    types::input::QueryRequest {
+        table: "bamba".to_string(),
+        query: empty_query(),
+        arguments: HashMap::new(),
+        table_relationships: HashMap::new(),
+        variables: None,
+    }
+}
+
+fn empty_query() -> types::input::Query {
+    types::input::Query {
+        aggregates: None,
+        fields: None,
+        limit: None,
+        offset: None,
+        order_by: None,
+        predicate: None,
+    }
 }
