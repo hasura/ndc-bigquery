@@ -17,6 +17,7 @@ pub async fn execute(
         //.map(|row: sqlx::postgres::PgRow| row.len())
         .fetch_all(&pool)
         .await?;
+
     //println!("{:?}", values);
     Ok(output::QueryResponse(vec![output::RowSet {
         rows: Some(vec![HashMap::from([(

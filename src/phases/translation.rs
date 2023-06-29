@@ -21,10 +21,14 @@ pub struct ExecutionPlan {
 impl ExecutionPlan {
     /// Extract the query component as SQL.
     pub fn query(&self) -> sql_string::SQL {
-        let mut sql = sql_string::SQL::new();
-        self.query.to_sql(&mut sql);
-        sql
+        select_to_sql(&self.query)
     }
+}
+
+pub fn select_to_sql(select: &sql_ast::Select) -> sql_string::SQL {
+    let mut sql = sql_string::SQL::new();
+    select.to_sql(&mut sql);
+    sql
 }
 
 /// Translate the incoming QueryRequest to an ExecutionPlan (SQL) to be run against the database.

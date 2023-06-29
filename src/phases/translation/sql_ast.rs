@@ -43,7 +43,7 @@ pub enum Expression {
     ColumnName(ColumnName),
     Value(Value),
 }
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum Value {
     Int4(i32),
     Bool(bool),

@@ -1,11 +1,12 @@
 /// Type definitions of a low-level SQL string representation.
 use super::sql_ast::Value;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct SQL {
     pub sql: String,
     pub params: Vec<Value>,
-    param_index: u64,
+    /// for internal use and tests only
+    pub param_index: u64,
 }
 
 #[derive(Debug)]
