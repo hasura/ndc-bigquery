@@ -2,14 +2,26 @@ use serde_json::Value;
 use std::collections::HashMap;
 
 use crate::types::{output, translation};
+use sqlx;
 
-pub fn execute(plan: translation::ExecutionPlan) -> output::QueryResponse {
-    output::QueryResponse(vec![output::RowSet {
+pub async fn execute(
+    pool: sqlx::PgPool,
+    plan: translation::ExecutionPlan,
+) -> Result<output::QueryResponse, sqlx::Error> {
+    let query = plan.query();
+    println!("{}", query.sql);
+    let rows = sqlx::query(query.sql.as_str())
+        // .bind(sql.params)
+        //.map(|row: sqlx::postgres::PgRow| row.len())
+        .fetch_all(&pool)
+        .await?;
+    //println!("{:?}", values);
+    Ok(output::QueryResponse(vec![output::RowSet {
         rows: Some(vec![HashMap::from([(
             "x".to_string(),
             output::RowFieldValue::Column {
                 value: Value::String("hi".to_string()),
             },
         )])]),
-    }])
+    }]))
 }

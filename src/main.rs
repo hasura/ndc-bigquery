@@ -6,7 +6,7 @@ use axum::{
     response::Response,
     routing::get,
     routing::post,
-    Router,
+    Extension, Router,
 };
 
 use axum::extract::{Path, Query};
@@ -15,18 +15,24 @@ use std::collections::HashMap;
 
 #[tokio::main]
 async fn main() {
-    let app = Router::new()
-        .route("/", get(root))
-        .route("/id/:id", get(id))
-        .route("/json", post(json))
-        .route("/select", get(select));
+    match connector::Connector::new().await {
+        Err(err) => println!("{}", err),
+        Ok(connector::Connector { pg_pool }) => {
+            let app = Router::new()
+                .route("/", get(root))
+                .route("/id/:id", get(id))
+                .route("/json", post(json))
+                .route("/select", get(routes::query::select))
+                .layer(Extension(pg_pool));
 
-    let server =
-        axum::Server::bind(&"0.0.0.0:3000".parse().unwrap()).serve(app.into_make_service());
+            let server =
+                axum::Server::bind(&"0.0.0.0:3000".parse().unwrap()).serve(app.into_make_service());
 
-    println!("Starting axum server at 0.0.0.0:3000");
+            println!("Starting axum server at 0.0.0.0:3000");
 
-    server.await.unwrap();
+            server.await.unwrap();
+        }
+    }
 }
 
 // routes
@@ -48,33 +54,4 @@ async fn id(
 
 async fn json(Json(payload): Json<serde_json::Value>) -> Json<Value> {
     Json(payload)
-}
-
-async fn select() -> Json<Vec<types::output::RowSet>> {
-    let plan = translate::translate(empty_query_request());
-    let types::output::QueryResponse(results) = execute::execute(plan);
-    Json(results)
-}
-
-// utils
-
-fn empty_query_request() -> types::input::QueryRequest {
-    types::input::QueryRequest {
-        table: "bamba".to_string(),
-        query: empty_query(),
-        arguments: HashMap::new(),
-        table_relationships: HashMap::new(),
-        variables: None,
-    }
-}
-
-fn empty_query() -> types::input::Query {
-    types::input::Query {
-        aggregates: None,
-        fields: None,
-        limit: None,
-        offset: None,
-        order_by: None,
-        predicate: None,
-    }
 }
