@@ -17,5 +17,5 @@ pub struct RowSet {
 #[derive(Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum RowFieldValue {
-    Column { value: Value },
+    Column(Value),
 }

@@ -34,13 +34,22 @@ pub fn select_to_sql(select: &sql_ast::Select) -> sql_string::SQL {
 /// Translate the incoming QueryRequest to an ExecutionPlan (SQL) to be run against the database.
 pub fn translate(query_request: input::QueryRequest) -> ExecutionPlan {
     let select = sql_ast::simple_select(
-        vec![(
-            sql_ast::ColumnAlias {
-                unique_index: 0,
-                name: "x".to_string(),
-            },
-            sql_ast::Expression::ColumnName(sql_ast::ColumnName::TableColumn("x".to_string())),
-        )],
+        vec![
+            (
+                sql_ast::ColumnAlias {
+                    unique_index: 0,
+                    name: "x".to_string(),
+                },
+                sql_ast::Expression::ColumnName(sql_ast::ColumnName::TableColumn("y".to_string())),
+            ),
+            (
+                sql_ast::ColumnAlias {
+                    unique_index: 0,
+                    name: "y".to_string(),
+                },
+                sql_ast::Expression::ColumnName(sql_ast::ColumnName::TableColumn("y".to_string())),
+            ),
+        ],
         sql_ast::From::Table {
             name: sql_ast::TableName::DBTable(query_request.table.clone()),
             alias: sql_ast::TableAlias {
