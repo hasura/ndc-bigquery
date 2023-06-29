@@ -1,6 +1,6 @@
-// copy-pasted from
-// https://github.com/hasura/v3-experiments/blob/gdc-spec/crates/gdc-client/src/models.rs
-
+/// input types for the connector.
+/// copy-pasted from
+/// https://github.com/hasura/v3-experiments/blob/gdc-spec/crates/gdc-client/src/models.rs
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;

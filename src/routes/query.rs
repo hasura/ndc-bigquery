@@ -1,3 +1,4 @@
+/// An api call to `/query` should end up here.
 use sqlx;
 
 use axum::response::Json;
@@ -7,10 +8,10 @@ use crate::*;
 use serde_json::Value;
 use std::collections::HashMap;
 
-pub async fn select(axum::Extension(pool): Extension<sqlx::PgPool>) -> Json<Value> {
-    let plan = translate::translate(empty_query_request());
+pub async fn query(axum::Extension(pool): Extension<sqlx::PgPool>) -> Json<Value> {
+    let plan = phases::translation::translate(empty_query_request());
 
-    match execute::execute(pool, plan).await {
+    match phases::execution::execute(pool, plan).await {
         Err(err) => Json(Value::String(err.to_string())),
         Ok(types::output::QueryResponse(results)) => match serde_json::to_value(results) {
             Err(err) => Json(Value::String(err.to_string())),

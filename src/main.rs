@@ -22,7 +22,7 @@ async fn main() {
                 .route("/", get(root))
                 .route("/id/:id", get(id))
                 .route("/json", post(json))
-                .route("/select", get(routes::query::select))
+                .route("/select", get(routes::query::query))
                 .layer(Extension(pg_pool));
 
             let server =
@@ -35,7 +35,7 @@ async fn main() {
     }
 }
 
-// routes
+// dummy stuff. Will be removed later.
 
 async fn root() -> &'static str {
     "hi"

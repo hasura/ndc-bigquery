@@ -1,3 +1,4 @@
+/// The state of the connector.
 use sqlx;
 
 pub struct Connector {
