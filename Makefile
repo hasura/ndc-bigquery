@@ -5,7 +5,10 @@ POSTGRES_DC_PORT=8666
 
 .PHONY: dev
 dev:
-	cargo watch -c -x test -x run
+	RUST_LOG=DEBUG \
+		PORT=${POSTGRES_DC_PORT} \
+		POSTGRESQL_CONNECTION_STRING=${POSTGRESQL_CONNECTION_STRING} \
+		cargo watch -c -x test -x run
 
 .PHONY: start-docker
 ## start-docker: run postgres + jaeger

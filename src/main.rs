@@ -27,7 +27,7 @@ async fn main() {
                 .route("/", get(root))
                 .route("/id/:id", get(id))
                 .route("/json", post(json))
-                .route("/query", get(routes::query::query))
+                .route("/query", post(routes::query::query))
                 .layer(Extension(pg_pool));
 
             let server =

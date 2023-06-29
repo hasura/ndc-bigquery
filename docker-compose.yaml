@@ -12,7 +12,6 @@ services:
     environment:
       POSTGRES_PASSWORD: "password"
     volumes:
-    volumes:
       - /var/lib/postgresql/data
       - ./static/chinook-postgres.sql:/docker-entrypoint-initdb.d/chinook-postgres.sql:ro
     healthcheck:
