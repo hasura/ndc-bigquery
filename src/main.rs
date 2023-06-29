@@ -1,5 +1,5 @@
 use ndc_postgres::*;
-
+use std::env;
 use axum::{
     body::{Bytes, Full},
     response::Json,
@@ -15,6 +15,11 @@ use std::collections::HashMap;
 
 #[tokio::main]
 async fn main() {
+    // allow server port to be set via PORT env var
+    // this may not be the place for this, but yolo for now
+    let port = env::var("PORT").unwrap_or("3000".to_string());
+    let address = format!("0.0.0.0:{}", port);
+
     match connector::Connector::new().await {
         Err(err) => println!("{}", err),
         Ok(connector::Connector { pg_pool }) => {
@@ -23,12 +28,13 @@ async fn main() {
                 .route("/id/:id", get(id))
                 .route("/json", post(json))
                 .route("/select", get(routes::query::query))
+                .route("/query", post(json)) // just echo stuff back for now
                 .layer(Extension(pg_pool));
 
             let server =
-                axum::Server::bind(&"0.0.0.0:3000".parse().unwrap()).serve(app.into_make_service());
+                axum::Server::bind(&address.parse().unwrap()).serve(app.into_make_service());
 
-            println!("Starting axum server at 0.0.0.0:3000");
+            println!("Starting axum server at {}", address);
 
             server.await.unwrap();
         }

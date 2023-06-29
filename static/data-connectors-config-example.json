@@ -1,0 +1,14 @@
+[
+  {
+    "kind": "postgres",
+    "url": "http://127.0.0.1:8081/api/v1/postgres"
+  },
+  {
+    "kind": "mysql",
+    "url": "http://127.0.0.1:8081/api/v1/mysql"
+  },
+  {
+    "kind": "athena",
+    "url": "http://127.0.0.1:8081/api/v1/athena"
+  }
+]
