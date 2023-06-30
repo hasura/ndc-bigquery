@@ -21,8 +21,8 @@ fn it_converts_simple_select() {
     assert_eq!(
         select_to_sql(&select),
         sql_string::SQL {
-            sql: "SELECT \"x\" AS \"hasu_col_0_x\" FROM \"bamba\" AS \"hasu_tbl_0_bamba\""
-                .to_string(),
+            //sql: "SELECT \"x\" AS \"hasu_col_0_x\" FROM \"bamba\" AS \"hasu_tbl_0_bamba\"".to_string(),
+            sql: "SELECT \"x\" AS \"x\" FROM \"bamba\" AS \"bamba\"".to_string(),
             params: vec![],
             param_index: 0,
         }

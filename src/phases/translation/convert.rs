@@ -45,7 +45,8 @@ impl CommonTableExpression {
 impl Select {
     pub fn to_sql(&self, sql: &mut SQL) {
         sql.append_syntax("SELECT ");
-        for (col, expr) in &self.select_list {
+        let SelectList(select_list) = &self.select_list;
+        for (col, expr) in select_list {
             expr.to_sql(sql);
             sql.append_syntax(" AS ");
             col.to_sql(sql);
@@ -55,6 +56,7 @@ impl Select {
         sql.append_syntax(" ");
 
         self.from.to_sql(sql);
+        self.where_.to_sql(sql);
     }
 }
 
@@ -71,15 +73,63 @@ impl From {
     }
 }
 
+impl Where {
+    pub fn to_sql(&self, sql: &mut SQL) {
+        let Where(expression) = self;
+        if *expression != true_expr() {
+            sql.append_syntax(" WHERE ");
+            expression.to_sql(sql);
+        }
+    }
+}
+
 // scalars
 impl Expression {
     pub fn to_sql(&self, sql: &mut SQL) {
         match &self {
             Expression::ColumnName(column_name) => column_name.to_sql(sql),
             Expression::Value(value) => value.to_sql(sql),
+            Expression::And { left, right } => {
+                sql.append_syntax("(");
+                left.to_sql(sql);
+                sql.append_syntax(" AND ");
+                right.to_sql(sql);
+                sql.append_syntax(")");
+            }
+            Expression::Or { left, right } => {
+                sql.append_syntax("(");
+                left.to_sql(sql);
+                sql.append_syntax(" OR ");
+                right.to_sql(sql);
+                sql.append_syntax(")");
+            }
+            Expression::Not(expr) => {
+                sql.append_syntax("NOT ");
+                expr.to_sql(sql);
+            }
+            Expression::BinaryOperator {
+                left,
+                operator,
+                right,
+            } => {
+                sql.append_syntax("(");
+                left.to_sql(sql);
+                operator.to_sql(sql);
+                right.to_sql(sql);
+                sql.append_syntax(")");
+            }
         }
     }
 }
+
+impl BinaryOperator {
+    pub fn to_sql(&self, sql: &mut SQL) {
+        match self {
+            BinaryOperator::Equals => sql.append_syntax(" = "),
+        }
+    }
+}
+
 impl Value {
     pub fn to_sql(&self, sql: &mut SQL) {
         match &self {
@@ -102,7 +152,8 @@ impl TableName {
 
 impl TableAlias {
     pub fn to_sql(&self, sql: &mut SQL) {
-        let name = format!("hasu_tbl_{}_{}", self.unique_index, self.name);
+        //let name = format!("hasu_tbl_{}_{}", self.unique_index, self.name);
+        let name = format!("{}", self.name);
         sql.append_identifier(&name);
     }
 }
@@ -118,7 +169,8 @@ impl ColumnName {
 
 impl ColumnAlias {
     pub fn to_sql(&self, sql: &mut SQL) {
-        let name = format!("hasu_col_{}_{}", self.unique_index, self.name);
+        //let name = format!("hasu_col_{}_{}", self.unique_index, self.name);
+        let name = format!("{}", self.name);
         sql.append_identifier(&name);
     }
 }

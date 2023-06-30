@@ -22,21 +22,26 @@ pub async fn execute(
     // convert to a vector of hashmap of results
     let mut results: Vec<HashMap<String, output::RowFieldValue>> = vec![];
     for row in rows.into_iter() {
-        println!("{:?}", row.columns());
+        //println!("{:?}", row.columns());
 
         let mut row_results: HashMap<String, output::RowFieldValue> = HashMap::from([]);
         for col in row.columns() {
             let value: String = row.get(col.ordinal());
             row_results.insert(
                 col.name().to_string(),
-                output::RowFieldValue::Column(Value::String(value)),
+                output::RowFieldValue::Column {
+                    value: Value::String(value),
+                },
             );
         }
         results.push(row_results);
     }
 
+    //println!("{:?}", results);
+
     // return results
     Ok(output::QueryResponse(vec![output::RowSet {
+        aggregates: None,
         rows: Some(results),
     }]))
 }
