@@ -23,7 +23,7 @@ pub async fn query(axum::Extension(pool): Extension<sqlx::PgPool>) -> Json<Value
 
 fn empty_query_request() -> types::input::QueryRequest {
     types::input::QueryRequest {
-        table: "bamba".to_string(),
+        table: "Customer".to_string(),
         query: empty_query(),
         arguments: HashMap::new(),
         table_relationships: HashMap::new(),

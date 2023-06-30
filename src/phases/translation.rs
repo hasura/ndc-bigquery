@@ -38,16 +38,20 @@ pub fn translate(query_request: input::QueryRequest) -> ExecutionPlan {
             (
                 sql_ast::ColumnAlias {
                     unique_index: 0,
-                    name: "x".to_string(),
+                    name: "City".to_string(),
                 },
-                sql_ast::Expression::ColumnName(sql_ast::ColumnName::TableColumn("y".to_string())),
+                sql_ast::Expression::ColumnName(sql_ast::ColumnName::TableColumn(
+                    "City".to_string(),
+                )),
             ),
             (
                 sql_ast::ColumnAlias {
                     unique_index: 0,
-                    name: "y".to_string(),
+                    name: "Country".to_string(),
                 },
-                sql_ast::Expression::ColumnName(sql_ast::ColumnName::TableColumn("y".to_string())),
+                sql_ast::Expression::ColumnName(sql_ast::ColumnName::TableColumn(
+                    "Country".to_string(),
+                )),
             ),
         ],
         sql_ast::From::Table {

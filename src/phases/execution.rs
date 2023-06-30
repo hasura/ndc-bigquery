@@ -26,10 +26,10 @@ pub async fn execute(
 
         let mut row_results: HashMap<String, output::RowFieldValue> = HashMap::from([]);
         for col in row.columns() {
-            let value: i32 = row.get(col.ordinal());
+            let value: String = row.get(col.ordinal());
             row_results.insert(
                 col.name().to_string(),
-                output::RowFieldValue::Column(Value::Number(value.into())),
+                output::RowFieldValue::Column(Value::String(value)),
             );
         }
         results.push(row_results);
