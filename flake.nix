@@ -26,12 +26,20 @@
 
       devShells.default = pkgs.mkShell {
         buildInputs = [
+          # build
           pkgs.cargo
+          pkgs.cargo-watch
           pkgs.clippy
           pkgs.rust-analyzer
           pkgs.rustPlatform.rustcSrc
           pkgs.rustc
           pkgs.rustfmt
+
+          # runtime
+          pkgs.protobuf
+
+          # development
+          pkgs.just
         ];
       };
     });

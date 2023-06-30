@@ -5,13 +5,16 @@
 ### Prequisites
 
 1. Install [rustup](https://www.rust-lang.org/tools/install).
-2. Install additional tools: `cargo install watch rustfmt`, `rustup component add rust-analyzer`.
-3. Install [docker](https://www.docker.com/)
-4. Install protoc. Here are a few options:
-   - `brew install protobuf`
-   - `apt-get install protobuf-compiler`
-   - `dnf install protobuf-compiler`
-5. Clone v3 experiments in a directory near this one: `(cd .. && git clone git@github.com:hasura/v3-experiments.git)`
+2. Install additional tools:
+    - `cargo install watch rustfmt`
+    - `rustup component add rust-analyzer`
+3. Install [just](https://github.com/casey/just)
+4. Install [docker](https://www.docker.com/)
+5. Install protoc. Here are a few options:
+    - `brew install protobuf`
+    - `apt-get install protobuf-compiler`
+    - `dnf install protobuf-compiler`
+6. Clone v3 experiments in a directory near this one: `(cd .. && git clone git@github.com:hasura/v3-experiments.git)`
 
 ### Compile
 
