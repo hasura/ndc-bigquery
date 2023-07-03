@@ -1,4 +1,4 @@
-use ndc_postgres::phases::translation::{select_to_sql, sql_ast, sql_string};
+use postgres_ndc::phases::translation::{select_to_sql, sql_ast, sql_string};
 
 #[test]
 fn it_converts_simple_select() {

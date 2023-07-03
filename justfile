@@ -8,7 +8,7 @@ dev:
   RUST_LOG=DEBUG \
     PORT={{POSTGRES_DC_PORT}} \
     POSTGRESQL_CONNECTION_STRING={{POSTGRESQL_CONNECTION_STRING}} \
-    cargo watch -c -x test -x run
+    cargo watch -c -C ./crates/postgres-ndc -x test -x run
 
 # run postgres + jaeger
 start-docker:
@@ -33,7 +33,7 @@ run-postgres-dc: start-docker
   RUST_LOG=DEBUG \
     PORT={{POSTGRES_DC_PORT}} \
     POSTGRESQL_CONNECTION_STRING={{POSTGRESQL_CONNECTION_STRING}} \
-    cargo run --release
+    cargo run --release --bin postgres-ndc
 
 # start a postgres docker image and connect to it using psql
 repl-postgres:

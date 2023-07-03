@@ -1,4 +1,4 @@
-use ndc_postgres::*;
+use postgres_ndc::*;
 use std::env;
 use axum::{
     body::{Bytes, Full},

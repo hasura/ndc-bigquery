@@ -1,16 +1,10 @@
-[package]
-name = "ndc-postgres"
-version = "0.1.0"
-edition = "2021"
+[workspace]
+members = [
+  "crates/postgres-ndc"
+]
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[profile.release]
+debug = true
 
-[dependencies]
-axum = "0.6.18"
-schemars = { version = "0.8.12", features = ["smol_str"] }
-serde = { version = "1.0.164", features = ["derive"] }
-serde_derive = "^1.0"
-serde_json = "1.0.99"
-serde_with = "^2.0"
-tokio = { version = "1.28.2", features = ["full"] }
-sqlx = { version = "0.6.3", features = [ "runtime-tokio-rustls", "postgres", "uuid", "json" ] }
+[profile.bench]
+debug = true
