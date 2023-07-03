@@ -11,7 +11,7 @@ pub async fn query(
     axum::Extension(pool): Extension<sqlx::PgPool>,
     Json(query_request): Json<types::input::QueryRequest>,
 ) -> Json<Value> {
-    println!("here");
+    println!("{}", serde_json::to_string(&query_request).unwrap());
     println!("{:?}", query_request);
     match phases::translation::translate(query_request) {
         Err(err) => Json(Value::String(err.to_string())),
