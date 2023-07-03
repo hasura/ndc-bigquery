@@ -26,9 +26,28 @@
         ]
     },
     {
+        "kind": "objectType",
+        "name": "TheArtist",
+        "fields": [
+            {
+                "name": "ArtistId",
+                "type": "Int"
+            },
+            {
+                "name": "Name",
+                "type": "String"
+            }
+        ]
+    },
+    {
         "kind": "model",
         "name": "Albums",
         "dataType": "Album"
+    },
+    {
+        "kind": "model",
+        "name": "TheArtists",
+        "dataType": "TheArtist"
     },
     {
         "kind": "modelSource",
@@ -63,9 +82,41 @@
         }
     },
     {
+        "kind": "modelSource",
+        "modelName": "TheArtists",
+        "dataSource": "db",
+        "modelSource": {
+            "tablePath": "Artist"
+        },
+        "typeSources": {
+            "TheArtist": {
+                "fieldSources": {
+                    "ArtistId": {
+                        "fieldSource": {
+                            "columnName": "ArtistId",
+                            "columnType": "integer"
+                        }
+                    },
+                    "Name": {
+                        "fieldSource": {
+                            "columnName": "Name",
+                            "columnType": "string"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    {
         "kind": "graphqlType",
         "typeName": "Album",
         "graphqlTypeName": "Album",
+        "graphqlTypeKind": "Object"
+    },
+    {
+        "kind": "graphqlType",
+        "typeName": "TheArtist",
+        "graphqlTypeName": "TheArtist",
         "graphqlTypeKind": "Object"
     },
     {
@@ -76,6 +127,18 @@
                 "queryRootField": "AlbumByID",
                 "uniqueIdentifier": [
                     "AlbumId"
+                ]
+            }
+        ]
+    },
+    {
+        "kind": "modelGraphqlApi",
+        "modelName": "TheArtists",
+        "selectUniques": [
+            {
+                "queryRootField": "TheArtistByID",
+                "uniqueIdentifier": [
+                    "ArtistId"
                 ]
             }
         ]
