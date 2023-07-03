@@ -4,7 +4,7 @@ pub mod convert;
 pub mod sql_ast;
 pub mod sql_string;
 
-use crate::types::input;
+use gdc_client::models;
 
 #[derive(Debug)]
 /// Definition of an execution plan to be run against the database.
@@ -32,7 +32,7 @@ pub fn select_to_sql(select: &sql_ast::Select) -> sql_string::SQL {
 }
 
 /// Translate the incoming QueryRequest to an ExecutionPlan (SQL) to be run against the database.
-pub fn translate(query_request: input::QueryRequest) -> Result<ExecutionPlan, Error> {
+pub fn translate(query_request: models::QueryRequest) -> Result<ExecutionPlan, Error> {
     let mut translate = Translate::new();
     translate.translate(query_request)
 }
@@ -59,7 +59,7 @@ impl Translate {
     }
     pub fn translate(
         &mut self,
-        query_request: input::QueryRequest,
+        query_request: models::QueryRequest,
     ) -> Result<ExecutionPlan, Error> {
         //println!("{:?}", query_request);
         // translate fields to select list
@@ -71,10 +71,10 @@ impl Translate {
         let columns: Vec<(sql_ast::ColumnAlias, sql_ast::Expression)> = fields
             .into_iter()
             .flat_map(|(alias, field)| match field {
-                input::Field::Column { column, .. } => {
+                models::Field::Column { column, .. } => {
                     Ok(make_column(column, self.make_column_alias(alias)))
                 }
-                input::Field::Relationship { .. } => {
+                models::Field::Relationship { .. } => {
                     Err("translate: relationships are not supported")
                 }
             })
@@ -123,9 +123,9 @@ impl Translate {
             name,
         }
     }
-    fn translate_expression(&mut self, predicate: input::Expression) -> sql_ast::Expression {
+    fn translate_expression(&mut self, predicate: models::Expression) -> sql_ast::Expression {
         match predicate {
-            input::Expression::And { expressions } => expressions
+            models::Expression::And { expressions } => expressions
                 .into_iter()
                 .map(|expr| self.translate_expression(expr))
                 .fold(
@@ -135,7 +135,7 @@ impl Translate {
                         right: Box::new(expr),
                     },
                 ),
-            input::Expression::Or { expressions } => expressions
+            models::Expression::Or { expressions } => expressions
                 .into_iter()
                 .map(|expr| self.translate_expression(expr))
                 .fold(
@@ -145,17 +145,17 @@ impl Translate {
                         right: Box::new(expr),
                     },
                 ),
-            input::Expression::Not { expression } => {
+            models::Expression::Not { expression } => {
                 sql_ast::Expression::Not(Box::new(self.translate_expression(*expression)))
             }
-            input::Expression::BinaryComparisonOperator {
+            models::Expression::BinaryComparisonOperator {
                 column,
                 operator,
                 value,
             } => sql_ast::Expression::BinaryOperator {
                 left: Box::new(translate_comparison_target(*column)),
                 operator: match *operator {
-                    input::BinaryComparisonOperator::Equal => sql_ast::BinaryOperator::Equals,
+                    models::BinaryComparisonOperator::Equal => sql_ast::BinaryOperator::Equals,
                     _ => sql_ast::BinaryOperator::Equals,
                 },
                 right: Box::new(translate_comparison_value(*value)),
@@ -165,19 +165,19 @@ impl Translate {
         }
     }
 }
-fn translate_comparison_target(column: input::ComparisonTarget) -> sql_ast::Expression {
+fn translate_comparison_target(column: models::ComparisonTarget) -> sql_ast::Expression {
     match column {
-        input::ComparisonTarget::Column { name, .. } => {
+        models::ComparisonTarget::Column { name, .. } => {
             sql_ast::Expression::ColumnName(sql_ast::ColumnName::TableColumn(name))
         }
         // dummy
         _ => sql_ast::Expression::Value(sql_ast::Value::Bool(true)),
     }
 }
-fn translate_comparison_value(value: input::ComparisonValue) -> sql_ast::Expression {
+fn translate_comparison_value(value: models::ComparisonValue) -> sql_ast::Expression {
     match value {
-        input::ComparisonValue::Column { column } => translate_comparison_target(*column),
-        input::ComparisonValue::Scalar { value } => match value {
+        models::ComparisonValue::Column { column } => translate_comparison_target(*column),
+        models::ComparisonValue::Scalar { value } => match value {
             serde_json::Value::Number(num) => sql_ast::Expression::Value(sql_ast::Value::Int4(
                 num.as_i64().unwrap().try_into().unwrap(),
             )),
