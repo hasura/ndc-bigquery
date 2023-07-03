@@ -1,6 +1,8 @@
 [workspace]
 members = [
-  "crates/postgres-ndc"
+  "crates/postgres-ndc",
+  "crates/postgres-multitenant-ndc",
+  "crates/gdc-client"
 ]
 
 [profile.release]

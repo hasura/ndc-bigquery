@@ -24,14 +24,22 @@ cargo build
 
 ### Run
 
+Run the main Postgres agent with:
+
 ```
-make run-postgres-dc
+just run-postgres-dc
+```
+
+Alternatively, run the multitenant Postgres agent with:
+
+```
+just run-postgres-multitenant-dc
 ```
 
 ### Develop
 
-1. Start the database sample: `make start-docker`
-2. Compile, run tests, and rerun server on file changes: `make dev`
+1. Start the database sample: `just start-docker`
+2. Compile, run tests, and rerun server on file changes: `just dev`
 3. Query the connector via curl: `curl -X POST http://localhost:8666/query`
 
 ## General structure
@@ -48,9 +56,9 @@ make run-postgres-dc
 
 ## Example
 
-1. Run `make start-docker`
-2. Run `make dev`
-3. Run `make run-v3`
+1. Run `just start-docker`
+2. Run `just dev`
+3. Run `just run-v3`
 4. Connect to GraphiQL at http://localhost:3000 and run a query:
 
    ```graphql
@@ -60,3 +68,9 @@ make run-postgres-dc
      }
    }
    ```
+
+## Multitenant example
+
+1. Run `just run-postgres-multitenant-dc`
+2. Run `just run-v3-multitenant`
+3. Run `just test-multitenant`

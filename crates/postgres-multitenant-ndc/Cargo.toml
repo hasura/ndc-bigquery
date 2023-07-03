@@ -1,0 +1,19 @@
+[package]
+name = "postgres-multitenant-ndc"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+axum = "0.6.18"
+axum-extra = "0.7.4"
+axum-macros = "0.3.7"
+serde = "1.0.164"
+serde_json = { version = "1.0.97", features = ["raw_value"] }
+sqlx = { version = "0.6.3", features = ["postgres", "runtime-tokio-rustls"] }
+tokio = "1.28.2"
+uuid = "1.3.4"
+gdc-client = { path = "../gdc-client" }
+sqlparser = { version = "0.35.0", features = ["visitor"] }
+clap = { version = "4.3.9", features = ["derive"] }
