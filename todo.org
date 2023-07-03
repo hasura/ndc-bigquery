@@ -1,0 +1,55 @@
+* postgres-ndc
+** /query
+For the following tickets each need to be accompanied with golden tests to test the new behaviour.
+This test should be a request file to send /query and the expected response for the chinook db.
+*** Write golden test structure
+We want to write tests in the following format:
+- Two files for each test - request and response
+- The request is a json QueryRequest to be sent to the server at the /query endpoint
+- The response should be the expected json response for the chinook db.
+*** Support postgres data types
+We need to decode our [[https://hasura.io/docs/latest/schema/postgres/postgresql-types/][supported postgres types]] in ~execution.rs~ in ~let value: String~.
+We probably need to create an enum type for postgres values write a serde_json decoder for them.
+*** Handle errors
+The are multiple errors that can occur when running a query. One of the is a 'database error'
+which is represented by the ~sqlx::Error~ type. Figure out what other errors exist and respond
+gracefully on errors.
+*** Logging
+Figure out how to appropriately log information such as the request, the generated sql ast, the generated sql string,
+the results, the response, the errors.
+*** Implement filtering
+We currently support expressions with equals, and, or, and not,
+but we don't have a test for them.
+
+We support several [[https://hasura.io/docs/latest/queries/postgres/query-filters/][filtering operations]]. Test them in the QueryRequest, translate them to sql_ast, and then sql_string.
+
+Warning: this section feels a bit under specifying in the spec. Maybe consult the v3 team or only implement
+parts of it for now.
+*** Limits and offsets
+We currently support limits and offsets, but we don't have a test for them.
+*** Variables
+Support passing user input as variables in a parameterized query.
+*** Order by
+** Port other endpoints
+the multitenant gdc reference has support for [[https://github.com/hasura/v3-experiments/blob/main/gdc/spec/src/specification/README.md][other endpoints]].
+Some can probably be ported from the multitenant code.
+*** /capabilities
+which describes which features the data source is capable of implementing.
+*** /schema
+which describes the resources provided by the data source, and the shape of the data they contain.
+*** /mutation
+which modifies the data in one of the relations described by the schema endpoint.
+*** /explain
+which explains a query plan, without actually executing it.
+
+Should reuse the /query endpoint stuff.
+*** /metrics
+which exposes runtime metrics about the data connector.
+** Support multiple projects
+We'd like to use a single agent to support multiple projects.
+To do that we need to qualify our endpoints with a uuid and maintain
+a hashmap from a uuid to (configuration, connection pool).
+
+Warning: I'm unsure how we expect this information will be passed eventually.
+Consider waiting for this task or implement the current behaviour.
+Consult the recorded discussion with Benoit.
