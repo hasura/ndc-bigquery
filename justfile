@@ -7,11 +7,11 @@ POSTGRES_DC_PORT := "8666"
 POSTGRES_MULTITENANT_DC_PORT := "8081"
 
 # watch the code and re-run on changes
-dev:
+dev: start-docker
   RUST_LOG=DEBUG \
     PORT={{POSTGRES_DC_PORT}} \
     POSTGRESQL_CONNECTION_STRING={{POSTGRESQL_CONNECTION_STRING}} \
-    cargo watch -c -C ./crates/postgres-ndc -x test -x run
+    cargo watch -i "tests/snapshots/*" -c -C ./crates/postgres-ndc -x test -x run
 
 # watch the multitenant code and re-run on changes
 dev-multitenant:
@@ -73,4 +73,3 @@ test-multitenant:
       -H 'Content-Type: application/json' \
     http://localhost:3000/graphql \
     -d '{ "query": "query { AlbumByID(AlbumId: 1) { Title } } " }'
-

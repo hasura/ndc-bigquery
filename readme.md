@@ -6,7 +6,7 @@
 
 1. Install [rustup](https://www.rust-lang.org/tools/install).
 2. Install additional tools:
-    - `cargo install watch rustfmt`
+    - `cargo install watch rustfmt insta`
     - `rustup component add rust-analyzer`
 3. Install [just](https://github.com/casey/just)
 4. Install [docker](https://www.docker.com/)
@@ -56,10 +56,9 @@ just run-postgres-multitenant-dc
 
 ## Example
 
-1. Run `just start-docker`
-2. Run `just dev`
-3. Run `just run-v3`
-4. Connect to GraphiQL at http://localhost:3000 and run a query:
+1. Run `just dev`
+2. Run `just run-v3`
+3. Connect to GraphiQL at http://localhost:3000 and run a query:
 
    ```graphql
    query {
@@ -74,3 +73,17 @@ just run-postgres-multitenant-dc
 1. Run `just run-postgres-multitenant-dc`
 2. Run `just run-v3-multitenant`
 3. Run `just test-multitenant`
+
+## Write a test
+
+1. Create a new file under `crates/postgres-ndc/tests/goldenfiles/<your-test-name>.json`
+2. Create a new test in `crates/postgres-ndc/tests/tests.rs` that looks like this:
+   ```rs
+   #[tokio::test]
+   async fn select_5() {
+       let result = test_query("select_5").await;
+       insta::assert_snapshot!(result);
+   }
+   ```
+3. Run the tests using `just dev`
+4. Review the results using `cargo insta review`

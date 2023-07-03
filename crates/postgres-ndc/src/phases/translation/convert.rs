@@ -57,6 +57,7 @@ impl Select {
 
         self.from.to_sql(sql);
         self.where_.to_sql(sql);
+        self.limit.to_sql(sql);
     }
 }
 
@@ -136,6 +137,18 @@ impl Value {
             Value::Int4(i) => sql.append_syntax(format!("{}", i).as_str()),
             Value::Bool(true) => sql.append_syntax("true"),
             Value::Bool(false) => sql.append_syntax("false"),
+        }
+    }
+}
+
+impl Limit {
+    pub fn to_sql(&self, sql: &mut SQL) {
+        match self.limit {
+            None => (),
+            Some(limit) => {
+                sql.append_syntax(" LIMIT ");
+                sql.append_syntax(format!("{}", limit).as_str());
+            }
         }
     }
 }

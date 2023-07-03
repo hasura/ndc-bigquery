@@ -2,7 +2,7 @@
 ** /query
 For the following tickets each need to be accompanied with golden tests to test the new behaviour.
 This test should be a request file to send /query and the expected response for the chinook db.
-*** Write golden test structure
+*** DONE Write golden test structure
 We want to write tests in the following format:
 - Two files for each test - request and response
 - The request is a json QueryRequest to be sent to the server at the /query endpoint

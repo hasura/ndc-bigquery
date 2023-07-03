@@ -1,0 +1,5 @@
+---
+source: crates/postgres-ndc/tests/tests.rs
+expression: result
+---
+[{"rows":[{"Title":{"value":"For Those About To Rock We Salute You"}},{"Title":{"value":"Balls to the Wall"}},{"Title":{"value":"Restless and Wild"}}]}]
