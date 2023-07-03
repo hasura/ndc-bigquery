@@ -44,15 +44,17 @@ just run-postgres-multitenant-dc
 
 ## General structure
 
-- Entry point: `src/main.rs`
-- Connector state: `src/connector.rs`
-- Routing: `src/routes/`
-- Input and output types: `src/types/`
-- Compiler phases: `src/phases/`:
-   - Translation from query request to sql ast: `src/phases/translation.rs`
-   - Translation from sql_ast to sql_string: `src/phases/translation/`
-   - Execution of the plan against postgres: `src/phases/execution.rs`
-- Unit and integration tests: `tests/`
+Our work is mainly in [crates/postgres-ndc/](crates/postgres-ndc/).
+
+- Entry point: [src/main.rs](crates/postgres-ndc/src/main.rs)
+- Connector state: [src/connector.rs](crates/postgres-ndc/src/connector.rs)
+- Routing: [src/routes/](crates/postgres-ndc/src/routes.rs)
+- Input and output types imported from: [crates/gdc-client/src/models.rs](crates/gdc-client/src/models.rs)
+- Compiler phases: [src/phases/](crates/postgres-ndc/src/phases/):
+   - Translation from query request to sql ast: [src/phases/translation.rs](crates/postgres-ndc/src/phases/translation.rs)
+   - Translation from sql_ast to sql_string: [src/phases/translation/](crates/postgres-ndc/src/phases/translation/)
+   - Execution of the plan against postgres: [src/phases/execution.rs](crates/postgres-ndc/src/phases/execution.rs)
+- Unit and integration tests: [tests/](crates/postgres-ndc/)
 
 ## Example
 
