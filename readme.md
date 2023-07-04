@@ -24,16 +24,10 @@ cargo build
 
 ### Run
 
-Run the main Postgres agent with:
+Run the multitenant Postgres agent with:
 
 ```
-just run-postgres-dc
-```
-
-Alternatively, run the multitenant Postgres agent with:
-
-```
-just run-postgres-multitenant-dc
+just run-postgres-ndc
 ```
 
 ### Develop
@@ -44,17 +38,17 @@ just run-postgres-multitenant-dc
 
 ## General structure
 
-Our work is mainly in [crates/postgres-ndc/](crates/postgres-ndc/).
-
-- Entry point: [src/main.rs](crates/postgres-ndc/src/main.rs)
-- Connector state: [src/connector.rs](crates/postgres-ndc/src/connector.rs)
-- Routing: [src/routes/](crates/postgres-ndc/src/routes.rs)
+The turn a request into a query and run it work lives in [crates/query-engine/](crates/query-engine/).
 - Input and output types imported from: [crates/gdc-client/src/models.rs](crates/gdc-client/src/models.rs)
-- Compiler phases: [src/phases/](crates/postgres-ndc/src/phases/):
-   - Translation from query request to sql ast: [src/phases/translation.rs](crates/postgres-ndc/src/phases/translation.rs)
-   - Translation from sql_ast to sql_string: [src/phases/translation/](crates/postgres-ndc/src/phases/translation/)
-   - Execution of the plan against postgres: [src/phases/execution.rs](crates/postgres-ndc/src/phases/execution.rs)
-- Unit and integration tests: [tests/](crates/postgres-ndc/)
+- Compiler phases: [src/phases/](crates/query-engine/src/phases/):
+   - Translation from query request to sql ast: [src/phases/translation.rs](crates/query-engine/src/phases/translation.rs)
+   - Translation from sql_ast to sql_string: [src/phases/translation/](crates/query-engine/src/phases/translation/)
+   - Execution of the plan against postgres: [src/phases/execution.rs](crates/query-engine/src/phases/execution.rs)
+- Unit and integration tests: [tests/](crates/query-engine/)
+
+The multitenant server lives in [crates/postgres-multitenant-ndc](crates/postgres-multitenant-ndc).
+- Entry point: [src/main.rs](crates/postgres-multitenant-ndc/src/main.rs)
+- Routing: [src/routes/](crates/postgres-multitenant-ndc/src/routes/mod.rs)
 
 ## Example
 
@@ -78,8 +72,8 @@ Our work is mainly in [crates/postgres-ndc/](crates/postgres-ndc/).
 
 ## Write a test
 
-1. Create a new file under `crates/postgres-ndc/tests/goldenfiles/<your-test-name>.json`
-2. Create a new test in `crates/postgres-ndc/tests/tests.rs` that looks like this:
+1. Create a new file under `crates/postgres-multitenant-ndc/tests/goldenfiles/<your-test-name>.json`
+2. Create a new test in `crates/postgres-multitenant-ndc/tests/tests.rs` that looks like this:
    ```rs
    #[tokio::test]
    async fn select_5() {

@@ -7,7 +7,7 @@ use crate::{
     state::ServerState,
 };
 use gdc_client::models;
-use postgres_ndc::{phases};
+use query_engine::{phases};
 
 // extremely basic version of explain where we just return the SQL we have created
 

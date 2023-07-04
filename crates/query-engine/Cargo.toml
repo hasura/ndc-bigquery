@@ -1,5 +1,5 @@
 [package]
-name = "postgres-ndc"
+name = "query-engine"
 version = "0.1.0"
 edition = "2021"
 
@@ -17,8 +17,3 @@ sqlx = { version = "0.6.3", features = [ "runtime-tokio-rustls", "postgres", "uu
 gdc-client = { path = "../gdc-client" }
 log = "0.4.19"
 env_logger = "0.10.0"
-
-[dev-dependencies]
-goldenfile = "1.4.5"
-axum-test-helper = "0.3.0"
-insta = { version = "1.30.0", features = ["json"] }

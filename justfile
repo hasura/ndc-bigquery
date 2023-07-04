@@ -1,22 +1,15 @@
 POSTGRESQL_CONNECTION_STRING := "postgresql://postgres:password@localhost:64002"
 
-# we use this port because it's hardcoded in the metadata too
-POSTGRES_DC_PORT := "8666"
-
 # this is hardcoded in the V3 metadata
-POSTGRES_MULTITENANT_DC_PORT := "8081"
-
-# watch the code and re-run on changes
-dev: start-docker
-  RUST_LOG=DEBUG \
-    PORT={{POSTGRES_DC_PORT}} \
-    POSTGRESQL_CONNECTION_STRING={{POSTGRESQL_CONNECTION_STRING}} \
-    cargo watch -i "tests/snapshots/*" -c -C ./crates/postgres-ndc -x test -x run
+POSTGRES_DC_PORT := "8081"
 
 # watch the multitenant code and re-run on changes
-dev-multitenant:
+dev: start-docker
   RUST_LOG=DEBUG \
-    cargo watch -c -C ./crates/postgres-multitenant-ndc -x test
+    cargo watch -i "tests/snapshots/*" -c \
+    -C ./crates/postgres-multitenant-ndc \
+    -x test \
+    -x 'run -- --deployments-dir ../../static/deployments/'
 
 # run postgres + jaeger
 start-docker:
@@ -25,20 +18,8 @@ start-docker:
   # start our local postgres
   docker compose up --wait
 
-run-v3: start-docker
-  @echo "http://localhost:3000/ for graphiql console"
-  @echo "http://localhost:4002/ for jaeger console"
-  # Run graphql-engine using static Chinook metadata
-  # we expect the `v3-experiments` repo to live next door to this one
-  RUST_LOG=DEBUG cargo run --release \
-    --manifest-path ../v3-experiments/Cargo.toml \
-    --bin engine -- \
-    --data-connectors-config ./static/data-connectors-config-example.json \
-    --metadata-path ./static/metadata-example.json \
-    --secrets-path ./static/secrets-example.json
-
 # run the regular V3 binary, pointing it at our multitenant agent
-run-v3-at-multitenant-agent: start-docker
+run-v3: start-docker
   @echo "http://localhost:3000/ for graphiql console"
   @echo "http://localhost:4002/ for jaeger console"
   # Run graphql-engine using static Chinook metadata
@@ -50,6 +31,7 @@ run-v3-at-multitenant-agent: start-docker
     --metadata-path ./static/metadata-example.json \
     --secrets-path ./static/secrets-example.json
 
+# run the V3 multitenant binary, pointing it at our multitenant agent
 run-v3-multitenant: start-docker
   @echo "http://localhost:4002/ for jaeger console"
   # Run graphql-engine using static Chinook metadata
@@ -60,17 +42,10 @@ run-v3-multitenant: start-docker
     --bin multitenant -- \
     --metadata-dir ../v3-experiments/metadata/ \
 
-# run-postgres-dc, pointing it at local postgres etc
-run-postgres-dc: start-docker
+# run-postgres-ndc, pointing it at local postgres etc
+run-postgres-ndc: start-docker
   RUST_LOG=DEBUG \
     PORT={{POSTGRES_DC_PORT}} \
-    POSTGRESQL_CONNECTION_STRING={{POSTGRESQL_CONNECTION_STRING}} \
-    cargo run --release --bin postgres-ndc
-
-# run-postgres-multitenant-dc, pointing it at local postgres etc
-run-postgres-multitenant-dc: start-docker
-  RUST_LOG=DEBUG \
-    PORT={{POSTGRES_MULTITENANT_DC_PORT}} \
     cargo run --release \
     --bin postgres-multitenant-ndc -- \
     --deployments-dir ./static/deployments/
@@ -80,7 +55,7 @@ repl-postgres:
   @docker compose up --wait postgres
   psql {{POSTGRESQL_CONNECTION_STRING}}
 
-# run a request to check multitenant is working
+# run a standard request to check multitenant is working
 test-multitenant:
   curl -X POST \
     -H 'Host: example.hasura.app' \
@@ -91,7 +66,5 @@ test-multitenant:
 # run all tests
 test: start-docker
   RUST_LOG=DEBUG \
-    PORT={{POSTGRES_DC_PORT}} \
-    POSTGRESQL_CONNECTION_STRING={{POSTGRESQL_CONNECTION_STRING}} \
     cargo test
 

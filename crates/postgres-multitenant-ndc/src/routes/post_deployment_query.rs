@@ -8,7 +8,7 @@ use axum::Json;
 
 use gdc_client::models;
 
-use postgres_ndc::{phases};
+use query_engine::{phases};
 
 #[axum_macros::debug_handler(state = ServerState)]
 pub async fn post_deployment_query(

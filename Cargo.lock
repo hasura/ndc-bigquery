@@ -1461,32 +1461,12 @@ dependencies = [
  "gdc-client",
  "goldenfile",
  "insta",
- "postgres-ndc",
+ "query-engine",
  "serde",
  "serde_json",
  "sqlx",
  "tokio",
  "uuid",
-]
-
-[[package]]
-name = "postgres-ndc"
-version = "0.1.0"
-dependencies = [
- "axum",
- "axum-test-helper",
- "env_logger",
- "gdc-client",
- "goldenfile",
- "insta",
- "log",
- "schemars",
- "serde",
- "serde_derive",
- "serde_json",
- "serde_with",
- "sqlx",
- "tokio",
 ]
 
 [[package]]
@@ -1502,6 +1482,23 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7b368fba921b0dce7e60f5e04ec15e565b3303972b42bcfde1d0713b881959eb"
 dependencies = [
  "unicode-ident",
+]
+
+[[package]]
+name = "query-engine"
+version = "0.1.0"
+dependencies = [
+ "axum",
+ "env_logger",
+ "gdc-client",
+ "log",
+ "schemars",
+ "serde",
+ "serde_derive",
+ "serde_json",
+ "serde_with",
+ "sqlx",
+ "tokio",
 ]
 
 [[package]]

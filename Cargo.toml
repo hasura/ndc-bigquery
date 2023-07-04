@@ -1,6 +1,6 @@
 [workspace]
 members = [
-  "crates/postgres-ndc",
+  "crates/query-engine",
   "crates/postgres-multitenant-ndc",
   "crates/gdc-client"
 ]
