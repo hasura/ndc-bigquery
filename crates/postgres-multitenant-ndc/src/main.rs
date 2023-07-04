@@ -1,17 +1,15 @@
 mod error;
 mod extract;
-mod routes;
 mod state;
-use axum::{
-    routing::{get, post},
-    Router,
-};
+mod routes;
+mod sync;
+
+use crate::sync::start_deployment_sync_thread;
 use std::env;
 use clap::Parser;
 use state::ServerState;
-use std::{ error::Error, time::Duration};
-
-use crate::state::update_deployments;
+use std::{ error::Error };
+use routes::{create_router};
 
 #[derive(Parser)]
 struct ServerOptions {
@@ -42,56 +40,4 @@ async fn main() -> Result<(), Box<dyn Error>> {
         .await?;
 
     Ok(())
-}
-
-fn create_router(state: ServerState) -> Router {
-    Router::new()
-        .route("/health", get(routes::get_health))
-        .route("/capabilities", get(routes::get_capabilities))
-        .route(
-            "/deployment/:deployment_id/capabilities",
-            get(routes::get_deployment_capabilities),
-        )
-        .route(
-            "/deployment/:deployment_id/health",
-            get(routes::get_deployment_health),
-        )
-        .route(
-            "/deployment/:deployment_id/schema",
-            get(routes::get_deployment_schema),
-        )
-        .route(
-            "/deployment/:deployment_id/query",
-            post(routes::post_deployment_query),
-        )
-        .route(
-            "/deployment/:deployment_id/query/explain",
-            post(routes::post_deployment_query_explain),
-        )
-        .route(
-            "/deployment/:deployment_id/mutation",
-            post(routes::post_deployment_mutation),
-        )
-        .route(
-            "/deployment/:deployment_id/mutation/explain",
-            post(routes::post_deployment_mutation_explain),
-        )
-        .with_state(state)
-}
-
-pub fn start_deployment_sync_thread(base_dir: String, state: ServerState) {
-    tokio::spawn(async move {
-        println!("Started deployments sync thread");
-        let mut interval = tokio::time::interval(Duration::from_secs(10));
-        loop {
-            interval.tick().await;
-            let base_dir = base_dir.clone();
-            let state = state.clone();
-            tokio::spawn(async move {
-                if let Err(err) = update_deployments(base_dir, state).await {
-                    println!("Error while updating deployments: {}", err)
-                }
-            });
-        }
-    });
 }
