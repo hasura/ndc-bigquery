@@ -10,6 +10,8 @@ We want to write tests in the following format:
 *** DONE Logging
 Figure out how to appropriately log information such as the request, the generated sql ast, the generated sql string,
 the results, the response, the errors.
+*** DONE Limits and offsets
+We currently support limits and offsets, but we don't have a test for them.
 *** Support postgres data types
 We need to decode our [[https://hasura.io/docs/latest/schema/postgres/postgresql-types/][supported postgres types]] in ~execution.rs~ in ~let value: String~.
 We probably need to create an enum type for postgres values write a serde_json decoder for them.
@@ -25,8 +27,6 @@ We support several [[https://hasura.io/docs/latest/queries/postgres/query-filter
 
 Warning: this section feels a bit under specifying in the spec. Maybe consult the v3 team or only implement
 parts of it for now.
-*** Limits and offsets
-We currently support limits and offsets, but we don't have a test for them.
 *** Variables
 Support passing user input as variables in a parameterized query.
 *** Order by

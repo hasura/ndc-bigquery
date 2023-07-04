@@ -149,7 +149,14 @@ impl Limit {
                 sql.append_syntax(" LIMIT ");
                 sql.append_syntax(format!("{}", limit).as_str());
             }
-        }
+        };
+        match self.offset {
+            None => (),
+            Some(offset) => {
+                sql.append_syntax(" OFFSET ");
+                sql.append_syntax(format!("{}", offset).as_str());
+            }
+        };
     }
 }
 

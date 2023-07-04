@@ -2,4 +2,4 @@
 source: crates/postgres-ndc/tests/tests.rs
 expression: result
 ---
-[{"rows":[{"Title":{"value":"For Those About To Rock We Salute You"}},{"Title":{"value":"Balls to the Wall"}},{"Title":{"value":"Restless and Wild"}}]}]
+[{"rows":[{"Title":{"value":"Let There Be Rock"}},{"Title":{"value":"Big Ones"}},{"Title":{"value":"Jagged Little Pill"}},{"Title":{"value":"Facelift"}},{"Title":{"value":"Warner 25 Anos"}}]}]
