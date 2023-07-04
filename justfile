@@ -87,3 +87,11 @@ test-multitenant:
       -H 'Content-Type: application/json' \
     http://localhost:3000/graphql \
     -d '{ "query": "query { AlbumByID(AlbumId: 1) { Title } } " }'
+
+# run all tests
+test: start-docker
+  RUST_LOG=DEBUG \
+    PORT={{POSTGRES_DC_PORT}} \
+    POSTGRESQL_CONNECTION_STRING={{POSTGRESQL_CONNECTION_STRING}} \
+    cargo test
+
