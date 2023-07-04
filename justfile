@@ -33,7 +33,21 @@ run-v3: start-docker
   RUST_LOG=DEBUG cargo run --release \
     --manifest-path ../v3-experiments/Cargo.toml \
     --bin engine -- \
-    --metadata-dir ./static/ \
+    --data-connectors-config ./static/data-connectors-config-example.json \
+    --metadata-path ./static/metadata-example.json \
+    --secrets-path ./static/secrets-example.json
+
+# run the regular V3 binary, pointing it at our multitenant agent
+run-v3-at-multitenant-agent: start-docker
+  @echo "http://localhost:3000/ for graphiql console"
+  @echo "http://localhost:4002/ for jaeger console"
+  # Run graphql-engine using static Chinook metadata
+  # we expect the `v3-experiments` repo to live next door to this one
+  RUST_LOG=DEBUG cargo run --release \
+    --manifest-path ../v3-experiments/Cargo.toml \
+    --bin engine -- \
+    --data-connectors-config ./static/data-connectors-config-example-for-multitenant.json \
+    --metadata-path ./static/metadata-example.json \
     --secrets-path ./static/secrets-example.json
 
 run-v3-multitenant: start-docker

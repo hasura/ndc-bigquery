@@ -1,7 +1,6 @@
 mod error;
 mod extract;
 mod routes;
-mod sql;
 mod state;
 use axum::{
     routing::{get, post},

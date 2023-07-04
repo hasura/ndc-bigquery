@@ -2,52 +2,29 @@
 use crate::{
     error::ServerError,
     extract::{Configuration, Pool},
-    sql::query_builder::{BoundParam, QueryBuilder},
     state::ServerState,
 };
 use axum::Json;
 
-use gdc_client::models::{QueryRequest, QueryResponse};
-use sqlx::{types, Row};
+use gdc_client::models;
+
+use postgres_ndc::{phases};
 
 #[axum_macros::debug_handler(state = ServerState)]
 pub async fn post_deployment_query(
-    Configuration(configuration): Configuration,
+    Configuration(_configuration): Configuration, // this will contain table of which tables live
+                                                  // where, etc
     Pool(pool): Pool,
-    Json(request): Json<QueryRequest>,
-) -> Result<Json<QueryResponse>, ServerError> {
-    println!("handling request");
-    let (statement, parameters) = QueryBuilder::build_sql(&request, &configuration)?;
+    Json(query_request): Json<models::QueryRequest>,
+) -> Result<Json<models::QueryResponse>, ServerError> {
 
-    println!("sql generated, executing...");
-    let statement_string = statement.to_string();
-    println!("{}", &statement_string);
-    let query = sqlx::query(&statement_string);
-    let query = parameters.into_iter().fold(query, |query, bound_param| {
-        match bound_param {
-            BoundParam::Number(number) => query.bind(number as i32),
-            BoundParam::Value(value) => match value {
-                serde_json::Value::Number(number) => query.bind(number.as_f64()),
-                serde_json::Value::String(string) => query.bind(string),
-                serde_json::Value::Bool(boolean) => query.bind(boolean),
-                // feels like a hack.
-                serde_json::Value::Null => query.bind(None::<bool>),
-                serde_json::Value::Array(array) => query.bind(types::Json(array)),
-                serde_json::Value::Object(object) => query.bind(types::Json(object)),
-            },
-        }
-    });
+    println!("{}", serde_json::to_string(&query_request).unwrap());
+    println!("{:?}", query_request);
 
-    let result = query.fetch_one(&pool).await?;
+    let plan = phases::translation::translate(query_request)?;
 
-    println!("sql response handled...");
-    let value: types::JsonValue = result
-        .try_get(0)
-        .map_err(|err| ServerError::Internal(err.to_string()))?;
-    // this parsing is technically not necessary, but useful for validation during development, and to ensure correctness.
-    // todo: remove this, and instead send the first column of the first row as response without parsing or allocating additonal memory
-    let response: QueryResponse =
-        serde_json::from_value(value).map_err(|err| ServerError::Internal(err.to_string()))?;
+    let result = phases::execution::execute(pool, plan).await?;
 
-    Ok(Json(response))
+    Ok(Json(result))
+
 }

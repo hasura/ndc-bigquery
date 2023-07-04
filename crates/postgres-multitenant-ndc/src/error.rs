@@ -5,8 +5,6 @@ use axum::{
 };
 use serde::Serialize;
 
-use crate::sql::query_builder::QueryBuilderError;
-
 pub enum ServerError {
     Internal(String),
     DatabaseError(String),
@@ -46,8 +44,8 @@ impl From<sqlx::Error> for ServerError {
     }
 }
 
-impl From<QueryBuilderError> for ServerError {
-    fn from(value: QueryBuilderError) -> Self {
+impl From<String> for ServerError {
+    fn from(value: String) -> Self {
         ServerError::Internal(value.to_string())
     }
 }
