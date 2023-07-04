@@ -1,3 +1,4 @@
+use log;
 /// Execute an execution plan against the database.
 use serde_json::Value;
 use sqlx;
@@ -14,7 +15,7 @@ pub async fn execute(
 ) -> Result<models::QueryResponse, sqlx::Error> {
     let query = plan.query();
 
-    println!("{}", query.sql);
+    log::info!("Generated SQL: {}", query.sql);
 
     // fetch from the database
     let rows: Vec<sqlx::postgres::PgRow> = sqlx::query(query.sql.as_str()).fetch_all(&pool).await?;

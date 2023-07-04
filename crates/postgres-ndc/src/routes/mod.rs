@@ -1,5 +1,7 @@
 pub mod query;
 
+use log;
+
 use crate::*;
 use axum::{
     body::{Bytes, Full},
@@ -15,6 +17,7 @@ use serde_json::Value;
 use std::collections::HashMap;
 
 pub async fn router() -> Result<Router, sqlx::Error> {
+    log::info!("Connecting to postgres...");
     let connector::Connector { pg_pool } = connector::Connector::new().await?;
     let app = Router::new()
         .route("/", get(root))

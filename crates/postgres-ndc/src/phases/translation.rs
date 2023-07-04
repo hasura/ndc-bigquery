@@ -5,6 +5,7 @@ pub mod sql_ast;
 pub mod sql_string;
 
 use gdc_client::models;
+use log;
 
 #[derive(Debug)]
 /// Definition of an execution plan to be run against the database.
@@ -61,7 +62,6 @@ impl Translate {
         &mut self,
         query_request: models::QueryRequest,
     ) -> Result<ExecutionPlan, Error> {
-        //println!("{:?}", query_request);
         // translate fields to select list
         let fields = match query_request.query.fields {
             None => Err("translate: no fields"),
@@ -101,7 +101,7 @@ impl Translate {
             limit: query_request.query.limit,
             offset: query_request.query.offset,
         };
-        println!("{:?}", select);
+        log::info!("SQL AST: {:?}", select);
 
         Ok(simple_exec_plan(query_request.table, select))
     }

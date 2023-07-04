@@ -7,6 +7,9 @@ We want to write tests in the following format:
 - Two files for each test - request and response
 - The request is a json QueryRequest to be sent to the server at the /query endpoint
 - The response should be the expected json response for the chinook db.
+*** DONE Logging
+Figure out how to appropriately log information such as the request, the generated sql ast, the generated sql string,
+the results, the response, the errors.
 *** Support postgres data types
 We need to decode our [[https://hasura.io/docs/latest/schema/postgres/postgresql-types/][supported postgres types]] in ~execution.rs~ in ~let value: String~.
 We probably need to create an enum type for postgres values write a serde_json decoder for them.
@@ -14,9 +17,6 @@ We probably need to create an enum type for postgres values write a serde_json d
 The are multiple errors that can occur when running a query. One of the is a 'database error'
 which is represented by the ~sqlx::Error~ type. Figure out what other errors exist and respond
 gracefully on errors.
-*** Logging
-Figure out how to appropriately log information such as the request, the generated sql ast, the generated sql string,
-the results, the response, the errors.
 *** Implement filtering
 We currently support expressions with equals, and, or, and not,
 but we don't have a test for them.

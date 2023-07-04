@@ -1,3 +1,6 @@
+#[macro_use]
+extern crate log;
+
 use postgres_ndc::routes;
 use std::env;
 
@@ -8,13 +11,16 @@ async fn main() {
     let port = env::var("PORT").unwrap_or("3000".to_string());
     let address = format!("0.0.0.0:{}", port);
 
+    env_logger::init();
+    info!("starting postgres-ndc client");
+
     match routes::router().await {
-        Err(err) => println!("{}", err.to_string()),
+        Err(err) => log::error!("{}", err.to_string()),
         Ok(app) => {
             let server =
                 axum::Server::bind(&address.parse().unwrap()).serve(app.into_make_service());
 
-            println!("Starting axum server at {}", address);
+            log::info!("Starting axum server at {}", address);
 
             server.await.unwrap();
         }
