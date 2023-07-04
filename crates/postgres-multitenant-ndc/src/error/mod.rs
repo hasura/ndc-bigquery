@@ -33,7 +33,7 @@ impl IntoResponse for ServerError {
             ServerError::DatabaseError(msg) => (StatusCode::INTERNAL_SERVER_ERROR, msg),
         };
 
-        println!("Returning error: {message} with status code: {status}");
+        log::error!("Returning error: {message} with status code: {status}");
         (status, Json(JsonErrorResponse { message })).into_response()
     }
 }

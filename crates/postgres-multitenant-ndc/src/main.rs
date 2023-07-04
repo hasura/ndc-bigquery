@@ -4,6 +4,8 @@ mod state;
 mod routes;
 mod sync;
 
+extern crate log;
+
 use crate::sync::start_deployment_sync_thread;
 use std::env;
 use clap::Parser;
@@ -29,7 +31,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let port = env::var("PORT").unwrap_or("8081".to_string());
     let address = format!("0.0.0.0:{}", port);
 
-    println!("Starting server on {}", address);
+    env_logger::init();
+    log::info!("Starting server on {}", address);
 
     let deployments_dir = server_options.deployments_dir;
 

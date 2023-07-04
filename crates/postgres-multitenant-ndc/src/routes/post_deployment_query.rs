@@ -18,8 +18,8 @@ pub async fn post_deployment_query(
     Json(query_request): Json<models::QueryRequest>,
 ) -> Result<Json<models::QueryResponse>, ServerError> {
 
-    println!("{}", serde_json::to_string(&query_request).unwrap());
-    println!("{:?}", query_request);
+    log::info!("{}", serde_json::to_string(&query_request).unwrap());
+    log::info!("{:?}", query_request);
 
     let plan = phases::translation::translate(query_request)?;
 

@@ -23,7 +23,7 @@ pub async fn execute(
     // convert to a vector of hashmap of results
     let mut results: Vec<HashMap<String, models::RowFieldValue>> = vec![];
     for row in rows.into_iter() {
-        //println!("{:?}", row.columns());
+        //log::info!("{:?}", row.columns());
 
         let mut row_results: HashMap<String, models::RowFieldValue> = HashMap::from([]);
         for col in row.columns() {
@@ -38,7 +38,7 @@ pub async fn execute(
         results.push(row_results);
     }
 
-    //println!("{:?}", results);
+    //log::info!("{:?}", results);
 
     // return results
     Ok(models::QueryResponse(vec![models::RowSet {
