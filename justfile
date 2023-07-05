@@ -75,3 +75,12 @@ lint +FLAGS:
 
 lint-apply +FLAGS:
   cargo clippy --fix {{FLAGS}}
+
+# run rustfmt on everything
+format:
+  cargo fmt --all
+
+# is everything formatted?
+format-check:
+  cargo fmt --all -- --check
+

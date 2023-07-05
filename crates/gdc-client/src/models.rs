@@ -322,7 +322,7 @@ pub enum Field {
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize, JsonSchema)]
 pub struct OrderBy {
     /// The elements to order by, in priority order
-    pub elements: Vec<OrderByElement>
+    pub elements: Vec<OrderByElement>,
 }
 // ANCHOR_END: OrderBy
 
@@ -456,13 +456,13 @@ pub enum BinaryComparisonOperator {
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize, JsonSchema)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum ComparisonTarget {
-    Column { 
+    Column {
         /// The name of the column
         name: String,
         /// Any relationships to traverse to reach this column
         path: Vec<PathElement>,
     },
-    RootTableColumn { 
+    RootTableColumn {
         /// The name of the column
         name: String,
     },

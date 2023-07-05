@@ -1,13 +1,11 @@
-
 extern crate goldenfile;
 
 use std::fs;
 
-
+use crate::state::update_deployments;
 use axum::http::StatusCode;
 use axum_test_helper::TestClient;
-use postgres_multitenant_ndc::{routes,state};
-use crate::state::update_deployments;
+use postgres_multitenant_ndc::{routes, state};
 use std::path::PathBuf;
 
 use std::env;
@@ -29,7 +27,7 @@ fn get_deployments_dir() -> String {
     let mut d = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     d.push("../../static/deployments");
 
-    return d.display().to_string()
+    return d.display().to_string();
 }
 
 async fn test_query(testdir: &str) -> String {
@@ -49,8 +47,7 @@ async fn test_query(testdir: &str) -> String {
     let _ = update_deployments(test_deployments_dir, state).await;
 
     let client = TestClient::new(router);
-    let request =
-        fs::read_to_string(format!("tests/goldenfiles/{}.json", testdir)).unwrap();
+    let request = fs::read_to_string(format!("tests/goldenfiles/{}.json", testdir)).unwrap();
 
     let url = format!("/deployment/{}/query", deployment_name);
 
@@ -64,7 +61,4 @@ async fn test_query(testdir: &str) -> String {
     assert_eq!(res.status(), StatusCode::OK);
 
     res.text().await
-
-    }
-
-
+}

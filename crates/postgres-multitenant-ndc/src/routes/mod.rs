@@ -8,11 +8,11 @@ mod post_deployment_mutation_explain;
 mod post_deployment_query;
 mod post_deployment_query_explain;
 
+use crate::state::ServerState;
 use axum::{
     routing::{get, post},
     Router,
 };
-use crate::state::ServerState;
 
 pub use get_capabilities::get_capabilities;
 pub use get_deployment_capabilities::get_deployment_capabilities;
@@ -58,5 +58,3 @@ pub fn create_router(state: ServerState) -> Router {
         )
         .with_state(state)
 }
-
-

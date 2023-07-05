@@ -1,5 +1,5 @@
-use std::{ time::Duration};
-use crate::state::{ServerState,update_deployments};
+use crate::state::{update_deployments, ServerState};
+use std::time::Duration;
 
 // look in the deployments folder every 10 seconds and add any we find to the shared state
 pub fn start_deployment_sync_thread(base_dir: String, state: ServerState) {

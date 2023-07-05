@@ -7,7 +7,7 @@ use crate::{
     state::ServerState,
 };
 use gdc_client::models;
-use query_engine::{phases};
+use query_engine::phases;
 
 // extremely basic version of explain where we just return the SQL we have created
 
@@ -17,7 +17,6 @@ pub async fn post_deployment_query_explain(
     Pool(_pool): Pool,
     Json(query_request): Json<models::QueryRequest>,
 ) -> Result<Json<models::ExplainResponse>, ServerError> {
-
     log::info!("{}", serde_json::to_string(&query_request).unwrap());
     log::info!("{:?}", query_request);
 

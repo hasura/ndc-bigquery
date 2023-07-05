@@ -1,17 +1,17 @@
 mod error;
 mod extract;
-mod state;
 mod routes;
+mod state;
 mod sync;
 
 extern crate log;
 
 use crate::sync::start_deployment_sync_thread;
-use std::env;
 use clap::Parser;
+use routes::create_router;
 use state::ServerState;
-use std::{ error::Error };
-use routes::{create_router};
+use std::env;
+use std::error::Error;
 
 #[derive(Parser)]
 struct ServerOptions {

@@ -6,9 +6,10 @@
 
 1. Install [rustup](https://www.rust-lang.org/tools/install).
 2. Install additional tools:
-    - `cargo install watch rustfmt insta`
+    - `cargo install watch insta`
     - `rustup component add rust-analyzer`
     - `rustup component add clippy`
+    - `rustup component add rustfmt"
 3. Install [just](https://github.com/casey/just)
 4. Install [docker](https://www.docker.com/)
 5. Install protoc. Here are a few options:
@@ -90,3 +91,9 @@ The multitenant server lives in [crates/postgres-multitenant-ndc](crates/postgre
 Run `just lint` to run clippy linter
 
 run `just lint-apply` to attempt to autofix all linter suggestions
+
+## Formatting
+
+Check your formatting is great with `just format-check`.
+
+Format all Rust code with `just format`.
