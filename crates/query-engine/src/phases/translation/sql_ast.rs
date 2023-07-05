@@ -1,19 +1,19 @@
 /// Type definitions of a SQL AST representation.
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct With {
     pub recursive: bool,
     pub common_table_expressions: Vec<CommonTableExpression>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct CommonTableExpression {
     pub table_name: TableAlias,
     pub column_names: Option<Vec<ColumnAlias>>,
     pub select: Box<Select>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Select {
     pub with: With,
     pub select_list: SelectList,
@@ -24,30 +24,30 @@ pub struct Select {
     pub limit: Limit,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct SelectList(pub Vec<(ColumnAlias, Expression)>);
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum From {
     Table { name: TableName, alias: TableAlias },
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Where(pub Expression);
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct GroupBy {}
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct OrderBy {}
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Limit {
     pub limit: Option<u32>,
     pub offset: Option<u32>,
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Expression {
     And {
         left: Box<Expression>,
@@ -67,42 +67,45 @@ pub enum Expression {
     Value(Value),
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum BinaryOperator {
     Equals,
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Value {
     Int4(i32),
     Bool(bool),
 }
 
 /// aliases that we give to relations
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TableAlias {
     pub unique_index: u64,
     pub name: String,
 }
 /// aliases that we give to columns
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ColumnAlias {
     pub unique_index: u64,
     pub name: String,
 }
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum TableName {
     /// refers to a db table object name
     DBTable { schema: String, table: String },
     /// refers to an alias we created
     AliasedTable(TableAlias),
 }
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ColumnName {
     /// refers to a db column object name
-    TableColumn { table: String, name: String },
+    TableColumn { table: TableName, name: String },
     /// refers to an alias we created
-    AliasedColumn { table: String, alias: ColumnAlias },
+    AliasedColumn {
+        table: TableName,
+        alias: ColumnAlias,
+    },
 }
 
 // utils

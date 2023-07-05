@@ -9,21 +9,9 @@ use uuid::Uuid;
 
 #[derive(Debug, Deserialize)]
 pub struct DeploymentConfiguration {
-    pub tables: HashMap<String, TableInfo>,
+    pub tables: query_engine::metadata::TablesInfo,
     pub schema: SchemaResponse,
     pub postgres_database_url: String,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct TableInfo {
-    pub schema_name: String,
-    pub table_name: String,
-    pub columns: HashMap<String, ColumnInfo>,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct ColumnInfo {
-    pub name: String,
 }
 
 #[derive(Debug, Clone)]

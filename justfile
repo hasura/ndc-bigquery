@@ -70,10 +70,10 @@ test: start-docker
     cargo test
 
 # run `clippy` linter
-lint +FLAGS:
+lint *FLAGS:
   cargo clippy {{FLAGS}}
 
-lint-apply +FLAGS:
+lint-apply *FLAGS:
   cargo clippy --fix {{FLAGS}}
 
 # run rustfmt on everything

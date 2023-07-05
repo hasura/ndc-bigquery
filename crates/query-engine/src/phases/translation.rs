@@ -3,6 +3,7 @@
 pub mod convert;
 pub mod sql_ast;
 pub mod sql_string;
+use crate::metadata;
 
 use gdc_client::models;
 use log;
@@ -33,9 +34,12 @@ pub fn select_to_sql(select: &sql_ast::Select) -> sql_string::SQL {
 }
 
 /// Translate the incoming QueryRequest to an ExecutionPlan (SQL) to be run against the database.
-pub fn translate(query_request: models::QueryRequest) -> Result<ExecutionPlan, Error> {
+pub fn translate(
+    tables_info: &metadata::TablesInfo,
+    query_request: models::QueryRequest,
+) -> Result<ExecutionPlan, Error> {
     let mut translate = Translate::new();
-    translate.translate(query_request)
+    translate.translate(tables_info, query_request)
 }
 
 /// A simple execution plan with only a root field and a query.
@@ -70,8 +74,21 @@ impl Translate {
     /// Translate a query request to sql ast.
     pub fn translate(
         &mut self,
+        metadata::TablesInfo(tables_info): &metadata::TablesInfo,
         query_request: models::QueryRequest,
     ) -> Result<ExecutionPlan, Error> {
+        // find the table according to the metadata.
+        let table: sql_ast::TableName = match tables_info.get(&query_request.table) {
+            Some(t) => Ok(sql_ast::TableName::DBTable {
+                schema: t.schema_name.clone(),
+                table: t.table_name.clone(),
+            }),
+            None => Error::new("Table not found."),
+        }?;
+        let table_alias: sql_ast::TableAlias = self.make_table_alias(query_request.table.clone());
+        let table_alias_name: sql_ast::TableName =
+            sql_ast::TableName::AliasedTable(table_alias.clone());
+
         // translate fields to select list
         let fields = match query_request.query.fields {
             None => Error::new("no fields in query request."),
@@ -83,7 +100,7 @@ impl Translate {
             .into_iter()
             .flat_map(|(alias, field)| match field {
                 models::Field::Column { column, .. } => Ok(make_column(
-                    query_request.table.clone(),
+                    table_alias_name.clone(),
                     column,
                     self.make_column_alias(alias),
                 )),
@@ -96,15 +113,15 @@ impl Translate {
             columns,
             sql_ast::From::Table {
                 // @todo: how do we know the name of the table schema? assume public for now.
-                name: sql_ast::TableName::from_public(query_request.table.clone()),
-                alias: self.make_table_alias(query_request.table.clone()),
+                name: table,
+                alias: table_alias,
             },
         );
 
         // translate where
         select.where_ = sql_ast::Where(match query_request.query.predicate {
             None => sql_ast::Expression::Value(sql_ast::Value::Bool(true)),
-            Some(predicate) => self.translate_expression(&query_request.table, predicate),
+            Some(predicate) => self.translate_expression(&table_alias_name, predicate),
         });
 
         // translate limit and offset
@@ -140,7 +157,7 @@ impl Translate {
     #[allow(clippy::only_used_in_recursion)]
     fn translate_expression(
         &mut self,
-        table: &String,
+        table: &sql_ast::TableName,
         predicate: models::Expression,
     ) -> sql_ast::Expression {
         match predicate {
@@ -186,13 +203,13 @@ impl Translate {
 }
 /// translate a comparison target.
 fn translate_comparison_target(
-    table: &str,
+    table: &sql_ast::TableName,
     column: models::ComparisonTarget,
 ) -> sql_ast::Expression {
     match column {
         models::ComparisonTarget::Column { name, .. } => {
             sql_ast::Expression::ColumnName(sql_ast::ColumnName::TableColumn {
-                table: table.to_owned(),
+                table: table.clone(),
                 name,
             })
         }
@@ -202,7 +219,10 @@ fn translate_comparison_target(
 }
 
 /// translate a comparison value.
-fn translate_comparison_value(table: &str, value: models::ComparisonValue) -> sql_ast::Expression {
+fn translate_comparison_value(
+    table: &sql_ast::TableName,
+    value: models::ComparisonValue,
+) -> sql_ast::Expression {
     match value {
         models::ComparisonValue::Column { column } => translate_comparison_target(table, *column),
         models::ComparisonValue::Scalar { value } => match value {
@@ -220,7 +240,7 @@ fn translate_comparison_value(table: &str, value: models::ComparisonValue) -> sq
 
 /// generate a column expression.
 fn make_column(
-    table: String,
+    table: sql_ast::TableName,
     name: String,
     alias: sql_ast::ColumnAlias,
 ) -> (sql_ast::ColumnAlias, sql_ast::Expression) {

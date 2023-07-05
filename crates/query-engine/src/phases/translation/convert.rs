@@ -186,12 +186,12 @@ impl ColumnName {
     pub fn to_sql(&self, sql: &mut SQL) {
         match self {
             ColumnName::TableColumn { table, name } => {
-                sql.append_identifier(table);
+                table.to_sql(sql);
                 sql.append_syntax(".");
                 sql.append_identifier(&name.to_string());
             }
             ColumnName::AliasedColumn { table, alias } => {
-                sql.append_identifier(table);
+                table.to_sql(sql);
                 sql.append_syntax(".");
                 alias.to_sql(sql);
             }
