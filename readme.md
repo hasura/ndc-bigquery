@@ -8,6 +8,7 @@
 2. Install additional tools:
     - `cargo install watch rustfmt insta`
     - `rustup component add rust-analyzer`
+    - `rustup component add clippy`
 3. Install [just](https://github.com/casey/just)
 4. Install [docker](https://www.docker.com/)
 5. Install protoc. Here are a few options:
@@ -83,3 +84,9 @@ The multitenant server lives in [crates/postgres-multitenant-ndc](crates/postgre
    ```
 3. Run the tests using `just dev`
 4. Review the results using `cargo insta review`
+
+## Linting
+
+Run `just lint` to run clippy linter
+
+run `just lint-apply` to attempt to autofix all linter suggestions

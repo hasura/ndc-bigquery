@@ -9,6 +9,7 @@ dev: start-docker
     cargo watch -i "tests/snapshots/*" -c \
     -C ./crates/postgres-multitenant-ndc \
     -x test \
+    -x clippy \
     -x 'run -- --deployments-dir ../../static/deployments/'
 
 # run postgres + jaeger
@@ -68,3 +69,9 @@ test: start-docker
   RUST_LOG=DEBUG \
     cargo test
 
+# run `clippy` linter
+lint:
+  cargo clippy
+
+lint-apply:
+  cargo clippy --fix

@@ -9,6 +9,12 @@ pub struct SQL {
     pub param_index: u64,
 }
 
+impl Default for SQL {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[derive(Debug)]
 pub struct DDL(pub SQL);
 

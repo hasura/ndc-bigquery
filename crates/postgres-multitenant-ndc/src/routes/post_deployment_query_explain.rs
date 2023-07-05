@@ -23,7 +23,7 @@ pub async fn post_deployment_query_explain(
 
     let statement = phases::translation::translate(query_request)?;
 
-    let statement_string = statement.query().sql.to_string();
+    let statement_string = statement.query().sql;
 
     let response = models::ExplainResponse {
         lines: vec![],

@@ -46,6 +46,6 @@ impl From<sqlx::Error> for ServerError {
 
 impl From<String> for ServerError {
     fn from(value: String) -> Self {
-        ServerError::Internal(value.to_string())
+        ServerError::Internal(value)
     }
 }

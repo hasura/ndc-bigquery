@@ -54,6 +54,12 @@ pub struct Translate {
     pub unique_index: u64,
 }
 
+impl Default for Translate {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Translate {
     pub fn new() -> Translate {
         Translate { unique_index: 0 }
@@ -92,7 +98,7 @@ impl Translate {
 
         select.where_ = sql_ast::Where(match query_request.query.predicate {
             None => sql_ast::Expression::Value(sql_ast::Value::Bool(true)),
-            Some(predicate) => self.translate_expression(predicate),
+            Some(predicate) => Self::translate_expression(predicate),
         });
 
         // translate limit
@@ -123,11 +129,11 @@ impl Translate {
             name,
         }
     }
-    fn translate_expression(&mut self, predicate: models::Expression) -> sql_ast::Expression {
+    fn translate_expression(predicate: models::Expression) -> sql_ast::Expression {
         match predicate {
             models::Expression::And { expressions } => expressions
                 .into_iter()
-                .map(|expr| self.translate_expression(expr))
+                .map(Self::translate_expression)
                 .fold(
                     sql_ast::Expression::Value(sql_ast::Value::Bool(true)),
                     |acc, expr| sql_ast::Expression::And {
@@ -137,7 +143,7 @@ impl Translate {
                 ),
             models::Expression::Or { expressions } => expressions
                 .into_iter()
-                .map(|expr| self.translate_expression(expr))
+                .map(Self::translate_expression)
                 .fold(
                     sql_ast::Expression::Value(sql_ast::Value::Bool(true)),
                     |acc, expr| sql_ast::Expression::Or {
@@ -146,7 +152,7 @@ impl Translate {
                     },
                 ),
             models::Expression::Not { expression } => {
-                sql_ast::Expression::Not(Box::new(self.translate_expression(*expression)))
+                sql_ast::Expression::Not(Box::new(Self::translate_expression(*expression)))
             }
             models::Expression::BinaryComparisonOperator {
                 column,

@@ -2,7 +2,7 @@
 extern crate goldenfile;
 
 use std::fs;
-use insta;
+
 
 use axum::http::StatusCode;
 use axum_test_helper::TestClient;

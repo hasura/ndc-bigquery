@@ -173,7 +173,7 @@ impl TableName {
 impl TableAlias {
     pub fn to_sql(&self, sql: &mut SQL) {
         //let name = format!("hasu_tbl_{}_{}", self.unique_index, self.name);
-        let name = format!("{}", self.name);
+        let name = self.name.to_string();
         sql.append_identifier(&name);
     }
 }
@@ -190,7 +190,7 @@ impl ColumnName {
 impl ColumnAlias {
     pub fn to_sql(&self, sql: &mut SQL) {
         //let name = format!("hasu_col_{}_{}", self.unique_index, self.name);
-        let name = format!("{}", self.name);
+        let name = self.name.to_string();
         sql.append_identifier(&name);
     }
 }
