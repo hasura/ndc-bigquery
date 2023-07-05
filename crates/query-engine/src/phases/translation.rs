@@ -60,57 +60,64 @@ impl Default for Translate {
     }
 }
 
+/// Create a new translation context and start translating a query request to a sql ast.
 impl Translate {
+    /// Create a transation context.
     pub fn new() -> Translate {
         Translate { unique_index: 0 }
     }
+
+    /// Translate a query request to sql ast.
     pub fn translate(
         &mut self,
         query_request: models::QueryRequest,
     ) -> Result<ExecutionPlan, Error> {
         // translate fields to select list
         let fields = match query_request.query.fields {
-            None => Err("translate: no fields"),
+            None => Error::new("no fields in query request."),
             Some(fields) => Ok(fields),
         }?;
 
+        // translate fields to columns or relationships.
         let columns: Vec<(sql_ast::ColumnAlias, sql_ast::Expression)> = fields
             .into_iter()
             .flat_map(|(alias, field)| match field {
-                models::Field::Column { column, .. } => {
-                    Ok(make_column(column, self.make_column_alias(alias)))
-                }
-                models::Field::Relationship { .. } => {
-                    Err("translate: relationships are not supported")
-                }
+                models::Field::Column { column, .. } => Ok(make_column(
+                    query_request.table.clone(),
+                    column,
+                    self.make_column_alias(alias),
+                )),
+                models::Field::Relationship { .. } => Error::new("relationships are not supported"),
             })
             .collect::<Vec<_>>();
 
+        // construct a simple select with the table name, alias, and selected columns.
         let mut select = sql_ast::simple_select(
             columns,
             sql_ast::From::Table {
-                name: sql_ast::TableName::DBTable(query_request.table.clone()),
+                // @todo: how do we know the name of the table schema? assume public for now.
+                name: sql_ast::TableName::from_public(query_request.table.clone()),
                 alias: self.make_table_alias(query_request.table.clone()),
             },
         );
 
         // translate where
-
         select.where_ = sql_ast::Where(match query_request.query.predicate {
             None => sql_ast::Expression::Value(sql_ast::Value::Bool(true)),
-            Some(predicate) => Self::translate_expression(predicate),
+            Some(predicate) => self.translate_expression(&query_request.table, predicate),
         });
 
-        // translate limit
-
+        // translate limit and offset
         select.limit = sql_ast::Limit {
             limit: query_request.query.limit,
             offset: query_request.query.offset,
         };
-        log::info!("SQL AST: {:?}", select);
 
+        // log and return
+        log::info!("SQL AST: {:?}", select);
         Ok(simple_exec_plan(query_request.table, select))
     }
+
     /// create column aliases using this function so they get a unique index.
     fn make_column_alias(&mut self, name: String) -> sql_ast::ColumnAlias {
         let index = self.unique_index;
@@ -129,11 +136,17 @@ impl Translate {
             name,
         }
     }
-    fn translate_expression(predicate: models::Expression) -> sql_ast::Expression {
+
+    #[allow(clippy::only_used_in_recursion)]
+    fn translate_expression(
+        &mut self,
+        table: &String,
+        predicate: models::Expression,
+    ) -> sql_ast::Expression {
         match predicate {
             models::Expression::And { expressions } => expressions
                 .into_iter()
-                .map(Self::translate_expression)
+                .map(|expr| self.translate_expression(table, expr))
                 .fold(
                     sql_ast::Expression::Value(sql_ast::Value::Bool(true)),
                     |acc, expr| sql_ast::Expression::And {
@@ -143,7 +156,7 @@ impl Translate {
                 ),
             models::Expression::Or { expressions } => expressions
                 .into_iter()
-                .map(Self::translate_expression)
+                .map(|expr| self.translate_expression(table, expr))
                 .fold(
                     sql_ast::Expression::Value(sql_ast::Value::Bool(true)),
                     |acc, expr| sql_ast::Expression::Or {
@@ -152,37 +165,46 @@ impl Translate {
                     },
                 ),
             models::Expression::Not { expression } => {
-                sql_ast::Expression::Not(Box::new(Self::translate_expression(*expression)))
+                sql_ast::Expression::Not(Box::new(self.translate_expression(table, *expression)))
             }
             models::Expression::BinaryComparisonOperator {
                 column,
                 operator,
                 value,
             } => sql_ast::Expression::BinaryOperator {
-                left: Box::new(translate_comparison_target(*column)),
+                left: Box::new(translate_comparison_target(table, *column)),
                 operator: match *operator {
                     models::BinaryComparisonOperator::Equal => sql_ast::BinaryOperator::Equals,
                     _ => sql_ast::BinaryOperator::Equals,
                 },
-                right: Box::new(translate_comparison_value(*value)),
+                right: Box::new(translate_comparison_value(table, *value)),
             },
             // dummy
             _ => sql_ast::Expression::Value(sql_ast::Value::Bool(true)),
         }
     }
 }
-fn translate_comparison_target(column: models::ComparisonTarget) -> sql_ast::Expression {
+/// translate a comparison target.
+fn translate_comparison_target(
+    table: &str,
+    column: models::ComparisonTarget,
+) -> sql_ast::Expression {
     match column {
         models::ComparisonTarget::Column { name, .. } => {
-            sql_ast::Expression::ColumnName(sql_ast::ColumnName::TableColumn(name))
+            sql_ast::Expression::ColumnName(sql_ast::ColumnName::TableColumn {
+                table: table.to_owned(),
+                name,
+            })
         }
         // dummy
         _ => sql_ast::Expression::Value(sql_ast::Value::Bool(true)),
     }
 }
-fn translate_comparison_value(value: models::ComparisonValue) -> sql_ast::Expression {
+
+/// translate a comparison value.
+fn translate_comparison_value(table: &str, value: models::ComparisonValue) -> sql_ast::Expression {
     match value {
-        models::ComparisonValue::Column { column } => translate_comparison_target(*column),
+        models::ComparisonValue::Column { column } => translate_comparison_target(table, *column),
         models::ComparisonValue::Scalar { value } => match value {
             serde_json::Value::Number(num) => sql_ast::Expression::Value(sql_ast::Value::Int4(
                 num.as_i64().unwrap().try_into().unwrap(),
@@ -195,14 +217,31 @@ fn translate_comparison_value(value: models::ComparisonValue) -> sql_ast::Expres
         _ => sql_ast::Expression::Value(sql_ast::Value::Bool(true)),
     }
 }
+
+/// generate a column expression.
 fn make_column(
+    table: String,
     name: String,
     alias: sql_ast::ColumnAlias,
 ) -> (sql_ast::ColumnAlias, sql_ast::Expression) {
     (
         alias,
-        sql_ast::Expression::ColumnName(sql_ast::ColumnName::TableColumn(name)),
+        sql_ast::Expression::ColumnName(sql_ast::ColumnName::TableColumn { table, name }),
     )
 }
 
-type Error = String;
+/// A type for translation errors.
+pub struct Error(pub String);
+
+impl Error {
+    pub fn new<T>(error: &str) -> Result<T, Error> {
+        Err(Error(format!("Translation failed: {}", error)))
+    }
+}
+
+impl std::fmt::Display for Error {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        let Error(err) = self;
+        write!(f, "{}", err)
+    }
+}

@@ -164,7 +164,11 @@ impl Limit {
 impl TableName {
     pub fn to_sql(&self, sql: &mut SQL) {
         match self {
-            TableName::DBTable(name) => sql.append_identifier(&name.to_string()),
+            TableName::DBTable { schema, table } => {
+                sql.append_identifier(schema);
+                sql.append_syntax(".");
+                sql.append_identifier(table);
+            }
             TableName::AliasedTable(alias) => alias.to_sql(sql),
         };
     }
@@ -181,8 +185,16 @@ impl TableAlias {
 impl ColumnName {
     pub fn to_sql(&self, sql: &mut SQL) {
         match self {
-            ColumnName::TableColumn(name) => sql.append_identifier(&name.to_string()),
-            ColumnName::AliasedColumn(alias) => alias.to_sql(sql),
+            ColumnName::TableColumn { table, name } => {
+                sql.append_identifier(table);
+                sql.append_syntax(".");
+                sql.append_identifier(&name.to_string());
+            }
+            ColumnName::AliasedColumn { table, alias } => {
+                sql.append_identifier(table);
+                sql.append_syntax(".");
+                alias.to_sql(sql);
+            }
         };
     }
 }

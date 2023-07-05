@@ -3,10 +3,12 @@ use axum::{
     response::{IntoResponse, Response},
     Json,
 };
+use query_engine::phases::translation;
 use serde::Serialize;
 
 pub enum ServerError {
     Internal(String),
+    QueryError(String),
     DatabaseError(String),
     DeploymentNotFound,
     DeploymentIdMissingOrInvalid,
@@ -21,6 +23,7 @@ impl IntoResponse for ServerError {
     fn into_response(self) -> Response {
         let (status, message) = match self {
             ServerError::Internal(msg) => (StatusCode::INTERNAL_SERVER_ERROR, msg),
+            ServerError::QueryError(msg) => (StatusCode::INTERNAL_SERVER_ERROR, msg),
             ServerError::DeploymentNotFound => (
                 StatusCode::NOT_FOUND,
                 "Deployment config not found".to_string(),
@@ -47,5 +50,11 @@ impl From<sqlx::Error> for ServerError {
 impl From<String> for ServerError {
     fn from(value: String) -> Self {
         ServerError::Internal(value)
+    }
+}
+
+impl From<translation::Error> for ServerError {
+    fn from(value: translation::Error) -> Self {
+        ServerError::QueryError(value.to_string())
     }
 }

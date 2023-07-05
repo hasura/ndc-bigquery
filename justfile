@@ -6,11 +6,11 @@ POSTGRES_DC_PORT := "8081"
 # watch the multitenant code and re-run on changes
 dev: start-docker
   RUST_LOG=DEBUG \
-    cargo watch -i "tests/snapshots/*" -c \
-    -C ./crates/postgres-multitenant-ndc \
+    cargo watch -i "tests/snapshots/*" \
+    -c \
     -x test \
     -x clippy \
-    -x 'run -- --deployments-dir ../../static/deployments/'
+    -x 'run -- --deployments-dir static/deployments/'
 
 # run postgres + jaeger
 start-docker:
@@ -70,8 +70,8 @@ test: start-docker
     cargo test
 
 # run `clippy` linter
-lint:
-  cargo clippy
+lint +FLAGS:
+  cargo clippy {{FLAGS}}
 
-lint-apply:
-  cargo clippy --fix
+lint-apply +FLAGS:
+  cargo clippy --fix {{FLAGS}}

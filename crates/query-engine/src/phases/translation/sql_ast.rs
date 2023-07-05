@@ -93,16 +93,16 @@ pub struct ColumnAlias {
 #[derive(Debug)]
 pub enum TableName {
     /// refers to a db table object name
-    DBTable(String),
+    DBTable { schema: String, table: String },
     /// refers to an alias we created
     AliasedTable(TableAlias),
 }
 #[derive(Debug, PartialEq, Eq)]
 pub enum ColumnName {
     /// refers to a db column object name
-    TableColumn(String),
+    TableColumn { table: String, name: String },
     /// refers to an alias we created
-    AliasedColumn(ColumnAlias),
+    AliasedColumn { table: String, alias: ColumnAlias },
 }
 
 // utils
@@ -145,4 +145,13 @@ pub fn true_expr() -> Expression {
 }
 pub fn false_expr() -> Expression {
     Expression::Value(Value::Bool(false))
+}
+
+impl TableName {
+    pub fn from_public(tablename: String) -> TableName {
+        TableName::DBTable {
+            schema: "public".to_string(),
+            table: tablename,
+        }
+    }
 }
