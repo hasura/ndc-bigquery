@@ -79,7 +79,7 @@ The multitenant server lives in [crates/postgres-multitenant-ndc](crates/postgre
    ```rs
    #[tokio::test]
    async fn select_5() {
-       let result = test_query("select_5").await;
+       let result = common::test_query("select_5").await;
        insta::assert_snapshot!(result);
    }
    ```

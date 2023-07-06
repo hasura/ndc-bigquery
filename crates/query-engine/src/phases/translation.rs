@@ -251,6 +251,7 @@ fn make_column(
 }
 
 /// A type for translation errors.
+#[derive(Debug)]
 pub struct Error(pub String);
 
 impl Error {

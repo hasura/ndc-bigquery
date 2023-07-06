@@ -1,0 +1,16 @@
+{
+  "table": "Album",
+  "query": {
+    "fields": {
+      "Title": {
+        "type": "column",
+        "column": "Title",
+        "arguments": {}
+      }
+    },
+	"limit": 5,
+	"offset": 3
+  },
+  "arguments": {},
+  "table_relationships": {}
+}
