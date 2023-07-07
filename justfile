@@ -84,3 +84,12 @@ format:
 format-check:
   cargo fmt --all -- --check
 
+# check the nix build works
+build-with-nix:
+  nix build --print-build-logs
+
+# check the docker build works
+build-docker-with-nix:
+  nix build .#docker --print-build-logs
+  docker load < ./result
+
