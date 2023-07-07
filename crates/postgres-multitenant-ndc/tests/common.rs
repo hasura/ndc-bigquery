@@ -8,7 +8,9 @@ use std::path::PathBuf;
 use std::env;
 
 /// Run a query against the server, get the result, and compare against the snapshot.
-pub async fn test_query(testname: &str) -> String {
+pub async fn test_query(testname: &str) -> serde_json::Value {
+    let _ = env_logger::builder().is_test(true).try_init();
+
     // initialise empty server state
     let state = state::ServerState::default();
 
@@ -38,7 +40,7 @@ pub async fn test_query(testname: &str) -> String {
 
     assert_eq!(res.status(), StatusCode::OK);
 
-    res.text().await
+    res.json().await
 }
 
 /// find the deployments folder via the crate root provided by `cargo test`.

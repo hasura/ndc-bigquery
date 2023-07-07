@@ -3,13 +3,20 @@ POSTGRESQL_CONNECTION_STRING := "postgresql://postgres:password@localhost:64002"
 # this is hardcoded in the V3 metadata
 POSTGRES_DC_PORT := "8081"
 
-# watch the multitenant code and re-run on changes
+# watch the code and re-run on changes
 dev: start-docker
   RUST_LOG=DEBUG \
     cargo watch -i "tests/snapshots/*" \
     -c \
     -x test \
     -x clippy \
+    -x 'run -- --deployments-dir static/deployments/'
+
+# watch the code and run the postgres-multitenant-gdc on changes
+watch-run: start-docker
+  RUST_LOG=DEBUG \
+    cargo watch -i "tests/snapshots/*" \
+    -c \
     -x 'run -- --deployments-dir static/deployments/'
 
 # run postgres + jaeger

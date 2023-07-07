@@ -9,7 +9,7 @@
     - `cargo install watch insta`
     - `rustup component add rust-analyzer`
     - `rustup component add clippy`
-    - `rustup component add rustfmt"
+    - `rustup component add rustfmt`
 3. Install [just](https://github.com/casey/just)
 4. Install [docker](https://www.docker.com/)
 5. Install protoc. Here are a few options:
@@ -80,7 +80,7 @@ The multitenant server lives in [crates/postgres-multitenant-ndc](crates/postgre
    #[tokio::test]
    async fn select_5() {
        let result = common::test_query("select_5").await;
-       insta::assert_snapshot!(result);
+       insta::assert_json_snapshot!(result);
    }
    ```
 3. Run the tests using `just dev`

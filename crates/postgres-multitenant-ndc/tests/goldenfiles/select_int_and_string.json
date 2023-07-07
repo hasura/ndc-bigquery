@@ -1,0 +1,39 @@
+{
+  "table": "Album",
+  "query": {
+    "fields": {
+      "AlbumId": {
+        "type": "column",
+        "column": "AlbumId",
+        "arguments": {}
+      },
+      "title": {
+        "type": "column",
+        "column": "Title",
+        "arguments": {}
+      }
+    },
+    "where": {
+      "type": "and",
+      "expressions": [
+        {
+          "type": "binary_comparison_operator",
+          "column": {
+            "type": "column",
+            "name": "AlbumId",
+            "path": []
+          },
+          "operator": {
+            "type": "equal"
+          },
+          "value": {
+            "type": "scalar",
+            "value": 35
+          }
+        }
+      ]
+    }
+  },
+  "arguments": {},
+  "table_relationships": {}
+}
