@@ -6,7 +6,7 @@
 
 1. Install [rustup](https://www.rust-lang.org/tools/install).
 2. Install additional tools:
-    - `cargo install watch insta`
+    - `cargo install watch cargo-insta`
     - `rustup component add rust-analyzer`
     - `rustup component add clippy`
     - `rustup component add rustfmt`

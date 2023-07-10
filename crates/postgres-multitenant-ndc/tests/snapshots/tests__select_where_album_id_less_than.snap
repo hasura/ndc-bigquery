@@ -1,0 +1,9 @@
+---
+source: crates/postgres-multitenant-ndc/tests/tests.rs
+expression: result
+---
+[
+  {
+    "rows": []
+  }
+]

@@ -63,19 +63,40 @@ pub enum Expression {
         operator: BinaryOperator,
         right: Box<Expression>,
     },
+    BinaryArrayOperator {
+        left: Box<Expression>,
+        operator: BinaryArrayOperator,
+        right: Vec<Expression>,
+    },
     ColumnName(ColumnName),
     Value(Value),
 }
 
+// we should consider at least the list in `Hasura.Backends.Postgres.Translate.BoolExp`
+// have skipped column checks for now, ie, CEQ, CNE, CGT etc
+// have skipped casts for now
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum BinaryOperator {
     Equals,
+    GreaterThan,
+    LessThan,
+    GreaterThanOrEqualTo,
+    LessThanOrEqualTo,
+    Like,
+    NotLike,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum BinaryArrayOperator {
+    In,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Value {
     Int4(i32),
     Bool(bool),
+    String(String),
+    Array(Vec<Value>),
 }
 
 /// aliases that we give to relations

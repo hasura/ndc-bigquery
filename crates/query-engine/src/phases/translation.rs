@@ -159,6 +159,7 @@ impl Translate {
         table: &sql_ast::TableName,
         predicate: models::Expression,
     ) -> sql_ast::Expression {
+        println!("{:?}", predicate);
         match predicate {
             models::Expression::And { expressions } => expressions
                 .into_iter()
@@ -191,10 +192,38 @@ impl Translate {
                 left: Box::new(translate_comparison_target(table, *column)),
                 operator: match *operator {
                     models::BinaryComparisonOperator::Equal => sql_ast::BinaryOperator::Equals,
-                    _ => sql_ast::BinaryOperator::Equals,
+                    models::BinaryComparisonOperator::Other { name } =>
+                    // the strings we're matching against here (ie 'like') are best guesses for now, will
+                    // need to update these as find out more
+                    {
+                        match &*name {
+                            "like" => sql_ast::BinaryOperator::Like,
+                            "nlike" => sql_ast::BinaryOperator::NotLike,
+                            "lt" => sql_ast::BinaryOperator::LessThan,
+                            "lte" => sql_ast::BinaryOperator::LessThanOrEqualTo,
+                            "gt" => sql_ast::BinaryOperator::GreaterThan,
+                            "gte" => sql_ast::BinaryOperator::GreaterThanOrEqualTo,
+                            _ => sql_ast::BinaryOperator::Equals,
+                        }
+                    }
                 },
                 right: Box::new(translate_comparison_value(table, *value)),
             },
+            models::Expression::BinaryArrayComparisonOperator {
+                column,
+                operator,
+                values,
+            } => sql_ast::Expression::BinaryArrayOperator {
+                left: Box::new(translate_comparison_target(table, *column)),
+                operator: match *operator {
+                    models::BinaryArrayComparisonOperator::In => sql_ast::BinaryArrayOperator::In,
+                },
+                right: values
+                    .iter()
+                    .map(|value| translate_comparison_value(table, value.clone()))
+                    .collect(),
+            },
+
             // dummy
             _ => sql_ast::Expression::Value(sql_ast::Value::Bool(true)),
         }
@@ -224,16 +253,28 @@ fn translate_comparison_value(
 ) -> sql_ast::Expression {
     match value {
         models::ComparisonValue::Column { column } => translate_comparison_target(table, *column),
-        models::ComparisonValue::Scalar { value } => match value {
-            serde_json::Value::Number(num) => sql_ast::Expression::Value(sql_ast::Value::Int4(
-                num.as_i64().unwrap().try_into().unwrap(),
-            )),
-            serde_json::Value::Bool(b) => sql_ast::Expression::Value(sql_ast::Value::Bool(b)),
-            // dummy
-            _ => sql_ast::Expression::Value(sql_ast::Value::Bool(true)),
-        },
+        models::ComparisonValue::Scalar { value: json_value } => {
+            sql_ast::Expression::Value(translate_json_value(&json_value))
+        }
         // dummy
         _ => sql_ast::Expression::Value(sql_ast::Value::Bool(true)),
+    }
+}
+
+fn translate_json_value(value: &serde_json::Value) -> sql_ast::Value {
+    match value {
+        serde_json::Value::Number(num) => {
+            sql_ast::Value::Int4(num.as_i64().unwrap().try_into().unwrap())
+        }
+        serde_json::Value::Bool(b) => sql_ast::Value::Bool(*b),
+        serde_json::Value::String(s) => sql_ast::Value::String(s.to_string()),
+        serde_json::Value::Array(items) => {
+            let inner_values: Vec<sql_ast::Value> =
+                items.iter().map(translate_json_value).collect();
+            sql_ast::Value::Array(inner_values)
+        }
+        // dummy
+        _ => sql_ast::Value::Bool(true),
     }
 }
 

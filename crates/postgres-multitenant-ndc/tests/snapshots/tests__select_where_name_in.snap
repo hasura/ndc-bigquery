@@ -1,0 +1,18 @@
+---
+source: crates/postgres-multitenant-ndc/tests/tests.rs
+expression: result
+---
+[
+  {
+    "rows": [
+      {
+        "AlbumId": {
+          "value": 346
+        },
+        "Title": {
+          "value": "Mozart: Chamber Music"
+        }
+      }
+    ]
+  }
+]

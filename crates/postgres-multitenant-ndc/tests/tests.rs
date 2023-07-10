@@ -18,3 +18,51 @@ async fn select_int_and_string() {
     let result = common::test_query("select_int_and_string").await;
     insta::assert_json_snapshot!(result);
 }
+
+#[tokio::test]
+async fn select_where_name_like() {
+    let result = common::test_query("select_where_name_like").await;
+    insta::assert_json_snapshot!(result);
+}
+
+#[tokio::test]
+async fn select_where_name_not_like() {
+    let result = common::test_query("select_where_name_not_like").await;
+    insta::assert_json_snapshot!(result);
+}
+
+#[tokio::test]
+async fn select_where_album_id_less_than() {
+    let result = common::test_query("select_where_album_id_less_than").await;
+    insta::assert_json_snapshot!(result);
+}
+
+#[tokio::test]
+async fn select_where_album_id_less_than_or_equal_to() {
+    let result = common::test_query("select_where_album_id_less_than_or_equal_to").await;
+    insta::assert_json_snapshot!(result);
+}
+
+#[tokio::test]
+async fn select_where_album_id_greater_than() {
+    let result = common::test_query("select_where_album_id_greater_than").await;
+    insta::assert_json_snapshot!(result);
+}
+
+#[tokio::test]
+async fn select_where_album_id_greater_than_or_equal_to() {
+    let result = common::test_query("select_where_album_id_greater_than_or_equal_to").await;
+    insta::assert_json_snapshot!(result);
+}
+
+#[tokio::test]
+async fn select_where_name_in() {
+    let result = common::test_query("select_where_name_in").await;
+    insta::assert_json_snapshot!(result);
+}
+
+#[tokio::test]
+async fn select_where_name_not_in() {
+    let result = common::test_query("select_where_name_not_in").await;
+    insta::assert_json_snapshot!(result);
+}

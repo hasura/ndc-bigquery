@@ -119,6 +119,24 @@ impl Expression {
                 right.to_sql(sql);
                 sql.append_syntax(")");
             }
+            Expression::BinaryArrayOperator {
+                left,
+                operator,
+                right,
+            } => {
+                sql.append_syntax("(");
+                left.to_sql(sql);
+                operator.to_sql(sql);
+                sql.append_syntax("(");
+                for (index, item) in right.iter().enumerate() {
+                    item.to_sql(sql);
+                    if index < (right.len() - 1) {
+                        sql.append_syntax(", ")
+                    }
+                }
+                sql.append_syntax(")");
+                sql.append_syntax(")");
+            }
         }
     }
 }
@@ -127,6 +145,20 @@ impl BinaryOperator {
     pub fn to_sql(&self, sql: &mut SQL) {
         match self {
             BinaryOperator::Equals => sql.append_syntax(" = "),
+            BinaryOperator::GreaterThan => sql.append_syntax(" > "),
+            BinaryOperator::GreaterThanOrEqualTo => sql.append_syntax(" >= "),
+            BinaryOperator::LessThan => sql.append_syntax(" < "),
+            BinaryOperator::LessThanOrEqualTo => sql.append_syntax(" <= "),
+            BinaryOperator::Like => sql.append_syntax(" LIKE "),
+            BinaryOperator::NotLike => sql.append_syntax(" NOT LIKE "),
+        }
+    }
+}
+
+impl BinaryArrayOperator {
+    pub fn to_sql(&self, sql: &mut SQL) {
+        match self {
+            BinaryArrayOperator::In => sql.append_syntax(" IN "),
         }
     }
 }
@@ -137,6 +169,17 @@ impl Value {
             Value::Int4(i) => sql.append_syntax(format!("{}", i).as_str()),
             Value::Bool(true) => sql.append_syntax("true"),
             Value::Bool(false) => sql.append_syntax("false"),
+            Value::String(s) => sql.append_syntax(format!("'{}'", s).as_str()),
+            Value::Array(items) => {
+                sql.append_syntax("ARRAY [");
+                for (index, item) in items.iter().enumerate() {
+                    item.to_sql(sql);
+                    if index < (items.len() - 1) {
+                        sql.append_syntax(", ")
+                    }
+                }
+                sql.append_syntax("]");
+            }
         }
     }
 }
