@@ -7,11 +7,11 @@ mod sync;
 extern crate log;
 
 use crate::sync::start_deployment_sync_thread;
+use axum::BoxError;
 use clap::Parser;
 use routes::create_router;
 use state::ServerState;
 use std::env;
-use std::error::Error;
 
 #[derive(Parser)]
 struct ServerOptions {
@@ -20,7 +20,9 @@ struct ServerOptions {
 }
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn Error>> {
+async fn main() -> Result<(), BoxError> {
+    axum_tracing_opentelemetry::tracing_subscriber_ext::init_subscribers()?;
+
     let server_options = ServerOptions::parse();
     let state = ServerState::default();
 
@@ -32,7 +34,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let address = format!("0.0.0.0:{}", port);
 
     env_logger::init();
-    log::info!("Starting server on {}", address);
+    tracing::info!("Starting server on {}", address);
 
     let deployments_dir = server_options.deployments_dir;
 
@@ -40,7 +42,36 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     axum::Server::bind(&address.parse()?)
         .serve(router.into_make_service())
+        .with_graceful_shutdown(shutdown_signal())
         .await?;
 
     Ok(())
+}
+
+// copied from https://github.com/davidB/axum-tracing-opentelemetry/blob/main/examples/otlp/src/main.rs
+async fn shutdown_signal() {
+    let ctrl_c = async {
+        tokio::signal::ctrl_c()
+            .await
+            .expect("failed to install Ctrl+C handler");
+    };
+
+    #[cfg(unix)]
+    let terminate = async {
+        tokio::signal::unix::signal(tokio::signal::unix::SignalKind::terminate())
+            .expect("failed to install signal handler")
+            .recv()
+            .await;
+    };
+
+    #[cfg(not(unix))]
+    let terminate = std::future::pending::<()>();
+
+    tokio::select! {
+        _ = ctrl_c => {},
+        _ = terminate => {},
+    }
+
+    tracing::warn!("signal received, starting graceful shutdown");
+    opentelemetry::global::shutdown_tracer_provider();
 }

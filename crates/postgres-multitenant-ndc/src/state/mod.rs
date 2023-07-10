@@ -53,7 +53,7 @@ pub async fn update_deployments(
                         // todo: add proper logging.
                         // We purposefully don't fail the entire function,
                         // so that issues reading one deployment won't affect others.
-                        log::error!("There was an issue reading configuration for deployment {deployment_id}: {}", err)
+                        tracing::error!("There was an issue reading configuration for deployment {deployment_id}: {}", err)
                     }
                 }
             }
@@ -114,7 +114,7 @@ async fn create_deployment_context(configuration: DeploymentConfiguration) -> De
         .map_err(|err| {
             // TODO: add proper logging in case of error.
             // be mindful about logging credentials
-            log::error!("There was an issue creating the connection pool: {}", err);
+            tracing::error!("There was an issue creating the connection pool: {}", err);
             err
         })
         .ok();

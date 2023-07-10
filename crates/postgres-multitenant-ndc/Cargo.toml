@@ -9,16 +9,26 @@ edition = "2021"
 axum = "0.6.18"
 axum-extra = "0.7.4"
 axum-macros = "0.3.7"
+axum-tracing-opentelemetry = { version = "0.11.0", features = [
+    "otlp",
+    "tracing_subscriber_ext",
+    "zipkin",                 # provides b3 and b3multi propagators
+] }
+clap = { version = "4.3.9", features = ["derive"] }
+env_logger = "0.10.0"
+gdc-client = { path = "../gdc-client" }
+log = "0.4.19"
+opentelemetry = "0.19.0" # must be same version axum-tracing-opentelemetry uses
+opentelemetry-otlp = { version = "0.12.0", features = [
+    "reqwest-client",
+] } # must be same version axum-tracing-opentelemetry uses
+query-engine = { path = "../query-engine" }
 serde = "1.0.164"
 serde_json = { version = "1.0.97", features = ["raw_value"] }
 sqlx = { version = "0.7.0", features = ["postgres", "runtime-tokio-rustls"] }
 tokio = "1.28.2"
+tracing = "0.1.37"
 uuid = "1.3.4"
-gdc-client = { path = "../gdc-client" }
-clap = { version = "4.3.9", features = ["derive"] }
-query-engine = { path = "../query-engine" }
-log = "0.4.19"
-env_logger = "0.10.0"
 
 [dev-dependencies]
 axum-test-helper = "0.3.0"

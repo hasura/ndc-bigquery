@@ -1,4 +1,3 @@
-use log;
 /// Execute an execution plan against the database.
 use serde_json;
 use std::collections::HashMap;
@@ -18,7 +17,7 @@ pub async fn execute(
 ) -> Result<models::QueryResponse, sqlx::Error> {
     let query = plan.query();
 
-    log::info!("Generated SQL: {}", query.sql);
+    tracing::info!("Generated SQL: {}", query.sql);
 
     // fetch from the database
     let rows: Vec<sqlx::postgres::PgRow> = sqlx::query(query.sql.as_str()).fetch_all(&pool).await?;
@@ -26,7 +25,7 @@ pub async fn execute(
     // convert to a vector of hashmap of results
     let mut results: Vec<HashMap<String, models::RowFieldValue>> = vec![];
     for row in rows.into_iter() {
-        //log::info!("{:?}", row.columns());
+        //tracing::info!("{:?}", row.columns());
 
         let mut row_results: HashMap<String, models::RowFieldValue> = HashMap::from([]);
         for col in row.columns() {
@@ -40,7 +39,7 @@ pub async fn execute(
         results.push(row_results);
     }
 
-    //log::info!("{:?}", results);
+    //tracing::info!("{:?}", results);
 
     // return results
     Ok(models::QueryResponse(vec![models::RowSet {

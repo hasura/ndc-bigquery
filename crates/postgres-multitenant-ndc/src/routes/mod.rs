@@ -7,12 +7,12 @@ mod post_deployment_mutation;
 mod post_deployment_mutation_explain;
 mod post_deployment_query;
 mod post_deployment_query_explain;
-
 use crate::state::ServerState;
 use axum::{
     routing::{get, post},
     Router,
 };
+use axum_tracing_opentelemetry::{opentelemetry_tracing_layer, response_with_trace_layer};
 
 pub use get_capabilities::get_capabilities;
 pub use get_deployment_capabilities::get_deployment_capabilities;
@@ -26,7 +26,6 @@ pub use post_deployment_query_explain::post_deployment_query_explain;
 
 pub fn create_router(state: ServerState) -> Router {
     Router::new()
-        .route("/health", get(get_health))
         .route("/capabilities", get(get_capabilities))
         .route(
             "/deployment/:deployment_id/capabilities",
@@ -57,4 +56,7 @@ pub fn create_router(state: ServerState) -> Router {
             post(post_deployment_mutation_explain),
         )
         .with_state(state)
+        .layer(response_with_trace_layer())
+        .layer(opentelemetry_tracing_layer())
+        .route("/health", get(get_health)) // don't trace this to avoid noise
 }

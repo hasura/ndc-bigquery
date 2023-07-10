@@ -6,7 +6,6 @@ pub mod sql_string;
 use crate::metadata;
 
 use gdc_client::models;
-use log;
 
 #[derive(Debug)]
 /// Definition of an execution plan to be run against the database.
@@ -131,7 +130,7 @@ impl Translate {
         };
 
         // log and return
-        log::info!("SQL AST: {:?}", select);
+        tracing::info!("SQL AST: {:?}", select);
         Ok(simple_exec_plan(query_request.table, select))
     }
 

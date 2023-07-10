@@ -6,6 +6,9 @@ POSTGRES_DC_PORT := "8081"
 # watch the code and re-run on changes
 dev: start-docker
   RUST_LOG=DEBUG \
+    OTEL_SERVICE_NAME=postgres-agent \
+    OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://localhost:4317 \
+    OTEL_TRACES_SAMPLER=always_on \
     cargo watch -i "tests/snapshots/*" \
     -c \
     -x test \
@@ -15,6 +18,9 @@ dev: start-docker
 # watch the code and run the postgres-multitenant-gdc on changes
 watch-run: start-docker
   RUST_LOG=DEBUG \
+    OTEL_SERVICE_NAME=postgres-agent \
+    OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://localhost:4317 \
+    OTEL_TRACES_SAMPLER=always_on \
     cargo watch -i "tests/snapshots/*" \
     -c \
     -x 'run -- --deployments-dir static/deployments/'
@@ -67,7 +73,8 @@ repl-postgres:
 test-multitenant:
   curl -X POST \
     -H 'Host: example.hasura.app' \
-      -H 'Content-Type: application/json' \
+    -H 'Content-Type: application/json' \
+    -H "X-B3-TraceId: 5f868e8d0968ddff87a747e592d13cec-742de8013df0852f-0" \
     http://localhost:3000/graphql \
     -d '{ "query": "query { AlbumByID(AlbumId: 1) { Title } } " }'
 

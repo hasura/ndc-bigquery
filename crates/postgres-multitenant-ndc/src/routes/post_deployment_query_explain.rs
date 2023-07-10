@@ -17,8 +17,8 @@ pub async fn post_deployment_query_explain(
     Pool(_pool): Pool,
     Json(query_request): Json<models::QueryRequest>,
 ) -> Result<Json<models::ExplainResponse>, ServerError> {
-    log::info!("{}", serde_json::to_string(&query_request).unwrap());
-    log::info!("{:?}", query_request);
+    tracing::info!("{}", serde_json::to_string(&query_request).unwrap());
+    tracing::info!("{:?}", query_request);
 
     let statement = phases::translation::translate(&configuration.tables, query_request)?;
 
