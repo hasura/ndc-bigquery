@@ -66,3 +66,51 @@ async fn select_where_name_not_in() {
     let result = common::test_query("select_where_name_not_in").await;
     insta::assert_json_snapshot!(result);
 }
+
+#[tokio::test]
+async fn select_where_name_ilike() {
+    let result = common::test_query("select_where_name_ilike").await;
+    insta::assert_json_snapshot!(result);
+}
+
+#[tokio::test]
+async fn select_where_name_nilike() {
+    let result = common::test_query("select_where_name_nilike").await;
+    insta::assert_json_snapshot!(result);
+}
+
+#[tokio::test]
+async fn select_where_name_similar() {
+    let result = common::test_query("select_where_name_similar").await;
+    insta::assert_json_snapshot!(result);
+}
+
+#[tokio::test]
+async fn select_where_name_nsimilar() {
+    let result = common::test_query("select_where_name_nsimilar").await;
+    insta::assert_json_snapshot!(result);
+}
+
+#[tokio::test]
+async fn select_where_name_regex() {
+    let result = common::test_query("select_where_name_regex").await;
+    insta::assert_json_snapshot!(result);
+}
+
+#[tokio::test]
+async fn select_where_name_nregex() {
+    let result = common::test_query("select_where_name_nregex").await;
+    insta::assert_json_snapshot!(result);
+}
+
+#[tokio::test]
+async fn select_where_name_iregex() {
+    let result = common::test_query("select_where_name_iregex").await;
+    insta::assert_json_snapshot!(result);
+}
+
+#[tokio::test]
+async fn select_where_name_niregex() {
+    let result = common::test_query("select_where_name_niregex").await;
+    insta::assert_json_snapshot!(result);
+}

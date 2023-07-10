@@ -1,0 +1,90 @@
+---
+source: crates/postgres-multitenant-ndc/tests/tests.rs
+expression: result
+---
+[
+  {
+    "rows": [
+      {
+        "AlbumId": {
+          "value": 1
+        },
+        "Title": {
+          "value": "For Those About To Rock We Salute You"
+        }
+      },
+      {
+        "AlbumId": {
+          "value": 2
+        },
+        "Title": {
+          "value": "Balls to the Wall"
+        }
+      },
+      {
+        "AlbumId": {
+          "value": 3
+        },
+        "Title": {
+          "value": "Restless and Wild"
+        }
+      },
+      {
+        "AlbumId": {
+          "value": 4
+        },
+        "Title": {
+          "value": "Let There Be Rock"
+        }
+      },
+      {
+        "AlbumId": {
+          "value": 5
+        },
+        "Title": {
+          "value": "Big Ones"
+        }
+      },
+      {
+        "AlbumId": {
+          "value": 7
+        },
+        "Title": {
+          "value": "Facelift"
+        }
+      },
+      {
+        "AlbumId": {
+          "value": 8
+        },
+        "Title": {
+          "value": "Warner 25 Anos"
+        }
+      },
+      {
+        "AlbumId": {
+          "value": 9
+        },
+        "Title": {
+          "value": "Plays Metallica By Four Cellos"
+        }
+      },
+      {
+        "AlbumId": {
+          "value": 10
+        },
+        "Title": {
+          "value": "Audioslave"
+        }
+      },
+      {
+        "AlbumId": {
+          "value": 11
+        },
+        "Title": {
+          "value": "Out Of Exile"
+        }
+      }
+    ]
+  }
+]

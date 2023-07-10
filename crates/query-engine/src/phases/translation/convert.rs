@@ -151,6 +151,14 @@ impl BinaryOperator {
             BinaryOperator::LessThanOrEqualTo => sql.append_syntax(" <= "),
             BinaryOperator::Like => sql.append_syntax(" LIKE "),
             BinaryOperator::NotLike => sql.append_syntax(" NOT LIKE "),
+            BinaryOperator::CaseInsensitiveLike => sql.append_syntax(" ILIKE "),
+            BinaryOperator::NotCaseInsensitiveLike => sql.append_syntax(" NOT ILIKE "),
+            BinaryOperator::Similar => sql.append_syntax(" SIMILAR TO "),
+            BinaryOperator::NotSimilar => sql.append_syntax(" NOT SIMILAR TO "),
+            BinaryOperator::Regex => sql.append_syntax(" ~ "),
+            BinaryOperator::NotRegex => sql.append_syntax(" !~ "),
+            BinaryOperator::CaseInsensitiveRegex => sql.append_syntax(" ~* "),
+            BinaryOperator::NotCaseInsensitiveRegex => sql.append_syntax(" !~* "),
         }
     }
 }

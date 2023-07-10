@@ -75,6 +75,8 @@ pub enum Expression {
 // we should consider at least the list in `Hasura.Backends.Postgres.Translate.BoolExp`
 // have skipped column checks for now, ie, CEQ, CNE, CGT etc
 // have skipped casts for now
+// we'd like to remove all the Not variants internally, but first we'll check there are no
+// performance implications
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum BinaryOperator {
     Equals,
@@ -84,6 +86,14 @@ pub enum BinaryOperator {
     LessThanOrEqualTo,
     Like,
     NotLike,
+    CaseInsensitiveLike,
+    NotCaseInsensitiveLike,
+    Similar,
+    NotSimilar,
+    Regex,
+    NotRegex,
+    CaseInsensitiveRegex,
+    NotCaseInsensitiveRegex,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
