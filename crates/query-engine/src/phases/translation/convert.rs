@@ -12,12 +12,14 @@ impl With {
             if self.recursive {
                 sql.append_syntax("RECURSIVE ");
             }
-            for cte in &self.common_table_expressions {
-                sql.append_syntax(" ");
+
+            let ctes = &self.common_table_expressions;
+            for (index, cte) in ctes.iter().enumerate() {
                 cte.to_sql(sql);
-                sql.append_syntax(",");
+                if index < (ctes.len() - 1) {
+                    sql.append_syntax(", ")
+                }
             }
-            sql.sql.pop(); // removing the last comma added by cte
         }
     }
 }
@@ -46,16 +48,21 @@ impl Select {
     pub fn to_sql(&self, sql: &mut SQL) {
         sql.append_syntax("SELECT ");
         let SelectList(select_list) = &self.select_list;
-        for (col, expr) in select_list {
+        for (index, (col, expr)) in select_list.iter().enumerate() {
             expr.to_sql(sql);
             sql.append_syntax(" AS ");
             col.to_sql(sql);
-            sql.append_syntax(",");
+            if index < (select_list.len() - 1) {
+                sql.append_syntax(", ")
+            }
         }
-        sql.sql.pop(); // pop the last comma
+
         sql.append_syntax(" ");
 
-        self.from.to_sql(sql);
+        match &self.from {
+            Some(from) => from.to_sql(sql),
+            None => (),
+        }
         self.where_.to_sql(sql);
         self.limit.to_sql(sql);
     }
@@ -67,6 +74,13 @@ impl From {
         match &self {
             From::Table { name, alias } => {
                 name.to_sql(sql);
+                sql.append_syntax(" AS ");
+                alias.to_sql(sql);
+            }
+            From::Select { select, alias } => {
+                sql.append_syntax("(");
+                select.to_sql(sql);
+                sql.append_syntax(")");
                 sql.append_syntax(" AS ");
                 alias.to_sql(sql);
             }
@@ -125,16 +139,35 @@ impl Expression {
                 right,
             } => {
                 sql.append_syntax("(");
-                left.to_sql(sql);
-                operator.to_sql(sql);
+                {
+                    left.to_sql(sql);
+                    operator.to_sql(sql);
+                    sql.append_syntax("(");
+                    for (index, item) in right.iter().enumerate() {
+                        item.to_sql(sql);
+                        if index < (right.len() - 1) {
+                            sql.append_syntax(", ")
+                        }
+                    }
+                    sql.append_syntax(")");
+                }
+                sql.append_syntax(")");
+            }
+            Expression::FunctionCall { function, args } => {
+                function.to_sql(sql);
                 sql.append_syntax("(");
-                for (index, item) in right.iter().enumerate() {
-                    item.to_sql(sql);
-                    if index < (right.len() - 1) {
+                for (index, arg) in args.iter().enumerate() {
+                    arg.to_sql(sql);
+                    if index < (args.len() - 1) {
                         sql.append_syntax(", ")
                     }
                 }
                 sql.append_syntax(")");
+            }
+            Expression::RowToJson(select) => {
+                sql.append_syntax("row_to_json");
+                sql.append_syntax("(");
+                select.to_sql(sql);
                 sql.append_syntax(")");
             }
         }
@@ -171,13 +204,22 @@ impl BinaryArrayOperator {
     }
 }
 
+impl Function {
+    pub fn to_sql(&self, sql: &mut SQL) {
+        match self {
+            Function::Coalesce => sql.append_syntax("coalesce"),
+            Function::JsonAgg => sql.append_syntax("json_agg"),
+        }
+    }
+}
+
 impl Value {
     pub fn to_sql(&self, sql: &mut SQL) {
         match &self {
             Value::Int4(i) => sql.append_syntax(format!("{}", i).as_str()),
+            Value::String(s) => sql.append_syntax(format!("'{}'", s).as_str()),
             Value::Bool(true) => sql.append_syntax("true"),
             Value::Bool(false) => sql.append_syntax("false"),
-            Value::String(s) => sql.append_syntax(format!("'{}'", s).as_str()),
             Value::Array(items) => {
                 sql.append_syntax("ARRAY [");
                 for (index, item) in items.iter().enumerate() {

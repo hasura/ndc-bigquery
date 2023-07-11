@@ -108,14 +108,12 @@ impl Translate {
             .collect::<Vec<_>>();
 
         // construct a simple select with the table name, alias, and selected columns.
-        let mut select = sql_ast::simple_select(
-            columns,
-            sql_ast::From::Table {
-                // @todo: how do we know the name of the table schema? assume public for now.
-                name: table,
-                alias: table_alias,
-            },
-        );
+        let mut select = sql_ast::simple_select(columns);
+
+        select.from = Some(sql_ast::From::Table {
+            name: table,
+            alias: table_alias,
+        });
 
         // translate where
         select.where_ = sql_ast::Where(match query_request.query.predicate {
@@ -129,9 +127,16 @@ impl Translate {
             offset: query_request.query.offset,
         };
 
+        // wrap the sql in row_to_json and json_agg
+        let final_select = sql_ast::select_as_json(
+            select,
+            self.make_column_alias("rows".to_string()),
+            self.make_table_alias("root".to_string()),
+        );
+
         // log and return
-        tracing::info!("SQL AST: {:?}", select);
-        Ok(simple_exec_plan(query_request.table, select))
+        tracing::info!("SQL AST: {:?}", final_select);
+        Ok(simple_exec_plan(query_request.table, final_select))
     }
 
     /// create column aliases using this function so they get a unique index.

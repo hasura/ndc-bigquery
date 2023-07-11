@@ -5,7 +5,7 @@ POSTGRES_DC_PORT := "8081"
 
 # watch the code and re-run on changes
 dev: start-docker
-  RUST_LOG=DEBUG \
+  RUST_LOG=INFO \
     OTEL_SERVICE_NAME=postgres-agent \
     OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://localhost:4317 \
     OTEL_TRACES_SAMPLER=always_on \
@@ -106,4 +106,3 @@ build-with-nix:
 build-docker-with-nix:
   nix build .#docker --print-build-logs
   docker load < ./result
-
