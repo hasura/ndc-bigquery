@@ -1,16 +1,14 @@
-#[allow(unused_imports)] // Server state is used by a dev time macro
-use crate::{
-    error::ServerError,
-    extract::{Configuration, Pool},
-    state::ServerState,
-};
 use axum::Json;
 
 use gdc_client::models;
-
 use query_engine::phases;
 
-#[axum_macros::debug_handler(state = ServerState)]
+use crate::{
+    error::ServerError,
+    extract::{Configuration, Pool},
+};
+
+#[axum_macros::debug_handler(state = crate::state::ServerState)]
 pub async fn post_deployment_query(
     // this will contain table of which tables live where, etc
     Configuration(configuration): Configuration,

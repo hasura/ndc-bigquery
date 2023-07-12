@@ -34,6 +34,8 @@ let
   buildArgs = {
     inherit src;
 
+    pname = "postgres-ndc";
+
     buildInputs = [
       openssl
     ] ++ lib.optionals stdenv.hostPlatform.isDarwin [

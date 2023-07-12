@@ -1,17 +1,16 @@
 use axum::Json;
 
-#[allow(unused_imports)] // Server state is used by a dev time macro
-use crate::{
-    error::ServerError,
-    extract::{Configuration, Pool},
-    state::ServerState,
-};
 use gdc_client::models;
 use query_engine::phases;
 
+use crate::{
+    error::ServerError,
+    extract::{Configuration, Pool},
+};
+
 // extremely basic version of explain where we just return the SQL we have created
 
-#[axum_macros::debug_handler(state = ServerState)]
+#[axum_macros::debug_handler(state = crate::state::ServerState)]
 pub async fn post_deployment_query_explain(
     Configuration(configuration): Configuration,
     Pool(_pool): Pool,

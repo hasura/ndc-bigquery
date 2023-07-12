@@ -3,10 +3,9 @@ use gdc_client::models::{
     Capabilities, CapabilitiesResponse, MutationCapabilities, QueryCapabilities,
 };
 
-#[allow(unused_imports)] // Server state is used by a dev time macro
-use crate::{extract::Configuration, state::ServerState};
+use crate::extract::Configuration;
 
-#[axum_macros::debug_handler(state = ServerState)]
+#[axum_macros::debug_handler(state = crate::state::ServerState)]
 pub async fn get_deployment_capabilities(
     Configuration(_configuration): Configuration,
 ) -> Json<CapabilitiesResponse> {

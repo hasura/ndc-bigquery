@@ -1,14 +1,13 @@
 use axum::Json;
 
-#[allow(unused_imports)] // Server state is used by a dev time macro
+use gdc_client::models::{ExplainResponse, MutationRequest};
+
 use crate::{
     error::ServerError,
     extract::{Configuration, Pool},
-    state::ServerState,
 };
-use gdc_client::models::{ExplainResponse, MutationRequest};
 
-#[axum_macros::debug_handler(state = ServerState)]
+#[axum_macros::debug_handler(state = crate::state::ServerState)]
 pub async fn post_deployment_mutation_explain(
     Configuration(_configuration): Configuration,
     Pool(_pool): Pool,

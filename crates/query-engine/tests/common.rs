@@ -1,5 +1,4 @@
 use query_engine::phases::translation;
-use serde_json;
 use std::fs;
 
 /// Run a query against the server, get the result, and compare against the snapshot.

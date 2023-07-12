@@ -1,5 +1,4 @@
 [workspace.package]
-name = "postgres-ndc"
 version = "0.1.0"
 
 [workspace]
