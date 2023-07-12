@@ -114,3 +114,9 @@ async fn select_where_name_niregex() {
     let result = common::test_query("select_where_name_niregex").await;
     insta::assert_json_snapshot!(result);
 }
+
+#[tokio::test]
+async fn select_order_by_name() {
+    let result = common::test_query("select_order_by_name").await;
+    insta::assert_json_snapshot!(result);
+}

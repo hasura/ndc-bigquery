@@ -63,7 +63,11 @@ impl Select {
             Some(from) => from.to_sql(sql),
             None => (),
         }
+
         self.where_.to_sql(sql);
+
+        self.order_by.to_sql(sql);
+
         self.limit.to_sql(sql);
     }
 }
@@ -298,5 +302,35 @@ impl ColumnAlias {
         //let name = format!("hasu_col_{}_{}", self.unique_index, self.name);
         let name = self.name.to_string();
         sql.append_identifier(&name);
+    }
+}
+
+impl OrderBy {
+    pub fn to_sql(&self, sql: &mut SQL) {
+        if !self.elements.is_empty() {
+            sql.append_syntax(" ORDER BY ");
+            for (index, order_by_item) in self.elements.iter().enumerate() {
+                order_by_item.to_sql(sql);
+                if index < (self.elements.len() - 1) {
+                    sql.append_syntax(", ")
+                }
+            }
+        }
+    }
+}
+
+impl OrderByElement {
+    pub fn to_sql(&self, sql: &mut SQL) {
+        self.target.to_sql(sql);
+        self.direction.to_sql(sql)
+    }
+}
+
+impl OrderByDirection {
+    pub fn to_sql(&self, sql: &mut SQL) {
+        match self {
+            OrderByDirection::Asc => sql.append_syntax(" ASC "),
+            OrderByDirection::Desc => sql.append_syntax(" DESC "),
+        }
     }
 }

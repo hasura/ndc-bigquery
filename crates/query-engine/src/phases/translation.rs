@@ -112,8 +112,14 @@ impl Translate {
 
         select.from = Some(sql_ast::From::Table {
             name: table,
-            alias: table_alias,
+            alias: table_alias.clone(),
         });
+
+        // translate order_by
+        select.order_by = self.translate_order_by(
+            sql_ast::TableName::AliasedTable(table_alias),
+            query_request.query.order_by,
+        );
 
         // translate where
         select.where_ = sql_ast::Where(match query_request.query.predicate {
@@ -155,6 +161,50 @@ impl Translate {
         sql_ast::TableAlias {
             unique_index: index,
             name,
+        }
+    }
+
+    fn translate_order_by(
+        &mut self,
+        table: sql_ast::TableName,
+        order_by: Option<models::OrderBy>,
+    ) -> sql_ast::OrderBy {
+        match order_by {
+            None => sql_ast::OrderBy { elements: vec![] },
+            Some(models::OrderBy { elements }) => {
+                let order_by_parts = elements
+                    .iter()
+                    .map(|order_by| sql_ast::OrderByElement {
+                        target: match &order_by.target {
+                            models::OrderByTarget::Column { name, path } => {
+                                if path.is_empty() {
+                                    sql_ast::Expression::ColumnName(
+                                        sql_ast::ColumnName::AliasedColumn {
+                                            table: table.clone(),
+                                            alias: self.make_column_alias(name.to_string()),
+                                        },
+                                    )
+                                } else {
+                                    panic!("relationships not implemented!")
+                                }
+                            }
+                            models::OrderByTarget::SingleColumnAggregate { .. } => {
+                                panic!("aggregates not implemented!")
+                            }
+                            models::OrderByTarget::StarCountAggregate { .. } => {
+                                panic!("aggregates not implemented!")
+                            }
+                        },
+                        direction: match order_by.order_direction {
+                            models::OrderDirection::Asc => sql_ast::OrderByDirection::Asc,
+                            models::OrderDirection::Desc => sql_ast::OrderByDirection::Desc,
+                        },
+                    })
+                    .collect();
+                sql_ast::OrderBy {
+                    elements: order_by_parts,
+                }
+            }
         }
     }
 

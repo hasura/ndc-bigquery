@@ -46,7 +46,22 @@ pub struct Where(pub Expression);
 pub struct GroupBy {}
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct OrderBy {}
+pub struct OrderBy {
+    pub elements: Vec<OrderByElement>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum OrderByDirection {
+    Asc,
+    Desc,
+}
+
+// todo: should we also include option for specifying NULLS FIRST | NULLS LAST
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct OrderByElement {
+    pub target: Expression,
+    pub direction: OrderByDirection,
+}
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Limit {
@@ -175,7 +190,7 @@ pub fn empty_group_by() -> GroupBy {
     GroupBy {}
 }
 pub fn empty_order_by() -> OrderBy {
-    OrderBy {}
+    OrderBy { elements: vec![] }
 }
 pub fn empty_limit() -> Limit {
     Limit {
