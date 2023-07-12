@@ -1,0 +1,14 @@
+{
+  "Album": {
+    "schema_name": "public",
+    "table_name": "Album",
+    "columns": {
+      "Id": {
+        "name": "AlbumId"
+      },
+      "Title": {
+        "name": "Title"
+      }
+    }
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "table": "Album",
+  "query": {
+    "fields": {
+      "AlbumId": {
+        "type": "column",
+        "column": "AlbumId",
+        "arguments": {}
+      }
+	},
+    "where": {
+      "type": "and",
+      "expressions": [
+        {
+          "type": "binary_array_comparison_operator",
+          "column": {
+            "type": "column",
+            "name": "Title",
+            "path": []
+          },
+          "operator": "in",
+          "values": [
+            {
+              "type": "scalar",
+              "value": "Mozart: Chamber Music"
+            },
+            {
+              "type": "scalar",
+              "value": "Something else"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "arguments": {},
+  "table_relationships": {}
+}

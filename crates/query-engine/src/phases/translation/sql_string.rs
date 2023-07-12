@@ -1,10 +1,8 @@
 /// Type definitions of a low-level SQL string representation.
-use super::sql_ast::Value;
-
 #[derive(Debug, PartialEq, Eq)]
 pub struct SQL {
     pub sql: String,
-    pub params: Vec<Value>,
+    pub params: Vec<Param>,
     /// for internal use and tests only
     pub param_index: u64,
 }
@@ -13,6 +11,11 @@ impl Default for SQL {
     fn default() -> Self {
         Self::new()
     }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum Param {
+    String(String),
 }
 
 #[derive(Debug)]
@@ -33,9 +36,9 @@ impl SQL {
         // todo: sanitize
         self.sql.push_str(format!("\"{}\"", sql).as_str());
     }
-    pub fn append_param(&mut self, value: Value) {
+    pub fn append_param(&mut self, param: Param) {
         self.param_index += 1;
         self.sql.push_str(format!("${}", self.param_index).as_str());
-        self.params.push(value);
+        self.params.push(param);
     }
 }

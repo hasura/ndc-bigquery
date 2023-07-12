@@ -216,8 +216,9 @@ impl Function {
 impl Value {
     pub fn to_sql(&self, sql: &mut SQL) {
         match &self {
+            Value::EmptyJsonArray => sql.append_syntax("'[]'"),
             Value::Int4(i) => sql.append_syntax(format!("{}", i).as_str()),
-            Value::String(s) => sql.append_syntax(format!("'{}'", s).as_str()),
+            Value::String(s) => sql.append_param(Param::String(s.clone())),
             Value::Bool(true) => sql.append_syntax("true"),
             Value::Bool(false) => sql.append_syntax("false"),
             Value::Array(items) => {

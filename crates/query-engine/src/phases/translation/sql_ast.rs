@@ -128,6 +128,7 @@ pub enum Value {
     Bool(bool),
     String(String),
     Array(Vec<Value>),
+    EmptyJsonArray,
 }
 
 /// aliases that we give to relations
@@ -236,7 +237,7 @@ pub fn select_as_json(
                             table_alias.clone(),
                         ))],
                     },
-                    Expression::Value(Value::String("[]".to_string())),
+                    Expression::Value(Value::EmptyJsonArray),
                 ],
             },
         )]),
