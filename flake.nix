@@ -54,7 +54,7 @@
         };
 
         rustDevToolchain = rustToolchain.override {
-          extensions = [ "rust-analyzer" ];
+          extensions = [ "rust-analyzer" "clippy" ];
         };
       in
       {
@@ -113,7 +113,8 @@
 
             # development
             pkgs.just
-
+            pkgs.cargo-watch
+            pkgs.cargo-insta
             pkgs.rnix-lsp
             rustDevToolchain
             pkgs.pkg-config

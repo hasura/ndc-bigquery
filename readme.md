@@ -44,6 +44,8 @@ just run-postgres-ndc
 	 | jq
    ```
 
+Among the docker containers is a Jaeger instance for tracing/debugging, accessible at http://127.0.0.1:4002.
+
 ## General structure
 
 The turn a request into a query and run it work lives in [crates/query-engine/](crates/query-engine/).
@@ -74,7 +76,7 @@ The multitenant server lives in [crates/postgres-multitenant-ndc](crates/postgre
 
 ## Multitenant example
 
-1. Run `just run-postgres-multitenant-dc`
+1. Run `just run-postgres-ndc`
 2. Run `just run-v3-multitenant`
 3. Run `just test-multitenant`
 
