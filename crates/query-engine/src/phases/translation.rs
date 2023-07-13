@@ -7,9 +7,12 @@ use crate::metadata;
 
 use gdc_client::models;
 
+use std::collections::HashMap;
+
 #[derive(Debug)]
 /// Definition of an execution plan to be run against the database.
 pub struct ExecutionPlan {
+    pub variables: Option<Vec<HashMap<String, serde_json::Value>>>,
     pub root_field: String,
     /// Run before the query. Should be a sql_ast in the future.
     pub pre: Vec<sql_string::DDL>,
@@ -42,8 +45,13 @@ pub fn translate(
 }
 
 /// A simple execution plan with only a root field and a query.
-pub fn simple_exec_plan(root_field: String, query: sql_ast::Select) -> ExecutionPlan {
+pub fn simple_exec_plan(
+    variables: Option<Vec<HashMap<String, serde_json::Value>>>,
+    root_field: String,
+    query: sql_ast::Select,
+) -> ExecutionPlan {
     ExecutionPlan {
+        variables,
         root_field,
         pre: vec![],
         query,
@@ -54,7 +62,7 @@ pub fn simple_exec_plan(root_field: String, query: sql_ast::Select) -> Execution
 /// State for the translation phase
 pub struct Translate {
     /// give each alias a unique name using this number.
-    pub unique_index: u64,
+    unique_index: u64,
 }
 
 impl Default for Translate {
@@ -142,7 +150,11 @@ impl Translate {
 
         // log and return
         tracing::info!("SQL AST: {:?}", final_select);
-        Ok(simple_exec_plan(query_request.table, final_select))
+        Ok(simple_exec_plan(
+            query_request.variables,
+            query_request.table,
+            final_select,
+        ))
     }
 
     /// create column aliases using this function so they get a unique index.
@@ -214,7 +226,6 @@ impl Translate {
         table: &sql_ast::TableName,
         predicate: models::Expression,
     ) -> sql_ast::Expression {
-        println!("{:?}", predicate);
         match predicate {
             models::Expression::And { expressions } => expressions
                 .into_iter()
@@ -319,8 +330,9 @@ fn translate_comparison_value(
         models::ComparisonValue::Scalar { value: json_value } => {
             sql_ast::Expression::Value(translate_json_value(&json_value))
         }
-        // dummy
-        _ => sql_ast::Expression::Value(sql_ast::Value::Bool(true)),
+        models::ComparisonValue::Variable { name: var } => {
+            sql_ast::Expression::Value(sql_ast::Value::Variable(var))
+        }
     }
 }
 

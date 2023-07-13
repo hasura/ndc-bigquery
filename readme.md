@@ -36,7 +36,13 @@ just run-postgres-ndc
 
 1. Start the database sample: `just start-docker`
 2. Compile, run tests, and rerun server on file changes: `just dev`
-3. Query the connector via curl: `curl -X POST http://localhost:8666/query`
+3. Query the connector via curl:
+   ```
+   curl -H "Content-Type: application/json" \
+     --data "@crates/postgres-multitenant-ndc/tests/goldenfiles/select_where_variable.json" \
+	 http://localhost:8081/deployment/88011674-8513-4d6b-897a-4ab856e0bb8a/query \
+	 | jq
+   ```
 
 ## General structure
 
@@ -137,4 +143,3 @@ Internally logging levels are set like this:
 
 So traces from `axum_tracing_opentelemetry` default to `info`, logs from `otel`
 default to `debug`, and everything else defaults to `info`.
-

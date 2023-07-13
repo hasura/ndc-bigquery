@@ -120,3 +120,15 @@ async fn select_order_by_name() {
     let result = common::test_query("select_order_by_name").await;
     insta::assert_json_snapshot!(result);
 }
+
+#[tokio::test]
+async fn select_where_variable() {
+    let result = common::test_query("select_where_variable").await;
+    insta::assert_json_snapshot!(result);
+}
+
+#[tokio::test]
+async fn select_where_variable_int() {
+    let result = common::test_query("select_where_variable_int").await;
+    insta::assert_json_snapshot!(result);
+}

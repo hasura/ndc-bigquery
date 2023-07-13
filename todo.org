@@ -12,14 +12,16 @@ Figure out how to appropriately log information such as the request, the generat
 the results, the response, the errors.
 *** DONE Limits and offsets
 We currently support limits and offsets, but we don't have a test for them.
-*** Support postgres data types
+*** DONE Support postgres data types
 We need to decode our [[https://hasura.io/docs/latest/schema/postgres/postgresql-types/][supported postgres types]] in ~execution.rs~ in ~let value: String~.
 We probably need to create an enum type for postgres values write a serde_json decoder for them.
 *** Handle errors
 The are multiple errors that can occur when running a query. One of the is a 'database error'
 which is represented by the ~sqlx::Error~ type. Figure out what other errors exist and respond
 gracefully on errors.
-*** Implement filtering
+*** Return json error
+When parsing of a query fails, the server should return a json error.
+*** DONE Implement filtering
 We currently support expressions with equals, and, or, and not,
 but we don't have a test for them.
 

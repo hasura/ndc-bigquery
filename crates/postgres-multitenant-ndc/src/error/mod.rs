@@ -3,7 +3,7 @@ use axum::{
     response::{IntoResponse, Response},
     Json,
 };
-use query_engine::phases::translation;
+use query_engine::phases::{execution, translation};
 use serde::Serialize;
 
 pub enum ServerError {
@@ -56,5 +56,14 @@ impl From<String> for ServerError {
 impl From<translation::Error> for ServerError {
     fn from(value: translation::Error) -> Self {
         ServerError::QueryError(value.to_string())
+    }
+}
+
+impl From<execution::Error> for ServerError {
+    fn from(err: execution::Error) -> Self {
+        match err {
+            execution::Error::Query(err) => ServerError::QueryError(err),
+            execution::Error::DB(err) => ServerError::DatabaseError(err.to_string()),
+        }
     }
 }

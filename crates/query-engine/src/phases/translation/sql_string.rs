@@ -13,11 +13,16 @@ impl Default for SQL {
     }
 }
 
+/// A parameter for a parameterized query.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Param {
+    /// A literal string
     String(String),
+    /// A variable name to look up in the `variables` field in a `QueryRequest`.
+    Variable(String),
 }
 
+/// A DDL statement.
 #[derive(Debug)]
 pub struct DDL(pub SQL);
 

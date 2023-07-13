@@ -27,7 +27,13 @@ pub async fn test_query(testname: &str) -> serde_json::Value {
     let _ = update_deployments(test_deployments_dir, state).await;
 
     let client = TestClient::new(router);
-    let request = fs::read_to_string(format!("tests/goldenfiles/{}.json", testname)).unwrap();
+    let request = match fs::read_to_string(format!("tests/goldenfiles/{}.json", testname)) {
+        Ok(request) => request,
+        Err(err) => {
+            println!("Error: {}", err);
+            panic!("error look up");
+        }
+    };
 
     let url = format!("/deployment/{}/query", deployment_name);
 
@@ -40,6 +46,7 @@ pub async fn test_query(testname: &str) -> serde_json::Value {
 
     assert_eq!(res.status(), StatusCode::OK);
 
+    //serde_json::Value::String(res.text().await)
     res.json().await
 }
 

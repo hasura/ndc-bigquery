@@ -1,0 +1,38 @@
+---
+source: crates/postgres-multitenant-ndc/tests/tests.rs
+expression: result
+---
+[
+  {
+    "rows": [
+      {
+        "AlbumId": {
+          "value": 35
+        },
+        "Title": {
+          "value": "Garage Inc. (Disc 1)"
+        }
+      },
+      {
+        "AlbumId": {
+          "value": 149
+        },
+        "Title": {
+          "value": "Garage Inc. (Disc 2)"
+        }
+      }
+    ]
+  },
+  {
+    "rows": [
+      {
+        "AlbumId": {
+          "value": 212
+        },
+        "Title": {
+          "value": "Beyond Good And Evil"
+        }
+      }
+    ]
+  }
+]

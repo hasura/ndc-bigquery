@@ -144,6 +144,7 @@ pub enum Value {
     String(String),
     Array(Vec<Value>),
     EmptyJsonArray,
+    Variable(String),
 }
 
 /// aliases that we give to relations
