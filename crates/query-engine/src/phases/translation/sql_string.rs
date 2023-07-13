@@ -3,8 +3,6 @@
 pub struct SQL {
     pub sql: String,
     pub params: Vec<Param>,
-    /// for internal use and tests only
-    pub param_index: u64,
 }
 
 impl Default for SQL {
@@ -31,19 +29,26 @@ impl SQL {
         SQL {
             sql: "".to_string(),
             params: vec![],
-            param_index: 0,
         }
     }
+    /// Append regular SQL syntax like a keyword (like `SELECT`), punctuation, etc.
     pub fn append_syntax(&mut self, sql: &str) {
         self.sql.push_str(sql);
     }
+    /// Append a SQL identifier like a column or a table name, which will be
+    /// inserted surrounded by quotes
     pub fn append_identifier(&mut self, sql: &String) {
         // todo: sanitize
         self.sql.push_str(format!("\"{}\"", sql).as_str());
     }
+    /// Append a parameter to a parameterized query. Will be represented as $1, $2, and so on,
+    /// in the sql query text, and will be inserted to the `params` vector, so we can
+    /// bind them later when we run the query.
     pub fn append_param(&mut self, param: Param) {
-        self.param_index += 1;
-        self.sql.push_str(format!("${}", self.param_index).as_str());
+        // we want the postgres param to start from 1
+        // so we first push the param and then check the length of the vector.
         self.params.push(param);
+        self.sql
+            .push_str(format!("${}", self.params.len()).as_str());
     }
 }
