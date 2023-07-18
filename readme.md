@@ -11,7 +11,7 @@
     - `rustup component add clippy`
     - `rustup component add rustfmt`
 3. Install [just](https://github.com/casey/just)
-4. Install [docker](https://www.docker.com/)
+4. Install [Docker](https://www.docker.com/)
 5. Install protoc. Here are a few options:
     - `brew install protobuf`
     - `apt-get install protobuf-compiler`

@@ -1,0 +1,81 @@
+version: "3.6"
+
+name: postgres-ndc-component-benchmarks
+
+services:
+  benchmark:
+    image: grafana/k6 
+    command: 
+      - run 
+      - /bench.js
+    environment:
+      DEPLOYMENT_ID: "9f532406-b0c8-4c17-a58a-64286c1e1fd6"
+      K6_OUT: "experimental-prometheus-rw"
+      K6_PROMETHEUS_RW_SERVER_URL: "http://prometheus:9090/api/v1/write"
+      K6_PROMETHEUS_RW_TREND_AS_NATIVE_HISTOGRAM: "true"
+    volumes:
+      - type: bind
+        source: ./bench.js
+        target: /bench.js
+        read_only: true
+    depends_on:
+      agent:
+        condition: service_started
+      prometheus:
+        condition: service_started
+
+  agent:
+    image: ${SELF_IMAGE:-ghcr.io/hasura/postgres-agent-rs}
+    environment:
+      # we don't care about traces right now, and the benchmarks flood the batch buffer
+      OTEL_TRACES_SAMPLER: "always_off"
+    volumes:
+      - type: bind
+        source: ./deployments
+        target: /data/deployments
+        read_only: true
+    depends_on:
+      postgres:
+        condition: service_started
+
+  postgres:
+    image: postgis/postgis:15-3.3-alpine
+    platform: linux/amd64
+    command:
+      - -F # turn fsync off for speed
+      - -N 1000 # increase max connections from 100 so we can run more HGEs
+    environment:
+      POSTGRES_PASSWORD: "password"
+    volumes:
+      - /var/lib/postgresql/data
+      - ./static/chinook-postgres.sql:/docker-entrypoint-initdb.d/chinook-postgres.sql:ro
+
+  # k6 will push statistics to Prometheus
+  prometheus:
+    image: prom/prometheus
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --web.enable-remote-write-receiver
+      - --enable-feature=native-histograms
+    volumes:
+      - type: volume
+        source: prometheus
+        target: /prometheus
+
+  # Grafana will visualize k6 statistics
+  grafana:
+    image: grafana/grafana
+    ports:
+      - 64300:3000
+    environment:
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_BASIC_ENABLED=false
+    volumes:
+      - ../grafana:/etc/grafana/provisioning/
+    depends_on:
+      prometheus:
+        condition: service_started
+
+volumes:
+  prometheus:
