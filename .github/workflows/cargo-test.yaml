@@ -21,5 +21,6 @@ jobs:
       - uses: actions-rs/cargo@v1
         env:
           POSTGRESQL_CONNECTION_STRING: postgresql://postgres:password@localhost:64002
+          RUST_LOG: INFO
         with:
           command: test

@@ -24,11 +24,11 @@ pub async fn execute(
 
     // run the query on each set of variables. The result is a vector of rows each
     // element in the vector is the result of running the query on one set of variables.
-    let rows: Option<Vec<serde_json::Value>> = match plan.variables {
+    let rows: Vec<serde_json::Value> = match plan.variables {
         None => {
             let empty_hashmap = HashMap::new();
             let rows = execute_query(&pool, &query, &empty_hashmap).await?;
-            Some(vec![rows])
+            vec![rows]
         }
         Some(variable_sets) => {
             let mut sets_of_rows = vec![];
@@ -36,7 +36,7 @@ pub async fn execute(
                 let rows = execute_query(&pool, &query, vars).await?;
                 sets_of_rows.push(rows);
             }
-            Some(sets_of_rows)
+            sets_of_rows
         }
     };
 
@@ -51,6 +51,47 @@ pub async fn execute(
     // );
 
     Ok(response)
+}
+
+pub async fn explain(
+    pool: sqlx::PgPool,
+    plan: ExecutionPlan,
+) -> Result<(String, Vec<String>), Error> {
+    let query = plan.explain_query();
+
+    tracing::info!(
+        "\nGenerated SQL: {}\nWith params: {:?}\nAnd variables: {:?}",
+        query.sql,
+        &query.params,
+        &plan.variables,
+    );
+
+    let empty_hashmap = HashMap::new();
+    let sqlx_query = match &plan.variables {
+        None => build_query_with_params(&query, &empty_hashmap).await?,
+        // When we get an explain with multiple variable sets,
+        // we choose the first one and return the plan for it,
+        // as returning multiple plans isn't really supported.
+        Some(variable_sets) => match variable_sets.get(0) {
+            None => build_query_with_params(&query, &empty_hashmap).await?,
+            Some(vars) => build_query_with_params(&query, vars).await?,
+        },
+    };
+
+    // run and fetch from the database
+    let rows: Vec<sqlx::postgres::PgRow> = sqlx_query.fetch_all(&pool).await?;
+
+    let mut results: Vec<String> = vec![];
+    for row in rows.into_iter() {
+        match row.get(0) {
+            None => {}
+            Some(col) => {
+                results.push(col);
+            }
+        }
+    }
+
+    Ok((query.sql, results))
 }
 
 /// Execute the query on one set of variables.

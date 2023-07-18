@@ -44,7 +44,7 @@ pub fn create_router(state: ServerState) -> Router {
             post(post_deployment_query),
         )
         .route(
-            "/deployment/:deployment_id/query/explain",
+            "/deployment/:deployment_id/explain",
             post(post_deployment_query_explain),
         )
         .route(

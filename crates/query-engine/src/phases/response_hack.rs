@@ -18,21 +18,16 @@ use serde_json;
 use serde_with::skip_serializing_none;
 use std::collections::HashMap;
 
-pub fn rows_to_response(sets_of_rows: Option<Vec<serde_json::Value>>) -> models::QueryResponse {
-    match sets_of_rows {
-        None => models::QueryResponse(vec![]),
-        Some(sets_of_rows) => {
-            let rowsets = sets_of_rows
-                .into_iter()
-                .map(|rows| RowSet {
-                    aggregates: None,
-                    rows: serde_json::from_value(rows).unwrap(),
-                })
-                .collect();
+pub fn rows_to_response(sets_of_rows: Vec<serde_json::Value>) -> models::QueryResponse {
+    let rowsets = sets_of_rows
+        .into_iter()
+        .map(|rows| RowSet {
+            aggregates: None,
+            rows: serde_json::from_value(rows).unwrap(),
+        })
+        .collect();
 
-            response_to_response(QueryResponse(rowsets))
-        }
-    }
+    response_to_response(QueryResponse(rowsets))
 }
 
 pub fn response_to_response(QueryResponse(response): QueryResponse) -> models::QueryResponse {

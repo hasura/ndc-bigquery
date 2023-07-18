@@ -27,11 +27,20 @@ impl ExecutionPlan {
     pub fn query(&self) -> sql_string::SQL {
         select_to_sql(&self.query)
     }
+    pub fn explain_query(&self) -> sql_string::SQL {
+        explain_to_sql(&sql_ast::Explain::Select(&self.query))
+    }
 }
 
 pub fn select_to_sql(select: &sql_ast::Select) -> sql_string::SQL {
     let mut sql = sql_string::SQL::new();
     select.to_sql(&mut sql);
+    sql
+}
+
+pub fn explain_to_sql(explain: &sql_ast::Explain) -> sql_string::SQL {
+    let mut sql = sql_string::SQL::new();
+    explain.to_sql(&mut sql);
     sql
 }
 

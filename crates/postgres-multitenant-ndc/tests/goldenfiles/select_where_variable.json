@@ -2,11 +2,6 @@
   "table": "Album",
   "query": {
     "fields": {
-      "AlbumId": {
-        "type": "column",
-        "column": "AlbumId",
-        "arguments": {}
-      },
       "Title": {
         "type": "column",
         "column": "Title",

@@ -44,6 +44,15 @@ impl CommonTableExpression {
     }
 }
 
+impl Explain<'_> {
+    pub fn to_sql(&self, sql: &mut SQL) {
+        sql.append_syntax("EXPLAIN ");
+        match self {
+            Explain::Select(select) => select.to_sql(sql),
+        }
+    }
+}
+
 impl Select {
     pub fn to_sql(&self, sql: &mut SQL) {
         sql.append_syntax("SELECT ");

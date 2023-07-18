@@ -1,6 +1,11 @@
 /// Type definitions of a SQL AST representation.
 
 #[derive(Debug, Clone, PartialEq, Eq)]
+pub enum Explain<'a> {
+    Select(&'a Select),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct With {
     pub recursive: bool,
     pub common_table_expressions: Vec<CommonTableExpression>,
