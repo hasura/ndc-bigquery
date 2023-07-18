@@ -9,26 +9,21 @@
       }
 	},
     "where": {
-      "type": "and",
-      "expressions": [
+      "type": "binary_array_comparison_operator",
+      "column": {
+        "type": "column",
+        "name": "Title",
+        "path": []
+      },
+      "operator": "in",
+      "values": [
         {
-          "type": "binary_array_comparison_operator",
-          "column": {
-            "type": "column",
-            "name": "Title",
-            "path": []
-          },
-          "operator": "in",
-          "values": [
-            {
-              "type": "scalar",
-              "value": "Mozart: Chamber Music"
-            },
-            {
-              "type": "scalar",
-              "value": "Something else"
-            }
-          ]
+          "type": "scalar",
+          "value": "Mozart: Chamber Music"
+        },
+        {
+          "type": "scalar",
+          "value": "Something else"
         }
       ]
     }

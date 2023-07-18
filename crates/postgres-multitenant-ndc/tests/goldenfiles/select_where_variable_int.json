@@ -14,24 +14,19 @@
       }
     },
     "where": {
-      "type": "and",
-      "expressions": [
-        {
-          "type": "binary_comparison_operator",
-          "column": {
-            "type": "column",
-            "name": "AlbumId",
-            "path": []
-          },
-          "operator": {
-            "type": "equal"
-          },
-          "value": {
-            "type": "variable",
-            "name": "id"
-          }
-        }
-      ]
+      "type": "binary_comparison_operator",
+      "column": {
+        "type": "column",
+        "name": "AlbumId",
+        "path": []
+      },
+      "operator": {
+        "type": "equal"
+      },
+      "value": {
+        "type": "variable",
+        "name": "id"
+      }
     }
   },
   "arguments": {},

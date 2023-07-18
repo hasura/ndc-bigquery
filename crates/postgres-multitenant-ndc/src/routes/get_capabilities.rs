@@ -9,7 +9,7 @@ pub async fn get_capabilities() -> Json<CapabilitiesResponse> {
         capabilities: Capabilities {
             explain: Some(empty.clone()),
             query: Some(QueryCapabilities {
-                foreach: Some(empty.clone()),
+                foreach: Some(empty),
                 order_by_aggregate: None,
                 relation_comparisons: None,
             }),
