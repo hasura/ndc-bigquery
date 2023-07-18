@@ -5,9 +5,6 @@ name: postgres-ndc-component-benchmarks
 services:
   benchmark:
     image: grafana/k6 
-    command: 
-      - run 
-      - /bench.js
     environment:
       DEPLOYMENT_ID: "9f532406-b0c8-4c17-a58a-64286c1e1fd6"
       K6_OUT: "experimental-prometheus-rw"
@@ -15,8 +12,8 @@ services:
       K6_PROMETHEUS_RW_TREND_AS_NATIVE_HISTOGRAM: "true"
     volumes:
       - type: bind
-        source: ./bench.js
-        target: /bench.js
+        source: ./benchmarks
+        target: /benchmarks
         read_only: true
     depends_on:
       agent:
@@ -26,6 +23,8 @@ services:
 
   agent:
     image: ${SELF_IMAGE:-ghcr.io/hasura/postgres-agent-rs}
+    ports:
+      - 3000
     environment:
       # we don't care about traces right now, and the benchmarks flood the batch buffer
       OTEL_TRACES_SAMPLER: "always_off"
@@ -44,11 +43,13 @@ services:
     command:
       - -F # turn fsync off for speed
       - -N 1000 # increase max connections from 100 so we can run more HGEs
+    ports:
+      - 5432
     environment:
       POSTGRES_PASSWORD: "password"
     volumes:
       - /var/lib/postgresql/data
-      - ./static/chinook-postgres.sql:/docker-entrypoint-initdb.d/chinook-postgres.sql:ro
+      - ../../static/chinook-postgres.sql:/docker-entrypoint-initdb.d/chinook-postgres.sql:ro
 
   # k6 will push statistics to Prometheus
   prometheus:
@@ -57,6 +58,8 @@ services:
       - --config.file=/etc/prometheus/prometheus.yml
       - --web.enable-remote-write-receiver
       - --enable-feature=native-histograms
+    ports:
+      - 9090
     volumes:
       - type: volume
         source: prometheus

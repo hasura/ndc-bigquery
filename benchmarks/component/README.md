@@ -2,12 +2,14 @@
 
 This is the benchmark suite for the PostgreSQL data connector.
 
-Running `run.sh` will:
+Running `run.sh` with a benchmark name as an argument will:
 
 1. build the PostgreSQL data connector Docker image,
 2. start the database with Chinook data,
 3. start the agent using an associated deployment, and
-4. run the benchmarks using k6.
+4. run a benchmark using k6.
+
+Running without arguments will list available benchmarks.
 
 Everything is run through Docker Compose.
 
@@ -33,3 +35,12 @@ There is a Grafana dashboard which can be viewed as follows:
 1. Open [http://localhost:64300][].
 2. Open the menu on the left and choose "Dashboards".
 3. Choose the "Test Result" dashboard.
+
+## Adding a benchmark
+
+You can add a benchmark by copying one of the files in the "benchmarks"
+subdirectory and altering it.
+
+Please make sure that the name of the file corresponds to the `testid`.
+
+For further information, consult the [k6 documentation](https://k6.io/docs/).

@@ -6,9 +6,9 @@ set -o pipefail
 
 cd -- "$(dirname -- "${BASH_SOURCE[0]}")"
 
-# print its arguments in green
+# prints its arguments to STDERR in green
 function info {
-  echo  "> $(tput setaf 2)$*$(tput sgr0)"
+  echo >&2 "> $(tput setaf 2)$*$(tput sgr0)"
 }
 
 function stop {
@@ -16,20 +16,27 @@ function stop {
   docker compose down agent
 }
 
-info 'Building a Docker image'
-SELF_IMAGE_PATH="$(cd ../.. && nix build --no-link --print-out-paths '.#docker')"
-SELF_IMAGE_NAME="$(cd ../.. && nix eval --raw '.#docker.imageName')"
-SELF_IMAGE_TAG="$(cd ../.. && nix eval --raw '.#docker.imageTag')"
-SELF_IMAGE="${SELF_IMAGE_NAME}:${SELF_IMAGE_TAG}"
-export SELF_IMAGE
+if [[ $# -ne 1 ]]; then
+  echo >&2 "Usage: ${BASH_SOURCE[0]} BENCHMARK"
+  echo >&2
+  echo >&2 "Benchmarks:"
+  ls ./benchmarks | sed 's/^/  - /'
+  exit 2
+fi
 
-info 'Loading the Docker image'
-docker load --quiet < "$SELF_IMAGE_PATH"
+BENCHMARK="$1"
+if [[ ! -f "./benchmarks/$BENCHMARK" ]]; then
+  echo >&2 "ERROR: Unknown benchmark: $BENCHMARK"
+  echo >&2
+  echo >&2 "Benchmarks:"
+  ls ./benchmarks | sed 's/^/  - /'
+  exit 1
+fi
+
+export SELF_IMAGE="$(../../nix/print-docker-image.sh)"
 
 trap stop EXIT INT QUIT TERM
-
-info 'Starting the services'
-docker compose up --detach --wait agent grafana
+./start.sh
 
 info 'Running the benchmarks'
-docker compose run --rm benchmark
+docker compose run --rm benchmark run "/benchmarks/$BENCHMARK"
