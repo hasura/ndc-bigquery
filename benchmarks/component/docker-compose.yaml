@@ -7,10 +7,14 @@ services:
     image: grafana/k6 
     environment:
       DEPLOYMENT_ID: "9f532406-b0c8-4c17-a58a-64286c1e1fd6"
+      OUTPUT_DIRECTORY: "/home/k6/output"
       K6_OUT: "experimental-prometheus-rw"
       K6_PROMETHEUS_RW_SERVER_URL: "http://prometheus:9090/api/v1/write"
       K6_PROMETHEUS_RW_TREND_AS_NATIVE_HISTOGRAM: "true"
     volumes:
+      - type: volume
+        source: benchmark_output
+        target: /home/k6/output
       - type: bind
         source: ./benchmarks
         target: /benchmarks
@@ -20,9 +24,26 @@ services:
         condition: service_started
       prometheus:
         condition: service_started
+      benchmark-output-init:
+        condition: service_completed_successfully
+
+  benchmark-output-init:
+    image: grafana/k6 
+    entrypoint:
+      - sh
+      - -c
+    command:
+      - |
+        /bin/mkdir -p /home/k6/output/summaries
+        /bin/chown -R k6: /home/k6/output
+    user: root
+    volumes:
+      - type: volume
+        source: benchmark_output
+        target: /home/k6/output
 
   agent:
-    image: ${SELF_IMAGE:-ghcr.io/hasura/postgres-agent-rs}
+    image: ghcr.io/hasura/postgres-agent-rs:dev
     ports:
       - 3000
     environment:
@@ -81,4 +102,5 @@ services:
         condition: service_started
 
 volumes:
+  benchmark_output:
   prometheus:

@@ -12,8 +12,7 @@ function info {
 }
 
 info 'Building a Docker image'
-SELF_IMAGE_PATH="$(cd ../.. && nix --no-warn-dirty build --no-link --print-out-paths '.#docker')"
-export SELF_IMAGE="$(../../nix/print-docker-image.sh)"
+SELF_IMAGE_PATH="$(cd ../.. && nix --no-warn-dirty build --no-link --print-out-paths '.#dockerDev')"
 
 info 'Loading the Docker image'
 docker load --quiet < "$SELF_IMAGE_PATH"

@@ -1,7 +1,7 @@
 import { check } from "k6";
 import http from "k6/http";
 
-const testid = "select where";
+const testid = "select-where";
 const url = `http://agent:3000/deployment/${__ENV.DEPLOYMENT_ID}/query`;
 const data = {
   table: "Album",
@@ -42,6 +42,16 @@ export default function () {
   check(response, {
     "status is 200": (r) => r.status == 200,
   });
+}
+
+export function handleSummary(data) {
+  const outputDirectory = __ENV.OUTPUT_DIRECTORY;
+  if (outputDirectory) {
+    const summaryFile = `${outputDirectory}/summaries/${testid}__${new Date().toISOString()}.json`;
+    return {
+      [summaryFile]: JSON.stringify(data),
+    };
+  }
 }
 
 export const options = {

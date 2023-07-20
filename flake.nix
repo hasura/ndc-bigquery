@@ -86,6 +86,11 @@
 
           docker = pkgs.callPackage ./nix/docker.nix { inherit postgres-agent; };
 
+          dockerDev = pkgs.callPackage ./nix/docker.nix {
+            inherit postgres-agent;
+            tag = "dev";
+          };
+
           docker-x86_64-linux = pkgs.callPackage ./nix/docker.nix {
             postgres-agent = postgres-agent-x86_64-linux;
             architecture = "amd64";

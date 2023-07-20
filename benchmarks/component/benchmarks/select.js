@@ -28,6 +28,16 @@ export default function () {
   });
 }
 
+export function handleSummary(data) {
+  const outputDirectory = __ENV.OUTPUT_DIRECTORY;
+  if (outputDirectory) {
+    const summaryFile = `${outputDirectory}/summaries/${testid}__${new Date().toISOString()}.json`;
+    return {
+      [summaryFile]: JSON.stringify(data),
+    };
+  }
+}
+
 export const options = {
   tags: {
     testid,

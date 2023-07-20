@@ -16,8 +16,8 @@ function stop {
   docker compose down agent
 }
 
-if [[ $# -ne 1 ]]; then
-  echo >&2 "Usage: ${BASH_SOURCE[0]} BENCHMARK"
+if [[ $# -eq 0 ]]; then
+  echo >&2 "Usage: ${BASH_SOURCE[0]} BENCHMARK [k6 args...]"
   echo >&2
   echo >&2 "Benchmarks:"
   ls ./benchmarks | sed 's/^/  - /'
@@ -25,6 +25,7 @@ if [[ $# -ne 1 ]]; then
 fi
 
 BENCHMARK="$1"
+shift
 if [[ ! -f "./benchmarks/$BENCHMARK" ]]; then
   echo >&2 "ERROR: Unknown benchmark: $BENCHMARK"
   echo >&2
@@ -33,10 +34,8 @@ if [[ ! -f "./benchmarks/$BENCHMARK" ]]; then
   exit 1
 fi
 
-export SELF_IMAGE="$(../../nix/print-docker-image.sh)"
-
 trap stop EXIT INT QUIT TERM
 ./start.sh
 
 info 'Running the benchmarks'
-docker compose run --rm benchmark run "/benchmarks/$BENCHMARK"
+docker compose run --rm benchmark run "/benchmarks/$BENCHMARK" "$@"

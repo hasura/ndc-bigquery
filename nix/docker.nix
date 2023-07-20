@@ -4,9 +4,8 @@
 , lib
 , architecture ? null
 , name ? "ghcr.io/hasura/postgres-agent-rs"
-
-  # See config options at https://github.com/moby/moby/blob/master/image/spec/v1.2.md#image-json-field-descriptions
-, extraConfig ? { }
+, tag ? null # defaults to the output hash
+, extraConfig ? { } # see config options at: https://github.com/moby/moby/blob/master/image/spec/v1.2.md#image-json-field-descriptions
 }:
 
 let
@@ -29,7 +28,9 @@ let
       };
     } // extraConfig;
   }
-  // lib.optionalAttrs (architecture != null) {
+  // lib.optionalAttrs (tag != null) {
+    inherit tag;
+  } // lib.optionalAttrs (architecture != null) {
     inherit architecture;
   };
 in
