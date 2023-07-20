@@ -7,7 +7,7 @@ use std::collections::HashMap;
 
 use super::response_hack;
 use super::translation::{sql_string, ExecutionPlan};
-use gdc_client::models;
+use ndc_client::models;
 
 pub async fn execute(
     pool: sqlx::PgPool,

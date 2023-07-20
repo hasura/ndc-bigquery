@@ -1,6 +1,6 @@
 use axum::Json;
 
-use gdc_client::models::SchemaResponse;
+use ndc_client::models::SchemaResponse;
 
 use crate::extract::Configuration;
 

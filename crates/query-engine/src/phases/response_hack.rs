@@ -1,4 +1,4 @@
-/// gdc_client::models contains the interface with which we communicate with v3.
+/// ndc_client::models contains the interface with which we communicate with v3.
 /// However, that interface specifies the results we return from the database as rust values,
 /// and we'd like the database to convert all of the data to json and for us to just
 /// send to it v3 without doing any serializing and deserializing.
@@ -11,7 +11,7 @@
 /// and then hack the results from the database to generate a result that matches what v3
 ///
 /// *currently* expects. We expect to remove this module in its entirely soon.
-use gdc_client::models;
+use ndc_client::models;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use serde_json;

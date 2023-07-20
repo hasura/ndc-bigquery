@@ -6,7 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-gdc-client = { path = "../gdc-client" }
+ndc-client = { git = "http://github.com/hasura/ndc-spec.git", rev = "04346c9" }
 query-engine = { path = "../query-engine" }
 
 axum = "0.6.19"

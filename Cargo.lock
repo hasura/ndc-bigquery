@@ -250,7 +250,7 @@ dependencies = [
  "axum",
  "futures",
  "http",
- "opentelemetry",
+ "opentelemetry 0.19.0",
  "opentelemetry-otlp",
  "opentelemetry-semantic-conventions",
  "opentelemetry-zipkin",
@@ -821,19 +821,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "gdc-client"
-version = "1.0.0"
-dependencies = [
- "reqwest",
- "schemars",
- "serde",
- "serde_json",
- "serde_with",
- "url",
- "uuid",
-]
-
-[[package]]
 name = "generic-array"
 version = "0.14.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1339,6 +1326,27 @@ dependencies = [
 ]
 
 [[package]]
+name = "ndc-client"
+version = "1.0.0"
+source = "git+http://github.com/hasura/ndc-spec.git?rev=04346c9#04346c97105e57c64693d839e69f7c27a364bee4"
+dependencies = [
+ "async-trait",
+ "clap",
+ "indexmap 1.9.3",
+ "opentelemetry 0.18.0",
+ "opentelemetry_sdk 0.18.0",
+ "reqwest",
+ "schemars",
+ "serde",
+ "serde_derive",
+ "serde_json",
+ "serde_with",
+ "tokio",
+ "url",
+ "uuid",
+]
+
+[[package]]
 name = "nom"
 version = "7.1.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1477,12 +1485,22 @@ dependencies = [
 
 [[package]]
 name = "opentelemetry"
+version = "0.18.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "69d6c3d7288a106c0a363e4b0e8d308058d56902adefb16f4936f417ffef086e"
+dependencies = [
+ "opentelemetry_api 0.18.0",
+ "opentelemetry_sdk 0.18.0",
+]
+
+[[package]]
+name = "opentelemetry"
 version = "0.19.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5f4b8347cc26099d3aeee044065ecc3ae11469796b4d65d065a23a584ed92a6f"
 dependencies = [
- "opentelemetry_api",
- "opentelemetry_sdk",
+ "opentelemetry_api 0.19.0",
+ "opentelemetry_sdk 0.19.0",
 ]
 
 [[package]]
@@ -1494,7 +1512,7 @@ dependencies = [
  "async-trait",
  "bytes",
  "http",
- "opentelemetry_api",
+ "opentelemetry_api 0.19.0",
  "reqwest",
 ]
 
@@ -1508,7 +1526,7 @@ dependencies = [
  "futures",
  "futures-util",
  "http",
- "opentelemetry",
+ "opentelemetry 0.19.0",
  "opentelemetry-http",
  "opentelemetry-proto",
  "prost",
@@ -1526,7 +1544,7 @@ checksum = "045f8eea8c0fa19f7d48e7bc3128a39c2e5c533d5c61298c548dfefc1064474c"
 dependencies = [
  "futures",
  "futures-util",
- "opentelemetry",
+ "opentelemetry 0.19.0",
  "prost",
  "tonic",
 ]
@@ -1537,7 +1555,7 @@ version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "24e33428e6bf08c6f7fcea4ddb8e358fab0fe48ab877a87c70c6ebe20f673ce5"
 dependencies = [
- "opentelemetry",
+ "opentelemetry 0.19.0",
 ]
 
 [[package]]
@@ -1550,7 +1568,7 @@ dependencies = [
  "futures-core",
  "http",
  "once_cell",
- "opentelemetry",
+ "opentelemetry 0.19.0",
  "opentelemetry-http",
  "opentelemetry-semantic-conventions",
  "reqwest",
@@ -1558,6 +1576,21 @@ dependencies = [
  "serde_json",
  "thiserror",
  "typed-builder",
+]
+
+[[package]]
+name = "opentelemetry_api"
+version = "0.18.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c24f96e21e7acc813c7a8394ee94978929db2bcc46cf6b5014fc612bf7760c22"
+dependencies = [
+ "futures-channel",
+ "futures-util",
+ "indexmap 1.9.3",
+ "js-sys",
+ "once_cell",
+ "pin-project-lite",
+ "thiserror",
 ]
 
 [[package]]
@@ -1578,6 +1611,24 @@ dependencies = [
 
 [[package]]
 name = "opentelemetry_sdk"
+version = "0.18.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1ca41c4933371b61c2a2f214bf16931499af4ec90543604ec828f7a625c09113"
+dependencies = [
+ "async-trait",
+ "crossbeam-channel",
+ "futures-channel",
+ "futures-executor",
+ "futures-util",
+ "once_cell",
+ "opentelemetry_api 0.18.0",
+ "percent-encoding",
+ "rand",
+ "thiserror",
+]
+
+[[package]]
+name = "opentelemetry_sdk"
 version = "0.19.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8b3a2a91fdbfdd4d212c0dcc2ab540de2c2bcbbd90be17de7a7daf8822d010c1"
@@ -1590,7 +1641,7 @@ dependencies = [
  "futures-executor",
  "futures-util",
  "once_cell",
- "opentelemetry_api",
+ "opentelemetry_api 0.19.0",
  "percent-encoding",
  "rand",
  "thiserror",
@@ -1717,10 +1768,10 @@ dependencies = [
  "axum-tracing-opentelemetry",
  "clap",
  "env_logger",
- "gdc-client",
  "insta",
  "log",
- "opentelemetry",
+ "ndc-client",
+ "opentelemetry 0.19.0",
  "opentelemetry-otlp",
  "query-engine",
  "serde",
@@ -1774,8 +1825,8 @@ name = "query-engine"
 version = "0.1.0"
 dependencies = [
  "env_logger",
- "gdc-client",
  "insta",
+ "ndc-client",
  "schemars",
  "serde",
  "serde_json",
@@ -2887,7 +2938,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "00a39dcf9bfc1742fa4d6215253b33a6e474be78275884c216fc2a06267b3600"
 dependencies = [
  "once_cell",
- "opentelemetry",
+ "opentelemetry 0.19.0",
  "tracing",
  "tracing-core",
  "tracing-log",

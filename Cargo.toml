@@ -5,5 +5,4 @@ version = "0.1.0"
 members = [
   "crates/query-engine",
   "crates/postgres-multitenant-ndc",
-  "crates/gdc-client"
 ]

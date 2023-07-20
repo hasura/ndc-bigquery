@@ -5,7 +5,7 @@ use crate::{
     extract::{Configuration, Pool},
 };
 
-use gdc_client::models::{MutationRequest, MutationResponse};
+use ndc_client::models::{MutationRequest, MutationResponse};
 
 #[axum_macros::debug_handler(state = crate::state::ServerState)]
 pub async fn post_deployment_mutation(

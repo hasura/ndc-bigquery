@@ -5,7 +5,7 @@ pub mod sql_ast;
 pub mod sql_string;
 use crate::metadata;
 
-use gdc_client::models;
+use ndc_client::models;
 
 use std::collections::HashMap;
 

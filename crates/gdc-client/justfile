@@ -1,4 +1,0 @@
-# Regenerate the OpenAPI GDC bindings
-gen-gdc-client openapi_json:
-  openapi-generator generate -g rust -o crates/gdc-client -i {{openapi_json}} --skip-validate-spec --package-name gdc-client -c openapi.config.yaml
-  rm -rf crates/gdc-client/{docs,git_push.sh,.openapi-generator}

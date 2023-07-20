@@ -1,4 +1,4 @@
-use gdc_client::models::SchemaResponse;
+use ndc_client::models::SchemaResponse;
 use serde::Deserialize;
 use sqlx::postgres::PgPoolOptions;
 use sqlx::PgPool;

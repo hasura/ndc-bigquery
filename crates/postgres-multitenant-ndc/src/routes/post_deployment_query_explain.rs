@@ -1,6 +1,6 @@
 use axum::Json;
 
-use gdc_client::models;
+use ndc_client::models;
 use query_engine::phases;
 
 use crate::{

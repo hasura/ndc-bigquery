@@ -1,5 +1,5 @@
 use axum::Json;
-use gdc_client::models::{Capabilities, CapabilitiesResponse, QueryCapabilities};
+use ndc_client::models::{Capabilities, CapabilitiesResponse, QueryCapabilities};
 
 #[axum_macros::debug_handler]
 pub async fn get_capabilities() -> Json<CapabilitiesResponse> {

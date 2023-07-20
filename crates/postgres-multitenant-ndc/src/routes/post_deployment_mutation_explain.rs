@@ -1,6 +1,6 @@
 use axum::Json;
 
-use gdc_client::models::{ExplainResponse, MutationRequest};
+use ndc_client::models::{ExplainResponse, MutationRequest};
 
 use crate::{
     error::ServerError,

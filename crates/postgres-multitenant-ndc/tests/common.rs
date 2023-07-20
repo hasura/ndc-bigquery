@@ -1,6 +1,6 @@
 use axum::http::StatusCode;
 use axum_test_helper::TestClient;
-use gdc_client::models::ExplainResponse;
+use ndc_client::models::ExplainResponse;
 use postgres_multitenant_ndc::state::update_deployments;
 use postgres_multitenant_ndc::{routes, state};
 use std::env;
