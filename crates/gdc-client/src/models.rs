@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 use schemars::JsonSchema;
+use serde::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;
 
 // ANCHOR_END

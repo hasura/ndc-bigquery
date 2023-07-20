@@ -6,19 +6,15 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-axum = "0.6.18"
-schemars = { version = "0.8.12", features = ["smol_str"] }
-serde = { version = "1.0.164", features = ["derive"] }
-serde_derive = "^1.0"
-serde_json = "1.0.99"
-serde_with = "^2.0"
-tokio = { version = "1.28.2", features = ["full"] }
-sqlx = { version = "0.7.0", features = [ "runtime-tokio-rustls", "postgres", "uuid", "json" ] }
 gdc-client = { path = "../gdc-client" }
-log = "0.4.19"
+
 env_logger = "0.10.0"
+schemars = { version = "0.8.12", features = ["smol_str"] }
+serde = { version = "1.0.171", features = ["derive"] }
+serde_json = "1.0.103"
+serde_with = "^2.3"
+sqlx = { version = "0.7.1", features = [ "json", "postgres", "runtime-tokio-rustls", "uuid" ] }
 tracing = "0.1.37"
 
 [dev-dependencies]
-insta = { version = "1.30.0", features = ["json"] }
-serde_json = "1.0.99"
+insta = { version = "1.31.0", features = ["json"] }

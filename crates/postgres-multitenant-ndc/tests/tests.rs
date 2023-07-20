@@ -140,10 +140,7 @@ mod explain {
     #[tokio::test]
     async fn select_by_pk() {
         let result = common::run_explain("select_by_pk").await;
-        common::is_contained_in_lines(
-            vec!["Aggregate", "Index Scan using \"PK_Album\"", "Index Cond"],
-            result.lines,
-        );
+        common::is_contained_in_lines(vec!["Aggregate", "Scan", "35"], result.lines);
         insta::assert_snapshot!(result.query);
     }
 

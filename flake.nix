@@ -112,12 +112,13 @@
             pkgs.protobuf
 
             # development
-            pkgs.just
-            pkgs.cargo-watch
+            pkgs.cargo-edit
             pkgs.cargo-insta
+            pkgs.cargo-watch
+            pkgs.just
+            pkgs.pkg-config
             pkgs.rnix-lsp
             rustDevToolchain
-            pkgs.pkg-config
           ];
         };
       });
