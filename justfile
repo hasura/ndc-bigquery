@@ -16,6 +16,14 @@ dev: start-docker
     -x 'run -- --deployments-dir static/deployments/'
 
 # watch the code and run the postgres-multitenant-gdc on changes
+run-quickly: start-docker
+  RUST_LOG=INFO \
+    OTEL_SERVICE_NAME=postgres-agent \
+    OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://localhost:4317 \
+    OTEL_TRACES_SAMPLER=always_on \
+    cargo run --release -- --deployments-dir static/deployments/
+
+# watch the code and run the postgres-multitenant-gdc on changes
 watch-run: start-docker
   RUST_LOG=DEBUG \
     OTEL_SERVICE_NAME=postgres-agent \
@@ -24,6 +32,15 @@ watch-run: start-docker
     cargo watch -i "tests/snapshots/*" \
     -c \
     -x 'run -- --deployments-dir static/deployments/'
+
+# Run the server and produce a flamegraph profile
+flamegraph: start-docker
+  RUST_LOG=DEBUG \
+    OTEL_SERVICE_NAME=postgres-agent \
+    OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://localhost:4317 \
+    OTEL_TRACES_SAMPLER=always_on \
+    cargo flamegraph --dev -- \
+    --deployments-dir static/deployments/
 
 # run postgres + jaeger
 start-docker:

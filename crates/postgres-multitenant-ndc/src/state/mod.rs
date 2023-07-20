@@ -126,7 +126,7 @@ async fn create_deployment_context(configuration: DeploymentConfiguration) -> De
 
 pub async fn create_pool(configuration: &DeploymentConfiguration) -> Result<PgPool, sqlx::Error> {
     PgPoolOptions::new()
-        .max_connections(5)
+        .max_connections(50)
         .connect(&configuration.postgres_database_url)
         .await
 }

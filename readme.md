@@ -46,19 +46,19 @@ just run-postgres-ndc
 
 Among the docker containers is a Jaeger instance for tracing/debugging, accessible at http://127.0.0.1:4002.
 
+### Profile
+
+We can produce a flamegraph using `just flamegraph` using [flamegraph-rs](https://github.com/flamegraph-rs/flamegraph). Follow the installation instructions.
+
+### Benchmark
+
+See [./benchmarks/component/README.md](./benchmarks/component/README.md).
+
+A benchmark history can be viewed [here](https://hasura.github.io/postgres-ndc/dev/bench).
+
 ## General structure
 
-The turn a request into a query and run it work lives in [crates/query-engine/](crates/query-engine/).
-- Input and output types imported from: [crates/gdc-client/src/models.rs](crates/gdc-client/src/models.rs)
-- Compiler phases: [src/phases/](crates/query-engine/src/phases/):
-   - Translation from query request to sql ast: [src/phases/translation.rs](crates/query-engine/src/phases/translation.rs)
-   - Translation from sql_ast to sql_string: [src/phases/translation/](crates/query-engine/src/phases/translation/)
-   - Execution of the plan against postgres: [src/phases/execution.rs](crates/query-engine/src/phases/execution.rs)
-- Unit and integration tests: [tests/](crates/query-engine/)
-
-The multitenant server lives in [crates/postgres-multitenant-ndc](crates/postgres-multitenant-ndc).
-- Entry point: [src/main.rs](crates/postgres-multitenant-ndc/src/main.rs)
-- Routing: [src/routes/](crates/postgres-multitenant-ndc/src/routes/mod.rs)
+See [architecture.md](./architecture.md).
 
 ## Example
 

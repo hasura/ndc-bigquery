@@ -1,7 +1,7 @@
 import { check } from "k6";
 import http from "k6/http";
 
-const testid = "select";
+const testid = "select by-pk";
 // const url = `http://localhost:8081/deployment/88011674-8513-4d6b-897a-4ab856e0bb8a/query`;
 const url = `http://agent:3000/deployment/${__ENV.DEPLOYMENT_ID}/query`;
 const data = {
@@ -9,8 +9,21 @@ const data = {
   query: {
     fields: {
       id: { type: "column", column: "AlbumId", arguments: {} },
-      title: { type: "column", column: "Title", arguments: {} },
-      artist_id: { type: "column", column: "ArtistId", arguments: {} },
+    },
+    where: {
+      type: "binary_comparison_operator",
+      column: {
+        type: "column",
+        name: "AlbumId",
+        path: [],
+      },
+      operator: {
+        type: "equal",
+      },
+      value: {
+        type: "scalar",
+        value: 1,
+      },
     },
   },
   arguments: {},
@@ -27,16 +40,6 @@ export default function () {
   check(response, {
     "status is 200": (r) => r.status == 200,
   });
-}
-
-export function handleSummary(data) {
-  const outputDirectory = __ENV.OUTPUT_DIRECTORY;
-  if (outputDirectory) {
-    const summaryFile = `${outputDirectory}/summaries/${testid}__${new Date().toISOString()}.json`;
-    return {
-      [summaryFile]: JSON.stringify(data),
-    };
-  }
 }
 
 export const options = {
