@@ -4,7 +4,7 @@
     "fields": {
       "AlbumId": {
         "type": "column",
-        "column": "AlbumId",
+        "column": "Id",
         "arguments": {}
       }
 	},

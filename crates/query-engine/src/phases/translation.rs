@@ -94,35 +94,44 @@ impl Translate {
         query_request: models::QueryRequest,
     ) -> Result<ExecutionPlan, Error> {
         // find the table according to the metadata.
-        let table: sql_ast::TableName = match tables_info.get(&query_request.table) {
-            Some(t) => Ok(sql_ast::TableName::DBTable {
-                schema: t.schema_name.clone(),
-                table: t.table_name.clone(),
-            }),
-            None => Error::new("Table not found."),
-        }?;
+        let table_info = tables_info
+            .get(&query_request.table)
+            .ok_or(Error::TableNotFound(query_request.table.clone()))?;
+        let table: sql_ast::TableName = sql_ast::TableName::DBTable {
+            schema: table_info.schema_name.clone(),
+            table: table_info.table_name.clone(),
+        };
         let table_alias: sql_ast::TableAlias = self.make_table_alias(query_request.table.clone());
         let table_alias_name: sql_ast::TableName =
             sql_ast::TableName::AliasedTable(table_alias.clone());
 
         // translate fields to select list
-        let fields = match query_request.query.fields {
-            None => Error::new("no fields in query request."),
-            Some(fields) => Ok(fields),
-        }?;
+        let fields = query_request.query.fields.ok_or(Error::NoFields)?;
 
         // translate fields to columns or relationships.
         let columns: Vec<(sql_ast::ColumnAlias, sql_ast::Expression)> = fields
             .into_iter()
-            .flat_map(|(alias, field)| match field {
-                models::Field::Column { column, .. } => Ok(make_column(
-                    table_alias_name.clone(),
-                    column,
-                    self.make_column_alias(alias),
-                )),
-                models::Field::Relationship { .. } => Error::new("relationships are not supported"),
+            .map(|(alias, field)| match field {
+                models::Field::Column { column, .. } => {
+                    let column_info =
+                        table_info
+                            .columns
+                            .get(&column)
+                            .ok_or(Error::ColumnNotFoundInTable(
+                                column,
+                                query_request.table.clone(),
+                            ))?;
+                    Ok(make_column(
+                        table_alias_name.clone(),
+                        column_info.name.clone(),
+                        self.make_column_alias(alias),
+                    ))
+                }
+                models::Field::Relationship { .. } => {
+                    Err(Error::NotSupported("relationships".to_string()))
+                }
             })
-            .collect::<Vec<_>>();
+            .collect::<Result<Vec<_>, Error>>()?;
 
         // construct a simple select with the table name, alias, and selected columns.
         let mut select = sql_ast::simple_select(columns);
@@ -376,17 +385,28 @@ fn make_column(
 
 /// A type for translation errors.
 #[derive(Debug)]
-pub struct Error(pub String);
-
-impl Error {
-    pub fn new<T>(error: &str) -> Result<T, Error> {
-        Err(Error(format!("Translation failed: {}", error)))
-    }
+pub enum Error {
+    TableNotFound(String),
+    ColumnNotFoundInTable(String, String),
+    NoFields,
+    NotSupported(String),
 }
 
 impl std::fmt::Display for Error {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        let Error(err) = self;
-        write!(f, "{}", err)
+        match self {
+            Error::TableNotFound(table_name) => write!(f, "Table '{}' not found.", table_name),
+            Error::ColumnNotFoundInTable(column_name, table_name) => write!(
+                f,
+                "Column '{}' not found in table '{}'.",
+                column_name, table_name
+            ),
+            Error::NotSupported(thing) => {
+                write!(f, "Queries containing {} are not supported.", thing)
+            }
+            Error::NoFields => {
+                write!(f, "No fields in request.")
+            }
+        }
     }
 }
