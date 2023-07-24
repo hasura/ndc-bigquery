@@ -8,9 +8,29 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+
+      # We need this because ndc-hub and ndc-multitenant are private repositores
+      # and we are using deploy keys to access them.
+      - name: Add SSH keys
+        run: |
+          mkdir -p /home/runner/.ssh
+          echo "${{ secrets.HASURA_CI_USER_BASE64_ENCODED_SSH_KEY }}" | base64 --decode > /home/runner/.ssh/hasura-ci
+          chmod 600 /home/runner/.ssh/hasura-ci
+          cat > /home/runner/.ssh/config <<EOF
+          IdentityFile /home/runner/.ssh/hasura-ci
+          EOF
+
+      - name: Install Protoc
+        uses: arduino/setup-protoc@v2
+        with:
+          version: "23.3"
+
+      - uses: actions/checkout@v2
+
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
+
       - uses: actions/cache@v2
         with:
           path: |
@@ -18,11 +38,10 @@ jobs:
             ~/.cargo/git
             target
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-      - name: Install Protoc
-        uses: arduino/setup-protoc@v2
-        with:
-          version: "23.3"
+
       - uses: actions-rs/cargo@v1
         with:
           command: build
           args: --release --all-features
+        env:
+          CARGO_NET_GIT_FETCH_WITH_CLI: "true"

@@ -6,8 +6,8 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-ndc-client = { git = "http://github.com/hasura/ndc-spec.git", rev = "04346c9" }
-
+ndc-client = { git = "https://github.com/hasura/ndc-spec.git", rev = "04346c9" }
+ndc-hub = { git = "ssh://git@github.com/hasura/ndc-hub.git", rev = "b6f1ce57" }
 env_logger = "0.10.0"
 schemars = { version = "0.8.12", features = ["smol_str"] }
 serde = { version = "1.0.171", features = ["derive"] }

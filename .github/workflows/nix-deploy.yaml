@@ -12,51 +12,66 @@ jobs:
     name: deploy::binary
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout 🛎️
-      uses: actions/checkout@v3
+      # We need this because ndc-hub and ndc-multitenant are private repositores
+      # and we are using deploy keys to access them.
+      - name: Add SSH keys
+        run: |
+          mkdir -p /home/runner/.ssh
+          echo "${{ secrets.HASURA_CI_USER_BASE64_ENCODED_SSH_KEY }}" | base64 --decode > /home/runner/.ssh/hasura-ci
+          chmod 600 /home/runner/.ssh/hasura-ci
+          cat > /home/runner/.ssh/config <<EOF
+          IdentityFile /home/runner/.ssh/hasura-ci
+          EOF
 
-    - name: Install Nix ❄
-      uses: DeterminateSystems/nix-installer-action@v4
+      - name: Checkout 🛎️
+        uses: actions/checkout@v3
 
-    - name: Run the Magic Nix Cache 🔌
-      uses: DeterminateSystems/magic-nix-cache-action@v1
+      - name: Install Nix ❄
+        uses: DeterminateSystems/nix-installer-action@v4
 
-    - name: Login to GitHub Container Registry 📦
-      uses: docker/login-action@v1
-      with:
-        registry: ghcr.io
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Run the Magic Nix Cache 🔌
+        uses: DeterminateSystems/magic-nix-cache-action@v1
 
-    - name: build the crate using nix 🔨
-      run: nix build --print-build-logs
+      - name: Login to GitHub Container Registry 📦
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Create release 🚀
-      uses: actions/upload-artifact@v3
-      with:
-        name: hasura-postgres-agent-rs
-        path: result/bin/postgres-multitenant-ndc
+      - name: build the crate using nix 🔨
+        run: nix build --print-build-logs
+
+      - name: Create release 🚀
+        uses: actions/upload-artifact@v3
+        with:
+          name: hasura-postgres-agent-rs
+          path: result/bin/postgres-multitenant-ndc
 
   docker:
     name: deploy::docker
     needs: binary
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout 🛎️
-      uses: actions/checkout@v3
+      - uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-    - name: Install Nix ❄
-      uses: DeterminateSystems/nix-installer-action@v4
+      - name: Checkout 🛎️
+        uses: actions/checkout@v3
 
-    - name: Run the Magic Nix Cache 🔌
-      uses: DeterminateSystems/magic-nix-cache-action@v1
+      - name: Install Nix ❄
+        uses: DeterminateSystems/nix-installer-action@v4
 
-    - name: Login to GitHub Container Registry 📦
-      uses: docker/login-action@v1
-      with:
-        registry: ghcr.io
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Run the Magic Nix Cache 🔌
+        uses: DeterminateSystems/magic-nix-cache-action@v1
 
-    - name: Deploy 🚀
-      run: nix run .#publish-docker-image ${{ github.ref }}
+      - name: Login to GitHub Container Registry 📦
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Deploy 🚀
+        run: nix run .#publish-docker-image ${{ github.ref }}

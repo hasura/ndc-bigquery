@@ -8,6 +8,7 @@ edition = "2021"
 [dependencies]
 ndc-client = { git = "http://github.com/hasura/ndc-spec.git", rev = "04346c9" }
 query-engine = { path = "../query-engine" }
+ndc-hub-multitenant = { git = "ssh://git@github.com/hasura/ndc-multitenant.git", rev = "8cee46e" }
 
 axum = "0.6.19"
 axum-macros = "0.3.8"
