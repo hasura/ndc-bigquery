@@ -1,6 +1,6 @@
 [
   {
     "data_source": "db",
-    "url": "http://localhost:8666"
+    "url": "http://localhost:8100"
   }
 ]

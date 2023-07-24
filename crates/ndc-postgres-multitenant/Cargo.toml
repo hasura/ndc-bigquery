@@ -1,0 +1,20 @@
+[package]
+name = "ndc-postgres-multitenant"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "ndc-postgres-multitenant"
+path = "bin/main.rs"
+
+[dependencies]
+ndc-hub-multitenant = { git = "ssh://git@github.com/hasura/ndc-multitenant.git", rev = "8cee46e" }
+ndc-postgres = { path = "../ndc-postgres" }
+
+tokio = { version = "1.29.1", features = ["full"] }
+
+[dev-dependencies]
+axum = "0.6.19"
+axum-test-helper = "0.3.0"
+insta = { version = "1.31.0", features = ["json"] }
+env_logger = "0.10.0"

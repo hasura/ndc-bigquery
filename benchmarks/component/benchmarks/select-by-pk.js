@@ -2,8 +2,8 @@ import { check } from "k6";
 import http from "k6/http";
 
 const testid = "select by-pk";
-// const url = `http://localhost:8081/deployment/88011674-8513-4d6b-897a-4ab856e0bb8a/query`;
-const url = `http://agent:3000/deployment/${__ENV.DEPLOYMENT_ID}/query`;
+const url = `http://localhost:8100/query`;
+//const url = `http://agent:3000/deployment/${__ENV.DEPLOYMENT_ID}/query`;
 const data = {
   table: "Album",
   query: {

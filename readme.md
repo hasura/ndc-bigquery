@@ -26,7 +26,7 @@ cargo build
 
 ### Run
 
-Run the multitenant Postgres agent with:
+Run the postgres agent with:
 
 ```
 just run-postgres-ndc
@@ -39,8 +39,8 @@ just run-postgres-ndc
 3. Query the connector via curl:
    ```
    curl -H "Content-Type: application/json" \
-     --data "@crates/postgres-multitenant-ndc/tests/goldenfiles/select_where_variable.json" \
-	 http://localhost:8081/deployment/88011674-8513-4d6b-897a-4ab856e0bb8a/query \
+     --data "@crates/ndc-postgres/tests/goldenfiles/select_where_variable.json" \
+	 http://localhost:8100/query \
 	 | jq
    ```
 
@@ -82,8 +82,8 @@ See [architecture.md](./architecture.md).
 
 ## Write a test
 
-1. Create a new file under `crates/postgres-multitenant-ndc/tests/goldenfiles/<your-test-name>.json`
-2. Create a new test in `crates/postgres-multitenant-ndc/tests/tests.rs` that looks like this:
+1. Create a new file under `crates/ndc-postgres/tests/goldenfiles/<your-test-name>.json`
+2. Create a new test in `crates/ndc-postgres/tests/tests.rs` that looks like this:
    ```rs
    #[tokio::test]
    async fn select_5() {

@@ -1,7 +1,8 @@
+# this will break until we can create a new test deployment binary file
 on:
   push:
     branches:
-      - main
+      - branch-that-does-not-exist-please-change-this-back-to-main-later
 
 name: Component benchmarks
 

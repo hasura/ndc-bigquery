@@ -1,4 +1,5 @@
 {
+	"version": 1,
     "tables": {
         "Album": {
             "schema_name": "public",

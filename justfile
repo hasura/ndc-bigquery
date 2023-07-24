@@ -1,7 +1,7 @@
 POSTGRESQL_CONNECTION_STRING := "postgresql://postgres:password@localhost:64002"
 
 # this is hardcoded in the V3 metadata
-POSTGRES_DC_PORT := "8081"
+POSTGRES_DC_PORT := "8100"
 
 # watch the code and re-run on changes
 dev: start-docker
@@ -13,7 +13,7 @@ dev: start-docker
     -c \
     -x test \
     -x clippy \
-    -x 'run -- --deployments-dir static/deployments/'
+    -x 'run --bin ndc-postgres -- --configuration static/deployments/88011674-8513-4d6b-897a-4ab856e0bb8a.json'
 
 # watch the code and run the postgres-multitenant-gdc on changes
 run-quickly: start-docker
@@ -21,7 +21,7 @@ run-quickly: start-docker
     OTEL_SERVICE_NAME=postgres-agent \
     OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://localhost:4317 \
     OTEL_TRACES_SAMPLER=always_on \
-    cargo run --release -- --deployments-dir static/deployments/
+    cargo run --release --bin ndc-postgres -- --configuration static/deployments/88011674-8513-4d6b-897a-4ab856e0bb8a.json
 
 # watch the code and run the postgres-multitenant-gdc on changes
 watch-run: start-docker
@@ -31,7 +31,15 @@ watch-run: start-docker
     OTEL_TRACES_SAMPLER=always_on \
     cargo watch -i "tests/snapshots/*" \
     -c \
-    -x 'run -- --deployments-dir static/deployments/'
+    -x 'run --bin ndc-postgres -- --configuration static/deployments/88011674-8513-4d6b-897a-4ab856e0bb8a.json'
+
+# watch the code and re-run on changes
+run-multitenant: start-docker
+  RUST_LOG=DEBUG \
+    OTEL_SERVICE_NAME=postgres-agent \
+    OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://localhost:4317 \
+    OTEL_TRACES_SAMPLER=always_on \
+    cargo run --bin ndc-postgres-multitenant -- --deployments-dir ./static/deployments
 
 # Run the server and produce a flamegraph profile
 flamegraph: start-docker
@@ -39,8 +47,8 @@ flamegraph: start-docker
     OTEL_SERVICE_NAME=postgres-agent \
     OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://localhost:4317 \
     OTEL_TRACES_SAMPLER=always_on \
-    cargo flamegraph --dev -- \
-    --deployments-dir static/deployments/
+    cargo flamegraph --dev --bin ndc-postgres -- \
+    --configuration static/deployments/88011674-8513-4d6b-897a-4ab856e0bb8a.json
 
 # run postgres + jaeger
 start-docker:
@@ -58,7 +66,7 @@ run-v3: start-docker
   RUST_LOG=DEBUG cargo run --release \
     --manifest-path ../v3-experiments/Cargo.toml \
     --bin engine -- \
-    --data-connectors-config ./static/data-connectors-config-example-for-multitenant.json \
+    --data-connectors-config ./static/data-connectors-config-example.json \
     --metadata-path ./static/metadata-example.json \
     --secrets-path ./static/secrets-example.json
 
@@ -71,7 +79,7 @@ run-v3-multitenant: start-docker
   RUST_LOG=DEBUG cargo run --release \
     --manifest-path ../v3-experiments/Cargo.toml \
     --bin multitenant -- \
-    --metadata-dir ../v3-experiments/metadata/ \
+    --metadata-dir ./static/metadata/ \
 
 # run-postgres-ndc, pointing it at local postgres etc
 run-postgres-ndc: start-docker

@@ -7,7 +7,7 @@ edition = "2021"
 
 [dependencies]
 ndc-client = { git = "https://github.com/hasura/ndc-spec.git", rev = "04346c9" }
-ndc-hub = { git = "ssh://git@github.com/hasura/ndc-hub.git", rev = "b6f1ce57" }
+
 env_logger = "0.10.0"
 schemars = { version = "0.8.12", features = ["smol_str"] }
 serde = { version = "1.0.171", features = ["derive"] }

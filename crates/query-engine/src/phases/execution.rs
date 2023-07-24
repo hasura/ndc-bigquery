@@ -10,7 +10,7 @@ use super::translation::{sql_string, ExecutionPlan};
 use ndc_client::models;
 
 pub async fn execute(
-    pool: sqlx::PgPool,
+    pool: &sqlx::PgPool,
     plan: ExecutionPlan,
 ) -> Result<models::QueryResponse, Error> {
     let query = plan.query();
@@ -27,13 +27,13 @@ pub async fn execute(
     let rows: Vec<serde_json::Value> = match plan.variables {
         None => {
             let empty_hashmap = HashMap::new();
-            let rows = execute_query(&pool, &query, &empty_hashmap).await?;
+            let rows = execute_query(pool, &query, &empty_hashmap).await?;
             vec![rows]
         }
         Some(variable_sets) => {
             let mut sets_of_rows = vec![];
             for vars in &variable_sets {
-                let rows = execute_query(&pool, &query, vars).await?;
+                let rows = execute_query(pool, &query, vars).await?;
                 sets_of_rows.push(rows);
             }
             sets_of_rows
@@ -54,7 +54,7 @@ pub async fn execute(
 }
 
 pub async fn explain(
-    pool: sqlx::PgPool,
+    pool: &sqlx::PgPool,
     plan: ExecutionPlan,
 ) -> Result<(String, Vec<String>), Error> {
     let query = plan.explain_query();
@@ -79,7 +79,7 @@ pub async fn explain(
     };
 
     // run and fetch from the database
-    let rows: Vec<sqlx::postgres::PgRow> = sqlx_query.fetch_all(&pool).await?;
+    let rows: Vec<sqlx::postgres::PgRow> = sqlx_query.fetch_all(pool).await?;
 
     let mut results: Vec<String> = vec![];
     for row in rows.into_iter() {

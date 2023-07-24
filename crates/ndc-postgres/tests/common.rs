@@ -1,8 +1,8 @@
 use axum::http::StatusCode;
 use axum_test_helper::TestClient;
 use ndc_client::models::ExplainResponse;
-use postgres_multitenant_ndc::state::update_deployments;
-use postgres_multitenant_ndc::{routes, state};
+use ndc_hub;
+use ndc_postgres::connector;
 use std::env;
 use std::fs;
 use std::path::PathBuf;
@@ -36,20 +36,18 @@ pub fn is_contained_in_lines(keywords: Vec<&str>, lines: Vec<String>) {
 async fn run_against_server(action: &str, testname: &str) -> serde_json::Value {
     let _ = env_logger::builder().is_test(true).try_init();
 
-    // initialise empty server state
-    let state = state::ServerState::default();
+    // work out where the deployment configs live
+    let test_deployment_file = get_deployment_file();
+
+    // initialise server state with the static configuration.
+    let state = ndc_hub::default_main::init_server_state::<connector::Postgres>(format!(
+        "{}",
+        test_deployment_file
+    ))
+    .await;
 
     // create a fresh router
-    let router = routes::create_router(state.clone());
-
-    // using the single static deployment from "./static" folder
-    let deployment_name = "88011674-8513-4d6b-897a-4ab856e0bb8a".to_string();
-
-    // work out where the deployment configs live
-    let test_deployments_dir = get_deployments_dir();
-
-    // check in folder for deployments, put them in state
-    let _ = update_deployments(test_deployments_dir, state).await;
+    let router = ndc_hub::default_main::create_router(state);
 
     let client = TestClient::new(router);
     let request = match fs::read_to_string(format!("tests/goldenfiles/{}.json", testname)) {
@@ -60,7 +58,7 @@ async fn run_against_server(action: &str, testname: &str) -> serde_json::Value {
         }
     };
 
-    let url = format!("/deployment/{}/{}", deployment_name, action);
+    let url = format!("/{}", action);
 
     let res = client
         .post(&url)
@@ -75,10 +73,11 @@ async fn run_against_server(action: &str, testname: &str) -> serde_json::Value {
     res.json().await
 }
 
-/// find the deployments folder via the crate root provided by `cargo test`.
-fn get_deployments_dir() -> String {
+/// find the deployments folder via the crate root provided by `cargo test`,
+/// and get our single static configuration file.
+fn get_deployment_file() -> String {
     let mut d = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-    d.push("../../static/deployments");
+    d.push("../../static/deployments/88011674-8513-4d6b-897a-4ab856e0bb8a.json");
 
     return d.display().to_string();
 }

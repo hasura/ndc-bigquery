@@ -4,5 +4,6 @@ version = "0.1.0"
 [workspace]
 members = [
   "crates/query-engine",
-  "crates/postgres-multitenant-ndc",
+  "crates/ndc-postgres",
+  "crates/ndc-postgres-multitenant",
 ]
