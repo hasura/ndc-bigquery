@@ -18,6 +18,10 @@ jobs:
             ~/.cargo/git
             target
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+      - name: Install Protoc
+        uses: arduino/setup-protoc@v2
+        with:
+          version: "23.3"
       - uses: actions-rs/cargo@v1
         with:
           command: build

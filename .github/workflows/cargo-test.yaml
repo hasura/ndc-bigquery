@@ -12,6 +12,10 @@ jobs:
         with:
           toolchain: stable
       - uses: Swatinem/rust-cache@v2
+      - name: Install Protoc
+        uses: arduino/setup-protoc@v2
+        with:
+          version: "23.3"
       - uses: isbang/compose-action@v1.4.1
         with:
           compose-file: "./docker-compose.yaml"
