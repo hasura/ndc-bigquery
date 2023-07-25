@@ -1,6 +1,6 @@
 on: [push]
 
-name: CI
+name: Postgres NDC tests
 
 jobs:
   build_and_test:
@@ -45,3 +45,15 @@ jobs:
           CARGO_NET_GIT_FETCH_WITH_CLI: "true"
         with:
           command: test
+
+      # scream into Slack if something goes wrong
+      - name: Report Status
+        if: github.ref == 'refs/heads/master'
+        uses: ravsamhq/notify-slack-action@v1
+        with:
+          status: ${{ job.status }}
+          notify_when: failure
+          notification_title: '😧 Error on <{repo_url}|{repo}>'
+          message_format: '🐴 *{workflow}* {status_message} for <{repo_url}|{repo}>'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.BROKEN_BUILD_SLACK_WEBHOOK_URL }}
