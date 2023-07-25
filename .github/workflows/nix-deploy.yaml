@@ -65,9 +65,16 @@ jobs:
     needs: binary
     runs-on: ubuntu-latest
     steps:
-      - uses: webfactory/ssh-agent@v0.7.0
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      # We need this because ndc-hub and ndc-multitenant are private repositores
+      # and we are using deploy keys to access them.
+      - name: Add SSH keys
+        run: |
+          mkdir -p /home/runner/.ssh
+          echo "${{ secrets.HASURA_CI_USER_BASE64_ENCODED_SSH_KEY }}" | base64 --decode > /home/runner/.ssh/hasura-ci
+          chmod 600 /home/runner/.ssh/hasura-ci
+          cat > /home/runner/.ssh/config <<EOF
+          IdentityFile /home/runner/.ssh/hasura-ci
+          EOF
 
       - name: Checkout 🛎️
         uses: actions/checkout@v3
