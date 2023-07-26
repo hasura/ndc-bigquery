@@ -1,146 +1,146 @@
 [
-    {
-        "kind": "dataSource",
-        "name": "db",
-        "sourceType": "postgres",
-        "sourceConfig": {
-            "note": "This is unused. This will be replaced with a data connector from data_connectors.json anyway. The real configuration is provided to the agent directly for local development."
-        }
-    },
-    {
-        "kind": "objectType",
-        "name": "Album",
-        "fields": [
-            {
-                "name": "AlbumId",
-                "type": "Int"
-            },
-            {
-                "name": "Title",
-                "type": "String"
-            },
-            {
-                "name": "ArtistId",
-                "type": "Int"
-            }
-        ]
-    },
-    {
-        "kind": "objectType",
-        "name": "TheArtist",
-        "fields": [
-            {
-                "name": "ArtistId",
-                "type": "Int"
-            },
-            {
-                "name": "Name",
-                "type": "String"
-            }
-        ]
-    },
-    {
-        "kind": "model",
-        "name": "Albums",
-        "dataType": "Album"
-    },
-    {
-        "kind": "model",
-        "name": "TheArtists",
-        "dataType": "TheArtist"
-    },
-    {
-        "kind": "modelSource",
-        "modelName": "Albums",
-        "dataSource": "db",
-        "modelSource": {
-            "tablePath": "Album"
-        },
-        "typeSources": {
-            "Album": {
-                "fieldSources": {
-                    "AlbumId": {
-                        "fieldSource": {
-                            "columnName": "AlbumId",
-                            "columnType": "integer"
-                        }
-                    },
-                    "Title": {
-                        "fieldSource": {
-                            "columnName": "Title",
-                            "columnType": "string"
-                        }
-                    },
-                    "ArtistId": {
-                        "fieldSource": {
-                            "columnName": "ArtistId",
-                            "columnType": "integer"
-                        }
-                    }
-                }
-            }
-        }
-    },
-    {
-        "kind": "modelSource",
-        "modelName": "TheArtists",
-        "dataSource": "db",
-        "modelSource": {
-            "tablePath": "Artist"
-        },
-        "typeSources": {
-            "TheArtist": {
-                "fieldSources": {
-                    "ArtistId": {
-                        "fieldSource": {
-                            "columnName": "ArtistId",
-                            "columnType": "integer"
-                        }
-                    },
-                    "Name": {
-                        "fieldSource": {
-                            "columnName": "Name",
-                            "columnType": "string"
-                        }
-                    }
-                }
-            }
-        }
-    },
-    {
-        "kind": "graphqlType",
-        "typeName": "Album",
-        "graphqlTypeName": "Album",
-        "graphqlTypeKind": "Object"
-    },
-    {
-        "kind": "graphqlType",
-        "typeName": "TheArtist",
-        "graphqlTypeName": "TheArtist",
-        "graphqlTypeKind": "Object"
-    },
-    {
-        "kind": "modelGraphqlApi",
-        "modelName": "Albums",
-        "selectUniques": [
-            {
-                "queryRootField": "AlbumByID",
-                "uniqueIdentifier": [
-                    "AlbumId"
-                ]
-            }
-        ]
-    },
-    {
-        "kind": "modelGraphqlApi",
-        "modelName": "TheArtists",
-        "selectUniques": [
-            {
-                "queryRootField": "TheArtistByID",
-                "uniqueIdentifier": [
-                    "ArtistId"
-                ]
-            }
-        ]
+  {
+    "kind": "dataSource",
+    "name": "db",
+    "sourceType": "postgres",
+    "sourceConfig": {
+      "note": "This is unused. This will be replaced with a data connector from data_connectors.json anyway. The real configuration is provided to the agent directly for local development."
     }
+  },
+  {
+    "kind": "objectType",
+    "name": "Album",
+    "fields": [
+      {
+        "name": "AlbumId",
+        "type": "Int"
+      },
+      {
+        "name": "Title",
+        "type": "String"
+      },
+      {
+        "name": "ArtistId",
+        "type": "Int"
+      }
+    ]
+  },
+  {
+    "kind": "objectType",
+    "name": "Artist",
+    "fields": [
+      {
+        "name": "ArtistId",
+        "type": "Int"
+      },
+      {
+        "name": "Name",
+        "type": "String"
+      }
+    ]
+  },
+  {
+    "kind": "model",
+    "name": "Albums",
+    "dataType": "Album"
+  },
+  {
+    "kind": "model",
+    "name": "Artists",
+    "dataType": "Artist"
+  },
+  {
+    "kind": "modelSource",
+    "modelName": "Albums",
+    "dataSource": "db",
+    "modelSource": {
+      "tablePath": "Album"
+    },
+    "typeSources": {
+      "Album": {
+        "fieldSources": {
+          "AlbumId": {
+            "fieldSource": {
+              "columnName": "AlbumId",
+              "columnType": "integer"
+            }
+          },
+          "Title": {
+            "fieldSource": {
+              "columnName": "Title",
+              "columnType": "string"
+            }
+          },
+          "ArtistId": {
+            "fieldSource": {
+              "columnName": "ArtistId",
+              "columnType": "integer"
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "kind": "modelSource",
+    "modelName": "Artists",
+    "dataSource": "db",
+    "modelSource": {
+      "tablePath": "Artist"
+    },
+    "typeSources": {
+      "Artist": {
+        "fieldSources": {
+          "ArtistId": {
+            "fieldSource": {
+              "columnName": "ArtistId",
+              "columnType": "integer"
+            }
+          },
+          "Name": {
+            "fieldSource": {
+              "columnName": "Name",
+              "columnType": "string"
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "kind": "graphqlType",
+    "typeName": "Album",
+    "graphqlTypeName": "Album",
+    "graphqlTypeKind": "Object"
+  },
+  {
+    "kind": "graphqlType",
+    "typeName": "Artist",
+    "graphqlTypeName": "Artist",
+    "graphqlTypeKind": "Object"
+  },
+  {
+    "kind": "modelGraphqlApi",
+    "modelName": "Albums",
+    "selectUniques": [
+      {
+        "queryRootField": "AlbumByID",
+        "uniqueIdentifier": [
+          "AlbumId"
+        ]
+      }
+    ]
+  },
+  {
+    "kind": "modelGraphqlApi",
+    "modelName": "Artists",
+    "selectUniques": [
+      {
+        "queryRootField": "ArtistByID",
+        "uniqueIdentifier": [
+          "ArtistId"
+        ]
+      }
+    ]
+  }
 ]

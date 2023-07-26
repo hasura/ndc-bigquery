@@ -35,9 +35,28 @@
       ]
     },
     {
+      "kind": "objectType",
+      "name": "Artist",
+      "fields": [
+        {
+          "name": "ArtistId",
+          "type": "Int"
+        },
+        {
+          "name": "Name",
+          "type": "String"
+        }
+      ]
+    },
+    {
       "kind": "model",
       "name": "Albums",
       "dataType": "Album"
+    },
+    {
+      "kind": "model",
+      "name": "Artists",
+      "dataType": "Artist"
     },
     {
       "kind": "modelSource",
@@ -72,9 +91,41 @@
       }
     },
     {
+      "kind": "modelSource",
+      "modelName": "Artists",
+      "dataSource": "db",
+      "modelSource": {
+        "tablePath": "Artist"
+      },
+      "typeSources": {
+        "Artist": {
+          "fieldSources": {
+            "ArtistId": {
+              "fieldSource": {
+                "columnName": "ArtistId",
+                "columnType": "integer"
+              }
+            },
+            "Name": {
+              "fieldSource": {
+                "columnName": "Name",
+                "columnType": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
       "kind": "graphqlType",
       "typeName": "Album",
       "graphqlTypeName": "Album",
+      "graphqlTypeKind": "Object"
+    },
+    {
+      "kind": "graphqlType",
+      "typeName": "Artist",
+      "graphqlTypeName": "Artist",
       "graphqlTypeKind": "Object"
     },
     {
@@ -85,6 +136,18 @@
           "queryRootField": "AlbumByID",
           "uniqueIdentifier": [
             "AlbumId"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "modelGraphqlApi",
+      "modelName": "Artists",
+      "selectUniques": [
+        {
+          "queryRootField": "ArtistByID",
+          "uniqueIdentifier": [
+            "ArtistId"
           ]
         }
       ]

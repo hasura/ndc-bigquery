@@ -133,3 +133,37 @@ build-with-nix:
 build-docker-with-nix:
   nix build .#docker --print-build-logs
   docker load < ./result
+
+# run metadata service from ../v3-experiments repo
+run-metadata-service:
+  RUST_LOG=DEBUG cargo run --release \
+    --manifest-path ../v3-experiments/Cargo.toml \
+    --bin metadata-service
+
+# regenerate our test metadata binary files using metadata service
+regenerate-metadata-binaries:
+  @echo "Please run 'just run-metadata-service' in another window before using this command"
+  curl -X POST \
+    -H 'Host: example.hasura.app' \
+    -H 'Content-Type: application/json' \
+    http://localhost:4000/validate \
+    -d @./static/metadata/example.hasura.app/metadata.json \
+      > ./static/metadata/example.hasura.app/metadata.bin
+
+# regenerate deployment binary files from json
+regenerate-deployment-binaries:
+  @echo "Please run 'just run-multitenant' in another window before using this command"
+
+  @echo "Regenerating benchmark deployment binary"
+  curl -X POST \
+    http://localhost:4000/validate \
+    -H 'Content-Type: application/json' \
+    -d @./benchmarks/component/deployments/9f532406-b0c8-4c17-a58a-64286c1e1fd6.json \
+    > ./benchmarks/component/deployments/9f532406-b0c8-4c17-a58a-64286c1e1fd6.bin
+
+  @echo "Regenerating test deployment binary"
+  curl -X POST \
+    http://localhost:4000/validate \
+    -H 'Content-Type: application/json' \
+    -d @./static/deployments/88011674-8513-4d6b-897a-4ab856e0bb8a.json \
+    > ./static/deployments/88011674-8513-4d6b-897a-4ab856e0bb8a.bin

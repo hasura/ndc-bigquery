@@ -15,6 +15,18 @@
           "name": "ArtistId"
         }
       }
+    },
+    "Artist": {
+      "schema_name": "public",
+      "table_name": "Artist",
+      "columns": {
+        "ArtistId": {
+          "name": "ArtistId"
+        },
+        "Name": {
+          "name": "Name"
+        }
+      }
     }
   },
   "schema": {
@@ -59,6 +71,27 @@
             }
           }
         }
+      },
+      "Artist": {
+        "description": "",
+        "fields": {
+          "ArtistId": {
+            "description": "",
+            "arguments": {},
+            "type": {
+              "type": "named",
+              "name": "Int"
+            }
+          },
+          "Name": {
+            "description": "",
+            "arguments": {},
+            "type": {
+              "type": "named",
+              "name": "String"
+            }
+          }
+        }
       }
     },
     "tables": [
@@ -72,6 +105,21 @@
           "AlbumByID": {
             "unique_columns": [
               "AlbumId"
+            ]
+          }
+        },
+        "foreign_keys": {}
+      },
+      {
+        "name": "Artist",
+        "description": "A collection of artists",
+        "arguments": {},
+        "type": "Artist",
+        "deletable": false,
+        "uniqueness_constraints": {
+          "ArtistById": {
+            "unique_columns": [
+              "ArtistId"
             ]
           }
         },
