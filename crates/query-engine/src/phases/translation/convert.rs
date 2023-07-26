@@ -183,6 +183,12 @@ impl Expression {
                 select.to_sql(sql);
                 sql.append_syntax(")");
             }
+            Expression::Count(count_type) => {
+                sql.append_syntax("COUNT");
+                sql.append_syntax("(");
+                count_type.to_sql(sql);
+                sql.append_syntax(")")
+            }
         }
     }
 }
@@ -222,6 +228,20 @@ impl Function {
         match self {
             Function::Coalesce => sql.append_syntax("coalesce"),
             Function::JsonAgg => sql.append_syntax("json_agg"),
+            Function::Unknown(name) => sql.append_syntax(name),
+        }
+    }
+}
+
+impl CountType {
+    pub fn to_sql(&self, sql: &mut SQL) {
+        match self {
+            CountType::Star => sql.append_syntax("*"),
+            CountType::Simple(column) => column.to_sql(sql),
+            CountType::Distinct(column) => {
+                sql.append_syntax("DISTINCT ");
+                column.to_sql(sql)
+            }
         }
     }
 }

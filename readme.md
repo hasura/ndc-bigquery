@@ -80,7 +80,7 @@ See [architecture.md](./architecture.md).
 2. Run `just run-v3-multitenant`
 3. Run `just test-multitenant`
 
-## Write a test
+## Write a database execution test
 
 1. Create a new file under `crates/ndc-postgres/tests/goldenfiles/<your-test-name>.json`
 2. Create a new test in `crates/ndc-postgres/tests/tests.rs` that looks like this:
@@ -93,6 +93,26 @@ See [architecture.md](./architecture.md).
    ```
 3. Run the tests using `just dev`
 4. Review the results using `cargo insta review`
+
+## Write a SQL translation snapshot test
+
+1. Create a new folder under `crates/query-engine/tests/goldenfiles/<your-test-name>/`
+2. Create `request.json` and `tables.json` files in that folder to specify your
+   request
+3. Create a new test in `crates/query-engine/tests/tests.rs` that looks like this:
+   ```rs
+   #[tokio::test]
+   async fn select_5() {
+       let result = common::test_translation("select_5").await;
+       insta::assert_snapshot!(result);
+   }
+   ```
+4. Run the tests using `just dev`
+5. Review the results using `cargo insta review`
+
+*warning* - SQL translation tests should aim to only contain one field or aggregate per
+request. This is because we parse the fields into a HashMap and cannot rely on
+the ordering, meaning the snapshots constantly change. 
 
 ## Linting
 

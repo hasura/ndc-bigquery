@@ -1,0 +1,12 @@
+{
+  "table": "Album",
+  "query": {
+    "aggregates": {
+      "how_many_albums": {
+        "type": "star_count"
+      }
+    }
+  },
+  "arguments": {},
+  "table_relationships": {}
+}

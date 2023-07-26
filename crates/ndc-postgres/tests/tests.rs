@@ -133,6 +133,12 @@ async fn select_where_variable_int() {
     insta::assert_json_snapshot!(result);
 }
 
+#[tokio::test]
+async fn aggregate_count_albums() {
+    let result = common::run_query("aggregate_count_albums").await;
+    insta::assert_json_snapshot!(result);
+}
+
 mod explain {
     use crate::common;
     use std::env;

@@ -106,10 +106,10 @@ impl Translate {
             sql_ast::TableName::AliasedTable(table_alias.clone());
 
         // translate fields to select list
-        let fields = query_request.query.fields.ok_or(Error::NoFields)?;
+        let fields = query_request.query.fields.unwrap_or(HashMap::new());
 
         // translate fields to columns or relationships.
-        let columns: Vec<(sql_ast::ColumnAlias, sql_ast::Expression)> = fields
+        let mut columns: Vec<(sql_ast::ColumnAlias, sql_ast::Expression)> = fields
             .into_iter()
             .map(|(alias, field)| match field {
                 models::Field::Column { column, .. } => {
@@ -132,6 +132,21 @@ impl Translate {
                 }
             })
             .collect::<Result<Vec<_>, Error>>()?;
+
+        // create all aggregate columns
+        let aggregate_columns = self.translate_aggregates(
+            sql_ast::TableName::AliasedTable(table_alias.clone()),
+            query_request.query.aggregates.unwrap_or(HashMap::new()),
+        )?;
+
+        // combine field and aggregate columns
+        columns.extend(aggregate_columns);
+
+        // fail if no columns defined at all
+        match Vec::is_empty(&columns) {
+            true => Err(Error::NoFields),
+            false => Ok(()),
+        }?;
 
         // construct a simple select with the table name, alias, and selected columns.
         let mut select = sql_ast::simple_select(columns);
@@ -192,6 +207,54 @@ impl Translate {
             unique_index: index,
             name,
         }
+    }
+
+    // translate any aggregates we should include in the query into our SQL AST
+    fn translate_aggregates(
+        &mut self,
+        table: sql_ast::TableName,
+        aggregates: HashMap<String, models::Aggregate>,
+    ) -> Result<Vec<(sql_ast::ColumnAlias, sql_ast::Expression)>, Error> {
+        aggregates
+            .into_iter()
+            .map(|(alias, aggregation)| {
+                let expression = match aggregation {
+                    models::Aggregate::ColumnCount { column, distinct } => {
+                        let count_column_alias = self.make_column_alias(column);
+                        if distinct {
+                            sql_ast::Expression::Count(sql_ast::CountType::Distinct(
+                                sql_ast::ColumnName::AliasedColumn {
+                                    table: table.clone(),
+                                    alias: count_column_alias,
+                                },
+                            ))
+                        } else {
+                            sql_ast::Expression::Count(sql_ast::CountType::Simple(
+                                sql_ast::ColumnName::AliasedColumn {
+                                    table: table.clone(),
+                                    alias: count_column_alias,
+                                },
+                            ))
+                        }
+                    }
+                    models::Aggregate::SingleColumn { column, function } => {
+                        sql_ast::Expression::FunctionCall {
+                            function: sql_ast::Function::Unknown(function),
+                            args: vec![sql_ast::Expression::ColumnName(
+                                sql_ast::ColumnName::AliasedColumn {
+                                    table: table.clone(),
+                                    alias: self.make_column_alias(column),
+                                },
+                            )],
+                        }
+                    }
+                    models::Aggregate::StarCount {} => {
+                        sql_ast::Expression::Count(sql_ast::CountType::Star)
+                    }
+                };
+                Ok((self.make_column_alias(alias), expression))
+            })
+            .collect::<Result<Vec<_>, Error>>()
     }
 
     fn translate_order_by(

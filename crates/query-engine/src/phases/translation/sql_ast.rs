@@ -105,6 +105,7 @@ pub enum Expression {
     RowToJson(TableName),
     ColumnName(ColumnName),
     Value(Value),
+    Count(CountType),
 }
 
 // we should consider at least the list in `Hasura.Backends.Postgres.Translate.BoolExp`
@@ -140,6 +141,14 @@ pub enum BinaryArrayOperator {
 pub enum Function {
     Coalesce,
     JsonAgg,
+    Unknown(String),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum CountType {
+    Star,
+    Simple(ColumnName),
+    Distinct(ColumnName),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]

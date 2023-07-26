@@ -1,0 +1,7 @@
+---
+source: crates/query-engine/tests/tests.rs
+expression: result
+---
+SELECT coalesce(json_agg(row_to_json("root")), '[]') AS "rows" FROM (SELECT max("Album"."ArtistId") AS "max_artist_id" FROM "public"."Album" AS "Album") AS "root"
+
+[]
