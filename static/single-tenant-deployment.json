@@ -1,0 +1,84 @@
+{
+  "version": 1,
+  "tables": {
+    "Album": {
+      "schema_name": "public",
+      "table_name": "Album",
+      "columns": {
+        "AlbumId": {
+          "name": "AlbumId"
+        },
+        "Title": {
+          "name": "Title"
+        },
+        "ArtistId": {
+          "name": "ArtistId"
+        }
+      }
+    }
+  },
+  "schema": {
+    "scalar_types": {
+      "String": {
+        "aggregate_functions": {},
+        "comparison_operators": {},
+        "update_operators": {}
+      },
+      "Int": {
+        "aggregate_functions": {},
+        "comparison_operators": {},
+        "update_operators": {}
+      }
+    },
+    "object_types": {
+      "Album": {
+        "description": "",
+        "fields": {
+          "AlbumId": {
+            "description": "",
+            "arguments": {},
+            "type": {
+              "type": "named",
+              "name": "Int"
+            }
+          },
+          "Title": {
+            "description": "",
+            "arguments": {},
+            "type": {
+              "type": "named",
+              "name": "String"
+            }
+          },
+          "ArtistId": {
+            "description": "",
+            "arguments": {},
+            "type": {
+              "type": "named",
+              "name": "Int"
+            }
+          }
+        }
+      }
+    },
+    "tables": [
+      {
+        "name": "Album",
+        "description": "A collection of albums",
+        "arguments": {},
+        "type": "Album",
+        "deletable": false,
+        "uniqueness_constraints": {
+          "AlbumByID": {
+            "unique_columns": [
+              "AlbumId"
+            ]
+          }
+        },
+        "foreign_keys": {}
+      }
+    ],
+    "commands": []
+  },
+  "postgres_database_url": "postgres://postgres:password@localhost:64002"
+}

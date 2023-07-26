@@ -1,5 +1,7 @@
 POSTGRESQL_CONNECTION_STRING := "postgresql://postgres:password@localhost:64002"
 
+SINGLE_TENANT_DEPLOYMENT := "static/single-tenant-deployment.json"
+
 # this is hardcoded in the V3 metadata
 POSTGRES_DC_PORT := "8100"
 
@@ -13,7 +15,7 @@ dev: start-docker
     -c \
     -x test \
     -x clippy \
-    -x 'run --bin ndc-postgres -- --configuration static/deployments/88011674-8513-4d6b-897a-4ab856e0bb8a.json'
+    -x 'run --bin ndc-postgres -- --configuration {{SINGLE_TENANT_DEPLOYMENT}}'
 
 # watch the code and run the postgres-multitenant-gdc on changes
 run-quickly: start-docker
@@ -21,7 +23,7 @@ run-quickly: start-docker
     OTEL_SERVICE_NAME=postgres-agent \
     OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://localhost:4317 \
     OTEL_TRACES_SAMPLER=always_on \
-    cargo run --release --bin ndc-postgres -- --configuration static/deployments/88011674-8513-4d6b-897a-4ab856e0bb8a.json
+    cargo run --release --bin ndc-postgres -- --configuration {{SINGLE_TENANT_DEPLOYMENT}}'
 
 # watch the code and run the postgres-multitenant-gdc on changes
 watch-run: start-docker
@@ -31,7 +33,7 @@ watch-run: start-docker
     OTEL_TRACES_SAMPLER=always_on \
     cargo watch -i "tests/snapshots/*" \
     -c \
-    -x 'run --bin ndc-postgres -- --configuration static/deployments/88011674-8513-4d6b-897a-4ab856e0bb8a.json'
+    -x 'run --bin ndc-postgres -- --configuration {{SINGLE_TENANT_DEPLOYMENT}}'
 
 # watch the code and re-run on changes
 run-multitenant: start-docker
@@ -48,7 +50,7 @@ flamegraph: start-docker
     OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://localhost:4317 \
     OTEL_TRACES_SAMPLER=always_on \
     cargo flamegraph --dev --bin ndc-postgres -- \
-    --configuration static/deployments/88011674-8513-4d6b-897a-4ab856e0bb8a.json
+    --configuration {{SINGLE_TENANT_DEPLOYMENT}}
 
 # run postgres + jaeger
 start-docker:

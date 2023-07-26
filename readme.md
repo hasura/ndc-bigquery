@@ -145,3 +145,28 @@ Internally logging levels are set like this:
 
 So traces from `axum_tracing_opentelemetry` default to `info`, logs from `otel`
 default to `debug`, and everything else defaults to `info`.
+
+## Deployment files
+
+In the multitenant agent we use a number of `deployment` files to configure
+each tenant. These are served from a folder (locally, we use
+`./static/deployments`) so the data in `./static/deployments/123456.json` will
+setup requests to `/deployment/123456/query`.
+
+However, we can't just use the JSON files. They must be validated and then
+turned into `.bin` files in the same folder. We can do this by starting the multitenant agent with `just
+run-multitenant` and then converting like follows:
+
+```sh
+curl -X POST \
+    http://localhost:4000/validate \
+    -H 'Content-Type: application/json' \
+    -d @./static/deployments/123456.json \
+    > ./static/deployments/123456.bin
+```
+
+We can then test this new deployment:
+
+```sh
+curl http://localhost:4000/deployment/00000000-0000-0000-0000-000000000000/schema
+```

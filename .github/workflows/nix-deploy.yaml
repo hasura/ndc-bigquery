@@ -46,7 +46,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: hasura-postgres-agent-rs
-          path: result/bin/postgres-multitenant-ndc
+          path: result/bin/ndc-postgres-multitenant
 
       # scream into Slack if something goes wrong
       - name: Report Status

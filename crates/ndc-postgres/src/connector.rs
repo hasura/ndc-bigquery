@@ -15,10 +15,10 @@ pub struct Postgres {}
 #[async_trait]
 impl connector::Connector for Postgres {
     /// RawConfiguration is what the user specifies as JSON
-    type RawConfiguration = configuration::Configuration;
+    type RawConfiguration = configuration::DeploymentConfiguration;
     /// Configuration is the validated version of that
     /// which gets stored as binary by us (when we host the agent).
-    type Configuration = configuration::Configuration;
+    type Configuration = configuration::DeploymentConfiguration;
     /// State is the in memory representation of a loaded Configuration,
     /// e.g. any connection pool, other handles etc. which might not be serializable
     type State = configuration::State;

@@ -45,7 +45,7 @@ services:
   agent:
     image: ghcr.io/hasura/postgres-agent-rs:dev
     ports:
-      - 3000
+      - 4000
     environment:
       # we don't care about traces right now, and the benchmarks flood the batch buffer
       OTEL_TRACES_SAMPLER: "always_off"

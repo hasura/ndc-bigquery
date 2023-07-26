@@ -7,7 +7,7 @@ use thiserror::Error;
 
 /// User configuration.
 #[derive(Debug, Clone, Deserialize, Serialize)]
-pub struct Configuration {
+pub struct DeploymentConfiguration {
     pub version: u32,
     pub tables: query_engine::metadata::TablesInfo,
     pub postgres_database_url: String,
@@ -21,8 +21,8 @@ pub struct State {
 
 /// Validate the user configuration.
 pub async fn validate_raw_configuration(
-    configuration: &Configuration,
-) -> Result<Configuration, connector::ConfigurationError> {
+    configuration: &DeploymentConfiguration,
+) -> Result<DeploymentConfiguration, connector::ConfigurationError> {
     if configuration.version != 1 {
         return Err(connector::ConfigurationError::Other(
             ConfigurationError::InvalidConfigVersion(configuration.version).into(),
@@ -33,7 +33,7 @@ pub async fn validate_raw_configuration(
 
 /// Create a connection pool and wrap it inside a connector State.
 pub async fn create_state(
-    configuration: &Configuration,
+    configuration: &DeploymentConfiguration,
 ) -> Result<State, connector::InitializationError> {
     let pool = create_pool(configuration).await.map_err(|e| {
         connector::InitializationError::Other(InitializationError::UnableToCreatePool(e).into())
@@ -42,7 +42,7 @@ pub async fn create_state(
 }
 
 /// Create a connection pool with default settings.
-async fn create_pool(configuration: &Configuration) -> Result<PgPool, sqlx::Error> {
+async fn create_pool(configuration: &DeploymentConfiguration) -> Result<PgPool, sqlx::Error> {
     PgPoolOptions::new()
         .max_connections(50)
         .connect(&configuration.postgres_database_url)

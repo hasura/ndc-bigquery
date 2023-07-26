@@ -1,68 +1,69 @@
-import { check } from "k6";
+import {check} from "k6";
 import http from "k6/http";
 
 const testid = "select-where";
-const url = `http://agent:3000/deployment/${__ENV.DEPLOYMENT_ID}/query`;
+const url = `http://agent:4000/deployment/${__ENV.DEPLOYMENT_ID}/query`;
 const data = {
-  table: "Album",
-  query: {
-    fields: {
-      id: { type: "column", column: "AlbumId", arguments: {} },
-      title: { type: "column", column: "Title", arguments: {} },
-      artist_id: { type: "column", column: "ArtistId", arguments: {} },
+  table : "Album",
+  query : {
+    fields : {
+      id : {type : "column", column : "AlbumId", arguments : {}},
+      title : {type : "column", column : "Title", arguments : {}},
+      artist_id : {type : "column", column : "ArtistId", arguments : {}},
     },
-    where: {
-      type: "binary_comparison_operator",
-      column: {
-        type: "column",
-        name: "Title",
-        path: [],
+    where : {
+      type : "binary_comparison_operator",
+      column : {
+        type : "column",
+        name : "Title",
+        path : [],
       },
-      operator: {
-        type: "other",
-        name: "ilike",
+      operator : {
+        type : "other",
+        name : "ilike",
       },
-      value: {
-        type: "scalar",
-        value: "%a%",
+      value : {
+        type : "scalar",
+        value : "%a%",
       },
     },
   },
-  arguments: {},
-  table_relationships: {},
+  arguments : {},
+  table_relationships : {},
 };
 
-export default function () {
+export default function() {
   const response = http.post(url, JSON.stringify(data), {
-    headers: {
-      "Content-Type": "application/json",
+    headers : {
+      "Content-Type" : "application/json",
     },
   });
 
   check(response, {
-    "status is 200": (r) => r.status == 200,
+    "status is 200" : (r) => r.status == 200,
   });
 }
 
 export function handleSummary(data) {
   const outputDirectory = __ENV.OUTPUT_DIRECTORY;
   if (outputDirectory) {
-    const summaryFile = `${outputDirectory}/summaries/${testid}__${new Date().toISOString()}.json`;
+    const summaryFile = `${outputDirectory}/summaries/${testid}__${
+        new Date().toISOString()}.json`;
     return {
-      [summaryFile]: JSON.stringify(data),
+      [summaryFile] : JSON.stringify(data),
     };
   }
 }
 
 export const options = {
-  tags: {
+  tags : {
     testid,
   },
-  scenarios: {
-    short_sustained: {
-      executor: "constant-vus",
-      vus: 100,
-      duration: "10s",
+  scenarios : {
+    short_sustained : {
+      executor : "constant-vus",
+      vus : 100,
+      duration : "10s",
     },
   },
 };

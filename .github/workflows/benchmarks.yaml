@@ -1,8 +1,4 @@
-# this will break until we can create a new test deployment binary file
-on:
-  push:
-    branches:
-      - branch-that-does-not-exist-please-change-this-back-to-main-later
+on: [push]
 
 name: Postgres NDC component benchmarks
 
@@ -56,7 +52,11 @@ jobs:
         run: |
           ./benchmarks/component/summarize.sh | tee benchmark-results.json
 
+      # we run these benchmarks on every push as they service as
+      # they are also our best multitenant tests atm
+      # however we only store the results on `main`.
       - name: Store benchmark result ⬆️
+        if: github.ref == 'refs/heads/master'
         uses: benchmark-action/github-action-benchmark@v1
         with:
           name: Component benchmarks
@@ -69,7 +69,7 @@ jobs:
 
       # scream into Slack if something goes wrong
       - name: Report Status
-        if: always()
+        if: github.ref == 'refs/heads/master'
         uses: ravsamhq/notify-slack-action@v1
         with:
           status: ${{ job.status }}
