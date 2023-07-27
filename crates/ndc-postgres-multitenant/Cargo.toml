@@ -8,7 +8,7 @@ name = "ndc-postgres-multitenant"
 path = "bin/main.rs"
 
 [dependencies]
-ndc-hub-multitenant = { git = "ssh://git@github.com/hasura/ndc-multitenant.git", rev = "b62b930" }
+ndc-hub-multitenant = { git = "ssh://git@github.com/hasura/ndc-multitenant.git", rev = "5041b99" }
 ndc-postgres = { path = "../ndc-postgres" }
 
 tokio = { version = "1.29.1", features = ["full"] }

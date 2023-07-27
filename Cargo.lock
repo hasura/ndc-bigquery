@@ -1333,7 +1333,7 @@ dependencies = [
 [[package]]
 name = "ndc-hub"
 version = "0.1.0"
-source = "git+ssh://git@github.com/hasura/ndc-hub.git?rev=0f2ff68#0f2ff6833a88defae08aa1aa0f26f0325b27c6b9"
+source = "git+https://github.com/hasura/ndc-hub.git?rev=79fc5da4#79fc5da4089c5a5360d2e6dd7aa12f680b447f69"
 dependencies = [
  "async-trait",
  "axum",
@@ -1358,7 +1358,7 @@ dependencies = [
 [[package]]
 name = "ndc-hub-multitenant"
 version = "0.1.0"
-source = "git+ssh://git@github.com/hasura/ndc-multitenant.git?rev=b62b930#b62b930a89f32a788a03b793b0fef0101b14fd92"
+source = "git+ssh://git@github.com/hasura/ndc-multitenant.git?rev=5041b99#5041b99b061855d87a5f0101ee11b08900c8ba64"
 dependencies = [
  "async-trait",
  "axum",
@@ -1390,6 +1390,7 @@ dependencies = [
  "async-trait",
  "axum",
  "axum-test-helper",
+ "clap",
  "env_logger",
  "insta",
  "log",

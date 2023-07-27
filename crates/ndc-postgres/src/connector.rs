@@ -14,6 +14,8 @@ pub struct Postgres {}
 
 #[async_trait]
 impl connector::Connector for Postgres {
+    /// Arguments for configuration?
+    type ConfigureArgs = configuration::ConfigureArgs;
     /// RawConfiguration is what the user specifies as JSON
     type RawConfiguration = configuration::DeploymentConfiguration;
     /// Configuration is the validated version of that
@@ -22,6 +24,13 @@ impl connector::Connector for Postgres {
     /// State is the in memory representation of a loaded Configuration,
     /// e.g. any connection pool, other handles etc. which might not be serializable
     type State = configuration::State;
+
+    /// Configure a configuration maybe?
+    async fn configure(
+        args: &Self::ConfigureArgs,
+    ) -> Result<configuration::DeploymentConfiguration, connector::ConfigurationError> {
+        configuration::configure(args).await
+    }
 
     /// Validate the config.
     async fn validate_raw_configuration(
