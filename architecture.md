@@ -5,8 +5,7 @@
 The query engine's job is to take a `QueryRequest`, which contains information about the query a user would like to run,
 translate it to PostgreSQL SQL, execute it against the database, and return the results as a `QueryReponse`.
 
-One place in particular that uses the Query Engine is the `/query` endpoint in
-[post_deployment_query.rs](/crates/postgres-multitenant-ndc/src/routes/post_deployment_query.rs).
+One place in particular that uses the Query Engine is the `/query` endpoint (defined in the `ndc-hub` repository).
 
 `/query` endpoints receives a `QueryRequest`, and calls the `translate` function from the Query Engine
 with it and with the information about the tables tracked in the metadata to receive and `ExecutionPlan`.

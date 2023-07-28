@@ -6,7 +6,6 @@ services:
   benchmark:
     image: grafana/k6 
     environment:
-      DEPLOYMENT_ID: "9f532406-b0c8-4c17-a58a-64286c1e1fd6"
       OUTPUT_DIRECTORY: "/home/k6/output"
       K6_OUT: "experimental-prometheus-rw"
       K6_PROMETHEUS_RW_SERVER_URL: "http://prometheus:9090/api/v1/write"
@@ -44,15 +43,17 @@ services:
 
   agent:
     image: ghcr.io/hasura/postgres-agent-rs:dev
-    ports:
-      - 4000
+    command:
+      - serve
+    init: true
     environment:
+      CONFIGURATION_FILE: "/deployment.json"
       # we don't care about traces right now, and the benchmarks flood the batch buffer
       OTEL_TRACES_SAMPLER: "always_off"
     volumes:
       - type: bind
-        source: ./deployments
-        target: /data/deployments
+        source: ./deployment.json
+        target: /deployment.json
         read_only: true
     depends_on:
       postgres:

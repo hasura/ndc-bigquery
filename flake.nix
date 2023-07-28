@@ -118,6 +118,7 @@
 
             # development
             pkgs.cargo-edit
+            pkgs.cargo-flamegraph
             pkgs.cargo-insta
             pkgs.cargo-watch
             pkgs.just

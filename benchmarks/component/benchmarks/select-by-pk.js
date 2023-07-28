@@ -2,7 +2,7 @@ import {check} from "k6";
 import http from "k6/http";
 
 const testid = "select by-pk";
-const url = `http://agent:4000/deployment/${__ENV.DEPLOYMENT_ID}/query`;
+const url = `http://agent:8100/query`;
 const data = {
   table : "Album",
   query : {

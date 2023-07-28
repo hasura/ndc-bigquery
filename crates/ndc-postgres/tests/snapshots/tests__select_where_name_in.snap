@@ -1,5 +1,5 @@
 ---
-source: crates/postgres-multitenant-ndc/tests/tests.rs
+source: crates/ndc-postgres/tests/tests.rs
 expression: result
 ---
 [

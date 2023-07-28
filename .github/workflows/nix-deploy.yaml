@@ -12,17 +12,6 @@ jobs:
     name: deploy::binary
     runs-on: ubuntu-latest
     steps:
-      # We need this because ndc-hub and ndc-multitenant are private repositores
-      # and we are using deploy keys to access them.
-      - name: Add SSH keys
-        run: |
-          mkdir -p /home/runner/.ssh
-          echo "${{ secrets.HASURA_CI_USER_BASE64_ENCODED_SSH_KEY }}" | base64 --decode > /home/runner/.ssh/hasura-ci
-          chmod 600 /home/runner/.ssh/hasura-ci
-          cat > /home/runner/.ssh/config <<EOF
-          IdentityFile /home/runner/.ssh/hasura-ci
-          EOF
-
       - name: Checkout 🛎️
         uses: actions/checkout@v3
 
@@ -46,7 +35,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: hasura-postgres-agent-rs
-          path: result/bin/ndc-postgres-multitenant
+          path: result/bin/ndc-postgres
 
       # scream into Slack if something goes wrong
       - name: Report Status
@@ -65,17 +54,6 @@ jobs:
     needs: binary
     runs-on: ubuntu-latest
     steps:
-      # We need this because ndc-hub and ndc-multitenant are private repositores
-      # and we are using deploy keys to access them.
-      - name: Add SSH keys
-        run: |
-          mkdir -p /home/runner/.ssh
-          echo "${{ secrets.HASURA_CI_USER_BASE64_ENCODED_SSH_KEY }}" | base64 --decode > /home/runner/.ssh/hasura-ci
-          chmod 600 /home/runner/.ssh/hasura-ci
-          cat > /home/runner/.ssh/config <<EOF
-          IdentityFile /home/runner/.ssh/hasura-ci
-          EOF
-
       - name: Checkout 🛎️
         uses: actions/checkout@v3
 

@@ -15,14 +15,9 @@ let
 
     config = {
       Entrypoint = [
-        "${postgres-agent}/bin/ndc-postgres-multitenant"
-        "--deployments-dir"
-        "/data/deployments"
+        "${postgres-agent}/bin/ndc-postgres"
       ];
-      ExposedPorts = { "4000/tcp" = { }; };
-      Volumes = {
-        "/data/deployments/" = { };
-      };
+      ExposedPorts = { "8100/tcp" = { }; };
     } // extraConfig;
   }
   // lib.optionalAttrs (tag != null) {

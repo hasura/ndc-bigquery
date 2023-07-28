@@ -11,17 +11,6 @@ jobs:
     name: Benchmark
     runs-on: ubuntu-latest
     steps:
-      # We need this because ndc-hub and ndc-multitenant are private repositores
-      # and we are using deploy keys to access them.
-      - name: Add SSH keys
-        run: |
-          mkdir -p /home/runner/.ssh
-          echo "${{ secrets.HASURA_CI_USER_BASE64_ENCODED_SSH_KEY }}" | base64 --decode > /home/runner/.ssh/hasura-ci
-          chmod 600 /home/runner/.ssh/hasura-ci
-          cat > /home/runner/.ssh/config <<EOF
-          IdentityFile /home/runner/.ssh/hasura-ci
-          EOF
-
       - name: Install Nix ❄
         uses: DeterminateSystems/nix-installer-action@v4
 
@@ -52,9 +41,8 @@ jobs:
         run: |
           ./benchmarks/component/summarize.sh | tee benchmark-results.json
 
-      # we run these benchmarks on every push as they service as
-      # they are also our best multitenant tests atm
-      # however we only store the results on `main`.
+      # We run these benchmarks on every push so we can easily see the results.
+      # However, we only store the results on `main`.
       - name: Store benchmark result ⬆️
         if: github.ref == 'refs/heads/master'
         uses: benchmark-action/github-action-benchmark@v1
@@ -78,4 +66,3 @@ jobs:
           message_format: '🐴 *{workflow}* {status_message} for <{repo_url}|{repo}>'
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.BROKEN_BUILD_SLACK_WEBHOOK_URL }}
-

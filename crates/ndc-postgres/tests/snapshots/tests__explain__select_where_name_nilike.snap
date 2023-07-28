@@ -1,5 +1,5 @@
 ---
-source: crates/postgres-multitenant-ndc/tests/tests.rs
+source: crates/ndc-postgres/tests/tests.rs
 expression: result.query
 ---
 EXPLAIN SELECT coalesce(json_agg(row_to_json("root")), '[]') AS "rows" FROM (SELECT "Album"."Title" AS "Title" FROM "public"."Album" AS "Album" WHERE (true AND ("Album"."Title" NOT ILIKE $1)) LIMIT 5) AS "root"
