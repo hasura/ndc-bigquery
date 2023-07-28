@@ -1,6 +1,6 @@
 POSTGRESQL_CONNECTION_STRING := "postgresql://postgres:password@localhost:64002"
 
-SINGLE_TENANT_DEPLOYMENT := "static/single-tenant-deployment.json"
+CHINOOK_DEPLOYMENT := "static/chinook-deployment.json"
 
 # this is hardcoded in the V3 metadata
 POSTGRES_DC_PORT := "8100"
@@ -15,7 +15,7 @@ dev: start-docker
     -c \
     -x test \
     -x clippy \
-    -x 'run --bin ndc-postgres -- serve --configuration {{SINGLE_TENANT_DEPLOYMENT}}'
+    -x 'run --bin ndc-postgres -- serve --configuration {{CHINOOK_DEPLOYMENT}}'
 
 # watch the code and run the postgres-multitenant-gdc on changes
 run-quickly: start-docker
@@ -23,7 +23,7 @@ run-quickly: start-docker
     OTEL_SERVICE_NAME=postgres-agent \
     OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://localhost:4317 \
     OTEL_TRACES_SAMPLER=always_on \
-    cargo run --release --bin ndc-postgres -- serve --configuration {{SINGLE_TENANT_DEPLOYMENT}}'
+    cargo run --release --bin ndc-postgres -- serve --configuration {{CHINOOK_DEPLOYMENT}}'
 
 # watch the code and run the postgres-multitenant-gdc on changes
 watch-run: start-docker
@@ -33,7 +33,7 @@ watch-run: start-docker
     OTEL_TRACES_SAMPLER=always_on \
     cargo watch -i "tests/snapshots/*" \
     -c \
-    -x 'run --bin ndc-postgres -- serve --configuration {{SINGLE_TENANT_DEPLOYMENT}}'
+    -x 'run --bin ndc-postgres -- serve --configuration {{CHINOOK_DEPLOYMENT}}'
 
 # watch the code and re-run on changes
 run-multitenant: start-docker
@@ -50,38 +50,25 @@ flamegraph: start-docker
     OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://localhost:4317 \
     OTEL_TRACES_SAMPLER=always_on \
     cargo flamegraph --dev --bin ndc-postgres -- \
-    serve --configuration {{SINGLE_TENANT_DEPLOYMENT}}
+    serve --configuration {{CHINOOK_DEPLOYMENT}}
 
 # run postgres + jaeger
 start-docker:
   # start jaeger, configured to listen to V3
-  docker compose -f ../v3-experiments/crates/engine/services/dev.docker-compose.yaml up -d jaeger
+  docker compose -f ../v3-engine/docker-compose.yaml up -d jaeger
   # start our local postgres
   docker compose up --wait
 
-# run the regular V3 binary, pointing it at our multitenant agent
-run-v3: start-docker
+# run the v3 engine binary, pointing it at our multitenant agent
+run-engine: start-docker
   @echo "http://localhost:3000/ for graphiql console"
   @echo "http://localhost:4002/ for jaeger console"
   # Run graphql-engine using static Chinook metadata
-  # we expect the `v3-experiments` repo to live next door to this one
+  # we expect the `v3-engine` repo to live next door to this one
   RUST_LOG=DEBUG cargo run --release \
-    --manifest-path ../v3-experiments/Cargo.toml \
+    --manifest-path ../v3-engine/Cargo.toml \
     --bin engine -- \
-    --data-connectors-config ./static/data-connectors-config-example.json \
-    --metadata-path ./static/metadata-example.json \
-    --secrets-path ./static/secrets-example.json
-
-# run the V3 multitenant binary, pointing it at our multitenant agent
-run-v3-multitenant: start-docker
-  @echo "http://localhost:4002/ for jaeger console"
-  # Run graphql-engine using static Chinook metadata
-  # we expect the `v3-experiments` repo to live next door to this one
-  # we should also set up --otlp-endpoint to point at Jaeger
-  RUST_LOG=DEBUG cargo run --release \
-    --manifest-path ../v3-experiments/Cargo.toml \
-    --bin multitenant -- \
-    --metadata-dir ./static/metadata/ \
+    --metadata-path ./static/chinook-metadata.json
 
 # run-postgres-ndc, pointing it at local postgres etc
 run-postgres-ndc: start-docker

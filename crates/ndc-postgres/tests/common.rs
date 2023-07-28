@@ -77,7 +77,7 @@ async fn run_against_server(action: &str, testname: &str) -> serde_json::Value {
 /// and get our single static configuration file.
 fn get_deployment_file() -> String {
     let mut d = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-    d.push("../../static/single-tenant-deployment.json");
+    d.push("../../static/chinook-deployment.json");
 
     return d.display().to_string();
 }

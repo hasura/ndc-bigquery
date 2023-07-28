@@ -16,7 +16,10 @@
     - `brew install protobuf`
     - `apt-get install protobuf-compiler`
     - `dnf install protobuf-compiler`
-6. Clone v3 experiments in a directory near this one: `(cd .. && git clone git@github.com:hasura/v3-experiments.git)`
+6. Clone [v3-engine](https://github.com/hasura/v3-engine) in a directory near this one:
+   ```
+   (cd .. && git clone git@github.com:hasura/v3-engine.git)
+   ```
 
 ### Compile
 

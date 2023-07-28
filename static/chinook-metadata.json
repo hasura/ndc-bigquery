@@ -1,0 +1,313 @@
+[
+  {
+    "kind": "dataSource",
+    "name": "db",
+    "dataConnectorUrl": "http://localhost:8100",
+    "schema": {
+      "scalar_types": {
+        "String": {
+          "aggregate_functions": {},
+          "comparison_operators": {
+            "like": {
+              "argument_type": {
+                "type": "named",
+                "name": "String"
+              }
+            }
+          },
+          "update_operators": {}
+        },
+        "Int": {
+          "aggregate_functions": {
+            "min": {
+              "result_type": {
+                "type": "nullable",
+                "underlying_type": {
+                  "type": "named",
+                  "name": "Int"
+                }
+              }
+            },
+            "max": {
+              "result_type": {
+                "type": "nullable",
+                "underlying_type": {
+                  "type": "named",
+                  "name": "Int"
+                }
+              }
+            }
+          },
+          "comparison_operators": {},
+          "update_operators": {}
+        }
+      },
+      "object_types": {
+        "artist": {
+          "description": "An artist",
+          "fields": {
+            "ArtistId": {
+              "description": "The artist's primary key",
+              "arguments": {},
+              "type": {
+                "type": "named",
+                "name": "Int"
+              }
+            },
+            "Name": {
+              "description": "The artist's name",
+              "arguments": {},
+              "type": {
+                "type": "named",
+                "name": "String"
+              }
+            }
+          }
+        },
+        "album": {
+          "description": "An album",
+          "fields": {
+            "AlbumId": {
+              "description": "The album's primary key",
+              "arguments": {},
+              "type": {
+                "type": "named",
+                "name": "Int"
+              }
+            },
+            "Title": {
+              "description": "The album's title",
+              "arguments": {},
+              "type": {
+                "type": "named",
+                "name": "String"
+              }
+            },
+            "ArtistId": {
+              "description": "The album's artist ID",
+              "arguments": {},
+              "type": {
+                "type": "named",
+                "name": "Int"
+              }
+            }
+          }
+        }
+      },
+      "tables": [
+        {
+          "name": "Artist",
+          "description": "A collection of artists",
+          "arguments": {},
+          "type": "artist",
+          "deletable": false,
+          "uniqueness_constraints": {
+            "ArtistById": {
+              "unique_columns": ["ArtistId"]
+            }
+          },
+          "foreign_keys": {}
+        },
+        {
+          "name": "Album",
+          "description": "A collection of albums",
+          "arguments": {},
+          "type": "album",
+          "deletable": false,
+          "uniqueness_constraints": {
+            "AlbumById": {
+              "unique_columns": ["AlbumId"]
+            }
+          },
+          "foreign_keys": {}
+        }
+      ],
+      "commands": []
+    }
+  },
+  {
+    "kind": "objectType",
+    "name": "artist",
+    "fields": [
+      {
+        "name": "id",
+        "type": "Int"
+      },
+      {
+        "name": "name",
+        "type": "String"
+      }
+    ]
+  },
+  {
+    "kind": "objectType",
+    "name": "album",
+    "fields": [
+      {
+        "name": "id",
+        "type": "Int"
+      },
+      {
+        "name": "title",
+        "type": "String"
+      },
+      {
+        "name": "artist_id",
+        "type": "Int"
+      }
+    ]
+  },
+  {
+    "kind": "model",
+    "name": "Artists",
+    "dataType": "artist"
+  },
+  {
+    "kind": "modelSource",
+    "modelName": "Artists",
+    "dataSource": "db",
+    "table": "Artist",
+    "typeMappings": {
+      "artist": {
+        "fieldMappings": {
+          "id": {
+            "column": "ArtistId"
+          },
+          "name": {
+            "column": "Name"
+          }
+        }
+      }
+    }
+  },
+  {
+    "kind": "model",
+    "name": "Albums",
+    "dataType": "album"
+  },
+  {
+    "kind": "modelSource",
+    "modelName": "Albums",
+    "dataSource": "db",
+    "table": "Album",
+    "typeMappings": {
+      "album": {
+        "fieldMappings": {
+          "id": {
+            "column": "AlbumId"
+          },
+          "title": {
+            "column": "Title"
+          },
+          "artist_id": {
+            "column": "ArtistId"
+          }
+        }
+      }
+    }
+  },
+  {
+    "kind": "typeOutputPermissions",
+    "typeName": "artist",
+    "outputPermissions": {
+      "admin": {
+        "fields": ["id", "name"]
+      }
+    }
+  },
+  {
+    "kind": "typeOutputPermissions",
+    "typeName": "album",
+    "outputPermissions": {
+      "admin": {
+        "fields": ["id", "title", "artist_id"]
+      }
+    }
+  },
+  {
+    "kind": "graphqlType",
+    "typeName": "artist",
+    "graphqlTypeName": "Artist",
+    "graphqlTypeKind": "Object"
+  },
+  {
+    "kind": "graphqlType",
+    "typeName": "album",
+    "graphqlTypeName": "Album",
+    "graphqlTypeKind": "Object"
+  },
+  {
+    "kind": "modelGraphqlApi",
+    "modelName": "Artists",
+    "selectUniques": [
+      {
+        "queryRootField": "ArtistByID",
+        "uniqueIdentifier": ["id"]
+      }
+    ]
+  },
+  {
+    "kind": "modelGraphqlApi",
+    "modelName": "Albums",
+    "selectUniques": [
+      {
+        "queryRootField": "AlbumByID",
+        "uniqueIdentifier": ["id"]
+      }
+    ]
+  },
+  {
+    "kind": "relationship",
+    "source": "artist",
+    "name": "Albums",
+    "target": {
+      "modelName": "Albums",
+      "relationshipType": "Array"
+    },
+    "mappings": [
+      {
+        "source": {
+          "fieldPath": [
+            {
+              "fieldName": "id"
+            }
+          ]
+        },
+        "target": {
+          "modelField": [
+            {
+              "fieldName": "album_id"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "kind": "relationship",
+    "source": "album",
+    "name": "Artist",
+    "target": {
+      "modelName": "Artists",
+      "relationshipType": "Object"
+    },
+    "mappings": [
+      {
+        "source": {
+          "fieldPath": [
+            {
+              "fieldName": "artist_id"
+            }
+          ]
+        },
+        "target": {
+          "modelField": [
+            {
+              "fieldName": "id"
+            }
+          ]
+        }
+      }
+    ]
+  }
+]

@@ -33,18 +33,13 @@ parts of it for now.
 Support passing user input as variables in a parameterized query.
 *** Order by
 ** Port other endpoints
-the multitenant gdc reference has support for [[https://github.com/hasura/v3-experiments/blob/main/gdc/spec/src/specification/README.md][other endpoints]].
-Some can probably be ported from the multitenant code.
+the NDC spec has support for [[https://github.com/hasura/ndc-spec/tree/main/specification/src/specification][other endpoints]].
 *** /capabilities
 which describes which features the data source is capable of implementing.
 *** /schema
 which describes the resources provided by the data source, and the shape of the data they contain.
 *** /mutation
 which modifies the data in one of the relations described by the schema endpoint.
-*** /explain
-which explains a query plan, without actually executing it.
-
-Should reuse the /query endpoint stuff.
 *** /metrics
 which exposes runtime metrics about the data connector.
 ** Support multiple projects
