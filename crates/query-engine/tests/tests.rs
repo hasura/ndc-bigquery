@@ -41,3 +41,9 @@ fn it_simple_object_relationship() {
     let result = common::test_translation("simple_object_relationship").unwrap();
     insta::assert_snapshot!(result);
 }
+
+#[test]
+fn nested_array_relationships() {
+    let result = common::test_translation("nested_array_relationships").unwrap();
+    insta::assert_snapshot!(result);
+}

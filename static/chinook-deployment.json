@@ -27,6 +27,21 @@
           "name": "Name"
         }
       }
+    },
+    "Track": {
+      "schema_name": "public",
+      "table_name": "Track",
+      "columns": {
+        "AlbumId": {
+          "name": "AlbumId"
+        },
+        "Name": {
+          "name": "Name"
+        },
+        "ArtistId": {
+          "name": "AlbumId"
+        }
+      }
     }
   },
   "schema": {
@@ -92,6 +107,35 @@
             }
           }
         }
+      },
+      "Track": {
+        "description": "",
+        "fields": {
+          "TrackId": {
+            "description": "",
+            "arguments": {},
+            "type": {
+              "type": "named",
+              "name": "Int"
+            }
+          },
+          "Name": {
+            "description": "",
+            "arguments": {},
+            "type": {
+              "type": "named",
+              "name": "String"
+            }
+          },
+          "AlbumId": {
+            "description": "",
+            "arguments": {},
+            "type": {
+              "type": "named",
+              "name": "Int"
+            }
+          }
+        }
       }
     },
     "tables": [
@@ -120,6 +164,21 @@
           "ArtistById": {
             "unique_columns": [
               "ArtistId"
+            ]
+          }
+        },
+        "foreign_keys": {}
+      },
+      {
+        "name": "Track",
+        "description": "A collection of tracks",
+        "arguments": {},
+        "type": "Track",
+        "deletable": false,
+        "uniqueness_constraints": {
+          "TrackByID": {
+            "unique_columns": [
+              "TrackId"
             ]
           }
         },

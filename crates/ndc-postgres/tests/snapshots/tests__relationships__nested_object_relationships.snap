@@ -1,0 +1,145 @@
+---
+source: crates/ndc-postgres/tests/tests.rs
+expression: result
+---
+[
+  {
+    "rows": [
+      {
+        "Album": {
+          "rows": {
+            "rows": [
+              {
+                "Artist": {
+                  "rows": {
+                    "rows": [
+                      {
+                        "artist": {
+                          "value": "Gonzaguinha"
+                        }
+                      }
+                    ]
+                  }
+                },
+                "album": {
+                  "value": "Meus Momentos"
+                }
+              }
+            ]
+          }
+        },
+        "track": {
+          "value": "Grito De Alerta"
+        }
+      },
+      {
+        "Album": {
+          "rows": {
+            "rows": [
+              {
+                "Artist": {
+                  "rows": {
+                    "rows": [
+                      {
+                        "artist": {
+                          "value": "Gonzaguinha"
+                        }
+                      }
+                    ]
+                  }
+                },
+                "album": {
+                  "value": "Meus Momentos"
+                }
+              }
+            ]
+          }
+        },
+        "track": {
+          "value": "Não Dá Mais Pra Segurar (Explode Coração)"
+        }
+      },
+      {
+        "Album": {
+          "rows": {
+            "rows": [
+              {
+                "Artist": {
+                  "rows": {
+                    "rows": [
+                      {
+                        "artist": {
+                          "value": "Gonzaguinha"
+                        }
+                      }
+                    ]
+                  }
+                },
+                "album": {
+                  "value": "Meus Momentos"
+                }
+              }
+            ]
+          }
+        },
+        "track": {
+          "value": "Começaria Tudo Outra Vez"
+        }
+      },
+      {
+        "Album": {
+          "rows": {
+            "rows": [
+              {
+                "Artist": {
+                  "rows": {
+                    "rows": [
+                      {
+                        "artist": {
+                          "value": "Gonzaguinha"
+                        }
+                      }
+                    ]
+                  }
+                },
+                "album": {
+                  "value": "Meus Momentos"
+                }
+              }
+            ]
+          }
+        },
+        "track": {
+          "value": "O Que É O Que É ?"
+        }
+      },
+      {
+        "Album": {
+          "rows": {
+            "rows": [
+              {
+                "Artist": {
+                  "rows": {
+                    "rows": [
+                      {
+                        "artist": {
+                          "value": "Gonzaguinha"
+                        }
+                      }
+                    ]
+                  }
+                },
+                "album": {
+                  "value": "Meus Momentos"
+                }
+              }
+            ]
+          }
+        },
+        "track": {
+          "value": "Sangrando"
+        }
+      }
+    ]
+  }
+]

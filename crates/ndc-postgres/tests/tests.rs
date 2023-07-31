@@ -139,16 +139,33 @@ async fn aggregate_count_albums() {
     insta::assert_json_snapshot!(result);
 }
 
-#[tokio::test]
-async fn select_album_object_relationship_to_artist() {
-    let result = common::run_query("select_album_object_relationship_to_artist").await;
-    insta::assert_json_snapshot!(result);
-}
+mod relationships {
+    use crate::common;
+    use std::env;
 
-#[tokio::test]
-async fn select_artist_array_relationship_to_album() {
-    let result = common::run_query("select_artist_array_relationship_to_album").await;
-    insta::assert_json_snapshot!(result);
+    #[tokio::test]
+    async fn select_album_object_relationship_to_artist() {
+        let result = common::run_query("select_album_object_relationship_to_artist").await;
+        insta::assert_json_snapshot!(result);
+    }
+
+    #[tokio::test]
+    async fn select_artist_array_relationship_to_album() {
+        let result = common::run_query("select_artist_array_relationship_to_album").await;
+        insta::assert_json_snapshot!(result);
+    }
+
+    #[tokio::test]
+    async fn nested_array_relationships() {
+        let result = common::run_query("nested_array_relationships").await;
+        insta::assert_json_snapshot!(result);
+    }
+
+    #[tokio::test]
+    async fn nested_object_relationships() {
+        let result = common::run_query("nested_object_relationships").await;
+        insta::assert_json_snapshot!(result);
+    }
 }
 
 mod explain {

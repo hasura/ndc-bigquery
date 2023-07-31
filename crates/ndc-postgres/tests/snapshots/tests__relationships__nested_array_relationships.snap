@@ -1,0 +1,187 @@
+---
+source: crates/ndc-postgres/tests/tests.rs
+expression: result
+---
+[
+  {
+    "rows": [
+      {
+        "Albums": {
+          "rows": {
+            "rows": [
+              {
+                "Tracks": {
+                  "rows": {
+                    "rows": [
+                      {
+                        "track": {
+                          "value": "A Kind Of Magic"
+                        }
+                      },
+                      {
+                        "track": {
+                          "value": "Under Pressure"
+                        }
+                      },
+                      {
+                        "track": {
+                          "value": "Radio GA GA"
+                        }
+                      },
+                      {
+                        "track": {
+                          "value": "I Want It All"
+                        }
+                      }
+                    ]
+                  }
+                },
+                "album": {
+                  "value": "Greatest Hits II"
+                }
+              },
+              {
+                "Tracks": {
+                  "rows": {
+                    "rows": [
+                      {
+                        "track": {
+                          "value": "Bohemian Rhapsody"
+                        }
+                      },
+                      {
+                        "track": {
+                          "value": "Another One Bites The Dust"
+                        }
+                      },
+                      {
+                        "track": {
+                          "value": "Killer Queen"
+                        }
+                      },
+                      {
+                        "track": {
+                          "value": "Fat Bottomed Girls"
+                        }
+                      }
+                    ]
+                  }
+                },
+                "album": {
+                  "value": "Greatest Hits I"
+                }
+              },
+              {
+                "Tracks": {
+                  "rows": {
+                    "rows": [
+                      {
+                        "track": {
+                          "value": "We Will Rock You"
+                        }
+                      },
+                      {
+                        "track": {
+                          "value": "We Are The Champions"
+                        }
+                      },
+                      {
+                        "track": {
+                          "value": "Sheer Heart Attack"
+                        }
+                      },
+                      {
+                        "track": {
+                          "value": "All Dead, All Dead"
+                        }
+                      }
+                    ]
+                  }
+                },
+                "album": {
+                  "value": "News Of The World"
+                }
+              }
+            ]
+          }
+        },
+        "artist": {
+          "value": "Queen"
+        }
+      },
+      {
+        "Albums": {
+          "rows": {
+            "rows": [
+              {
+                "Tracks": {
+                  "rows": {
+                    "rows": [
+                      {
+                        "track": {
+                          "value": "Detroit Rock City"
+                        }
+                      },
+                      {
+                        "track": {
+                          "value": "Black Diamond"
+                        }
+                      },
+                      {
+                        "track": {
+                          "value": "Hard Luck Woman"
+                        }
+                      },
+                      {
+                        "track": {
+                          "value": "Sure Know Something"
+                        }
+                      }
+                    ]
+                  }
+                },
+                "album": {
+                  "value": "Greatest Kiss"
+                }
+              },
+              {
+                "Tracks": {
+                  "rows": {
+                    "rows": [
+                      {
+                        "track": {
+                          "value": "Comin' Home"
+                        }
+                      },
+                      {
+                        "track": {
+                          "value": "Plaster Caster"
+                        }
+                      },
+                      {
+                        "track": {
+                          "value": "Goin' Blind"
+                        }
+                      },
+                      {
+                        "track": {
+                          "value": "Do You Love Me"
+                        }
+                      }
+                    ]
+                  }
+                },
+                "album": {
+                  "value": "Unplugged [Live]"
+                }
+              }
+            ]
+          }
+        },
+        "artist": {
+          "value": "Kiss"
+        }
+      }
+    ]
+  }
+]

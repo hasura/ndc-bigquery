@@ -43,7 +43,7 @@
         }
       },
       "object_types": {
-        "artist": {
+        "Artist": {
           "description": "An artist",
           "fields": {
             "ArtistId": {
@@ -64,7 +64,7 @@
             }
           }
         },
-        "album": {
+        "Album": {
           "description": "An album",
           "fields": {
             "AlbumId": {
@@ -92,6 +92,35 @@
               }
             }
           }
+        },
+        "Track": {
+          "description": "A track",
+          "fields": {
+            "TrackId": {
+              "description": "The track's primary key",
+              "arguments": {},
+              "type": {
+                "type": "named",
+                "name": "Int"
+              }
+            },
+            "Name": {
+              "description": "The track's name",
+              "arguments": {},
+              "type": {
+                "type": "named",
+                "name": "String"
+              }
+            },
+            "AlbumId": {
+              "description": "The track's album ID",
+              "arguments": {},
+              "type": {
+                "type": "named",
+                "name": "Int"
+              }
+            }
+          }
         }
       },
       "tables": [
@@ -99,7 +128,7 @@
           "name": "Artist",
           "description": "A collection of artists",
           "arguments": {},
-          "type": "artist",
+          "type": "Artist",
           "deletable": false,
           "uniqueness_constraints": {
             "ArtistById": {
@@ -112,11 +141,24 @@
           "name": "Album",
           "description": "A collection of albums",
           "arguments": {},
-          "type": "album",
+          "type": "Album",
           "deletable": false,
           "uniqueness_constraints": {
             "AlbumById": {
               "unique_columns": ["AlbumId"]
+            }
+          },
+          "foreign_keys": {}
+        },
+        {
+          "name": "Track",
+          "description": "A collection of tracks",
+          "arguments": {},
+          "type": "Track",
+          "deletable": false,
+          "uniqueness_constraints": {
+            "TrackById": {
+              "unique_columns": ["TrackId"]
             }
           },
           "foreign_keys": {}
@@ -127,32 +169,50 @@
   },
   {
     "kind": "objectType",
-    "name": "artist",
+    "name": "Artist",
     "fields": [
       {
-        "name": "id",
+        "name": "ArtistId",
         "type": "Int"
       },
       {
-        "name": "name",
+        "name": "Name",
         "type": "String"
       }
     ]
   },
   {
     "kind": "objectType",
-    "name": "album",
+    "name": "Album",
     "fields": [
       {
-        "name": "id",
+        "name": "AlbumId",
         "type": "Int"
       },
       {
-        "name": "title",
+        "name": "Title",
         "type": "String"
       },
       {
-        "name": "artist_id",
+        "name": "ArtistId",
+        "type": "Int"
+      }
+    ]
+  },
+  {
+    "kind": "objectType",
+    "name": "Track",
+    "fields": [
+      {
+        "name": "TrackId",
+        "type": "Int"
+      },
+      {
+        "name": "Name",
+        "type": "String"
+      },
+      {
+        "name": "AlbumId",
         "type": "Int"
       }
     ]
@@ -160,7 +220,7 @@
   {
     "kind": "model",
     "name": "Artists",
-    "dataType": "artist"
+    "dataType": "Artist"
   },
   {
     "kind": "modelSource",
@@ -168,12 +228,12 @@
     "dataSource": "db",
     "table": "Artist",
     "typeMappings": {
-      "artist": {
+      "Artist": {
         "fieldMappings": {
-          "id": {
+          "ArtistId": {
             "column": "ArtistId"
           },
-          "name": {
+          "Name": {
             "column": "Name"
           }
         }
@@ -183,7 +243,7 @@
   {
     "kind": "model",
     "name": "Albums",
-    "dataType": "album"
+    "dataType": "Album"
   },
   {
     "kind": "modelSource",
@@ -191,15 +251,15 @@
     "dataSource": "db",
     "table": "Album",
     "typeMappings": {
-      "album": {
+      "Album": {
         "fieldMappings": {
-          "id": {
+          "AlbumId": {
             "column": "AlbumId"
           },
-          "title": {
+          "Title": {
             "column": "Title"
           },
-          "artist_id": {
+          "ArtistId": {
             "column": "ArtistId"
           }
         }
@@ -207,33 +267,74 @@
     }
   },
   {
-    "kind": "typeOutputPermissions",
-    "typeName": "artist",
-    "outputPermissions": {
-      "admin": {
-        "fields": ["id", "name"]
+    "kind": "model",
+    "name": "Tracks",
+    "dataType": "Track"
+  },
+  {
+    "kind": "modelSource",
+    "modelName": "Tracks",
+    "dataSource": "db",
+    "table": "Track",
+    "typeMappings": {
+      "Track": {
+        "fieldMappings": {
+          "TrackId": {
+            "column": "TrackId"
+          },
+          "Name": {
+            "column": "Name"
+          },
+          "AlbumId": {
+            "column": "AlbumId"
+          }
+        }
       }
     }
   },
   {
     "kind": "typeOutputPermissions",
-    "typeName": "album",
+    "typeName": "Artist",
     "outputPermissions": {
       "admin": {
-        "fields": ["id", "title", "artist_id"]
+        "fields": ["ArtistId", "Name"]
+      }
+    }
+  },
+  {
+    "kind": "typeOutputPermissions",
+    "typeName": "Album",
+    "outputPermissions": {
+      "admin": {
+        "fields": ["AlbumId", "Title", "ArtistId"]
+      }
+    }
+  },
+  {
+    "kind": "typeOutputPermissions",
+    "typeName": "Track",
+    "outputPermissions": {
+      "admin": {
+        "fields": ["TrackId", "Name", "AlbumId"]
       }
     }
   },
   {
     "kind": "graphqlType",
-    "typeName": "artist",
+    "typeName": "Artist",
     "graphqlTypeName": "Artist",
     "graphqlTypeKind": "Object"
   },
   {
     "kind": "graphqlType",
-    "typeName": "album",
+    "typeName": "Album",
     "graphqlTypeName": "Album",
+    "graphqlTypeKind": "Object"
+  },
+  {
+    "kind": "graphqlType",
+    "typeName": "Track",
+    "graphqlTypeName": "Track",
     "graphqlTypeKind": "Object"
   },
   {
@@ -242,7 +343,7 @@
     "selectUniques": [
       {
         "queryRootField": "ArtistByID",
-        "uniqueIdentifier": ["id"]
+        "uniqueIdentifier": ["ArtistId"]
       }
     ]
   },
@@ -252,13 +353,23 @@
     "selectUniques": [
       {
         "queryRootField": "AlbumByID",
-        "uniqueIdentifier": ["id"]
+        "uniqueIdentifier": ["AlbumId"]
+      }
+    ]
+  },
+  {
+    "kind": "modelGraphqlApi",
+    "modelName": "Tracks",
+    "selectUniques": [
+      {
+        "queryRootField": "TrackByID",
+        "uniqueIdentifier": ["TrackId"]
       }
     ]
   },
   {
     "kind": "relationship",
-    "source": "artist",
+    "source": "Artist",
     "name": "Albums",
     "target": {
       "modelName": "Albums",
@@ -269,14 +380,14 @@
         "source": {
           "fieldPath": [
             {
-              "fieldName": "id"
+              "fieldName": "ArtistId"
             }
           ]
         },
         "target": {
           "modelField": [
             {
-              "fieldName": "album_id"
+              "fieldName": "ArtistId"
             }
           ]
         }
@@ -285,7 +396,34 @@
   },
   {
     "kind": "relationship",
-    "source": "album",
+    "source": "Album",
+    "name": "Tracks",
+    "target": {
+      "modelName": "Tracks",
+      "relationshipType": "Array"
+    },
+    "mappings": [
+      {
+        "source": {
+          "fieldPath": [
+            {
+              "fieldName": "AlbumId"
+            }
+          ]
+        },
+        "target": {
+          "modelField": [
+            {
+              "fieldName": "AlbumId"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "kind": "relationship",
+    "source": "Album",
     "name": "Artist",
     "target": {
       "modelName": "Artists",
@@ -296,14 +434,41 @@
         "source": {
           "fieldPath": [
             {
-              "fieldName": "artist_id"
+              "fieldName": "ArtistId"
             }
           ]
         },
         "target": {
           "modelField": [
             {
-              "fieldName": "id"
+              "fieldName": "ArtistId"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "kind": "relationship",
+    "source": "Track",
+    "name": "Album",
+    "target": {
+      "modelName": "Albums",
+      "relationshipType": "Object"
+    },
+    "mappings": [
+      {
+        "source": {
+          "fieldPath": [
+            {
+              "fieldName": "AlbumId"
+            }
+          ]
+        },
+        "target": {
+          "modelField": [
+            {
+              "fieldName": "AlbumId"
             }
           ]
         }
