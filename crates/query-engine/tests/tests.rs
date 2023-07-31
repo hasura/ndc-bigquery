@@ -47,3 +47,9 @@ fn nested_array_relationships() {
     let result = common::test_translation("nested_array_relationships").unwrap();
     insta::assert_snapshot!(result);
 }
+
+#[test]
+fn dup_array_relationship() {
+    let result = common::test_translation("dup_array_relationship").unwrap();
+    insta::assert_snapshot!(result);
+}

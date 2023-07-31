@@ -164,12 +164,11 @@ impl Translate {
                     relationship,
                     ..
                 } => {
-                    let table_alias = self.make_table_alias(relationship.clone());
-                    let column_alias = self.make_column_alias(alias);
-                    let relationship_alias = self.make_column_alias(relationship.clone());
+                    let table_alias = self.make_table_alias(alias.clone());
+                    let column_alias = self.make_column_alias(alias.clone());
                     let column_name = sql_ast::ColumnName::AliasedColumn {
                         table: sql_ast::TableName::AliasedTable(table_alias.clone()),
-                        name: relationship_alias,
+                        name: column_alias.clone(),
                     };
                     join_fields.push((table_alias, relationship, *query));
                     Ok((column_alias, sql_ast::Expression::ColumnName(column_name)))
@@ -341,8 +340,8 @@ impl Translate {
                 // wrap the sql in row_to_json and json_agg
                 let final_select = wrap_select(
                     select,
-                    self.make_column_alias(relationship_name.clone()),
-                    self.make_table_alias(relationship_name),
+                    self.make_column_alias(alias.name.clone()),
+                    self.make_table_alias(alias.name.clone()),
                 );
 
                 Ok(sql_ast::Join::LeftOuterJoinLateral(

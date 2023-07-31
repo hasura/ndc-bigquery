@@ -166,6 +166,12 @@ mod relationships {
         let result = common::run_query("nested_object_relationships").await;
         insta::assert_json_snapshot!(result);
     }
+
+    #[tokio::test]
+    async fn dup_array_relationship() {
+        let result = common::run_query("dup_array_relationship").await;
+        insta::assert_json_snapshot!(result);
+    }
 }
 
 mod explain {

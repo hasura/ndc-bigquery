@@ -1,0 +1,7 @@
+---
+source: crates/query-engine/tests/tests.rs
+expression: result
+---
+SELECT coalesce(json_agg(row_to_json("root")), '[]') AS "rows" FROM (SELECT "albums"."albums" AS "albums", "Albums"."Albums" AS "Albums" FROM "public"."Artist" AS "Artist" LEFT OUTER JOIN LATERAL (SELECT coalesce(json_agg(row_to_json("albums")), '[]') AS "albums" FROM (SELECT "Album"."Title" AS "title" FROM "public"."Album" AS "Album" WHERE (true AND ("Artist"."ArtistId" = "Album"."ArtistId"))) AS "albums") AS "albums" ON ('true')  LEFT OUTER JOIN LATERAL (SELECT coalesce(json_agg(row_to_json("Albums")), '[]') AS "Albums" FROM (SELECT "Album"."Title" AS "title" FROM "public"."Album" AS "Album" WHERE (true AND ("Artist"."ArtistId" = "Album"."ArtistId"))) AS "Albums") AS "Albums" ON ('true')  LIMIT 5) AS "root"
+
+[]
