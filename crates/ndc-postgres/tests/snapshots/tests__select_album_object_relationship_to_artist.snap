@@ -1,0 +1,90 @@
+---
+source: crates/ndc-postgres/tests/tests.rs
+expression: result
+---
+[
+  {
+    "rows": [
+      {
+        "Artist": {
+          "rows": {
+            "rows": [
+              {
+                "Name": {
+                  "value": "AC/DC"
+                }
+              }
+            ]
+          }
+        },
+        "Title": {
+          "value": "Let There Be Rock"
+        }
+      },
+      {
+        "Artist": {
+          "rows": {
+            "rows": [
+              {
+                "Name": {
+                  "value": "Aerosmith"
+                }
+              }
+            ]
+          }
+        },
+        "Title": {
+          "value": "Big Ones"
+        }
+      },
+      {
+        "Artist": {
+          "rows": {
+            "rows": [
+              {
+                "Name": {
+                  "value": "Alanis Morissette"
+                }
+              }
+            ]
+          }
+        },
+        "Title": {
+          "value": "Jagged Little Pill"
+        }
+      },
+      {
+        "Artist": {
+          "rows": {
+            "rows": [
+              {
+                "Name": {
+                  "value": "Alice In Chains"
+                }
+              }
+            ]
+          }
+        },
+        "Title": {
+          "value": "Facelift"
+        }
+      },
+      {
+        "Artist": {
+          "rows": {
+            "rows": [
+              {
+                "Name": {
+                  "value": "Antônio Carlos Jobim"
+                }
+              }
+            ]
+          }
+        },
+        "Title": {
+          "value": "Warner 25 Anos"
+        }
+      }
+    ]
+  }
+]

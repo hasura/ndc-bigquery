@@ -29,3 +29,15 @@ fn it_aggregate_function_albums() {
     let result = common::test_translation("aggregate_function_albums").unwrap();
     insta::assert_snapshot!(result);
 }
+
+#[test]
+fn it_simple_array_relationship() {
+    let result = common::test_translation("simple_array_relationship").unwrap();
+    insta::assert_snapshot!(result);
+}
+
+#[test]
+fn it_simple_object_relationship() {
+    let result = common::test_translation("simple_object_relationship").unwrap();
+    insta::assert_snapshot!(result);
+}

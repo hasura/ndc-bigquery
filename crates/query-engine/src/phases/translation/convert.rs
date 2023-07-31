@@ -1,5 +1,6 @@
 /// Convert a SQL AST to a low-level SQL string.
 use super::sql_ast::*;
+use super::sql_helpers;
 use super::sql_string::*;
 
 // Convert to SQL strings
@@ -73,6 +74,10 @@ impl Select {
             None => (),
         }
 
+        for join in self.joins.iter() {
+            join.to_sql(sql)
+        }
+
         self.where_.to_sql(sql);
 
         self.order_by.to_sql(sql);
@@ -101,10 +106,26 @@ impl From {
     }
 }
 
+impl Join {
+    pub fn to_sql(&self, sql: &mut SQL) {
+        match self {
+            Join::LeftOuterJoinLateral(join) => {
+                sql.append_syntax(" LEFT OUTER JOIN LATERAL ");
+                sql.append_syntax("(");
+                join.select.to_sql(sql);
+                sql.append_syntax(")");
+                sql.append_syntax(" AS ");
+                join.alias.to_sql(sql);
+                sql.append_syntax(" ON ('true') ");
+            }
+        }
+    }
+}
+
 impl Where {
     pub fn to_sql(&self, sql: &mut SQL) {
         let Where(expression) = self;
-        if *expression != true_expr() {
+        if *expression != sql_helpers::true_expr() {
             sql.append_syntax(" WHERE ");
             expression.to_sql(sql);
         }
@@ -318,10 +339,10 @@ impl ColumnName {
                 sql.append_syntax(".");
                 sql.append_identifier(&name.to_string());
             }
-            ColumnName::AliasedColumn { table, alias } => {
+            ColumnName::AliasedColumn { table, name } => {
                 table.to_sql(sql);
                 sql.append_syntax(".");
-                alias.to_sql(sql);
+                name.to_sql(sql);
             }
         };
     }

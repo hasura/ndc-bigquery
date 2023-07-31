@@ -50,9 +50,29 @@ pub fn rowset_to_rowset(rowset: RowSet) -> models::RowSet {
                                             rows: rowset_to_rowset(rows),
                                         }
                                     }
-                                    RowFieldValue::Column(json) => {
-                                        models::RowFieldValue::Column { value: json }
-                                    }
+                                    RowFieldValue::Column(json) => match json {
+                                        // this is cheating, if we have an array, we assume it's a
+                                        // relationship
+                                        // pretty sure this will break if we select from a Postgres
+                                        // array column, as we'll mistake it for a relationship
+                                        // Ideally, we'll change the data connectors to return raw
+                                        // GraphQL-shaped JSON
+                                        serde_json::Value::Array(array_items) => {
+                                            let rows = array_items
+                                                .into_iter()
+                                                .map(|item_json| {
+                                                    serde_json::from_value(item_json).unwrap()
+                                                })
+                                                .collect();
+                                            models::RowFieldValue::Relationship {
+                                                rows: rowset_to_rowset(RowSet {
+                                                    rows,
+                                                    aggregates: None,
+                                                }),
+                                            }
+                                        }
+                                        _ => models::RowFieldValue::Column { value: json },
+                                    },
                                 },
                             )
                         })

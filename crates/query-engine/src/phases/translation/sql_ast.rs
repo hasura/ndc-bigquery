@@ -23,6 +23,7 @@ pub struct Select {
     pub with: With,
     pub select_list: SelectList,
     pub from: Option<From>,
+    pub joins: Vec<Join>,
     pub where_: Where,
     pub group_by: GroupBy,
     pub order_by: OrderBy,
@@ -42,6 +43,17 @@ pub enum From {
         select: Box<Select>,
         alias: TableAlias,
     },
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum Join {
+    LeftOuterJoinLateral(LeftOuterJoinLateral),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct LeftOuterJoinLateral {
+    pub select: Box<Select>,
+    pub alias: TableAlias,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -162,123 +174,28 @@ pub enum Value {
 }
 
 /// aliases that we give to relations
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct TableAlias {
     pub unique_index: u64,
     pub name: String,
 }
 /// aliases that we give to columns
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ColumnAlias {
     pub unique_index: u64,
     pub name: String,
 }
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum TableName {
     /// refers to a db table object name
     DBTable { schema: String, table: String },
     /// refers to an alias we created
     AliasedTable(TableAlias),
 }
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ColumnName {
     /// refers to a db column object name
     TableColumn { table: TableName, name: String },
     /// refers to an alias we created
-    AliasedColumn {
-        table: TableName,
-        alias: ColumnAlias,
-    },
-}
-
-// utils
-pub fn empty_with() -> With {
-    With {
-        recursive: false,
-        common_table_expressions: vec![],
-    }
-}
-pub fn empty_where() -> Expression {
-    Expression::Value(Value::Bool(true))
-}
-pub fn empty_group_by() -> GroupBy {
-    GroupBy {}
-}
-pub fn empty_order_by() -> OrderBy {
-    OrderBy { elements: vec![] }
-}
-pub fn empty_limit() -> Limit {
-    Limit {
-        limit: None,
-        offset: None,
-    }
-}
-
-pub fn true_expr() -> Expression {
-    Expression::Value(Value::Bool(true))
-}
-pub fn false_expr() -> Expression {
-    Expression::Value(Value::Bool(false))
-}
-
-impl TableName {
-    pub fn from_public(tablename: String) -> TableName {
-        TableName::DBTable {
-            schema: "public".to_string(),
-            table: tablename,
-        }
-    }
-}
-
-/// create a simple select with a select list and the rest are empty.
-pub fn simple_select(select_list: Vec<(ColumnAlias, Expression)>) -> Select {
-    Select {
-        with: empty_with(),
-        select_list: SelectList(select_list),
-        from: None,
-        where_: Where(empty_where()),
-        group_by: empty_group_by(),
-        order_by: empty_order_by(),
-        limit: empty_limit(),
-    }
-}
-
-/// wrap an existing select in row_to_json and json_agg
-pub fn select_as_json(
-    select: Select,
-    column_alias: ColumnAlias,
-    table_alias: TableAlias,
-) -> Select {
-    Select {
-        with: empty_with(),
-        // This translates to: `coalesce(json_agg(row_to_json(<table_alias>)), '[]') AS <column_alias>`.
-        //
-        // - `row_to_json` takes a row and converts it to a json object.
-        // - `json_agg` aggregates the json objects to a json array.
-        // - `coalesce(<thing>, <otherwise>)` returns <thing> if it is not null, and <otherwise> if it is null.
-        select_list: SelectList(vec![(
-            column_alias,
-            Expression::FunctionCall {
-                function: Function::Coalesce,
-                args: vec![
-                    Expression::FunctionCall {
-                        function: Function::JsonAgg,
-                        args: vec![Expression::RowToJson(TableName::AliasedTable(
-                            table_alias.clone(),
-                        ))],
-                    },
-                    Expression::Value(Value::EmptyJsonArray),
-                ],
-            },
-        )]),
-        // FROM (select ...) as <table_alias>
-        from: Some(From::Select {
-            select: Box::new(select),
-            alias: table_alias,
-        }),
-        where_: Where(empty_where()),
-        group_by: empty_group_by(),
-        order_by: empty_order_by(),
-        limit: empty_limit(),
-    }
+    AliasedColumn { table: TableName, name: ColumnAlias },
 }

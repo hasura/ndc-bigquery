@@ -2,6 +2,7 @@
 /// Also exports the SQL AST types and the low-level string representation of a SQL query type.
 pub mod convert;
 pub mod sql_ast;
+pub mod sql_helpers;
 pub mod sql_string;
 use crate::metadata;
 
@@ -90,92 +91,18 @@ impl Translate {
     /// Translate a query request to sql ast.
     pub fn translate(
         &mut self,
-        metadata::TablesInfo(tables_info): &metadata::TablesInfo,
+        tables_info: &metadata::TablesInfo,
         query_request: models::QueryRequest,
     ) -> Result<ExecutionPlan, Error> {
-        // find the table according to the metadata.
-        let table_info = tables_info
-            .get(&query_request.table)
-            .ok_or(Error::TableNotFound(query_request.table.clone()))?;
-        let table: sql_ast::TableName = sql_ast::TableName::DBTable {
-            schema: table_info.schema_name.clone(),
-            table: table_info.table_name.clone(),
-        };
-        let table_alias: sql_ast::TableAlias = self.make_table_alias(query_request.table.clone());
-        let table_alias_name: sql_ast::TableName =
-            sql_ast::TableName::AliasedTable(table_alias.clone());
-
-        // translate fields to select list
-        let fields = query_request.query.fields.unwrap_or(HashMap::new());
-
-        // translate fields to columns or relationships.
-        let mut columns: Vec<(sql_ast::ColumnAlias, sql_ast::Expression)> = fields
-            .into_iter()
-            .map(|(alias, field)| match field {
-                models::Field::Column { column, .. } => {
-                    let column_info =
-                        table_info
-                            .columns
-                            .get(&column)
-                            .ok_or(Error::ColumnNotFoundInTable(
-                                column,
-                                query_request.table.clone(),
-                            ))?;
-                    Ok(make_column(
-                        table_alias_name.clone(),
-                        column_info.name.clone(),
-                        self.make_column_alias(alias),
-                    ))
-                }
-                models::Field::Relationship { .. } => {
-                    Err(Error::NotSupported("relationships".to_string()))
-                }
-            })
-            .collect::<Result<Vec<_>, Error>>()?;
-
-        // create all aggregate columns
-        let aggregate_columns = self.translate_aggregates(
-            sql_ast::TableName::AliasedTable(table_alias.clone()),
-            query_request.query.aggregates.unwrap_or(HashMap::new()),
+        let select = self.translate_query(
+            tables_info,
+            &query_request.table,
+            &query_request.table_relationships,
+            query_request.query,
         )?;
 
-        // combine field and aggregate columns
-        columns.extend(aggregate_columns);
-
-        // fail if no columns defined at all
-        match Vec::is_empty(&columns) {
-            true => Err(Error::NoFields),
-            false => Ok(()),
-        }?;
-
-        // construct a simple select with the table name, alias, and selected columns.
-        let mut select = sql_ast::simple_select(columns);
-
-        select.from = Some(sql_ast::From::Table {
-            name: table,
-            alias: table_alias.clone(),
-        });
-
-        // translate order_by
-        select.order_by = self.translate_order_by(
-            sql_ast::TableName::AliasedTable(table_alias),
-            query_request.query.order_by,
-        );
-
-        // translate where
-        select.where_ = sql_ast::Where(match query_request.query.predicate {
-            None => sql_ast::Expression::Value(sql_ast::Value::Bool(true)),
-            Some(predicate) => self.translate_expression(&table_alias_name, predicate),
-        });
-
-        // translate limit and offset
-        select.limit = sql_ast::Limit {
-            limit: query_request.query.limit,
-            offset: query_request.query.offset,
-        };
-
         // wrap the sql in row_to_json and json_agg
-        let final_select = sql_ast::select_as_json(
+        let final_select = sql_helpers::select_table_as_json_array(
             select,
             self.make_column_alias("rows".to_string()),
             self.make_table_alias("root".to_string()),
@@ -188,6 +115,119 @@ impl Translate {
             query_request.table,
             final_select,
         ))
+    }
+
+    /// Translate a query to sql ast.
+    pub fn translate_query(
+        &mut self,
+        tables_info: &metadata::TablesInfo,
+        table_name: &String,
+        relationships: &HashMap<String, models::Relationship>,
+        query: models::Query,
+    ) -> Result<sql_ast::Select, Error> {
+        let metadata::TablesInfo(tables_info_map) = tables_info;
+        // find the table according to the metadata.
+        let table_info = tables_info_map
+            .get(table_name)
+            .ok_or(Error::TableNotFound(table_name.clone()))?;
+        let table: sql_ast::TableName = sql_ast::TableName::DBTable {
+            schema: table_info.schema_name.clone(),
+            table: table_info.table_name.clone(),
+        };
+        let table_alias: sql_ast::TableAlias = self.make_table_alias(table_name.clone());
+        let table_alias_name: sql_ast::TableName =
+            sql_ast::TableName::AliasedTable(table_alias.clone());
+
+        // join aliases
+        let mut join_fields: Vec<(sql_ast::TableAlias, String, models::Query)> = vec![];
+
+        // translate fields to select list
+        let fields = query.fields.unwrap_or(HashMap::new());
+
+        // translate fields to columns or relationships.
+        let mut columns: Vec<(sql_ast::ColumnAlias, sql_ast::Expression)> = fields
+            .into_iter()
+            .map(|(alias, field)| match field {
+                models::Field::Column { column, .. } => {
+                    let column_info = table_info
+                        .columns
+                        .get(&column)
+                        .ok_or(Error::ColumnNotFoundInTable(column, table_name.clone()))?;
+                    Ok(make_column(
+                        table_alias_name.clone(),
+                        column_info.name.clone(),
+                        self.make_column_alias(alias),
+                    ))
+                }
+                models::Field::Relationship {
+                    query,
+                    relationship,
+                    ..
+                } => {
+                    let table_alias = self.make_table_alias(relationship.clone());
+                    let column_alias = self.make_column_alias(alias);
+                    let relationship_alias = self.make_column_alias(relationship.clone());
+                    let column_name = sql_ast::ColumnName::AliasedColumn {
+                        table: sql_ast::TableName::AliasedTable(table_alias.clone()),
+                        name: relationship_alias,
+                    };
+                    join_fields.push((table_alias, relationship, *query));
+                    Ok((column_alias, sql_ast::Expression::ColumnName(column_name)))
+                }
+            })
+            .collect::<Result<Vec<_>, Error>>()?;
+
+        // create all aggregate columns
+        let aggregate_columns = self.translate_aggregates(
+            sql_ast::TableName::AliasedTable(table_alias.clone()),
+            query.aggregates.unwrap_or(HashMap::new()),
+        )?;
+
+        // combine field and aggregate columns
+        columns.extend(aggregate_columns);
+
+        // fail if no columns defined at all
+        match Vec::is_empty(&columns) {
+            true => Err(Error::NoFields),
+            false => Ok(()),
+        }?;
+
+        // construct a simple select with the table name, alias, and selected columns.
+        let mut select = sql_helpers::simple_select(columns);
+
+        select.from = Some(sql_ast::From::Table {
+            name: table,
+            alias: table_alias.clone(),
+        });
+
+        // collect any joins for relationships
+        select.joins = self.translate_joins(
+            relationships,
+            tables_info,
+            &table_alias,
+            table_name,
+            join_fields,
+        )?;
+
+        // translate order_by
+        select.order_by = self.translate_order_by(
+            sql_ast::TableName::AliasedTable(table_alias),
+            query.order_by,
+        );
+
+        // translate where
+        select.where_ = sql_ast::Where(match query.predicate {
+            None => sql_ast::Expression::Value(sql_ast::Value::Bool(true)),
+            Some(predicate) => self.translate_expression(&table_alias_name, predicate),
+        });
+
+        // translate limit and offset
+        select.limit = sql_ast::Limit {
+            limit: query.limit,
+            offset: query.offset,
+        };
+
+        Ok(select)
     }
 
     /// create column aliases using this function so they get a unique index.
@@ -209,6 +249,112 @@ impl Translate {
         }
     }
 
+    // translate any joins we should include in the query into our SQL AST
+    fn translate_joins(
+        &mut self,
+        relationships: &HashMap<String, models::Relationship>,
+        tables_info: &metadata::TablesInfo,
+        table_alias: &sql_ast::TableAlias,
+        table_name: &str,
+        join_fields: Vec<(sql_ast::TableAlias, String, models::Query)>,
+    ) -> Result<Vec<sql_ast::Join>, Error> {
+        let metadata::TablesInfo(tables_info_map) = tables_info;
+        // find the table according to the metadata.
+        let table_info = tables_info_map
+            .get(table_name)
+            .ok_or(Error::TableNotFound(table_name.to_string()))?;
+
+        join_fields
+            .into_iter()
+            .map(|(alias, relationship_name, query)| {
+                let relationship = relationships
+                    .get(&relationship_name)
+                    .ok_or(Error::RelationshipNotFound(relationship_name.clone()))?;
+
+                let target_table_info = tables_info_map
+                    .get(&relationship.target_table)
+                    .ok_or(Error::TableNotFound(relationship.target_table.clone()))?;
+                let target_table_alias: sql_ast::TableAlias =
+                    self.make_table_alias(relationship.target_table.clone());
+                let target_table_alias_name: sql_ast::TableName =
+                    sql_ast::TableName::AliasedTable(target_table_alias);
+
+                let mut select = self.translate_query(
+                    tables_info,
+                    &relationship.target_table,
+                    relationships,
+                    query,
+                )?;
+
+                // apply join conditions
+                let sql_ast::Where(expr) = select.where_;
+
+                let with_join_condition = relationship
+                    .column_mapping
+                    .iter()
+                    .map(|(source_col, target_col)| {
+                        let source_column_info = table_info.columns.get(source_col).ok_or(
+                            Error::ColumnNotFoundInTable(
+                                source_col.clone(),
+                                table_name.to_string(),
+                            ),
+                        )?;
+                        let target_column_info = target_table_info.columns.get(target_col).ok_or(
+                            Error::ColumnNotFoundInTable(
+                                target_col.clone(),
+                                relationship.target_table.clone(),
+                            ),
+                        )?;
+                        Ok(sql_ast::Expression::BinaryOperator {
+                            left: Box::new(sql_ast::Expression::ColumnName(
+                                sql_ast::ColumnName::TableColumn {
+                                    table: sql_ast::TableName::AliasedTable(table_alias.clone()),
+                                    name: source_column_info.name.clone(),
+                                },
+                            )),
+                            operator: sql_ast::BinaryOperator::Equals,
+                            right: Box::new(sql_ast::Expression::ColumnName(
+                                sql_ast::ColumnName::TableColumn {
+                                    table: target_table_alias_name.clone(),
+                                    name: target_column_info.name.clone(),
+                                },
+                            )),
+                        })
+                    })
+                    .try_fold(expr, |expr, op| {
+                        let op = op?;
+                        Ok(sql_ast::Expression::And {
+                            left: Box::new(expr),
+                            right: Box::new(op),
+                        })
+                    })?;
+
+                select.where_ = sql_ast::Where(with_join_condition);
+
+                let wrap_select = match relationship.relationship_type {
+                    // objects should return `sql_helpers::select_row_as_json`, but we need an
+                    // array so that we turn it into a `Relationship` in `response_hack.rs`
+                    models::RelationshipType::Object => sql_helpers::select_table_as_json_array,
+                    models::RelationshipType::Array => sql_helpers::select_table_as_json_array,
+                };
+
+                // wrap the sql in row_to_json and json_agg
+                let final_select = wrap_select(
+                    select,
+                    self.make_column_alias(relationship_name.clone()),
+                    self.make_table_alias(relationship_name),
+                );
+
+                Ok(sql_ast::Join::LeftOuterJoinLateral(
+                    sql_ast::LeftOuterJoinLateral {
+                        select: Box::new(final_select),
+                        alias,
+                    },
+                ))
+            })
+            .collect::<Result<Vec<sql_ast::Join>, Error>>()
+    }
+
     // translate any aggregates we should include in the query into our SQL AST
     fn translate_aggregates(
         &mut self,
@@ -225,14 +371,14 @@ impl Translate {
                             sql_ast::Expression::Count(sql_ast::CountType::Distinct(
                                 sql_ast::ColumnName::AliasedColumn {
                                     table: table.clone(),
-                                    alias: count_column_alias,
+                                    name: count_column_alias,
                                 },
                             ))
                         } else {
                             sql_ast::Expression::Count(sql_ast::CountType::Simple(
                                 sql_ast::ColumnName::AliasedColumn {
                                     table: table.clone(),
-                                    alias: count_column_alias,
+                                    name: count_column_alias,
                                 },
                             ))
                         }
@@ -243,7 +389,7 @@ impl Translate {
                             args: vec![sql_ast::Expression::ColumnName(
                                 sql_ast::ColumnName::AliasedColumn {
                                     table: table.clone(),
-                                    alias: self.make_column_alias(column),
+                                    name: self.make_column_alias(column),
                                 },
                             )],
                         }
@@ -274,7 +420,7 @@ impl Translate {
                                     sql_ast::Expression::ColumnName(
                                         sql_ast::ColumnName::AliasedColumn {
                                             table: table.clone(),
-                                            alias: self.make_column_alias(name.to_string()),
+                                            name: self.make_column_alias(name.to_string()),
                                         },
                                     )
                                 } else {
@@ -451,6 +597,7 @@ fn make_column(
 pub enum Error {
     TableNotFound(String),
     ColumnNotFoundInTable(String, String),
+    RelationshipNotFound(String),
     NoFields,
     NotSupported(String),
 }
@@ -464,6 +611,9 @@ impl std::fmt::Display for Error {
                 "Column '{}' not found in table '{}'.",
                 column_name, table_name
             ),
+            Error::RelationshipNotFound(relationship_name) => {
+                write!(f, "Relationship '{}' not found.", relationship_name)
+            }
             Error::NotSupported(thing) => {
                 write!(f, "Queries containing {} are not supported.", thing)
             }

@@ -1,0 +1,105 @@
+---
+source: crates/ndc-postgres/tests/tests.rs
+expression: result
+---
+[
+  {
+    "rows": [
+      {
+        "Albums": {
+          "rows": {
+            "rows": [
+              {
+                "Title": {
+                  "value": "Jagged Little Pill"
+                }
+              }
+            ]
+          }
+        },
+        "Name": {
+          "value": "Alanis Morissette"
+        }
+      },
+      {
+        "Albums": {
+          "rows": {
+            "rows": [
+              {
+                "Title": {
+                  "value": "Facelift"
+                }
+              }
+            ]
+          }
+        },
+        "Name": {
+          "value": "Alice In Chains"
+        }
+      },
+      {
+        "Albums": {
+          "rows": {
+            "rows": [
+              {
+                "Title": {
+                  "value": "Warner 25 Anos"
+                }
+              },
+              {
+                "Title": {
+                  "value": "Chill: Brazil (Disc 2)"
+                }
+              }
+            ]
+          }
+        },
+        "Name": {
+          "value": "Antônio Carlos Jobim"
+        }
+      },
+      {
+        "Albums": {
+          "rows": {
+            "rows": [
+              {
+                "Title": {
+                  "value": "Plays Metallica By Four Cellos"
+                }
+              }
+            ]
+          }
+        },
+        "Name": {
+          "value": "Apocalyptica"
+        }
+      },
+      {
+        "Albums": {
+          "rows": {
+            "rows": [
+              {
+                "Title": {
+                  "value": "Audioslave"
+                }
+              },
+              {
+                "Title": {
+                  "value": "Out Of Exile"
+                }
+              },
+              {
+                "Title": {
+                  "value": "Revelations"
+                }
+              }
+            ]
+          }
+        },
+        "Name": {
+          "value": "Audioslave"
+        }
+      }
+    ]
+  }
+]
