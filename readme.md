@@ -65,8 +65,8 @@ See [architecture.md](./architecture.md).
 
 ## Example
 
-1. Run `just dev`
-2. Run `just run-v3`
+1. Run `just dev` (or `just run`)
+2. Run `just run-engine`
 3. Connect to GraphiQL at http://localhost:3000 and run a query:
 
    ```graphql
@@ -76,13 +76,7 @@ See [architecture.md](./architecture.md).
      }
    }
    ```
-
-## Running with the engine
-
-1. Run `just run-postgres-ndc`
-2. Run `just run-v3-engine`
-3. Run `just run`
-4. Run `just test-integrated`
+   (or `just test-integrated`)
 
 ## Write a database execution test
 
@@ -116,7 +110,7 @@ See [architecture.md](./architecture.md).
 
 *warning* - SQL translation tests should aim to only contain one field or aggregate per
 request. This is because we parse the fields into a HashMap and cannot rely on
-the ordering, meaning the snapshots constantly change. 
+the ordering, meaning the snapshots constantly change.
 
 ## Linting
 
