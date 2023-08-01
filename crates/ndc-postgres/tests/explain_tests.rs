@@ -1,7 +1,6 @@
-mod common;
+pub mod common;
 
-use common::assertions::is_contained_in_lines;
-use common::requests::run_explain;
+use crate::common::{is_contained_in_lines, run_explain};
 
 #[tokio::test]
 async fn select_by_pk() {

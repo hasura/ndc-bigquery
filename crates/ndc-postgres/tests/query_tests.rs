@@ -1,7 +1,7 @@
-mod common;
+pub mod common;
 
 mod basic {
-    use super::common::requests::run_query;
+    use super::common::run_query;
 
     #[tokio::test]
     async fn select_by_pk() {
@@ -23,7 +23,7 @@ mod basic {
 }
 
 mod predicates {
-    use super::common::requests::run_query;
+    use super::common::run_query;
 
     #[tokio::test]
     async fn select_where_name_like() {
@@ -135,7 +135,7 @@ mod predicates {
 }
 
 mod sorting {
-    use super::common::requests::run_query;
+    use super::common::run_query;
 
     #[tokio::test]
     async fn select_order_by_name() {
@@ -145,7 +145,7 @@ mod sorting {
 }
 
 mod aggregation {
-    use super::common::requests::run_query;
+    use super::common::run_query;
 
     #[tokio::test]
     async fn aggregate_count_albums() {
@@ -155,7 +155,7 @@ mod aggregation {
 }
 
 mod relationships {
-    use super::common::requests::run_query;
+    use super::common::run_query;
 
     #[tokio::test]
     async fn select_album_object_relationship_to_artist() {

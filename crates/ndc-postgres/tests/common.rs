@@ -1,11 +1,10 @@
-use std::fs;
+use ndc_postgres::connector;
 
 use axum::http::StatusCode;
 use axum_test_helper::TestClient;
-
-use ndc_postgres::connector;
-
-use super::deployment::get_deployment_file;
+use std::env;
+use std::fs;
+use std::path::PathBuf;
 
 /// Run a query against the server, get the result, and compare against the snapshot.
 pub async fn run_query(testname: &str) -> serde_json::Value {
@@ -54,4 +53,27 @@ async fn run_against_server(action: &str, testname: &str) -> serde_json::Value {
 
     //serde_json::Value::String(res.text().await)
     res.json().await
+}
+
+/// find the deployments folder via the crate root provided by `cargo test`,
+/// and get our single static configuration file.
+pub fn get_deployment_file() -> String {
+    let mut d = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+    d.push("../../static/chinook-deployment.json");
+
+    return d.display().to_string();
+}
+
+/// Check if all keywords are contained in this vector of strings.
+/// Used to check the output of EXPLAIN. We use this method instead of
+/// snapshot testing because small details (like cost) can change from
+/// run to run rendering the output unstable.
+pub fn is_contained_in_lines(keywords: Vec<&str>, lines: Vec<String>) {
+    let connected_lines = lines.join("\n");
+    tracing::info!(
+        "expected keywords: {:?}\nlines: {}",
+        keywords,
+        connected_lines,
+    );
+    assert!(keywords.iter().all(|&s| connected_lines.contains(s)));
 }
