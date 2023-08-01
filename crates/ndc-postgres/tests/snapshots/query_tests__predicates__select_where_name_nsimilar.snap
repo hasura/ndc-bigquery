@@ -1,0 +1,50 @@
+---
+source: crates/ndc-postgres/tests/query_tests.rs
+expression: result
+---
+[
+  {
+    "rows": [
+      {
+        "AlbumId": {
+          "value": 1
+        },
+        "Title": {
+          "value": "For Those About To Rock We Salute You"
+        }
+      },
+      {
+        "AlbumId": {
+          "value": 4
+        },
+        "Title": {
+          "value": "Let There Be Rock"
+        }
+      },
+      {
+        "AlbumId": {
+          "value": 6
+        },
+        "Title": {
+          "value": "Jagged Little Pill"
+        }
+      },
+      {
+        "AlbumId": {
+          "value": 7
+        },
+        "Title": {
+          "value": "Facelift"
+        }
+      },
+      {
+        "AlbumId": {
+          "value": 8
+        },
+        "Title": {
+          "value": "Warner 25 Anos"
+        }
+      }
+    ]
+  }
+]

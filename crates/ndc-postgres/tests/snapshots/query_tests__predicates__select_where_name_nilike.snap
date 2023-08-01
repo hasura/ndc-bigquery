@@ -1,0 +1,35 @@
+---
+source: crates/ndc-postgres/tests/query_tests.rs
+expression: result
+---
+[
+  {
+    "rows": [
+      {
+        "Title": {
+          "value": "For Those About To Rock We Salute You"
+        }
+      },
+      {
+        "Title": {
+          "value": "Restless and Wild"
+        }
+      },
+      {
+        "Title": {
+          "value": "Let There Be Rock"
+        }
+      },
+      {
+        "Title": {
+          "value": "Big Ones"
+        }
+      },
+      {
+        "Title": {
+          "value": "Jagged Little Pill"
+        }
+      }
+    ]
+  }
+]

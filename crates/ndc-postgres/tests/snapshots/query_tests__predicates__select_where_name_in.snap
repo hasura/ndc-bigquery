@@ -1,0 +1,18 @@
+---
+source: crates/ndc-postgres/tests/query_tests.rs
+expression: result
+---
+[
+  {
+    "rows": [
+      {
+        "AlbumId": {
+          "value": 346
+        },
+        "Title": {
+          "value": "Mozart: Chamber Music"
+        }
+      }
+    ]
+  }
+]

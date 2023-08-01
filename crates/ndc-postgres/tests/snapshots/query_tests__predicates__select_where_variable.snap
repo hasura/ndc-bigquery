@@ -1,0 +1,29 @@
+---
+source: crates/ndc-postgres/tests/query_tests.rs
+expression: result
+---
+[
+  {
+    "rows": [
+      {
+        "Title": {
+          "value": "Garage Inc. (Disc 1)"
+        }
+      },
+      {
+        "Title": {
+          "value": "Garage Inc. (Disc 2)"
+        }
+      }
+    ]
+  },
+  {
+    "rows": [
+      {
+        "Title": {
+          "value": "Beyond Good And Evil"
+        }
+      }
+    ]
+  }
+]

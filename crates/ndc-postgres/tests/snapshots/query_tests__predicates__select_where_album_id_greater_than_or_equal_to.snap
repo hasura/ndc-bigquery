@@ -1,0 +1,74 @@
+---
+source: crates/ndc-postgres/tests/query_tests.rs
+expression: result
+---
+[
+  {
+    "rows": [
+      {
+        "AlbumId": {
+          "value": 340
+        },
+        "Title": {
+          "value": "Liszt - 12 Études D'Execution Transcendante"
+        }
+      },
+      {
+        "AlbumId": {
+          "value": 341
+        },
+        "Title": {
+          "value": "Great Recordings of the Century - Shubert: Schwanengesang, 4 Lieder"
+        }
+      },
+      {
+        "AlbumId": {
+          "value": 342
+        },
+        "Title": {
+          "value": "Locatelli: Concertos for Violin, Strings and Continuo, Vol. 3"
+        }
+      },
+      {
+        "AlbumId": {
+          "value": 343
+        },
+        "Title": {
+          "value": "Respighi:Pines of Rome"
+        }
+      },
+      {
+        "AlbumId": {
+          "value": 344
+        },
+        "Title": {
+          "value": "Schubert: The Late String Quartets & String Quintet (3 CD's)"
+        }
+      },
+      {
+        "AlbumId": {
+          "value": 345
+        },
+        "Title": {
+          "value": "Monteverdi: L'Orfeo"
+        }
+      },
+      {
+        "AlbumId": {
+          "value": 346
+        },
+        "Title": {
+          "value": "Mozart: Chamber Music"
+        }
+      },
+      {
+        "AlbumId": {
+          "value": 347
+        },
+        "Title": {
+          "value": "Koyaanisqatsi (Soundtrack from the Motion Picture)"
+        }
+      }
+    ]
+  }
+]

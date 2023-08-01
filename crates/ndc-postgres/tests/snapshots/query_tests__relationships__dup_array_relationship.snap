@@ -1,0 +1,102 @@
+---
+source: crates/ndc-postgres/tests/query_tests.rs
+expression: result
+---
+[
+  {
+    "rows": [
+      {
+        "Albums": {
+          "rows": {
+            "rows": [
+              {
+                "title": {
+                  "value": "For Those About To Rock We Salute You"
+                }
+              },
+              {
+                "title": {
+                  "value": "Let There Be Rock"
+                }
+              }
+            ]
+          }
+        },
+        "albums": {
+          "rows": {
+            "rows": [
+              {
+                "title": {
+                  "value": "For Those About To Rock We Salute You"
+                }
+              },
+              {
+                "title": {
+                  "value": "Let There Be Rock"
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "Albums": {
+          "rows": {
+            "rows": [
+              {
+                "title": {
+                  "value": "Balls to the Wall"
+                }
+              },
+              {
+                "title": {
+                  "value": "Restless and Wild"
+                }
+              }
+            ]
+          }
+        },
+        "albums": {
+          "rows": {
+            "rows": [
+              {
+                "title": {
+                  "value": "Balls to the Wall"
+                }
+              },
+              {
+                "title": {
+                  "value": "Restless and Wild"
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "Albums": {
+          "rows": {
+            "rows": [
+              {
+                "title": {
+                  "value": "Big Ones"
+                }
+              }
+            ]
+          }
+        },
+        "albums": {
+          "rows": {
+            "rows": [
+              {
+                "title": {
+                  "value": "Big Ones"
+                }
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }
+]

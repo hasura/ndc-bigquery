@@ -1,0 +1,50 @@
+---
+source: crates/ndc-postgres/tests/query_tests.rs
+expression: result
+---
+[
+  {
+    "rows": [
+      {
+        "AlbumId": {
+          "value": 2
+        },
+        "Title": {
+          "value": "Balls to the Wall"
+        }
+      },
+      {
+        "AlbumId": {
+          "value": 3
+        },
+        "Title": {
+          "value": "Restless and Wild"
+        }
+      },
+      {
+        "AlbumId": {
+          "value": 5
+        },
+        "Title": {
+          "value": "Big Ones"
+        }
+      },
+      {
+        "AlbumId": {
+          "value": 6
+        },
+        "Title": {
+          "value": "Jagged Little Pill"
+        }
+      },
+      {
+        "AlbumId": {
+          "value": 7
+        },
+        "Title": {
+          "value": "Facelift"
+        }
+      }
+    ]
+  }
+]

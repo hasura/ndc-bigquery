@@ -1,0 +1,35 @@
+---
+source: crates/ndc-postgres/tests/query_tests.rs
+expression: result
+---
+[
+  {
+    "rows": [
+      {
+        "Title": {
+          "value": "A Matter of Life and Death"
+        }
+      },
+      {
+        "Title": {
+          "value": "A Real Dead One"
+        }
+      },
+      {
+        "Title": {
+          "value": "A Real Live One"
+        }
+      },
+      {
+        "Title": {
+          "value": "A Soprano Inspired"
+        }
+      },
+      {
+        "Title": {
+          "value": "A TempestadeTempestade Ou O Livro Dos Dias"
+        }
+      }
+    ]
+  }
+]

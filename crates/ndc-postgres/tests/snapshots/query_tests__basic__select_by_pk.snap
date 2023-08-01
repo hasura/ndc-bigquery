@@ -1,0 +1,15 @@
+---
+source: crates/ndc-postgres/tests/query_tests.rs
+expression: result
+---
+[
+  {
+    "rows": [
+      {
+        "Title": {
+          "value": "Garage Inc. (Disc 1)"
+        }
+      }
+    ]
+  }
+]
