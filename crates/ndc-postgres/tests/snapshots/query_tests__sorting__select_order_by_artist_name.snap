@@ -1,0 +1,35 @@
+---
+source: crates/ndc-postgres/tests/query_tests.rs
+expression: result
+---
+[
+  {
+    "rows": [
+      {
+        "Name": {
+          "value": "Worlds"
+        }
+      },
+      {
+        "Name": {
+          "value": "The World of Classical Favourites"
+        }
+      },
+      {
+        "Name": {
+          "value": "Sir Neville Marriner: A Celebration"
+        }
+      },
+      {
+        "Name": {
+          "value": "Fauré: Requiem, Ravel: Pavane & Others"
+        }
+      },
+      {
+        "Name": {
+          "value": "Bach: Orchestral Suites Nos. 1 - 4"
+        }
+      }
+    ]
+  }
+]

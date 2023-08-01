@@ -53,3 +53,9 @@ fn dup_array_relationship() {
     let result = common::test_translation("dup_array_relationship").unwrap();
     insta::assert_snapshot!(result);
 }
+
+#[test]
+fn sorting_by_relationship_column() {
+    let result = common::test_translation("sorting_by_relationship_column").unwrap();
+    insta::assert_snapshot!(result);
+}
