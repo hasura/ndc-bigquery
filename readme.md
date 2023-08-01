@@ -49,6 +49,10 @@ just run-postgres-ndc
 
 Among the docker containers is a Jaeger instance for tracing/debugging, accessible at http://127.0.0.1:4002.
 
+## Debug
+
+See [debugging.md](./debugging.md).
+
 ### Profile
 
 We can produce a flamegraph using `just flamegraph` using [flamegraph-rs](https://github.com/flamegraph-rs/flamegraph). Follow the installation instructions.

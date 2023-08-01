@@ -35,6 +35,15 @@ watch-run: start-docker
     -c \
     -x 'run -- serve --configuration {{CHINOOK_DEPLOYMENT}}'
 
+# Run ndc-postgres with rust-gdb.
+debug: start-docker
+  cargo build
+  RUST_LOG=DEBUG \
+    OTEL_SERVICE_NAME=postgres-agent \
+    OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://localhost:4317 \
+    OTEL_TRACES_SAMPLER=always_on \
+    rust-gdb --args target/debug/ndc-postgres serve --configuration {{CHINOOK_DEPLOYMENT}}
+
 # Run the server and produce a flamegraph profile
 flamegraph: start-docker
   RUST_LOG=DEBUG \
