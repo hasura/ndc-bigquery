@@ -8,6 +8,7 @@ use crate::metadata;
 
 use ndc_client::models;
 
+use itertools::Itertools;
 use std::collections::HashMap;
 
 #[derive(Debug)]
@@ -147,6 +148,13 @@ impl Translate {
         // translate fields to columns or relationships.
         let mut columns: Vec<(sql_ast::ColumnAlias, sql_ast::Expression)> = fields
             .into_iter()
+            // We only do this for easier testing. Not strictly required.
+            // We sort the columns because the hashes in hashmaps are random and we can
+            // get differently ordered fields here, which means the SQL we generate is
+            // different, which means we can't store the SQL we generate in tests verbatim.
+            // We use the unstable version because we have no equal keys and it can be
+            // faster in some cases.
+            .sorted_unstable_by(|(a, _), (b, _)| Ord::cmp(&a, &b))
             .map(|(alias, field)| match field {
                 models::Field::Column { column, .. } => {
                     let column_info = table_info
