@@ -2,6 +2,6 @@
 source: crates/query-engine/tests/tests.rs
 expression: result
 ---
-SELECT coalesce(json_agg(row_to_json("root")), '[]') AS "rows" FROM (SELECT "Album"."Title" AS "Name" FROM "public"."Album" AS "Album" LEFT OUTER JOIN LATERAL (SELECT "Artist"."Name" AS "Name" FROM "Artist" AS "Artist" WHERE (true AND ("Album"."ArtistId" = "Artist"."ArtistId"))) AS "Artist" ON ('true')  ORDER BY "Artist"."Name" ASC  LIMIT 5 OFFSET 3) AS "root"
+SELECT coalesce(json_agg(row_to_json("root")), '[]') AS "rows" FROM (SELECT "Album"."Title" AS "Name" FROM "public"."Album" AS "Album" LEFT OUTER JOIN LATERAL (SELECT "Artist"."ArtistId" AS "ArtistId", "Artist"."Name" AS "Name" FROM "Artist" AS "Artist" WHERE (true AND ("Album"."ArtistId" = "Artist"."ArtistId"))) AS "Artist" ON ('true')  ORDER BY "Artist"."Name" ASC  LIMIT 5 OFFSET 3) AS "root"
 
 []

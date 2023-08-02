@@ -148,6 +148,12 @@ mod sorting {
         let result = run_query("select_order_by_artist_name").await;
         insta::assert_json_snapshot!(result);
     }
+
+    #[tokio::test]
+    async fn select_order_by_album_artist_name() {
+        let result = run_query("select_order_by_album_artist_name").await;
+        insta::assert_json_snapshot!(result);
+    }
 }
 
 mod aggregation {

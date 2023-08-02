@@ -1,0 +1,25 @@
+---
+source: crates/ndc-postgres/tests/query_tests.rs
+expression: result
+---
+[
+  {
+    "rows": [
+      {
+        "Name": "Snowballed"
+      },
+      {
+        "Name": "Put The Finger On You"
+      },
+      {
+        "Name": "Let's Get It Up"
+      },
+      {
+        "Name": "Inject The Venom"
+      },
+      {
+        "Name": "Breaking The Rules"
+      }
+    ]
+  }
+]
