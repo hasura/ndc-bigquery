@@ -12,14 +12,16 @@ name = "ndc-postgres"
 path = "bin/main.rs"
 
 [dependencies]
-ndc-client = { git = "https://github.com/hasura/ndc-spec.git", rev = "04346c9" }
-ndc-hub = { git = "https://github.com/hasura/ndc-hub.git", rev = "79fc5da4" }
+ndc-client = { git = "https://github.com/hasura/ndc-spec.git", rev = "f3a6759" }
+ndc-hub = { git = "https://github.com/hasura/ndc-hub.git", rev = "f2909c2" }
 query-engine = { path = "../query-engine" }
 
 async-trait = "0.1.68"
 clap = { version = "4.3.9", features = ["derive"] }
+indexmap = "1"
 log = "0.4.19"
 serde = "1.0.171"
+serde_derive = "^1.0"
 serde_json = { version = "1.0.103", features = ["raw_value"] }
 sqlx = { version = "0.7.1", features = [ "json", "postgres", "runtime-tokio-rustls" ] }
 tokio = { version = "1.29.1", features = ["full"] }

@@ -6,9 +6,7 @@ expression: result
   {
     "rows": [
       {
-        "Title": {
-          "value": "Garage Inc. (Disc 1)"
-        }
+        "Title": "Garage Inc. (Disc 1)"
       }
     ]
   }

@@ -1,5 +1,5 @@
 {
-  "table": "Album",
+  "collection": "Album",
   "query": {
     "aggregates": {
       "max_artist_id": {
@@ -10,5 +10,5 @@
     }
   },
   "arguments": {},
-  "table_relationships": {}
+  "collection_relationships": {}
 }

@@ -1,5 +1,5 @@
 {
-  "table": "Artist",
+  "collection": "Artist",
   "query": {
     "fields": {
       "artist": {
@@ -78,14 +78,14 @@
     "offset": 50
   },
   "arguments": {},
-  "table_relationships": {
+  "collection_relationships": {
     "ArtistAlbums": {
       "column_mapping": {
         "ArtistId": "ArtistId"
       },
       "relationship_type": "array",
-      "source_table_or_type": "Artist",
-      "target_table": "Album",
+      "source_collection_or_type": "Artist",
+      "target_collection": "Album",
       "arguments": {}
     },
     "AlbumTracks": {
@@ -93,8 +93,8 @@
         "AlbumId": "AlbumId"
       },
       "relationship_type": "array",
-      "source_table_or_type": "Album",
-      "target_table": "Track",
+      "source_collection_or_type": "Album",
+      "target_collection": "Track",
       "arguments": {}
     }
   }

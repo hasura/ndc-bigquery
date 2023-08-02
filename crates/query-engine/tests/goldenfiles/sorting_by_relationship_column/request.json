@@ -1,5 +1,5 @@
 {
-  "table": "Album",
+  "collection": "Album",
   "query": {
     "fields": {
       "Name": {
@@ -20,7 +20,11 @@
             "path": [
               {
                 "relationship": "AlbumArtist",
-                "arguments": {}
+                "arguments": {},
+                "predicate": {
+                  "type": "and",
+                  "expressions": []
+                }
               }
             ]
           }
@@ -29,14 +33,14 @@
     }
   },
   "arguments": {},
-  "table_relationships": {
+  "collection_relationships": {
     "AlbumArtist": {
       "column_mapping": {
         "ArtistId": "ArtistId"
       },
       "relationship_type": "object",
-      "source_table_or_type": "Album",
-      "target_table": "Artist",
+      "source_collection_or_type": "Album",
+      "target_collection": "Artist",
       "arguments": {}
     }
   }

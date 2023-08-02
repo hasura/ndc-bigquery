@@ -6,44 +6,24 @@ expression: result
   {
     "rows": [
       {
-        "AlbumId": {
-          "value": 1
-        },
-        "Title": {
-          "value": "For Those About To Rock We Salute You"
-        }
+        "AlbumId": 1,
+        "Title": "For Those About To Rock We Salute You"
       },
       {
-        "AlbumId": {
-          "value": 4
-        },
-        "Title": {
-          "value": "Let There Be Rock"
-        }
+        "AlbumId": 4,
+        "Title": "Let There Be Rock"
       },
       {
-        "AlbumId": {
-          "value": 6
-        },
-        "Title": {
-          "value": "Jagged Little Pill"
-        }
+        "AlbumId": 6,
+        "Title": "Jagged Little Pill"
       },
       {
-        "AlbumId": {
-          "value": 7
-        },
-        "Title": {
-          "value": "Facelift"
-        }
+        "AlbumId": 7,
+        "Title": "Facelift"
       },
       {
-        "AlbumId": {
-          "value": 8
-        },
-        "Title": {
-          "value": "Warner 25 Anos"
-        }
+        "AlbumId": 8,
+        "Title": "Warner 25 Anos"
       }
     ]
   }

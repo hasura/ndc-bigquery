@@ -6,29 +6,19 @@ expression: result
   {
     "rows": [
       {
-        "Title": {
-          "value": "Let There Be Rock"
-        }
+        "Title": "Let There Be Rock"
       },
       {
-        "Title": {
-          "value": "Big Ones"
-        }
+        "Title": "Big Ones"
       },
       {
-        "Title": {
-          "value": "Jagged Little Pill"
-        }
+        "Title": "Jagged Little Pill"
       },
       {
-        "Title": {
-          "value": "Facelift"
-        }
+        "Title": "Facelift"
       },
       {
-        "Title": {
-          "value": "Warner 25 Anos"
-        }
+        "Title": "Warner 25 Anos"
       }
     ]
   }

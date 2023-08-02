@@ -1117,15 +1117,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "itertools"
-version = "0.11.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b1c173a5686ce8bfa551b3563d0c2170bf24ca44da99c7ca4bfdab5418c3fe57"
-dependencies = [
- "either",
-]
-
-[[package]]
 name = "itoa"
 version = "1.0.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1289,8 +1280,8 @@ dependencies = [
 
 [[package]]
 name = "ndc-client"
-version = "1.0.0"
-source = "git+https://github.com/hasura/ndc-spec.git?rev=04346c9#04346c97105e57c64693d839e69f7c27a364bee4"
+version = "0.1.0"
+source = "git+https://github.com/hasura/ndc-spec.git?rev=f3a6759#f3a675975a24a6a7672dd7692c95a4c669555611"
 dependencies = [
  "async-trait",
  "clap",
@@ -1311,7 +1302,7 @@ dependencies = [
 [[package]]
 name = "ndc-hub"
 version = "0.1.0"
-source = "git+https://github.com/hasura/ndc-hub.git?rev=79fc5da4#79fc5da4089c5a5360d2e6dd7aa12f680b447f69"
+source = "git+https://github.com/hasura/ndc-hub.git?rev=f2909c2#f2909c2297f659b1bfec117a74f295e870f23cb9"
 dependencies = [
  "async-trait",
  "axum",
@@ -1342,6 +1333,7 @@ dependencies = [
  "axum-test-helper",
  "clap",
  "env_logger",
+ "indexmap 1.9.3",
  "insta",
  "log",
  "ndc-client",
@@ -1349,6 +1341,7 @@ dependencies = [
  "prometheus",
  "query-engine",
  "serde",
+ "serde_derive",
  "serde_json",
  "sqlx",
  "thiserror",
@@ -1759,7 +1752,7 @@ checksum = "119533552c9a7ffacc21e099c24a0ac8bb19c2a2a3f363de84cd9b844feab270"
 dependencies = [
  "bytes",
  "heck",
- "itertools 0.10.5",
+ "itertools",
  "lazy_static",
  "log",
  "multimap",
@@ -1780,7 +1773,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e5d2d8d10f3c6ded6da8b05b5fb3b8a5082514344d56c9f871412d29b4e075b4"
 dependencies = [
  "anyhow",
- "itertools 0.10.5",
+ "itertools",
  "proc-macro2",
  "quote",
  "syn 1.0.109",
@@ -1806,8 +1799,8 @@ name = "query-engine"
 version = "0.1.0"
 dependencies = [
  "env_logger",
+ "indexmap 1.9.3",
  "insta",
- "itertools 0.11.0",
  "ndc-client",
  "schemars",
  "serde",
@@ -2048,6 +2041,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "02c613288622e5f0c3fdc5dbd4db1c5fbe752746b1d1a56a0630b78fd00de44f"
 dependencies = [
  "dyn-clone",
+ "indexmap 1.9.3",
  "schemars_derive",
  "serde",
  "serde_json",
@@ -2318,7 +2312,7 @@ version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0c12bc9199d1db8234678b7051747c07f517cdcf019262d1847b94ec8b1aee3e"
 dependencies = [
- "itertools 0.10.5",
+ "itertools",
  "nom",
  "unicode_categories",
 ]

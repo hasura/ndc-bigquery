@@ -6,68 +6,36 @@ expression: result
   {
     "rows": [
       {
-        "AlbumId": {
-          "value": 340
-        },
-        "Title": {
-          "value": "Liszt - 12 Études D'Execution Transcendante"
-        }
+        "AlbumId": 340,
+        "Title": "Liszt - 12 Études D'Execution Transcendante"
       },
       {
-        "AlbumId": {
-          "value": 341
-        },
-        "Title": {
-          "value": "Great Recordings of the Century - Shubert: Schwanengesang, 4 Lieder"
-        }
+        "AlbumId": 341,
+        "Title": "Great Recordings of the Century - Shubert: Schwanengesang, 4 Lieder"
       },
       {
-        "AlbumId": {
-          "value": 342
-        },
-        "Title": {
-          "value": "Locatelli: Concertos for Violin, Strings and Continuo, Vol. 3"
-        }
+        "AlbumId": 342,
+        "Title": "Locatelli: Concertos for Violin, Strings and Continuo, Vol. 3"
       },
       {
-        "AlbumId": {
-          "value": 343
-        },
-        "Title": {
-          "value": "Respighi:Pines of Rome"
-        }
+        "AlbumId": 343,
+        "Title": "Respighi:Pines of Rome"
       },
       {
-        "AlbumId": {
-          "value": 344
-        },
-        "Title": {
-          "value": "Schubert: The Late String Quartets & String Quintet (3 CD's)"
-        }
+        "AlbumId": 344,
+        "Title": "Schubert: The Late String Quartets & String Quintet (3 CD's)"
       },
       {
-        "AlbumId": {
-          "value": 345
-        },
-        "Title": {
-          "value": "Monteverdi: L'Orfeo"
-        }
+        "AlbumId": 345,
+        "Title": "Monteverdi: L'Orfeo"
       },
       {
-        "AlbumId": {
-          "value": 346
-        },
-        "Title": {
-          "value": "Mozart: Chamber Music"
-        }
+        "AlbumId": 346,
+        "Title": "Mozart: Chamber Music"
       },
       {
-        "AlbumId": {
-          "value": 347
-        },
-        "Title": {
-          "value": "Koyaanisqatsi (Soundtrack from the Motion Picture)"
-        }
+        "AlbumId": 347,
+        "Title": "Koyaanisqatsi (Soundtrack from the Motion Picture)"
       }
     ]
   }

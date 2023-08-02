@@ -1,3 +1,4 @@
+use indexmap::IndexMap;
 /// ndc_client::models contains the interface with which we communicate with v3.
 /// However, that interface specifies the results we return from the database as rust values,
 /// and we'd like the database to convert all of the data to json and for us to just
@@ -16,7 +17,6 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use serde_json;
 use serde_with::skip_serializing_none;
-use std::collections::HashMap;
 
 pub fn rows_to_response(sets_of_rows: Vec<serde_json::Value>) -> models::QueryResponse {
     let rowsets = sets_of_rows
@@ -46,9 +46,7 @@ pub fn rowset_to_rowset(rowset: RowSet) -> models::RowSet {
                                 name,
                                 match value {
                                     RowFieldValue::Relationship { rows } => {
-                                        models::RowFieldValue::Relationship {
-                                            rows: rowset_to_rowset(rows),
-                                        }
+                                        models::RowFieldValue::Relationship(rowset_to_rowset(rows))
                                     }
                                     RowFieldValue::Column(json) => match json {
                                         // this is cheating, if we have an array, we assume it's a
@@ -64,14 +62,14 @@ pub fn rowset_to_rowset(rowset: RowSet) -> models::RowSet {
                                                     serde_json::from_value(item_json).unwrap()
                                                 })
                                                 .collect();
-                                            models::RowFieldValue::Relationship {
-                                                rows: rowset_to_rowset(RowSet {
+                                            models::RowFieldValue::Relationship(rowset_to_rowset(
+                                                RowSet {
                                                     rows,
                                                     aggregates: None,
-                                                }),
-                                            }
+                                                },
+                                            ))
                                         }
-                                        _ => models::RowFieldValue::Column { value: json },
+                                        _ => models::RowFieldValue::Column(json),
                                     },
                                 },
                             )
@@ -95,9 +93,9 @@ pub struct QueryResponse(pub Vec<RowSet>);
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize, JsonSchema)]
 pub struct RowSet {
     /// The results of the aggregates returned by the query
-    pub aggregates: Option<HashMap<String, serde_json::Value>>,
+    pub aggregates: Option<IndexMap<String, serde_json::Value>>,
     /// The rows returned by the query, corresponding to the query's fields
-    pub rows: Option<Vec<HashMap<String, RowFieldValue>>>,
+    pub rows: Option<Vec<IndexMap<String, RowFieldValue>>>,
 }
 // ANCHOR_END: RowSet
 

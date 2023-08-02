@@ -2,6 +2,7 @@ use ndc_postgres::connector;
 
 use axum::http::StatusCode;
 use axum_test_helper::TestClient;
+use serde_derive::Deserialize;
 use std::env;
 use std::fs;
 use std::path::PathBuf;
@@ -11,8 +12,21 @@ pub async fn run_query(testname: &str) -> serde_json::Value {
     run_against_server("query", testname).await
 }
 
+#[derive(Clone, Debug, PartialEq, Deserialize)]
+pub struct ExactExplainResponse {
+    pub details: ExplainDetails,
+}
+
+#[derive(Clone, Debug, PartialEq, Deserialize)]
+pub struct ExplainDetails {
+    #[serde(rename = "SQL Query")]
+    pub query: String,
+    #[serde(rename = "Execution Plan")]
+    pub plan: String,
+}
+
 /// Run a query against the server, get the result, and compare against the snapshot.
-pub async fn run_explain(testname: &str) -> ndc_client::models::ExplainResponse {
+pub async fn run_explain(testname: &str) -> ExactExplainResponse {
     let result = run_against_server("explain", testname).await;
     serde_json::from_value(result).unwrap()
 }
@@ -68,12 +82,7 @@ pub fn get_deployment_file() -> String {
 /// Used to check the output of EXPLAIN. We use this method instead of
 /// snapshot testing because small details (like cost) can change from
 /// run to run rendering the output unstable.
-pub fn is_contained_in_lines(keywords: Vec<&str>, lines: Vec<String>) {
-    let connected_lines = lines.join("\n");
-    tracing::info!(
-        "expected keywords: {:?}\nlines: {}",
-        keywords,
-        connected_lines,
-    );
-    assert!(keywords.iter().all(|&s| connected_lines.contains(s)));
+pub fn is_contained_in_lines(keywords: Vec<&str>, lines: String) {
+    tracing::info!("expected keywords: {:?}\nlines: {}", keywords, lines,);
+    assert!(keywords.iter().all(|&s| lines.contains(s)));
 }

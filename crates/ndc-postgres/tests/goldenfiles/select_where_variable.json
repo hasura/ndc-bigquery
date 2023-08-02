@@ -1,5 +1,5 @@
 {
-  "table": "Album",
+  "collection": "Album",
   "query": {
     "fields": {
       "Title": {
@@ -26,6 +26,6 @@
     }
   },
   "arguments": {},
-  "table_relationships": {},
+  "collection_relationships": {},
   "variables": [{"search": "%Garage%"}, {"search": "%Good%"}]
 }

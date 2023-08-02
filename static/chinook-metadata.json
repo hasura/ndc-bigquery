@@ -123,7 +123,7 @@
           }
         }
       },
-      "tables": [
+      "collections": [
         {
           "name": "Artist",
           "description": "A collection of artists",
@@ -164,7 +164,8 @@
           "foreign_keys": {}
         }
       ],
-      "commands": []
+      "functions": [],
+      "procedures": []
     }
   },
   {

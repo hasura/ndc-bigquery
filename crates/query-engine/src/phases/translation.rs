@@ -6,15 +6,15 @@ pub mod sql_helpers;
 pub mod sql_string;
 use crate::metadata;
 
+use indexmap::IndexMap;
 use ndc_client::models;
 
-use itertools::Itertools;
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 
 #[derive(Debug)]
 /// Definition of an execution plan to be run against the database.
 pub struct ExecutionPlan {
-    pub variables: Option<Vec<HashMap<String, serde_json::Value>>>,
+    pub variables: Option<Vec<BTreeMap<String, serde_json::Value>>>,
     pub root_field: String,
     /// Run before the query. Should be a sql_ast in the future.
     pub pre: Vec<sql_string::DDL>,
@@ -57,7 +57,7 @@ pub fn translate(
 
 /// A simple execution plan with only a root field and a query.
 pub fn simple_exec_plan(
-    variables: Option<Vec<HashMap<String, serde_json::Value>>>,
+    variables: Option<Vec<BTreeMap<String, serde_json::Value>>>,
     root_field: String,
     query: sql_ast::Select,
 ) -> ExecutionPlan {
@@ -97,8 +97,8 @@ impl Translate {
     ) -> Result<ExecutionPlan, Error> {
         let select = self.translate_query(
             tables_info,
-            &query_request.table,
-            &query_request.table_relationships,
+            &query_request.collection,
+            &query_request.collection_relationships,
             query_request.query,
         )?;
 
@@ -113,7 +113,7 @@ impl Translate {
         tracing::info!("SQL AST: {:?}", final_select);
         Ok(simple_exec_plan(
             query_request.variables,
-            query_request.table,
+            query_request.collection,
             final_select,
         ))
     }
@@ -123,7 +123,7 @@ impl Translate {
         &mut self,
         tables_info: &metadata::TablesInfo,
         table_name: &String,
-        relationships: &HashMap<String, models::Relationship>,
+        relationships: &BTreeMap<String, models::Relationship>,
         query: models::Query,
     ) -> Result<sql_ast::Select, Error> {
         let metadata::TablesInfo(tables_info_map) = tables_info;
@@ -143,18 +143,11 @@ impl Translate {
         let mut join_fields: Vec<(sql_ast::TableAlias, String, models::Query)> = vec![];
 
         // translate fields to select list
-        let fields = query.fields.unwrap_or(HashMap::new());
+        let fields = query.fields.unwrap_or(IndexMap::new());
 
         // translate fields to columns or relationships.
         let mut columns: Vec<(sql_ast::ColumnAlias, sql_ast::Expression)> = fields
             .into_iter()
-            // We only do this for easier testing. Not strictly required.
-            // We sort the columns because the hashes in hashmaps are random and we can
-            // get differently ordered fields here, which means the SQL we generate is
-            // different, which means we can't store the SQL we generate in tests verbatim.
-            // We use the unstable version because we have no equal keys and it can be
-            // faster in some cases.
-            .sorted_unstable_by(|(a, _), (b, _)| Ord::cmp(&a, &b))
             .map(|(alias, field)| match field {
                 models::Field::Column { column, .. } => {
                     let column_info = table_info
@@ -187,7 +180,7 @@ impl Translate {
         // create all aggregate columns
         let aggregate_columns = self.translate_aggregates(
             sql_ast::TableName::AliasedTable(table_alias.clone()),
-            query.aggregates.unwrap_or(HashMap::new()),
+            query.aggregates.unwrap_or(IndexMap::new()),
         )?;
 
         // combine field and aggregate columns
@@ -278,10 +271,10 @@ impl Translate {
         let metadata::TablesInfo(tables_info_map) = tables_info;
 
         let target_table_info = tables_info_map
-            .get(&relationship.target_table)
-            .ok_or(Error::TableNotFound(relationship.target_table.clone()))?;
+            .get(&relationship.target_collection)
+            .ok_or(Error::TableNotFound(relationship.target_collection.clone()))?;
         let target_table_alias: sql_ast::TableAlias =
-            self.make_table_alias(relationship.target_table.clone());
+            self.make_table_alias(relationship.target_collection.clone());
         let target_table_alias_name: sql_ast::TableName =
             sql_ast::TableName::AliasedTable(target_table_alias);
 
@@ -300,7 +293,7 @@ impl Translate {
                 let target_column_info = target_table_info.columns.get(target_col).ok_or(
                     Error::ColumnNotFoundInTable(
                         target_col.clone(),
-                        relationship.target_table.clone(),
+                        relationship.target_collection.clone(),
                     ),
                 )?;
                 Ok(sql_ast::Expression::BinaryOperator {
@@ -331,7 +324,7 @@ impl Translate {
     // translate any joins we should include in the query into our SQL AST
     fn translate_joins(
         &mut self,
-        relationships: &HashMap<String, models::Relationship>,
+        relationships: &BTreeMap<String, models::Relationship>,
         tables_info: &metadata::TablesInfo,
         table_alias: &sql_ast::TableAlias,
         table_name: &str,
@@ -352,7 +345,7 @@ impl Translate {
 
                 let mut select = self.translate_query(
                     tables_info,
-                    &relationship.target_table,
+                    &relationship.target_collection,
                     relationships,
                     query,
                 )?;
@@ -399,7 +392,7 @@ impl Translate {
     fn translate_aggregates(
         &mut self,
         table: sql_ast::TableName,
-        aggregates: HashMap<String, models::Aggregate>,
+        aggregates: IndexMap<String, models::Aggregate>,
     ) -> Result<Vec<(sql_ast::ColumnAlias, sql_ast::Expression)>, Error> {
         aggregates
             .into_iter()
@@ -448,7 +441,7 @@ impl Translate {
     fn translate_order_by_target_for_column(
         &mut self,
         tables_info: &metadata::TablesInfo,
-        relationships: &HashMap<String, models::Relationship>,
+        relationships: &BTreeMap<String, models::Relationship>,
         table_alias: &sql_ast::TableAlias,
         table_name: &String,
         name: &String,
@@ -487,7 +480,7 @@ impl Translate {
                                 .ok_or(Error::TableNotFound(table_name.clone()))?;
 
                             let target_table_alias: sql_ast::TableAlias =
-                                self.make_table_alias(relationship.target_table.clone());
+                                self.make_table_alias(relationship.target_collection.clone());
 
                             let target_table_alias_name: sql_ast::TableName =
                                 sql_ast::TableName::AliasedTable(target_table_alias.clone());
@@ -550,7 +543,7 @@ impl Translate {
     fn translate_order_by(
         &mut self,
         tables_info: &metadata::TablesInfo,
-        relationships: &HashMap<String, models::Relationship>,
+        relationships: &BTreeMap<String, models::Relationship>,
         table_alias: &sql_ast::TableAlias,
         table_name: &String,
         order_by: Option<models::OrderBy>,

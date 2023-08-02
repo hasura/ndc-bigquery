@@ -3,7 +3,7 @@ use serde_json;
 
 use sqlx;
 use sqlx::Row;
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 
 use super::response_hack;
 use super::translation::{sql_string, ExecutionPlan};
@@ -26,8 +26,8 @@ pub async fn execute(
     // element in the vector is the result of running the query on one set of variables.
     let rows: Vec<serde_json::Value> = match plan.variables {
         None => {
-            let empty_hashmap = HashMap::new();
-            let rows = execute_query(pool, &query, &empty_hashmap).await?;
+            let empty_map = BTreeMap::new();
+            let rows = execute_query(pool, &query, &empty_map).await?;
             vec![rows]
         }
         Some(variable_sets) => {
@@ -53,10 +53,7 @@ pub async fn execute(
     Ok(response)
 }
 
-pub async fn explain(
-    pool: &sqlx::PgPool,
-    plan: ExecutionPlan,
-) -> Result<(String, Vec<String>), Error> {
+pub async fn explain(pool: &sqlx::PgPool, plan: ExecutionPlan) -> Result<(String, String), Error> {
     let query = plan.explain_query();
 
     tracing::info!(
@@ -66,14 +63,14 @@ pub async fn explain(
         &plan.variables,
     );
 
-    let empty_hashmap = HashMap::new();
+    let empty_map = BTreeMap::new();
     let sqlx_query = match &plan.variables {
-        None => build_query_with_params(&query, &empty_hashmap).await?,
+        None => build_query_with_params(&query, &empty_map).await?,
         // When we get an explain with multiple variable sets,
         // we choose the first one and return the plan for it,
         // as returning multiple plans isn't really supported.
         Some(variable_sets) => match variable_sets.get(0) {
-            None => build_query_with_params(&query, &empty_hashmap).await?,
+            None => build_query_with_params(&query, &empty_map).await?,
             Some(vars) => build_query_with_params(&query, vars).await?,
         },
     };
@@ -91,14 +88,14 @@ pub async fn explain(
         }
     }
 
-    Ok((query.sql, results))
+    Ok((query.sql, results.join("\n")))
 }
 
 /// Execute the query on one set of variables.
 async fn execute_query(
     pool: &sqlx::PgPool,
     query: &sql_string::SQL,
-    variables: &HashMap<String, serde_json::Value>,
+    variables: &BTreeMap<String, serde_json::Value>,
 ) -> Result<serde_json::Value, Error> {
     // build query
     let sqlx_query = build_query_with_params(query, variables).await?;
@@ -115,7 +112,7 @@ async fn execute_query(
 /// Create a SQLx query based on our SQL query and bind our parameters and variables to it.
 async fn build_query_with_params<'a>(
     query: &'a sql_string::SQL,
-    variables: &'a HashMap<String, serde_json::Value>,
+    variables: &'a BTreeMap<String, serde_json::Value>,
 ) -> Result<sqlx::query::Query<'a, sqlx::Postgres, sqlx::postgres::PgArguments>, Error> {
     let sqlx_query = sqlx::query(query.sql.as_str());
 

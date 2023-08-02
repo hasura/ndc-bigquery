@@ -1,5 +1,5 @@
 {
-  "table": "Album",
+  "collection": "Album",
   "query": {
     "fields": {
       "AlbumId": {
@@ -30,6 +30,6 @@
     }
   },
   "arguments": {},
-  "table_relationships": {},
+  "collection_relationships": {},
   "variables": [{"id": 35}, {"id": 222}]
 }

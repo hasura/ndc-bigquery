@@ -7,98 +7,62 @@ expression: result
     "rows": [
       {
         "Albums": {
-          "rows": {
-            "rows": [
-              {
-                "Title": {
-                  "value": "Jagged Little Pill"
-                }
-              }
-            ]
-          }
+          "rows": [
+            {
+              "Title": "Jagged Little Pill"
+            }
+          ]
         },
-        "Name": {
-          "value": "Alanis Morissette"
-        }
+        "Name": "Alanis Morissette"
       },
       {
         "Albums": {
-          "rows": {
-            "rows": [
-              {
-                "Title": {
-                  "value": "Facelift"
-                }
-              }
-            ]
-          }
+          "rows": [
+            {
+              "Title": "Facelift"
+            }
+          ]
         },
-        "Name": {
-          "value": "Alice In Chains"
-        }
+        "Name": "Alice In Chains"
       },
       {
         "Albums": {
-          "rows": {
-            "rows": [
-              {
-                "Title": {
-                  "value": "Warner 25 Anos"
-                }
-              },
-              {
-                "Title": {
-                  "value": "Chill: Brazil (Disc 2)"
-                }
-              }
-            ]
-          }
+          "rows": [
+            {
+              "Title": "Warner 25 Anos"
+            },
+            {
+              "Title": "Chill: Brazil (Disc 2)"
+            }
+          ]
         },
-        "Name": {
-          "value": "Antônio Carlos Jobim"
-        }
+        "Name": "Antônio Carlos Jobim"
       },
       {
         "Albums": {
-          "rows": {
-            "rows": [
-              {
-                "Title": {
-                  "value": "Plays Metallica By Four Cellos"
-                }
-              }
-            ]
-          }
+          "rows": [
+            {
+              "Title": "Plays Metallica By Four Cellos"
+            }
+          ]
         },
-        "Name": {
-          "value": "Apocalyptica"
-        }
+        "Name": "Apocalyptica"
       },
       {
         "Albums": {
-          "rows": {
-            "rows": [
-              {
-                "Title": {
-                  "value": "Audioslave"
-                }
-              },
-              {
-                "Title": {
-                  "value": "Out Of Exile"
-                }
-              },
-              {
-                "Title": {
-                  "value": "Revelations"
-                }
-              }
-            ]
-          }
+          "rows": [
+            {
+              "Title": "Audioslave"
+            },
+            {
+              "Title": "Out Of Exile"
+            },
+            {
+              "Title": "Revelations"
+            }
+          ]
         },
-        "Name": {
-          "value": "Audioslave"
-        }
+        "Name": "Audioslave"
       }
     ]
   }

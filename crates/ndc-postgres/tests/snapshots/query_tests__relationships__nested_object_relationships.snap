@@ -7,138 +7,88 @@ expression: result
     "rows": [
       {
         "Album": {
-          "rows": {
-            "rows": [
-              {
-                "Artist": {
-                  "rows": {
-                    "rows": [
-                      {
-                        "artist": {
-                          "value": "Gonzaguinha"
-                        }
-                      }
-                    ]
+          "rows": [
+            {
+              "Artist": {
+                "rows": [
+                  {
+                    "artist": "Gonzaguinha"
                   }
-                },
-                "album": {
-                  "value": "Meus Momentos"
-                }
-              }
-            ]
-          }
+                ]
+              },
+              "album": "Meus Momentos"
+            }
+          ]
         },
-        "track": {
-          "value": "Grito De Alerta"
-        }
+        "track": "Grito De Alerta"
       },
       {
         "Album": {
-          "rows": {
-            "rows": [
-              {
-                "Artist": {
-                  "rows": {
-                    "rows": [
-                      {
-                        "artist": {
-                          "value": "Gonzaguinha"
-                        }
-                      }
-                    ]
+          "rows": [
+            {
+              "Artist": {
+                "rows": [
+                  {
+                    "artist": "Gonzaguinha"
                   }
-                },
-                "album": {
-                  "value": "Meus Momentos"
-                }
-              }
-            ]
-          }
+                ]
+              },
+              "album": "Meus Momentos"
+            }
+          ]
         },
-        "track": {
-          "value": "Não Dá Mais Pra Segurar (Explode Coração)"
-        }
+        "track": "Não Dá Mais Pra Segurar (Explode Coração)"
       },
       {
         "Album": {
-          "rows": {
-            "rows": [
-              {
-                "Artist": {
-                  "rows": {
-                    "rows": [
-                      {
-                        "artist": {
-                          "value": "Gonzaguinha"
-                        }
-                      }
-                    ]
+          "rows": [
+            {
+              "Artist": {
+                "rows": [
+                  {
+                    "artist": "Gonzaguinha"
                   }
-                },
-                "album": {
-                  "value": "Meus Momentos"
-                }
-              }
-            ]
-          }
+                ]
+              },
+              "album": "Meus Momentos"
+            }
+          ]
         },
-        "track": {
-          "value": "Começaria Tudo Outra Vez"
-        }
+        "track": "Começaria Tudo Outra Vez"
       },
       {
         "Album": {
-          "rows": {
-            "rows": [
-              {
-                "Artist": {
-                  "rows": {
-                    "rows": [
-                      {
-                        "artist": {
-                          "value": "Gonzaguinha"
-                        }
-                      }
-                    ]
+          "rows": [
+            {
+              "Artist": {
+                "rows": [
+                  {
+                    "artist": "Gonzaguinha"
                   }
-                },
-                "album": {
-                  "value": "Meus Momentos"
-                }
-              }
-            ]
-          }
+                ]
+              },
+              "album": "Meus Momentos"
+            }
+          ]
         },
-        "track": {
-          "value": "O Que É O Que É ?"
-        }
+        "track": "O Que É O Que É ?"
       },
       {
         "Album": {
-          "rows": {
-            "rows": [
-              {
-                "Artist": {
-                  "rows": {
-                    "rows": [
-                      {
-                        "artist": {
-                          "value": "Gonzaguinha"
-                        }
-                      }
-                    ]
+          "rows": [
+            {
+              "Artist": {
+                "rows": [
+                  {
+                    "artist": "Gonzaguinha"
                   }
-                },
-                "album": {
-                  "value": "Meus Momentos"
-                }
-              }
-            ]
-          }
+                ]
+              },
+              "album": "Meus Momentos"
+            }
+          ]
         },
-        "track": {
-          "value": "Sangrando"
-        }
+        "track": "Sangrando"
       }
     ]
   }

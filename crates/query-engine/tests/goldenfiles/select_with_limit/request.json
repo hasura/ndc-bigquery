@@ -1,5 +1,5 @@
 {
-  "table": "Album",
+  "collection": "Album",
   "query": {
     "fields": {
       "Title": {
@@ -12,5 +12,5 @@
 	"offset": 3
   },
   "arguments": {},
-  "table_relationships": {}
+  "collection_relationships": {}
 }

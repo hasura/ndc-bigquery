@@ -7,83 +7,53 @@ expression: result
     "rows": [
       {
         "Artist": {
-          "rows": {
-            "rows": [
-              {
-                "Name": {
-                  "value": "AC/DC"
-                }
-              }
-            ]
-          }
+          "rows": [
+            {
+              "Name": "AC/DC"
+            }
+          ]
         },
-        "Title": {
-          "value": "Let There Be Rock"
-        }
+        "Title": "Let There Be Rock"
       },
       {
         "Artist": {
-          "rows": {
-            "rows": [
-              {
-                "Name": {
-                  "value": "Aerosmith"
-                }
-              }
-            ]
-          }
+          "rows": [
+            {
+              "Name": "Aerosmith"
+            }
+          ]
         },
-        "Title": {
-          "value": "Big Ones"
-        }
+        "Title": "Big Ones"
       },
       {
         "Artist": {
-          "rows": {
-            "rows": [
-              {
-                "Name": {
-                  "value": "Alanis Morissette"
-                }
-              }
-            ]
-          }
+          "rows": [
+            {
+              "Name": "Alanis Morissette"
+            }
+          ]
         },
-        "Title": {
-          "value": "Jagged Little Pill"
-        }
+        "Title": "Jagged Little Pill"
       },
       {
         "Artist": {
-          "rows": {
-            "rows": [
-              {
-                "Name": {
-                  "value": "Alice In Chains"
-                }
-              }
-            ]
-          }
+          "rows": [
+            {
+              "Name": "Alice In Chains"
+            }
+          ]
         },
-        "Title": {
-          "value": "Facelift"
-        }
+        "Title": "Facelift"
       },
       {
         "Artist": {
-          "rows": {
-            "rows": [
-              {
-                "Name": {
-                  "value": "Antônio Carlos Jobim"
-                }
-              }
-            ]
-          }
+          "rows": [
+            {
+              "Name": "Antônio Carlos Jobim"
+            }
+          ]
         },
-        "Title": {
-          "value": "Warner 25 Anos"
-        }
+        "Title": "Warner 25 Anos"
       }
     ]
   }

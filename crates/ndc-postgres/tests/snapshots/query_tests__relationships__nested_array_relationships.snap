@@ -7,180 +7,112 @@ expression: result
     "rows": [
       {
         "Albums": {
-          "rows": {
-            "rows": [
-              {
-                "Tracks": {
-                  "rows": {
-                    "rows": [
-                      {
-                        "track": {
-                          "value": "A Kind Of Magic"
-                        }
-                      },
-                      {
-                        "track": {
-                          "value": "Under Pressure"
-                        }
-                      },
-                      {
-                        "track": {
-                          "value": "Radio GA GA"
-                        }
-                      },
-                      {
-                        "track": {
-                          "value": "I Want It All"
-                        }
-                      }
-                    ]
+          "rows": [
+            {
+              "Tracks": {
+                "rows": [
+                  {
+                    "track": "A Kind Of Magic"
+                  },
+                  {
+                    "track": "Under Pressure"
+                  },
+                  {
+                    "track": "Radio GA GA"
+                  },
+                  {
+                    "track": "I Want It All"
                   }
-                },
-                "album": {
-                  "value": "Greatest Hits II"
-                }
+                ]
               },
-              {
-                "Tracks": {
-                  "rows": {
-                    "rows": [
-                      {
-                        "track": {
-                          "value": "Bohemian Rhapsody"
-                        }
-                      },
-                      {
-                        "track": {
-                          "value": "Another One Bites The Dust"
-                        }
-                      },
-                      {
-                        "track": {
-                          "value": "Killer Queen"
-                        }
-                      },
-                      {
-                        "track": {
-                          "value": "Fat Bottomed Girls"
-                        }
-                      }
-                    ]
+              "album": "Greatest Hits II"
+            },
+            {
+              "Tracks": {
+                "rows": [
+                  {
+                    "track": "Bohemian Rhapsody"
+                  },
+                  {
+                    "track": "Another One Bites The Dust"
+                  },
+                  {
+                    "track": "Killer Queen"
+                  },
+                  {
+                    "track": "Fat Bottomed Girls"
                   }
-                },
-                "album": {
-                  "value": "Greatest Hits I"
-                }
+                ]
               },
-              {
-                "Tracks": {
-                  "rows": {
-                    "rows": [
-                      {
-                        "track": {
-                          "value": "We Will Rock You"
-                        }
-                      },
-                      {
-                        "track": {
-                          "value": "We Are The Champions"
-                        }
-                      },
-                      {
-                        "track": {
-                          "value": "Sheer Heart Attack"
-                        }
-                      },
-                      {
-                        "track": {
-                          "value": "All Dead, All Dead"
-                        }
-                      }
-                    ]
+              "album": "Greatest Hits I"
+            },
+            {
+              "Tracks": {
+                "rows": [
+                  {
+                    "track": "We Will Rock You"
+                  },
+                  {
+                    "track": "We Are The Champions"
+                  },
+                  {
+                    "track": "Sheer Heart Attack"
+                  },
+                  {
+                    "track": "All Dead, All Dead"
                   }
-                },
-                "album": {
-                  "value": "News Of The World"
-                }
-              }
-            ]
-          }
+                ]
+              },
+              "album": "News Of The World"
+            }
+          ]
         },
-        "artist": {
-          "value": "Queen"
-        }
+        "artist": "Queen"
       },
       {
         "Albums": {
-          "rows": {
-            "rows": [
-              {
-                "Tracks": {
-                  "rows": {
-                    "rows": [
-                      {
-                        "track": {
-                          "value": "Detroit Rock City"
-                        }
-                      },
-                      {
-                        "track": {
-                          "value": "Black Diamond"
-                        }
-                      },
-                      {
-                        "track": {
-                          "value": "Hard Luck Woman"
-                        }
-                      },
-                      {
-                        "track": {
-                          "value": "Sure Know Something"
-                        }
-                      }
-                    ]
+          "rows": [
+            {
+              "Tracks": {
+                "rows": [
+                  {
+                    "track": "Detroit Rock City"
+                  },
+                  {
+                    "track": "Black Diamond"
+                  },
+                  {
+                    "track": "Hard Luck Woman"
+                  },
+                  {
+                    "track": "Sure Know Something"
                   }
-                },
-                "album": {
-                  "value": "Greatest Kiss"
-                }
+                ]
               },
-              {
-                "Tracks": {
-                  "rows": {
-                    "rows": [
-                      {
-                        "track": {
-                          "value": "Comin' Home"
-                        }
-                      },
-                      {
-                        "track": {
-                          "value": "Plaster Caster"
-                        }
-                      },
-                      {
-                        "track": {
-                          "value": "Goin' Blind"
-                        }
-                      },
-                      {
-                        "track": {
-                          "value": "Do You Love Me"
-                        }
-                      }
-                    ]
+              "album": "Greatest Kiss"
+            },
+            {
+              "Tracks": {
+                "rows": [
+                  {
+                    "track": "Comin' Home"
+                  },
+                  {
+                    "track": "Plaster Caster"
+                  },
+                  {
+                    "track": "Goin' Blind"
+                  },
+                  {
+                    "track": "Do You Love Me"
                   }
-                },
-                "album": {
-                  "value": "Unplugged [Live]"
-                }
-              }
-            ]
-          }
+                ]
+              },
+              "album": "Unplugged [Live]"
+            }
+          ]
         },
-        "artist": {
-          "value": "Kiss"
-        }
+        "artist": "Kiss"
       }
     ]
   }

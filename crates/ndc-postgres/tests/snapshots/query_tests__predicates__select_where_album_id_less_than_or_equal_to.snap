@@ -6,12 +6,8 @@ expression: result
   {
     "rows": [
       {
-        "AlbumId": {
-          "value": 1
-        },
-        "Title": {
-          "value": "For Those About To Rock We Salute You"
-        }
+        "AlbumId": 1,
+        "Title": "For Those About To Rock We Salute You"
       }
     ]
   }

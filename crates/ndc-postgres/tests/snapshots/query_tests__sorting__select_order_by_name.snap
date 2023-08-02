@@ -6,29 +6,19 @@ expression: result
   {
     "rows": [
       {
-        "Title": {
-          "value": "A Matter of Life and Death"
-        }
+        "Title": "A Matter of Life and Death"
       },
       {
-        "Title": {
-          "value": "A Real Dead One"
-        }
+        "Title": "A Real Dead One"
       },
       {
-        "Title": {
-          "value": "A Real Live One"
-        }
+        "Title": "A Real Live One"
       },
       {
-        "Title": {
-          "value": "A Soprano Inspired"
-        }
+        "Title": "A Soprano Inspired"
       },
       {
-        "Title": {
-          "value": "A TempestadeTempestade Ou O Livro Dos Dias"
-        }
+        "Title": "A TempestadeTempestade Ou O Livro Dos Dias"
       }
     ]
   }

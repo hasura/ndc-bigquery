@@ -6,60 +6,32 @@ expression: result
   {
     "rows": [
       {
-        "AlbumId": {
-          "value": 1
-        },
-        "Title": {
-          "value": "For Those About To Rock We Salute You"
-        }
+        "AlbumId": 1,
+        "Title": "For Those About To Rock We Salute You"
       },
       {
-        "AlbumId": {
-          "value": 4
-        },
-        "Title": {
-          "value": "Let There Be Rock"
-        }
+        "AlbumId": 4,
+        "Title": "Let There Be Rock"
       },
       {
-        "AlbumId": {
-          "value": 59
-        },
-        "Title": {
-          "value": "Deep Purple In Rock"
-        }
+        "AlbumId": 59,
+        "Title": "Deep Purple In Rock"
       },
       {
-        "AlbumId": {
-          "value": 108
-        },
-        "Title": {
-          "value": "Rock In Rio [CD1]"
-        }
+        "AlbumId": 108,
+        "Title": "Rock In Rio [CD1]"
       },
       {
-        "AlbumId": {
-          "value": 109
-        },
-        "Title": {
-          "value": "Rock In Rio [CD2]"
-        }
+        "AlbumId": 109,
+        "Title": "Rock In Rio [CD2]"
       },
       {
-        "AlbumId": {
-          "value": 213
-        },
-        "Title": {
-          "value": "Pure Cult: The Best Of The Cult (For Rockers, Ravers, Lovers & Sinners) [UK]"
-        }
+        "AlbumId": 213,
+        "Title": "Pure Cult: The Best Of The Cult (For Rockers, Ravers, Lovers & Sinners) [UK]"
       },
       {
-        "AlbumId": {
-          "value": 216
-        },
-        "Title": {
-          "value": "Hot Rocks, 1964-1971 (Disc 1)"
-        }
+        "AlbumId": 216,
+        "Title": "Hot Rocks, 1964-1971 (Disc 1)"
       }
     ]
   }

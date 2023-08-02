@@ -6,29 +6,19 @@ expression: result
   {
     "rows": [
       {
-        "Name": {
-          "value": "Worlds"
-        }
+        "Name": "Worlds"
       },
       {
-        "Name": {
-          "value": "The World of Classical Favourites"
-        }
+        "Name": "The World of Classical Favourites"
       },
       {
-        "Name": {
-          "value": "Sir Neville Marriner: A Celebration"
-        }
+        "Name": "Sir Neville Marriner: A Celebration"
       },
       {
-        "Name": {
-          "value": "Fauré: Requiem, Ravel: Pavane & Others"
-        }
+        "Name": "Fauré: Requiem, Ravel: Pavane & Others"
       },
       {
-        "Name": {
-          "value": "Bach: Orchestral Suites Nos. 1 - 4"
-        }
+        "Name": "Bach: Orchestral Suites Nos. 1 - 4"
       }
     ]
   }

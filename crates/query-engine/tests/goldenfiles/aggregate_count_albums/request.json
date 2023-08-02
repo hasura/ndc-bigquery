@@ -1,5 +1,5 @@
 {
-  "table": "Album",
+  "collection": "Album",
   "query": {
     "aggregates": {
       "how_many_albums": {
@@ -8,5 +8,5 @@
     }
   },
   "arguments": {},
-  "table_relationships": {}
+  "collection_relationships": {}
 }

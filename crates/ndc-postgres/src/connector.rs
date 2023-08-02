@@ -7,7 +7,7 @@ use query_engine::phases;
 
 use async_trait::async_trait;
 use ndc_client::models;
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 
 #[derive(Clone, Default)]
 pub struct Postgres {}
@@ -92,7 +92,7 @@ impl connector::Connector for Postgres {
         }?;
 
         // Execute an explain query.
-        let (query, lines) = match phases::execution::explain(&state.pool, plan).await {
+        let (query, plan) = match phases::execution::explain(&state.pool, plan).await {
             Ok(plan) => Ok(plan),
             Err(err) => Err(match err {
                 phases::execution::Error::Query(err) => {
@@ -106,7 +106,10 @@ impl connector::Connector for Postgres {
             }),
         }?;
 
-        let response = models::ExplainResponse { lines, query };
+        let details =
+            BTreeMap::from_iter([("SQL Query".into(), query), ("Execution Plan".into(), plan)]);
+
+        let response = models::ExplainResponse { details };
 
         Ok(response)
     }
@@ -157,10 +160,11 @@ impl connector::Connector for Postgres {
         _configuration: &Self::Configuration,
     ) -> Result<models::SchemaResponse, connector::SchemaError> {
         Ok(models::SchemaResponse {
-            commands: vec![],
-            tables: vec![],
-            object_types: HashMap::new(),
-            scalar_types: HashMap::new(),
+            collections: vec![],
+            procedures: vec![],
+            functions: vec![],
+            object_types: BTreeMap::new(),
+            scalar_types: BTreeMap::new(),
         })
     }
 
