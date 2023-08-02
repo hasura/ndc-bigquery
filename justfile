@@ -8,17 +8,11 @@ POSTGRES_DC_PORT := "8100"
 # run the connector
 run: start-docker
   RUST_LOG=INFO \
-    OTEL_SERVICE_NAME=postgres-agent \
-    OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://localhost:4317 \
-    OTEL_TRACES_SAMPLER=always_on \
     cargo run --release -- serve --configuration {{CHINOOK_DEPLOYMENT}}
 
 # watch the code, then test and re-run on changes
 dev: start-docker
   RUST_LOG=INFO \
-    OTEL_SERVICE_NAME=postgres-agent \
-    OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://localhost:4317 \
-    OTEL_TRACES_SAMPLER=always_on \
     cargo watch -i "tests/snapshots/*" \
     -c \
     -x test \
@@ -28,9 +22,6 @@ dev: start-docker
 # watch the code, and re-run on changes
 watch-run: start-docker
   RUST_LOG=DEBUG \
-    OTEL_SERVICE_NAME=postgres-agent \
-    OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://localhost:4317 \
-    OTEL_TRACES_SAMPLER=always_on \
     cargo watch -i "tests/snapshots/*" \
     -c \
     -x 'run -- serve --configuration {{CHINOOK_DEPLOYMENT}}'
@@ -39,17 +30,11 @@ watch-run: start-docker
 debug: start-docker
   cargo build
   RUST_LOG=DEBUG \
-    OTEL_SERVICE_NAME=postgres-agent \
-    OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://localhost:4317 \
-    OTEL_TRACES_SAMPLER=always_on \
     rust-gdb --args target/debug/ndc-postgres serve --configuration {{CHINOOK_DEPLOYMENT}}
 
 # Run the server and produce a flamegraph profile
 flamegraph: start-docker
   RUST_LOG=DEBUG \
-    OTEL_SERVICE_NAME=postgres-agent \
-    OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://localhost:4317 \
-    OTEL_TRACES_SAMPLER=always_on \
     cargo flamegraph --dev -- \
     serve --configuration {{CHINOOK_DEPLOYMENT}}
 
