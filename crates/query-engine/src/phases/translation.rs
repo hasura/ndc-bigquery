@@ -8,7 +8,6 @@ use crate::metadata;
 
 use indexmap::IndexMap;
 use ndc_client::models;
-
 use std::collections::BTreeMap;
 
 #[derive(Debug)]
@@ -365,10 +364,14 @@ impl Translate {
                 select.where_ = sql_ast::Where(with_join_condition);
 
                 let wrap_select = match relationship.relationship_type {
-                    // objects should return `sql_helpers::select_row_as_json`, but we need an
-                    // array so that we turn it into a `Relationship` in `response_hack.rs`
-                    models::RelationshipType::Object => sql_helpers::select_table_as_json_array,
-                    models::RelationshipType::Array => sql_helpers::select_table_as_json_array,
+                    // for some reason v3-engine expects object relationships
+                    // also in the form of a json array wrapped in `rows`.
+                    models::RelationshipType::Object => {
+                        sql_helpers::select_table_as_json_array_in_rows_object
+                    }
+                    models::RelationshipType::Array => {
+                        sql_helpers::select_table_as_json_array_in_rows_object
+                    }
                 };
 
                 // wrap the sql in row_to_json and json_agg

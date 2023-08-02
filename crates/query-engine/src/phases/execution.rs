@@ -5,10 +5,10 @@ use sqlx;
 use sqlx::Row;
 use std::collections::BTreeMap;
 
-use super::response_hack;
 use super::translation::{sql_string, ExecutionPlan};
 use ndc_client::models;
 
+/// Execute a query against postgres.
 pub async fn execute(
     pool: &sqlx::PgPool,
     plan: ExecutionPlan,
@@ -43,7 +43,7 @@ pub async fn execute(
     // tracing::info!("Database rows result: {:?}", rows);
 
     // Hack a response from the query results. See the 'response_hack' for more details.
-    let response = response_hack::rows_to_response(rows);
+    let response = rows_to_response(rows);
 
     // tracing::info!(
     //     "Query response: {}",
@@ -53,6 +53,20 @@ pub async fn execute(
     Ok(response)
 }
 
+/// Take the postgres results and return them as a QueryResponse.
+fn rows_to_response(sets_of_rows: Vec<serde_json::Value>) -> models::QueryResponse {
+    let rowsets = sets_of_rows
+        .into_iter()
+        .map(|rows| models::RowSet {
+            aggregates: None,
+            rows: serde_json::from_value(rows).unwrap(),
+        })
+        .collect();
+
+    models::QueryResponse(rowsets)
+}
+
+/// Convert a query to an EXPLAIN query and execute it against postgres.
 pub async fn explain(pool: &sqlx::PgPool, plan: ExecutionPlan) -> Result<(String, String), Error> {
     let query = plan.explain_query();
 
