@@ -5,7 +5,7 @@ use sqlx;
 use sqlx::Row;
 use std::collections::BTreeMap;
 
-use super::translation::{sql_string, ExecutionPlan};
+use super::translation::{sql, ExecutionPlan};
 use ndc_client::models;
 
 /// Execute a query against postgres.
@@ -108,7 +108,7 @@ pub async fn explain(pool: &sqlx::PgPool, plan: ExecutionPlan) -> Result<(String
 /// Execute the query on one set of variables.
 async fn execute_query(
     pool: &sqlx::PgPool,
-    query: &sql_string::SQL,
+    query: &sql::string::SQL,
     variables: &BTreeMap<String, serde_json::Value>,
 ) -> Result<serde_json::Value, Error> {
     // build query
@@ -125,7 +125,7 @@ async fn execute_query(
 
 /// Create a SQLx query based on our SQL query and bind our parameters and variables to it.
 async fn build_query_with_params<'a>(
-    query: &'a sql_string::SQL,
+    query: &'a sql::string::SQL,
     variables: &'a BTreeMap<String, serde_json::Value>,
 ) -> Result<sqlx::query::Query<'a, sqlx::Postgres, sqlx::postgres::PgArguments>, Error> {
     let sqlx_query = sqlx::query(query.sql.as_str());
@@ -134,8 +134,8 @@ async fn build_query_with_params<'a>(
         .params
         .iter()
         .try_fold(sqlx_query, |sqlx_query, param| match param {
-            sql_string::Param::String(s) => Ok(sqlx_query.bind(s)),
-            sql_string::Param::Variable(var) => match variables.get(var) {
+            sql::string::Param::String(s) => Ok(sqlx_query.bind(s)),
+            sql::string::Param::Variable(var) => match variables.get(var) {
                 Some(value) => match value {
                     serde_json::Value::String(s) => Ok(sqlx_query.bind(s)),
                     serde_json::Value::Number(n) => Ok(sqlx_query.bind(n.as_f64())),

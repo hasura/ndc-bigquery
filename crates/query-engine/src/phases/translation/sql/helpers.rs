@@ -1,4 +1,4 @@
-use super::sql_ast::*;
+use super::ast::*;
 
 /// SQL AST builder helpers.
 use std::collections::BTreeMap;

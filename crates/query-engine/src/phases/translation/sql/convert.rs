@@ -1,7 +1,7 @@
 /// Convert a SQL AST to a low-level SQL string.
-use super::sql_ast::*;
-use super::sql_helpers;
-use super::sql_string::*;
+use super::ast::*;
+use super::helpers;
+use super::string::*;
 
 // Convert to SQL strings
 
@@ -125,7 +125,7 @@ impl Join {
 impl Where {
     pub fn to_sql(&self, sql: &mut SQL) {
         let Where(expression) = self;
-        if *expression != sql_helpers::true_expr() {
+        if *expression != helpers::true_expr() {
             sql.append_syntax(" WHERE ");
             expression.to_sql(sql);
         }

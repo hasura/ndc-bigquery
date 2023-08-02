@@ -18,7 +18,7 @@ pub fn test_translation(testname: &str) -> Result<String, translation::Error> {
 
     let plan = translation::translate(&tables, request)?;
     let query = plan.query();
-    let params: Vec<(usize, &translation::sql_string::Param)> = query
+    let params: Vec<(usize, &translation::sql::string::Param)> = query
         .params
         .iter()
         .enumerate()
