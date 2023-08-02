@@ -4,7 +4,7 @@ import http from "k6/http";
 const testid = "select";
 const url = `http://agent:8100/query`;
 const data = {
-  table : "Album",
+  collection : "Album",
   query : {
     fields : {
       id : {type : "column", column : "AlbumId", arguments : {}},
@@ -13,7 +13,7 @@ const data = {
     },
   },
   arguments : {},
-  table_relationships : {},
+  collection_relationships : {},
 };
 
 export default function() {
