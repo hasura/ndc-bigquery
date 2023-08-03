@@ -1340,6 +1340,7 @@ dependencies = [
  "ndc-hub",
  "prometheus",
  "query-engine",
+ "schemars",
  "serde",
  "serde_derive",
  "serde_json",

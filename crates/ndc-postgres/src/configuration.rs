@@ -1,6 +1,7 @@
 use clap::Args;
 /// Configuration and state for our connector.
 use ndc_hub::connector;
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use sqlx::postgres::PgPool;
 use sqlx::postgres::PgPoolOptions;
@@ -9,7 +10,7 @@ use std::collections::HashMap;
 use thiserror::Error;
 
 /// User configuration.
-#[derive(Debug, Clone, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize, PartialEq, JsonSchema)]
 pub struct DeploymentConfiguration {
     pub version: u32,
     pub tables: query_engine::metadata::TablesInfo,
