@@ -155,16 +155,58 @@ impl connector::Connector for Postgres {
         Ok(result)
     }
 
-    /// @todo: dummy for now
+    /// @todo
     async fn get_schema(
-        _configuration: &Self::Configuration,
+        configuration: &Self::Configuration,
     ) -> Result<models::SchemaResponse, connector::SchemaError> {
+        let scalar_types = BTreeMap::from_iter([(
+            "any".into(),
+            ndc_client::models::ScalarType {
+                aggregate_functions: BTreeMap::new(),
+                comparison_operators: BTreeMap::new(),
+                update_operators: BTreeMap::new(),
+            },
+        )]);
+
+        let query_engine::metadata::TablesInfo(tablesinfo) = &configuration.tables;
+        let collections = tablesinfo
+            .iter()
+            .map(|(table_name, _table)| ndc_client::models::CollectionInfo {
+                name: table_name.clone(),
+                description: None,
+                arguments: BTreeMap::new(),
+                collection_type: table_name.clone(),
+                insertable_columns: None,
+                updatable_columns: None,
+                deletable: false,
+                uniqueness_constraints: BTreeMap::new(),
+                foreign_keys: BTreeMap::new(),
+            })
+            .collect();
+
+        let object_types = BTreeMap::from_iter(tablesinfo.iter().map(|(table_name, table)| {
+            let object_type = models::ObjectType {
+                description: None,
+                fields: BTreeMap::from_iter(table.columns.values().map(|column| {
+                    (
+                        column.name.clone(),
+                        models::ObjectField {
+                            arguments: BTreeMap::new(),
+                            description: None,
+                            r#type: models::Type::Named { name: "any".into() },
+                        },
+                    )
+                })),
+            };
+            (table_name.clone(), object_type)
+        }));
+
         Ok(models::SchemaResponse {
-            collections: vec![],
+            collections,
             procedures: vec![],
             functions: vec![],
-            object_types: BTreeMap::new(),
-            scalar_types: BTreeMap::new(),
+            object_types,
+            scalar_types,
         })
     }
 
