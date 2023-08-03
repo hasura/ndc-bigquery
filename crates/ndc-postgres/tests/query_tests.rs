@@ -62,6 +62,12 @@ mod predicates {
     }
 
     #[tokio::test]
+    async fn select_where_album_id_equals_self() {
+        let result = run_query("select_where_album_id_equals_self").await;
+        insta::assert_json_snapshot!(result);
+    }
+
+    #[tokio::test]
     async fn select_where_name_in() {
         let result = run_query("select_where_name_in").await;
         insta::assert_json_snapshot!(result);

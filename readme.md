@@ -32,7 +32,7 @@ cargo build
 Run the postgres agent with:
 
 ```
-just run-postgres-ndc
+just run
 ```
 
 ### Develop
