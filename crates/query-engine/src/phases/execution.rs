@@ -54,13 +54,10 @@ pub async fn execute(
 }
 
 /// Take the postgres results and return them as a QueryResponse.
-fn rows_to_response(sets_of_rows: Vec<serde_json::Value>) -> models::QueryResponse {
-    let rowsets = sets_of_rows
+fn rows_to_response(results: Vec<serde_json::Value>) -> models::QueryResponse {
+    let rowsets = results
         .into_iter()
-        .map(|rows| models::RowSet {
-            aggregates: None,
-            rows: serde_json::from_value(rows).unwrap(),
-        })
+        .map(|raw_rowset| serde_json::from_value(raw_rowset).unwrap())
         .collect();
 
     models::QueryResponse(rowsets)

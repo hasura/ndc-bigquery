@@ -93,26 +93,31 @@ impl Translate {
         tables_info: &metadata::TablesInfo,
         query_request: models::QueryRequest,
     ) -> Result<ExecutionPlan, Error> {
-        let select = self.translate_query(
+        let select_set = self.translate_query(
             tables_info,
             &query_request.collection,
             &query_request.collection_relationships,
             query_request.query,
         )?;
 
-        // wrap the sql in row_to_json and json_agg
-        let final_select = sql::helpers::select_table_as_json_array(
-            select,
+        // form a single JSON item shaped `{ rows: [], aggregates: {} }`
+        // that matches the models::RowSet type
+        let json_select = sql::helpers::select_rowset(
+            self.make_column_alias("universe".to_string()),
+            self.make_table_alias("universe".to_string()),
+            self.make_table_alias("rows".to_string()),
             self.make_column_alias("rows".to_string()),
-            self.make_table_alias("root".to_string()),
+            self.make_table_alias("aggregates".to_string()),
+            self.make_column_alias("aggregates".to_string()),
+            select_set,
         );
 
         // log and return
-        tracing::info!("SQL AST: {:?}", final_select);
+        tracing::info!("SQL AST: {:?}", json_select);
         Ok(simple_exec_plan(
             query_request.variables,
             query_request.collection,
-            final_select,
+            json_select,
         ))
     }
 
@@ -123,6 +128,124 @@ impl Translate {
         table_name: &String,
         relationships: &BTreeMap<String, models::Relationship>,
         query: models::Query,
+    ) -> Result<sql::helpers::SelectSet, Error> {
+        // Error::NoFields becomes Ok(None)
+        // everything stays Err
+        let map_no_fields_error_to_none = |err| match err {
+            Error::NoFields => Ok(None),
+            other_error => Err(other_error),
+        };
+
+        // wrap valid result in Some
+        let wrap_ok = |a| Ok(Some(a));
+
+        // translate rows query. if there are no fields, make this a None
+        let row_select: Option<sql::ast::Select> = self
+            .translate_rows_query(tables_info, table_name, relationships, &query)
+            .map_or_else(map_no_fields_error_to_none, wrap_ok)?;
+
+        // translate aggregate select. if there are no fields, make this a None
+        let aggregate_select: Option<sql::ast::Select> = self
+            .translate_aggregate_query(tables_info, table_name, relationships, &query)
+            .map_or_else(map_no_fields_error_to_none, wrap_ok)?;
+
+        match (row_select, aggregate_select) {
+            (Some(rows), None) => Ok(sql::helpers::SelectSet::Rows(rows)),
+            (None, Some(aggregates)) => Ok(sql::helpers::SelectSet::Aggregates(aggregates)),
+            (Some(rows), Some(aggregates)) => {
+                Ok(sql::helpers::SelectSet::RowsAndAggregates(rows, aggregates))
+            }
+            _ => Err(Error::NoFields),
+        }
+    }
+
+    /// Translate aggregates query to sql ast.
+    pub fn translate_aggregate_query(
+        &mut self,
+        tables_info: &metadata::TablesInfo,
+        table_name: &String,
+        relationships: &BTreeMap<String, models::Relationship>,
+        query: &models::Query,
+    ) -> Result<sql::ast::Select, Error> {
+        let metadata::TablesInfo(tables_info_map) = tables_info;
+        // find the table according to the metadata.
+        let table_info = tables_info_map
+            .get(table_name)
+            .ok_or(Error::TableNotFound(table_name.clone()))?;
+        let table: sql::ast::TableName = sql::ast::TableName::DBTable {
+            schema: table_info.schema_name.clone(),
+            table: table_info.table_name.clone(),
+        };
+        let table_alias: sql::ast::TableAlias = self.make_table_alias(table_name.clone());
+        let table_alias_name: sql::ast::TableName =
+            sql::ast::TableName::AliasedTable(table_alias.clone());
+
+        // join aliases
+        let join_fields: Vec<(sql::ast::TableAlias, String, models::Query)> = vec![];
+
+        // translate aggregates to select list
+        let aggregate_fields = query.aggregates.clone().ok_or(Error::NoFields)?;
+
+        // fail if no aggregates defined at all
+        match IndexMap::is_empty(&aggregate_fields) {
+            true => Err(Error::NoFields),
+            false => Ok(()),
+        }?;
+
+        // create all aggregate columns
+        let aggregate_columns = self.translate_aggregates(
+            sql::ast::TableName::AliasedTable(table_alias.clone()),
+            aggregate_fields,
+        )?;
+
+        // construct a simple select with the table name, alias, and selected columns.
+        let mut aggregate_select = sql::helpers::simple_select(aggregate_columns);
+
+        aggregate_select.from = Some(sql::ast::From::Table {
+            name: table,
+            alias: table_alias.clone(),
+        });
+
+        // collect any joins for relationships
+        let mut relationship_joins = self.translate_joins(
+            relationships,
+            tables_info,
+            &table_alias,
+            table_name,
+            join_fields,
+        )?;
+
+        // translate order_by
+        let (order_by, order_by_joins) = self.translate_order_by(
+            tables_info,
+            relationships,
+            &table_alias,
+            table_name,
+            &query.order_by,
+        )?;
+
+        relationship_joins.extend(order_by_joins);
+
+        aggregate_select.joins = relationship_joins;
+
+        aggregate_select.order_by = order_by;
+
+        // translate where
+        aggregate_select.where_ = sql::ast::Where(match query.clone().predicate {
+            None => sql::ast::Expression::Value(sql::ast::Value::Bool(true)),
+            Some(predicate) => self.translate_expression(&table_alias_name, predicate),
+        });
+
+        Ok(aggregate_select)
+    }
+
+    /// Translate rows part of query to sql ast.
+    pub fn translate_rows_query(
+        &mut self,
+        tables_info: &metadata::TablesInfo,
+        table_name: &String,
+        relationships: &BTreeMap<String, models::Relationship>,
+        query: &models::Query,
     ) -> Result<sql::ast::Select, Error> {
         let metadata::TablesInfo(tables_info_map) = tables_info;
         // find the table according to the metadata.
@@ -141,10 +264,16 @@ impl Translate {
         let mut join_fields: Vec<(sql::ast::TableAlias, String, models::Query)> = vec![];
 
         // translate fields to select list
-        let fields = query.fields.unwrap_or(IndexMap::new());
+        let fields = query.fields.clone().ok_or(Error::NoFields)?;
+
+        // fail if no columns defined at all
+        match IndexMap::is_empty(&fields) {
+            true => Err(Error::NoFields),
+            false => Ok(()),
+        }?;
 
         // translate fields to columns or relationships.
-        let mut columns: Vec<(sql::ast::ColumnAlias, sql::ast::Expression)> = fields
+        let columns: Vec<(sql::ast::ColumnAlias, sql::ast::Expression)> = fields
             .into_iter()
             .map(|(alias, field)| match field {
                 models::Field::Column { column, .. } => {
@@ -175,25 +304,10 @@ impl Translate {
             })
             .collect::<Result<Vec<_>, Error>>()?;
 
-        // create all aggregate columns
-        let aggregate_columns = self.translate_aggregates(
-            sql::ast::TableName::AliasedTable(table_alias.clone()),
-            query.aggregates.unwrap_or(IndexMap::new()),
-        )?;
-
-        // combine field and aggregate columns
-        columns.extend(aggregate_columns);
-
-        // fail if no columns defined at all
-        match Vec::is_empty(&columns) {
-            true => Err(Error::NoFields),
-            false => Ok(()),
-        }?;
-
         // construct a simple select with the table name, alias, and selected columns.
-        let mut select = sql::helpers::simple_select(columns);
+        let mut rows_select = sql::helpers::simple_select(columns);
 
-        select.from = Some(sql::ast::From::Table {
+        rows_select.from = Some(sql::ast::From::Table {
             name: table,
             alias: table_alias.clone(),
         });
@@ -213,28 +327,28 @@ impl Translate {
             relationships,
             &table_alias,
             table_name,
-            query.order_by,
+            &query.order_by,
         )?;
 
         relationship_joins.extend(order_by_joins);
 
-        select.joins = relationship_joins;
+        rows_select.joins = relationship_joins;
 
-        select.order_by = order_by;
+        rows_select.order_by = order_by;
 
         // translate where
-        select.where_ = sql::ast::Where(match query.predicate {
+        rows_select.where_ = sql::ast::Where(match query.predicate.clone() {
             None => sql::ast::Expression::Value(sql::ast::Value::Bool(true)),
             Some(predicate) => self.translate_expression(&table_alias_name, predicate),
         });
 
         // translate limit and offset
-        select.limit = sql::ast::Limit {
+        rows_select.limit = sql::ast::Limit {
             limit: query.limit,
             offset: query.offset,
         };
 
-        Ok(select)
+        Ok(rows_select)
     }
 
     /// create column aliases using this function so they get a unique index.
@@ -338,11 +452,11 @@ impl Translate {
                     .get(&relationship_name)
                     .ok_or(Error::RelationshipNotFound(relationship_name.clone()))?;
 
-                let mut select = self.translate_query(
+                let mut select = self.translate_rows_query(
                     tables_info,
                     &relationship.target_collection,
                     relationships,
-                    query,
+                    &query,
                 )?;
 
                 // apply join conditions
@@ -358,6 +472,11 @@ impl Translate {
 
                 select.where_ = sql::ast::Where(with_join_condition);
 
+                // when we want to get nested aggregates working, we should be using
+                // `select_rowset` here instead so that we also generate selects for any aggregate
+                // rows
+                // we'll need to work out a way of generating unique table aliases that don't
+                // collide with the top level ones first though
                 let wrap_select = match relationship.relationship_type {
                     // for some reason v3-engine expects object relationships
                     // also in the form of a json array wrapped in `rows`.
@@ -601,7 +720,7 @@ impl Translate {
         relationships: &BTreeMap<String, models::Relationship>,
         source_table_alias: &sql::ast::TableAlias,
         source_table_name: &String,
-        order_by: Option<models::OrderBy>,
+        order_by: &Option<models::OrderBy>,
     ) -> Result<(sql::ast::OrderBy, Vec<sql::ast::Join>), Error> {
         let mut joins: Vec<sql::ast::Join> = vec![];
 

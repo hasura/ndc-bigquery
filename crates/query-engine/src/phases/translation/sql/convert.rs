@@ -54,18 +54,31 @@ impl Explain<'_> {
     }
 }
 
+impl SelectList {
+    pub fn to_sql(&self, sql: &mut SQL) {
+        match self {
+            SelectList::SelectList(select_list) => {
+                for (index, (col, expr)) in select_list.iter().enumerate() {
+                    expr.to_sql(sql);
+                    sql.append_syntax(" AS ");
+                    col.to_sql(sql);
+                    if index < (select_list.len() - 1) {
+                        sql.append_syntax(", ")
+                    }
+                }
+            }
+            SelectList::SelectStar => {
+                sql.append_syntax("*");
+            }
+        }
+    }
+}
+
 impl Select {
     pub fn to_sql(&self, sql: &mut SQL) {
         sql.append_syntax("SELECT ");
-        let SelectList(select_list) = &self.select_list;
-        for (index, (col, expr)) in select_list.iter().enumerate() {
-            expr.to_sql(sql);
-            sql.append_syntax(" AS ");
-            col.to_sql(sql);
-            if index < (select_list.len() - 1) {
-                sql.append_syntax(", ")
-            }
-        }
+
+        self.select_list.to_sql(sql);
 
         sql.append_syntax(" ");
 
@@ -117,6 +130,14 @@ impl Join {
                 sql.append_syntax(" AS ");
                 join.alias.to_sql(sql);
                 sql.append_syntax(" ON ('true') ");
+            }
+            Join::CrossJoin(join) => {
+                sql.append_syntax(" CROSS JOIN ");
+                sql.append_syntax("(");
+                join.select.to_sql(sql);
+                sql.append_syntax(")");
+                sql.append_syntax(" AS ");
+                join.alias.to_sql(sql);
             }
         }
     }
@@ -228,6 +249,14 @@ impl Expression {
                 count_type.to_sql(sql);
                 sql.append_syntax(")")
             }
+        }
+    }
+}
+
+impl Type {
+    pub fn to_sql(&self, sql: &mut SQL) {
+        match self {
+            Type::Json => sql.append_syntax("json"),
         }
     }
 }

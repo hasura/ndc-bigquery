@@ -11,6 +11,23 @@ expression: result
       "how_many_distinct_artist_ids": 204,
       "max_artist_id": 275,
       "min_artist_id": 1
-    }
+    },
+    "rows": [
+      {
+        "Title": "Let There Be Rock"
+      },
+      {
+        "Title": "Big Ones"
+      },
+      {
+        "Title": "Jagged Little Pill"
+      },
+      {
+        "Title": "Facelift"
+      },
+      {
+        "Title": "Warner 25 Anos"
+      }
+    ]
   }
 ]

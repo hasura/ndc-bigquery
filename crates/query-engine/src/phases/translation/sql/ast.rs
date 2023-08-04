@@ -32,7 +32,10 @@ pub struct Select {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct SelectList(pub Vec<(ColumnAlias, Expression)>);
+pub enum SelectList {
+    SelectList(Vec<(ColumnAlias, Expression)>),
+    SelectStar,
+}
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum From {
@@ -49,6 +52,13 @@ pub enum From {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Join {
     LeftOuterJoinLateral(LeftOuterJoinLateral),
+    CrossJoin(CrossJoin),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CrossJoin {
+    pub select: Box<Select>,
+    pub alias: TableAlias,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -120,6 +130,11 @@ pub enum Expression {
     ColumnName(ColumnName),
     Value(Value),
     Count(CountType),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum Type {
+    Json,
 }
 
 // we should consider at least the list in `Hasura.Backends.Postgres.Translate.BoolExp`
