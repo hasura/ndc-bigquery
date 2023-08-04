@@ -11,6 +11,9 @@ perf.data.old
 *.pdb
 *.swp
 
+# generated files
+generated/
+
 # direnv
 /.direnv
 .envrc.local

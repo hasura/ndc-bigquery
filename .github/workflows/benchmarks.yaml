@@ -24,7 +24,18 @@ jobs:
         run: |
           docker load < $(nix build --no-link --print-out-paths '.#dockerDev')
 
-      - name: Start services ▶️
+      - name: Start dependencies ▶️
+        run: |
+          cd benchmarks/component
+          docker compose up --detach --wait postgres grafana
+
+      - name: Generate the deployment configuration 🚧
+        run: |
+          cd benchmarks/component
+          mkdir -p generated
+          docker compose run generate-configuration > generated/deployment.json
+
+      - name: Start the agent ▶️
         run: |
           cd benchmarks/component
           docker compose up --detach --wait agent

@@ -52,9 +52,18 @@ services:
       OTEL_TRACES_SAMPLER: "always_off"
     volumes:
       - type: bind
-        source: ./deployment.json
+        source: ./generated/deployment.json
         target: /deployment.json
         read_only: true
+    depends_on:
+      postgres:
+        condition: service_started
+
+  generate-configuration:
+    image: ghcr.io/hasura/postgres-agent-rs:dev
+    command:
+      - generate-configuration
+      - "postgresql://postgres:password@postgres"
     depends_on:
       postgres:
         condition: service_started

@@ -1,5 +1,6 @@
 {
   "version": 1,
+  "postgres_database_url": "postgresql://postgres:password@localhost:64002",
   "tables": {
     "Album": {
       "schema_name": "public",
@@ -8,11 +9,24 @@
         "AlbumId": {
           "name": "AlbumId"
         },
-        "Title": {
-          "name": "Title"
-        },
         "ArtistId": {
           "name": "ArtistId"
+        },
+        "Title": {
+          "name": "Title"
+        }
+      },
+      "uniqueness_constraints": {
+        "PK_Album": [
+          "AlbumId"
+        ]
+      },
+      "foreign_relations": {
+        "FK_AlbumArtistId": {
+          "foreign_table": "Album",
+          "column_mapping": {
+            "ArtistId": "ArtistId"
+          }
         }
       }
     },
@@ -26,6 +40,306 @@
         "Name": {
           "name": "Name"
         }
+      },
+      "uniqueness_constraints": {
+        "PK_Artist": [
+          "ArtistId"
+        ]
+      },
+      "foreign_relations": {}
+    },
+    "Customer": {
+      "schema_name": "public",
+      "table_name": "Customer",
+      "columns": {
+        "Address": {
+          "name": "Address"
+        },
+        "City": {
+          "name": "City"
+        },
+        "Company": {
+          "name": "Company"
+        },
+        "Country": {
+          "name": "Country"
+        },
+        "CustomerId": {
+          "name": "CustomerId"
+        },
+        "Email": {
+          "name": "Email"
+        },
+        "Fax": {
+          "name": "Fax"
+        },
+        "FirstName": {
+          "name": "FirstName"
+        },
+        "LastName": {
+          "name": "LastName"
+        },
+        "Phone": {
+          "name": "Phone"
+        },
+        "PostalCode": {
+          "name": "PostalCode"
+        },
+        "State": {
+          "name": "State"
+        },
+        "SupportRepId": {
+          "name": "SupportRepId"
+        }
+      },
+      "uniqueness_constraints": {
+        "PK_Customer": [
+          "CustomerId"
+        ]
+      },
+      "foreign_relations": {
+        "FK_CustomerSupportRepId": {
+          "foreign_table": "Customer",
+          "column_mapping": {
+            "SupportRepId": "EmployeeId"
+          }
+        }
+      }
+    },
+    "Employee": {
+      "schema_name": "public",
+      "table_name": "Employee",
+      "columns": {
+        "Address": {
+          "name": "Address"
+        },
+        "BirthDate": {
+          "name": "BirthDate"
+        },
+        "City": {
+          "name": "City"
+        },
+        "Country": {
+          "name": "Country"
+        },
+        "Email": {
+          "name": "Email"
+        },
+        "EmployeeId": {
+          "name": "EmployeeId"
+        },
+        "Fax": {
+          "name": "Fax"
+        },
+        "FirstName": {
+          "name": "FirstName"
+        },
+        "HireDate": {
+          "name": "HireDate"
+        },
+        "LastName": {
+          "name": "LastName"
+        },
+        "Phone": {
+          "name": "Phone"
+        },
+        "PostalCode": {
+          "name": "PostalCode"
+        },
+        "ReportsTo": {
+          "name": "ReportsTo"
+        },
+        "State": {
+          "name": "State"
+        },
+        "Title": {
+          "name": "Title"
+        }
+      },
+      "uniqueness_constraints": {
+        "PK_Employee": [
+          "EmployeeId"
+        ]
+      },
+      "foreign_relations": {
+        "FK_EmployeeReportsTo": {
+          "foreign_table": "Employee",
+          "column_mapping": {
+            "ReportsTo": "EmployeeId"
+          }
+        }
+      }
+    },
+    "Genre": {
+      "schema_name": "public",
+      "table_name": "Genre",
+      "columns": {
+        "GenreId": {
+          "name": "GenreId"
+        },
+        "Name": {
+          "name": "Name"
+        }
+      },
+      "uniqueness_constraints": {
+        "PK_Genre": [
+          "GenreId"
+        ]
+      },
+      "foreign_relations": {}
+    },
+    "Invoice": {
+      "schema_name": "public",
+      "table_name": "Invoice",
+      "columns": {
+        "BillingAddress": {
+          "name": "BillingAddress"
+        },
+        "BillingCity": {
+          "name": "BillingCity"
+        },
+        "BillingCountry": {
+          "name": "BillingCountry"
+        },
+        "BillingPostalCode": {
+          "name": "BillingPostalCode"
+        },
+        "BillingState": {
+          "name": "BillingState"
+        },
+        "CustomerId": {
+          "name": "CustomerId"
+        },
+        "InvoiceDate": {
+          "name": "InvoiceDate"
+        },
+        "InvoiceId": {
+          "name": "InvoiceId"
+        },
+        "Total": {
+          "name": "Total"
+        }
+      },
+      "uniqueness_constraints": {
+        "PK_Invoice": [
+          "InvoiceId"
+        ]
+      },
+      "foreign_relations": {
+        "FK_InvoiceCustomerId": {
+          "foreign_table": "Invoice",
+          "column_mapping": {
+            "CustomerId": "CustomerId"
+          }
+        }
+      }
+    },
+    "InvoiceLine": {
+      "schema_name": "public",
+      "table_name": "InvoiceLine",
+      "columns": {
+        "InvoiceId": {
+          "name": "InvoiceId"
+        },
+        "InvoiceLineId": {
+          "name": "InvoiceLineId"
+        },
+        "Quantity": {
+          "name": "Quantity"
+        },
+        "TrackId": {
+          "name": "TrackId"
+        },
+        "UnitPrice": {
+          "name": "UnitPrice"
+        }
+      },
+      "uniqueness_constraints": {
+        "PK_InvoiceLine": [
+          "InvoiceLineId"
+        ]
+      },
+      "foreign_relations": {
+        "FK_InvoiceLineInvoiceId": {
+          "foreign_table": "InvoiceLine",
+          "column_mapping": {
+            "InvoiceId": "InvoiceId"
+          }
+        },
+        "FK_InvoiceLineTrackId": {
+          "foreign_table": "InvoiceLine",
+          "column_mapping": {
+            "TrackId": "TrackId"
+          }
+        }
+      }
+    },
+    "MediaType": {
+      "schema_name": "public",
+      "table_name": "MediaType",
+      "columns": {
+        "MediaTypeId": {
+          "name": "MediaTypeId"
+        },
+        "Name": {
+          "name": "Name"
+        }
+      },
+      "uniqueness_constraints": {
+        "PK_MediaType": [
+          "MediaTypeId"
+        ]
+      },
+      "foreign_relations": {}
+    },
+    "Playlist": {
+      "schema_name": "public",
+      "table_name": "Playlist",
+      "columns": {
+        "Name": {
+          "name": "Name"
+        },
+        "PlaylistId": {
+          "name": "PlaylistId"
+        }
+      },
+      "uniqueness_constraints": {
+        "PK_Playlist": [
+          "PlaylistId"
+        ]
+      },
+      "foreign_relations": {}
+    },
+    "PlaylistTrack": {
+      "schema_name": "public",
+      "table_name": "PlaylistTrack",
+      "columns": {
+        "PlaylistId": {
+          "name": "PlaylistId"
+        },
+        "TrackId": {
+          "name": "TrackId"
+        }
+      },
+      "uniqueness_constraints": {
+        "PK_PlaylistTrack": [
+          "PlaylistId",
+          "TrackId"
+        ]
+      },
+      "foreign_relations": {
+        "FK_PlaylistTrackPlaylistId": {
+          "foreign_table": "PlaylistTrack",
+          "column_mapping": {
+            "PlaylistId": "PlaylistId"
+          }
+        },
+        "FK_PlaylistTrackTrackId": {
+          "foreign_table": "PlaylistTrack",
+          "column_mapping": {
+            "TrackId": "TrackId"
+          }
+        }
       }
     },
     "Track": {
@@ -35,157 +349,141 @@
         "AlbumId": {
           "name": "AlbumId"
         },
+        "Bytes": {
+          "name": "Bytes"
+        },
+        "Composer": {
+          "name": "Composer"
+        },
+        "GenreId": {
+          "name": "GenreId"
+        },
+        "MediaTypeId": {
+          "name": "MediaTypeId"
+        },
+        "Milliseconds": {
+          "name": "Milliseconds"
+        },
         "Name": {
           "name": "Name"
         },
-        "ArtistId": {
-          "name": "AlbumId"
+        "TrackId": {
+          "name": "TrackId"
+        },
+        "UnitPrice": {
+          "name": "UnitPrice"
+        }
+      },
+      "uniqueness_constraints": {
+        "PK_Track": [
+          "TrackId"
+        ]
+      },
+      "foreign_relations": {
+        "FK_TrackAlbumId": {
+          "foreign_table": "Track",
+          "column_mapping": {
+            "AlbumId": "AlbumId"
+          }
+        },
+        "FK_TrackGenreId": {
+          "foreign_table": "Track",
+          "column_mapping": {
+            "GenreId": "GenreId"
+          }
+        },
+        "FK_TrackMediaTypeId": {
+          "foreign_table": "Track",
+          "column_mapping": {
+            "MediaTypeId": "MediaTypeId"
+          }
         }
       }
+    },
+    "geography_columns": {
+      "schema_name": "public",
+      "table_name": "geography_columns",
+      "columns": {
+        "coord_dimension": {
+          "name": "coord_dimension"
+        },
+        "f_geography_column": {
+          "name": "f_geography_column"
+        },
+        "f_table_catalog": {
+          "name": "f_table_catalog"
+        },
+        "f_table_name": {
+          "name": "f_table_name"
+        },
+        "f_table_schema": {
+          "name": "f_table_schema"
+        },
+        "srid": {
+          "name": "srid"
+        },
+        "type": {
+          "name": "type"
+        }
+      },
+      "uniqueness_constraints": {},
+      "foreign_relations": {}
+    },
+    "geometry_columns": {
+      "schema_name": "public",
+      "table_name": "geometry_columns",
+      "columns": {
+        "coord_dimension": {
+          "name": "coord_dimension"
+        },
+        "f_geometry_column": {
+          "name": "f_geometry_column"
+        },
+        "f_table_catalog": {
+          "name": "f_table_catalog"
+        },
+        "f_table_name": {
+          "name": "f_table_name"
+        },
+        "f_table_schema": {
+          "name": "f_table_schema"
+        },
+        "srid": {
+          "name": "srid"
+        },
+        "type": {
+          "name": "type"
+        }
+      },
+      "uniqueness_constraints": {},
+      "foreign_relations": {}
+    },
+    "spatial_ref_sys": {
+      "schema_name": "public",
+      "table_name": "spatial_ref_sys",
+      "columns": {
+        "auth_name": {
+          "name": "auth_name"
+        },
+        "auth_srid": {
+          "name": "auth_srid"
+        },
+        "proj4text": {
+          "name": "proj4text"
+        },
+        "srid": {
+          "name": "srid"
+        },
+        "srtext": {
+          "name": "srtext"
+        }
+      },
+      "uniqueness_constraints": {
+        "spatial_ref_sys_pkey": [
+          "srid"
+        ]
+      },
+      "foreign_relations": {}
     }
-  },
-  "schema": {
-    "scalar_types": {
-      "String": {
-        "aggregate_functions": {},
-        "comparison_operators": {},
-        "update_operators": {}
-      },
-      "Int": {
-        "aggregate_functions": {},
-        "comparison_operators": {},
-        "update_operators": {}
-      }
-    },
-    "object_types": {
-      "Album": {
-        "description": "",
-        "fields": {
-          "AlbumId": {
-            "description": "",
-            "arguments": {},
-            "type": {
-              "type": "named",
-              "name": "Int"
-            }
-          },
-          "Title": {
-            "description": "",
-            "arguments": {},
-            "type": {
-              "type": "named",
-              "name": "String"
-            }
-          },
-          "ArtistId": {
-            "description": "",
-            "arguments": {},
-            "type": {
-              "type": "named",
-              "name": "Int"
-            }
-          }
-        }
-      },
-      "Artist": {
-        "description": "",
-        "fields": {
-          "ArtistId": {
-            "description": "",
-            "arguments": {},
-            "type": {
-              "type": "named",
-              "name": "Int"
-            }
-          },
-          "Name": {
-            "description": "",
-            "arguments": {},
-            "type": {
-              "type": "named",
-              "name": "String"
-            }
-          }
-        }
-      },
-      "Track": {
-        "description": "",
-        "fields": {
-          "TrackId": {
-            "description": "",
-            "arguments": {},
-            "type": {
-              "type": "named",
-              "name": "Int"
-            }
-          },
-          "Name": {
-            "description": "",
-            "arguments": {},
-            "type": {
-              "type": "named",
-              "name": "String"
-            }
-          },
-          "AlbumId": {
-            "description": "",
-            "arguments": {},
-            "type": {
-              "type": "named",
-              "name": "Int"
-            }
-          }
-        }
-      }
-    },
-    "tables": [
-      {
-        "name": "Album",
-        "description": "A collection of albums",
-        "arguments": {},
-        "type": "Album",
-        "deletable": false,
-        "uniqueness_constraints": {
-          "AlbumByID": {
-            "unique_columns": [
-              "AlbumId"
-            ]
-          }
-        },
-        "foreign_keys": {}
-      },
-      {
-        "name": "Artist",
-        "description": "A collection of artists",
-        "arguments": {},
-        "type": "Artist",
-        "deletable": false,
-        "uniqueness_constraints": {
-          "ArtistById": {
-            "unique_columns": [
-              "ArtistId"
-            ]
-          }
-        },
-        "foreign_keys": {}
-      },
-      {
-        "name": "Track",
-        "description": "A collection of tracks",
-        "arguments": {},
-        "type": "Track",
-        "deletable": false,
-        "uniqueness_constraints": {
-          "TrackByID": {
-            "unique_columns": [
-              "TrackId"
-            ]
-          }
-        },
-        "foreign_keys": {}
-      }
-    ],
-    "commands": []
-  },
-  "postgres_database_url": "postgres://postgres:password@localhost:64002"
+  }
 }

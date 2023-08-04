@@ -28,12 +28,12 @@ jobs:
             postgres
 
       - uses: actions-rs/cargo@v1
+        with:
+          command: test
         env:
           POSTGRESQL_CONNECTION_STRING: postgresql://postgres:password@localhost:64002
           RUST_LOG: INFO
           CARGO_NET_GIT_FETCH_WITH_CLI: "true"
-        with:
-          command: test
 
       # scream into Slack if something goes wrong
       - name: Report Status

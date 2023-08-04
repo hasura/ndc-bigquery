@@ -38,6 +38,24 @@ flamegraph: start-docker
     cargo flamegraph --dev -- \
     serve --configuration {{CHINOOK_DEPLOYMENT}}
 
+# run all tests
+test: start-docker
+  RUST_LOG=DEBUG \
+    cargo test
+
+# run a standard request to check the service correctly integrates with the engine
+test-integrated:
+  curl -X POST \
+    -H 'Host: example.hasura.app' \
+    -H 'Content-Type: application/json' \
+    http://localhost:3000/graphql \
+    -d '{ "query": "query { AlbumByID(id: 1) { title } } " }'
+
+# re-generate the deployment configuration file
+generate-chinook-configuration:
+  mkdir -p "$(dirname '{{CHINOOK_DEPLOYMENT}}')"
+  cargo run -- generate-configuration '{{POSTGRESQL_CONNECTION_STRING}}' > '{{CHINOOK_DEPLOYMENT}}'
+
 # run postgres + jaeger
 start-docker:
   # start jaeger, configured to listen to V3
@@ -60,19 +78,6 @@ run-engine: start-docker
 repl-postgres:
   @docker compose up --wait postgres
   psql {{POSTGRESQL_CONNECTION_STRING}}
-
-# run all tests
-test: start-docker
-  RUST_LOG=DEBUG \
-    cargo test
-
-# run a standard request to check the service correctly integrates with the engine
-test-integrated:
-  curl -X POST \
-    -H 'Host: example.hasura.app' \
-    -H 'Content-Type: application/json' \
-    http://localhost:3000/graphql \
-    -d '{ "query": "query { AlbumByID(id: 1) { title } } " }'
 
 # run `clippy` linter
 lint *FLAGS:

@@ -17,5 +17,12 @@ SELF_IMAGE_PATH="$(cd ../.. && nix --no-warn-dirty build --no-link --print-out-p
 info 'Loading the Docker image'
 docker load --quiet < "$SELF_IMAGE_PATH"
 
-info 'Starting the services'
-docker compose up --detach --wait agent grafana
+info 'Starting the dependencies'
+docker compose up --detach --wait postgres grafana
+
+info 'Generating the deployment configuration'
+mkdir -p generated
+docker compose run generate-configuration > generated/deployment.json
+
+info 'Starting the agent'
+docker compose up --detach --wait agent

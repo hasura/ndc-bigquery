@@ -3,6 +3,8 @@ name = "ndc-postgres"
 version = "0.1.0"
 edition = "2021"
 
+default-run = "ndc-postgres"
+
 [lib]
 name = "ndc_postgres"
 path = "src/lib.rs"
@@ -35,3 +37,4 @@ axum = "0.6.19"
 axum-test-helper = "0.3.0"
 insta = { version = "1.31.0", features = ["json"] }
 env_logger = "0.10.0"
+similar-asserts = "1.4.2"

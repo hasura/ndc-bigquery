@@ -148,7 +148,7 @@ Though still, You Might Not Need It.
 
 At this point in time we've settled on a fairly sweet spot for testing, where infrastructure code is very limited and contained in one place.
 Since testing can very easily become complex and "another project to maintain", we want to deliberately put limitations to how wildly it can grow,
-and contain all infrastructure code to a single module - `tests/common.rs` (in each relevant crate), without infra code in tests.
+and contain all infrastructure code to a single module - `tests/common/mod.rs` (in each relevant crate), without infra code in tests.
 
 We do this so that we will notice when it grows too large and requires some explicit and calculated attention.
 
