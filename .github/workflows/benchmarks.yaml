@@ -55,7 +55,7 @@ jobs:
       # We run these benchmarks on every push so we can easily see the results.
       # However, we only store the results on `main`.
       - name: Store benchmark result ⬆️
-        if: github.ref == 'refs/heads/master'
+        if: github.ref == 'refs/heads/main'
         uses: benchmark-action/github-action-benchmark@v1
         with:
           name: Component benchmarks
