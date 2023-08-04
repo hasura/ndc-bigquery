@@ -6,6 +6,7 @@ services:
   benchmark:
     image: grafana/k6 
     environment:
+      AGENT_SOCKET: "agent:8100"
       OUTPUT_DIRECTORY: "/home/k6/output"
       K6_OUT: "experimental-prometheus-rw"
       K6_PROMETHEUS_RW_SERVER_URL: "http://prometheus:9090/api/v1/write"
@@ -17,6 +18,10 @@ services:
       - type: bind
         source: ./benchmarks
         target: /benchmarks
+        read_only: true
+      - type: bind
+        source: ./common.js
+        target: /common.js
         read_only: true
     depends_on:
       agent:

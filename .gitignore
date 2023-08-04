@@ -13,6 +13,8 @@ perf.data.old
 
 # generated files
 generated/
+*.log
+*.pid
 
 # direnv
 /.direnv

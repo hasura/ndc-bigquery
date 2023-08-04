@@ -122,6 +122,7 @@
             pkgs.cargo-insta
             pkgs.cargo-watch
             pkgs.just
+            pkgs.k6
             pkgs.pkg-config
             pkgs.rnix-lsp
             rustDevToolchain

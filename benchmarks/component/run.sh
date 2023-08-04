@@ -12,8 +12,12 @@ function info {
 }
 
 function stop {
-  info 'Stopping the agent'
-  docker compose down agent
+  if [[ -e ./agent.pid ]]; then
+    info 'Stopping the agent'
+    AGENT_PID="$(< ./agent.pid)"
+    kill "$AGENT_PID" || :
+    rm ./agent.pid
+  fi
 }
 
 if [[ $# -eq 0 ]]; then
@@ -38,4 +42,7 @@ trap stop EXIT INT QUIT TERM
 ./start.sh
 
 info 'Running the benchmarks'
-docker compose run --rm benchmark run "/benchmarks/$BENCHMARK" "$@"
+export K6_OUT="experimental-prometheus-rw"
+export K6_PROMETHEUS_RW_SERVER_URL="http://$(docker compose port prometheus 9090)/api/v1/write"
+export K6_PROMETHEUS_RW_TREND_AS_NATIVE_HISTOGRAM="true"
+k6 run "./benchmarks/$BENCHMARK" "$@"
