@@ -167,21 +167,7 @@ impl Translate {
         relationships: &BTreeMap<String, models::Relationship>,
         query: &models::Query,
     ) -> Result<sql::ast::Select, Error> {
-        let metadata::TablesInfo(tables_info_map) = tables_info;
-        // find the table according to the metadata.
-        let table_info = tables_info_map
-            .get(table_name)
-            .ok_or(Error::TableNotFound(table_name.clone()))?;
-        let table: sql::ast::TableName = sql::ast::TableName::DBTable {
-            schema: table_info.schema_name.clone(),
-            table: table_info.table_name.clone(),
-        };
         let table_alias: sql::ast::TableAlias = self.make_table_alias(table_name.clone());
-        let table_alias_name: sql::ast::TableName =
-            sql::ast::TableName::AliasedTable(table_alias.clone());
-
-        // join aliases
-        let join_fields: Vec<(sql::ast::TableAlias, String, models::Query)> = vec![];
 
         // translate aggregates to select list
         let aggregate_fields = query.aggregates.clone().ok_or(Error::NoFields)?;
@@ -198,45 +184,16 @@ impl Translate {
             aggregate_fields,
         )?;
 
-        // construct a simple select with the table name, alias, and selected columns.
-        let mut aggregate_select = sql::helpers::simple_select(aggregate_columns);
-
-        aggregate_select.from = Some(sql::ast::From::Table {
-            name: table,
-            alias: table_alias.clone(),
-        });
-
-        // collect any joins for relationships
-        let mut relationship_joins = self.translate_joins(
-            relationships,
+        // create the select clause and the joins, order by, where clauses.
+        // We don't add the limit afterwards.
+        self.translate_query_part(
             tables_info,
-            &table_alias,
             table_name,
-            join_fields,
-        )?;
-
-        // translate order_by
-        let (order_by, order_by_joins) = self.translate_order_by(
-            tables_info,
             relationships,
-            &table_alias,
-            table_name,
-            &query.order_by,
-        )?;
-
-        relationship_joins.extend(order_by_joins);
-
-        aggregate_select.joins = relationship_joins;
-
-        aggregate_select.order_by = order_by;
-
-        // translate where
-        aggregate_select.where_ = sql::ast::Where(match query.clone().predicate {
-            None => sql::ast::Expression::Value(sql::ast::Value::Bool(true)),
-            Some(predicate) => self.translate_expression(&table_alias_name, predicate),
-        });
-
-        Ok(aggregate_select)
+            query,
+            aggregate_columns,
+            vec![],
+        )
     }
 
     /// Translate rows part of query to sql ast.
@@ -252,10 +209,6 @@ impl Translate {
         let table_info = tables_info_map
             .get(table_name)
             .ok_or(Error::TableNotFound(table_name.clone()))?;
-        let table: sql::ast::TableName = sql::ast::TableName::DBTable {
-            schema: table_info.schema_name.clone(),
-            table: table_info.table_name.clone(),
-        };
         let table_alias: sql::ast::TableAlias = self.make_table_alias(table_name.clone());
         let table_alias_name: sql::ast::TableName =
             sql::ast::TableName::AliasedTable(table_alias.clone());
@@ -304,10 +257,59 @@ impl Translate {
             })
             .collect::<Result<Vec<_>, Error>>()?;
 
-        // construct a simple select with the table name, alias, and selected columns.
-        let mut rows_select = sql::helpers::simple_select(columns);
+        // create the select clause and the joins, order by, where clauses.
+        // We'll add the limit afterwards.
+        let mut select = self.translate_query_part(
+            tables_info,
+            table_name,
+            relationships,
+            query,
+            columns,
+            join_fields,
+        )?;
 
-        rows_select.from = Some(sql::ast::From::Table {
+        // Add the limit.
+        select.limit = sql::ast::Limit {
+            limit: query.limit,
+            offset: query.offset,
+        };
+        Ok(select)
+    }
+
+    /// Translate the lion (or common) part of 'rows' or 'aggregates' part of a query.
+    /// Specifically, from, joins, order bys, and where clauses.
+    ///
+    /// This expects to get the relevant information about tables, relationships, the root table,
+    /// and the query, as well as the columns and join fields after processing.
+    ///
+    /// One thing that this doesn't do that you want to do for 'rows' and not 'aggregates' is
+    /// set the limit and offset so you want to do that after calling this function.
+    fn translate_query_part(
+        &mut self,
+        tables_info: &metadata::TablesInfo,
+        table_name: &String,
+        relationships: &BTreeMap<String, models::Relationship>,
+        query: &models::Query,
+        columns: Vec<(sql::ast::ColumnAlias, sql::ast::Expression)>,
+        join_fields: Vec<(sql::ast::TableAlias, String, models::Query)>,
+    ) -> Result<sql::ast::Select, Error> {
+        let metadata::TablesInfo(tables_info_map) = tables_info;
+        // find the table according to the metadata.
+        let table_info = tables_info_map
+            .get(table_name)
+            .ok_or(Error::TableNotFound(table_name.clone()))?;
+        let table: sql::ast::TableName = sql::ast::TableName::DBTable {
+            schema: table_info.schema_name.clone(),
+            table: table_info.table_name.clone(),
+        };
+        let table_alias: sql::ast::TableAlias = self.make_table_alias(table_name.clone());
+        let table_alias_name: sql::ast::TableName =
+            sql::ast::TableName::AliasedTable(table_alias.clone());
+
+        // construct a simple select with the table name, alias, and selected columns.
+        let mut select = sql::helpers::simple_select(columns);
+
+        select.from = Some(sql::ast::From::Table {
             name: table,
             alias: table_alias.clone(),
         });
@@ -332,23 +334,17 @@ impl Translate {
 
         relationship_joins.extend(order_by_joins);
 
-        rows_select.joins = relationship_joins;
+        select.joins = relationship_joins;
 
-        rows_select.order_by = order_by;
+        select.order_by = order_by;
 
         // translate where
-        rows_select.where_ = sql::ast::Where(match query.predicate.clone() {
+        select.where_ = sql::ast::Where(match query.clone().predicate {
             None => sql::ast::Expression::Value(sql::ast::Value::Bool(true)),
             Some(predicate) => self.translate_expression(&table_alias_name, predicate),
         });
 
-        // translate limit and offset
-        rows_select.limit = sql::ast::Limit {
-            limit: query.limit,
-            offset: query.offset,
-        };
-
-        Ok(rows_select)
+        Ok(select)
     }
 
     /// create column aliases using this function so they get a unique index.
