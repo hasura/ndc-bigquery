@@ -28,12 +28,24 @@ jobs:
             target
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
-      - uses: actions-rs/cargo@v1
+      - name: build
+        uses: actions-rs/cargo@v1
         with:
           command: build
           args: --release --all-features
         env:
           CARGO_NET_GIT_FETCH_WITH_CLI: "true"
+          # fail on warnings
+          RUSTFLAGS: "-D warnings"
+
+      - name: lint
+        uses: actions-rs/cargo@v1
+        with:
+          command: clippy
+        env:
+          CARGO_NET_GIT_FETCH_WITH_CLI: "true"
+          # fail on warnings
+          RUSTFLAGS: "-D warnings"
 
       # scream into Slack if something goes wrong
       - name: Report Status
@@ -46,4 +58,3 @@ jobs:
           message_format: '🐴 *{workflow}* {status_message} for <{repo_url}|{repo}>'
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.BROKEN_BUILD_SLACK_WEBHOOK_URL }}
-
