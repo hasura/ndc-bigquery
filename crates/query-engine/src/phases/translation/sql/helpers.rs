@@ -1,5 +1,4 @@
 use super::ast::*;
-use std::collections::BTreeMap;
 
 pub enum SelectSet {
     Rows(Select),
@@ -227,49 +226,6 @@ pub fn select_row_as_json_with_default(
         ],
     };
     let mut final_select = simple_select(vec![(column_alias, expression)]);
-    final_select.from = Some(From::Select {
-        select: Box::new(select),
-        alias: table_alias,
-    });
-    final_select
-}
-
-/// Wrap a query in
-///
-/// > SELECT
-/// >   json_build_object('rows', coalesce(json_agg(row_to_json(<table_alias>)), '[]')) AS <column_alias>
-/// > FROM <query> as <table_alias>
-///
-/// - `row_to_json` takes a row and converts it to a json object.
-/// - `json_agg` aggregates the json objects to a json array.
-/// - `coalesce(<thing>, <otherwise>)` returns <thing> if it is not null, and <otherwise> if it is null.
-/// - `json_build_object('rows', ...)` wraps that array in another object which looks like this
-///   `{ "rows": [ {<row>}, ... ] }`, because that's what v3 engine expects for relationships.
-pub fn select_table_as_json_array_in_rows_object(
-    select: Select,
-    column_alias: ColumnAlias,
-    table_alias: TableAlias,
-) -> Select {
-    let select_list = vec![(
-        column_alias,
-        Expression::JsonBuildObject(BTreeMap::from([(
-            "rows".to_string(),
-            Box::new(Expression::FunctionCall {
-                function: Function::Coalesce,
-                args: vec![
-                    Expression::FunctionCall {
-                        function: Function::JsonAgg,
-                        args: vec![Expression::RowToJson(TableName::AliasedTable(
-                            table_alias.clone(),
-                        ))],
-                    },
-                    Expression::Value(Value::EmptyJsonArray),
-                ],
-            }),
-        )])),
-    )];
-
-    let mut final_select = simple_select(select_list);
     final_select.from = Some(From::Select {
         select: Box::new(select),
         alias: table_alias,

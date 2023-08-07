@@ -51,6 +51,7 @@ pub fn translate(
 }
 
 /// Translate a query to sql ast.
+/// We return a SELECT for the 'rows' field and a SELECT for the 'aggregates' field.
 pub fn translate_query(
     tables_info: &metadata::TablesInfo,
     table_name: &String,

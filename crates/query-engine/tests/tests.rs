@@ -49,6 +49,12 @@ fn nested_array_relationships() {
 }
 
 #[test]
+fn nested_aggregates() {
+    let result = common::test_translation("nested_aggregates").unwrap();
+    insta::assert_snapshot!(result);
+}
+
+#[test]
 fn dup_array_relationship() {
     let result = common::test_translation("dup_array_relationship").unwrap();
     insta::assert_snapshot!(result);

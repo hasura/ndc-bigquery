@@ -2,7 +2,6 @@
 
 use super::error::Error;
 use super::helpers;
-use super::root;
 
 use crate::metadata;
 use crate::phases::translation::sql;
@@ -17,8 +16,10 @@ pub fn translate_joins(
     tables_info: &metadata::TablesInfo,
     table_alias: &sql::ast::TableAlias,
     table_name: &str,
+    // We got these by processing the fields selection.
     join_fields: Vec<(sql::ast::TableAlias, String, models::Query)>,
 ) -> Result<Vec<sql::ast::Join>, Error> {
+    // traverse and build a join.
     join_fields
         .into_iter()
         .map(|(alias, relationship_name, query)| {
@@ -26,47 +27,92 @@ pub fn translate_joins(
                 .get(&relationship_name)
                 .ok_or(Error::RelationshipNotFound(relationship_name.clone()))?;
 
-            let mut select = root::translate_rows_query(
+            // process inner query and get the SELECTs for the 'rows' and 'aggregates' fields.
+            let select_set = super::translate_query(
                 tables_info,
                 &relationship.target_collection,
                 relationships,
-                &query,
+                query,
             )?;
 
-            // apply join conditions
-            let sql::ast::Where(expr) = select.where_;
+            // add join expressions to row / aggregate selects
+            let final_select_set = match select_set {
+                // Only rows
+                sql::helpers::SelectSet::Rows(mut row_select) => {
+                    let sql::ast::Where(row_expr) = row_select.where_;
 
-            let with_join_condition =
-                translate_column_mapping(tables_info, table_name, table_alias, expr, relationship)?;
+                    row_select.where_ = sql::ast::Where(translate_column_mapping(
+                        tables_info,
+                        table_name,
+                        table_alias,
+                        row_expr,
+                        relationship,
+                    )?);
 
-            select.where_ = sql::ast::Where(with_join_condition);
-
-            // when we want to get nested aggregates working, we should be using
-            // `select_rowset` here instead so that we also generate selects for any aggregate
-            // rows
-            // we'll need to work out a way of generating unique table aliases that don't
-            // collide with the top level ones first though
-            let wrap_select = match relationship.relationship_type {
-                // for some reason v3-engine expects object relationships
-                // also in the form of a json array wrapped in `rows`.
-                models::RelationshipType::Object => {
-                    sql::helpers::select_table_as_json_array_in_rows_object
+                    Ok(sql::helpers::SelectSet::Rows(row_select))
                 }
-                models::RelationshipType::Array => {
-                    sql::helpers::select_table_as_json_array_in_rows_object
-                }
-            };
+                // Only aggregates
+                sql::helpers::SelectSet::Aggregates(mut aggregate_select) => {
+                    let sql::ast::Where(aggregate_expr) = aggregate_select.where_;
 
-            // wrap the sql in row_to_json and json_agg
-            let final_select = wrap_select(
-                select,
+                    aggregate_select.where_ = sql::ast::Where(translate_column_mapping(
+                        tables_info,
+                        table_name,
+                        table_alias,
+                        aggregate_expr,
+                        relationship,
+                    )?);
+
+                    Ok(sql::helpers::SelectSet::Aggregates(aggregate_select))
+                }
+                // Both
+                sql::helpers::SelectSet::RowsAndAggregates(
+                    mut row_select,
+                    mut aggregate_select,
+                ) => {
+                    let sql::ast::Where(row_expr) = row_select.where_;
+
+                    row_select.where_ = sql::ast::Where(translate_column_mapping(
+                        tables_info,
+                        table_name,
+                        table_alias,
+                        row_expr,
+                        relationship,
+                    )?);
+
+                    let sql::ast::Where(aggregate_expr) = aggregate_select.where_;
+
+                    aggregate_select.where_ = sql::ast::Where(translate_column_mapping(
+                        tables_info,
+                        table_name,
+                        table_alias,
+                        aggregate_expr,
+                        relationship,
+                    )?);
+
+                    // Build (what will be) a RowSet with both fields.
+                    Ok(sql::helpers::SelectSet::RowsAndAggregates(
+                        row_select,
+                        aggregate_select,
+                    ))
+                }
+            }?;
+
+            // form a single JSON item shaped `{ rows: [], aggregates: {} }`
+            // that matches the models::RowSet type
+            let json_select = sql::helpers::select_rowset(
                 helpers::make_column_alias(alias.name.clone()),
                 helpers::make_table_alias(alias.name.clone()),
+                helpers::make_table_alias("rows".to_string()),
+                helpers::make_column_alias("rows".to_string()),
+                helpers::make_table_alias("aggregates".to_string()),
+                helpers::make_column_alias("aggregates".to_string()),
+                final_select_set,
             );
 
             Ok(sql::ast::Join::LeftOuterJoinLateral(
                 sql::ast::LeftOuterJoinLateral {
-                    select: Box::new(final_select),
+                    select: Box::new(json_select),
                     alias,
                 },
             ))
