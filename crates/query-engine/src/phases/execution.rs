@@ -5,13 +5,13 @@ use sqlx;
 use sqlx::Row;
 use std::collections::BTreeMap;
 
-use super::translation::{sql, ExecutionPlan};
+use super::translation::sql;
 use ndc_client::models;
 
 /// Execute a query against postgres.
 pub async fn execute(
     pool: &sqlx::PgPool,
-    plan: ExecutionPlan,
+    plan: sql::execution_plan::ExecutionPlan,
 ) -> Result<models::QueryResponse, Error> {
     let query = plan.query();
 
@@ -64,7 +64,10 @@ fn rows_to_response(results: Vec<serde_json::Value>) -> models::QueryResponse {
 }
 
 /// Convert a query to an EXPLAIN query and execute it against postgres.
-pub async fn explain(pool: &sqlx::PgPool, plan: ExecutionPlan) -> Result<(String, String), Error> {
+pub async fn explain(
+    pool: &sqlx::PgPool,
+    plan: sql::execution_plan::ExecutionPlan,
+) -> Result<(String, String), Error> {
     let query = plan.explain_query();
 
     tracing::info!(

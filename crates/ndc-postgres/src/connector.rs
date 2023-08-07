@@ -83,7 +83,8 @@ impl connector::Connector for Postgres {
         tracing::info!("{:?}", query_request);
 
         // Compile the query.
-        let plan = match phases::translation::translate(&configuration.tables, query_request) {
+        let plan = match phases::translation::query::translate(&configuration.tables, query_request)
+        {
             Ok(plan) => Ok(plan),
             Err(err) => {
                 tracing::error!("{}", err);
@@ -124,12 +125,13 @@ impl connector::Connector for Postgres {
         tracing::info!("{:?}", query_request);
 
         // Compile the query.
-        let plan = match phases::translation::translate(&configuration.tables, query_request) {
+        let plan = match phases::translation::query::translate(&configuration.tables, query_request)
+        {
             Ok(plan) => Ok(plan),
             Err(err) => {
                 tracing::error!("{}", err);
                 match err {
-                    phases::translation::Error::NotSupported(_) => {
+                    phases::translation::query::error::Error::NotSupported(_) => {
                         Err(connector::QueryError::UnsupportedOperation(err.to_string()))
                     }
                     _ => Err(connector::QueryError::InvalidRequest(err.to_string())),
