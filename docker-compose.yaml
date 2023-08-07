@@ -8,12 +8,16 @@ services:
       - -F # turn fsync off for speed
       - -N 1000 # increase max connections from 100 so we can run more HGEs
     ports:
-      - "64002:5432"
+      - 64002:5432
     environment:
       POSTGRES_PASSWORD: "password"
     volumes:
-      - /var/lib/postgresql/data
-      - ./static/chinook-postgres.sql:/docker-entrypoint-initdb.d/chinook-postgres.sql:ro
+      - type: tmpfs
+        target: /var/lib/postgresql/data
+      - type: bind
+        source: ./static/chinook-postgres.sql
+        target: /docker-entrypoint-initdb.d/chinook-postgres.sql
+        read_only: true
     healthcheck:
       test:
         - CMD-SHELL

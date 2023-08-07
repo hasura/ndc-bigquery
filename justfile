@@ -1,17 +1,53 @@
-POSTGRESQL_CONNECTION_STRING := "postgresql://postgres:password@localhost:64002"
+set shell := ["bash", "-c"]
 
+CONNECTOR_IMAGE_NAME := "ghcr.io/hasura/postgres-agent-rs"
+CONNECTOR_IMAGE_TAG := "dev"
+CONNECTOR_IMAGE := CONNECTOR_IMAGE_NAME + ":" + CONNECTOR_IMAGE_TAG
+POSTGRESQL_CONNECTION_STRING := "postgresql://postgres:password@localhost:64002"
 CHINOOK_DEPLOYMENT := "static/chinook-deployment.json"
 
-# this is hardcoded in chinook-metadata.json
-POSTGRES_DC_PORT := "8100"
+# Notes:
+# * Building Docker images will not work on macOS.
+#   You can use `main` instead, by running:
+#     just --set CONNECTOR_IMAGE_TAG dev-main <targets>
 
 # run the connector
-run: start-docker
+run: start-dependencies
   RUST_LOG=INFO \
     cargo run --release -- serve --configuration {{CHINOOK_DEPLOYMENT}}
 
+# run the connector inside a Docker image
+run-in-docker: build-docker-with-nix start-dependencies
+  #!/usr/bin/env bash
+  set -e -u
+  configuration_file="$(mktemp)"
+  trap 'rm -f "$configuration_file"' EXIT
+  echo '> Generating the configuration...'
+  docker run \
+    --rm \
+    --platform=linux/amd64 \
+    --net='postgres-ndc_default' \
+    {{CONNECTOR_IMAGE}} \
+    generate-configuration \
+    'postgresql://postgres:password@postgres' \
+    > "$configuration_file"
+  echo '> Starting the server...'
+  docker run \
+    --name=postgres-ndc \
+    --rm \
+    --interactive \
+    --tty \
+    --platform=linux/amd64 \
+    --net='postgres-ndc_default' \
+    --publish='8100:8100' \
+    --env=RUST_LOG='INFO' \
+    --mount="type=bind,source=${configuration_file},target=/deployment.json,readonly=true" \
+    {{CONNECTOR_IMAGE}} \
+    serve \
+    --configuration='/deployment.json'
+
 # watch the code, then test and re-run on changes
-dev: start-docker
+dev: start-dependencies
   RUST_LOG=INFO \
     cargo watch -i "tests/snapshots/*" \
     -c \
@@ -20,26 +56,26 @@ dev: start-docker
     -x 'run -- serve --configuration {{CHINOOK_DEPLOYMENT}}'
 
 # watch the code, and re-run on changes
-watch-run: start-docker
+watch-run: start-dependencies
   RUST_LOG=DEBUG \
     cargo watch -i "tests/snapshots/*" \
     -c \
     -x 'run -- serve --configuration {{CHINOOK_DEPLOYMENT}}'
 
 # Run ndc-postgres with rust-gdb.
-debug: start-docker
+debug: start-dependencies
   cargo build
   RUST_LOG=DEBUG \
     rust-gdb --args target/debug/ndc-postgres serve --configuration {{CHINOOK_DEPLOYMENT}}
 
 # Run the server and produce a flamegraph profile
-flamegraph: start-docker
+flamegraph: start-dependencies
   RUST_LOG=DEBUG \
     cargo flamegraph --dev -- \
     serve --configuration {{CHINOOK_DEPLOYMENT}}
 
 # run all tests
-test: start-docker
+test: start-dependencies
   RUST_LOG=DEBUG \
     cargo test
 
@@ -57,14 +93,14 @@ generate-chinook-configuration:
   cargo run -- generate-configuration '{{POSTGRESQL_CONNECTION_STRING}}' > '{{CHINOOK_DEPLOYMENT}}'
 
 # run postgres + jaeger
-start-docker:
+start-dependencies:
   # start jaeger, configured to listen to V3
   docker compose -f ../v3-engine/docker-compose.yaml up -d jaeger
   # start our local postgres
-  docker compose up --wait
+  docker compose up --wait postgres
 
 # run the v3 engine binary, pointing it at our connector
-run-engine: start-docker
+run-engine: start-dependencies
   @echo "http://localhost:3000/ for graphiql console"
   @echo "http://localhost:4002/ for jaeger console"
   # Run graphql-engine using static Chinook metadata
@@ -100,5 +136,8 @@ build-with-nix:
 
 # check the docker build works
 build-docker-with-nix:
-  nix build .#docker --print-build-logs
-  docker load < ./result
+  #!/usr/bin/env bash
+  if [[ '{{CONNECTOR_IMAGE_TAG}}' == 'dev' ]]; then
+    echo 'nix build | docker load'
+    docker load < "$(nix build --no-link --print-out-paths '.#dockerDev')"
+  fi
