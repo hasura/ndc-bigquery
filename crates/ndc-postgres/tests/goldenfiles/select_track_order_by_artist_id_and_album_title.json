@@ -15,7 +15,7 @@
           "order_direction": "asc",
           "target": {
             "type": "column",
-            "name": "Name",
+            "name": "ArtistId",
             "path": [
               {
                 "relationship": "TrackAlbum",
@@ -24,9 +24,18 @@
                   "type": "and",
                   "expressions": []
                 }
-              },
+              }
+            ]
+          }
+        },
+        {
+          "order_direction": "asc",
+          "target": {
+            "type": "column",
+            "name": "Title",
+            "path": [
               {
-                "relationship": "AlbumArtist",
+                "relationship": "TrackAlbum",
                 "arguments": {},
                 "predicate": {
                   "type": "and",
@@ -49,15 +58,6 @@
   },
   "arguments": {},
   "collection_relationships": {
-    "AlbumArtist": {
-      "column_mapping": {
-        "ArtistId": "ArtistId"
-      },
-      "relationship_type": "object",
-      "source_collection_or_type": "Album",
-      "target_collection": "Artist",
-      "arguments": {}
-    },
     "TrackAlbum": {
       "column_mapping": {
         "AlbumId": "AlbumId"
