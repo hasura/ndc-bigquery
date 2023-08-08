@@ -1,5 +1,4 @@
 use super::error::Error;
-use super::helpers;
 use super::relationships;
 use crate::phases::translation::sql;
 
@@ -58,10 +57,10 @@ pub fn translate_order_by(
                                 // select query.
                                 Some(select) => {
                                     // Give it a nice unique alias.
-                                    let table_alias = helpers::make_table_alias(format!(
-                                        "%ORDER_{}_FOR_{}",
-                                        index, source_table_name
-                                    ));
+                                    let table_alias = sql::helpers::make_order_by_table_alias(
+                                        index,
+                                        source_table_name,
+                                    );
 
                                     // Build a join and push it to the accumulated joins.
                                     let new_join = sql::ast::LeftOuterJoinLateral {
@@ -140,7 +139,7 @@ fn translate_order_by_target_for_column(
     let mut joins: Vec<sql::ast::LeftOuterJoinLateral> = vec![];
 
     // This will be the column we reference in the order by.
-    let selected_column_alias = helpers::make_column_alias(column_name);
+    let selected_column_alias = sql::helpers::make_column_alias(column_name);
 
     // Loop through relationships in reverse order,
     // building up new joins and replacing the selected column for the order by.
@@ -170,11 +169,12 @@ fn translate_order_by_target_for_column(
                     "Cannot order by values in an array relationship".to_string(),
                 )),
                 models::RelationshipType::Object => {
-                    let source_table_alias: sql::ast::TableAlias =
-                        helpers::make_table_alias(relationship.source_collection_or_type.clone());
+                    let source_table_alias: sql::ast::TableAlias = sql::helpers::make_table_alias(
+                        relationship.source_collection_or_type.clone(),
+                    );
 
                     let target_collection_alias: sql::ast::TableAlias =
-                        helpers::make_table_alias(relationship.target_collection.clone());
+                        sql::helpers::make_table_alias(relationship.target_collection.clone());
 
                     let target_collection_alias_name: sql::ast::TableName =
                         sql::ast::TableName::AliasedTable(target_collection_alias.clone());
@@ -210,7 +210,7 @@ fn translate_order_by_target_for_column(
                     let source_relationship_table_key_columns: Vec<_> = relationship
                         .column_mapping
                         .keys()
-                        .map(|source_col| helpers::make_column_alias(source_col.to_string()))
+                        .map(|source_col| sql::helpers::make_column_alias(source_col.to_string()))
                         .collect();
 
                     // generate a condition for this join.

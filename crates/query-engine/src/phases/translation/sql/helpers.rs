@@ -1,10 +1,15 @@
+//! Helpers for building sql::ast types in certain shapes and patterns.
+
 use super::ast::*;
 
+/// Used as input to helpers to construct SELECTs which return 'rows' and/or 'aggregates' results.
 pub enum SelectSet {
     Rows(Select),
     Aggregates(Select),
     RowsAndAggregates(Select, Select),
 }
+
+// Empty clauses //
 
 /// An empty `WITH` clause.
 pub fn empty_with() -> With {
@@ -56,6 +61,55 @@ impl TableName {
         }
     }
 }
+
+// Aliasing //
+
+/// Generate a column expression refering to a specific table.
+pub fn make_column(
+    table: TableName,
+    name: String,
+    alias: ColumnAlias,
+) -> (ColumnAlias, Expression) {
+    (
+        alias,
+        Expression::ColumnName(ColumnName::TableColumn { table, name }),
+    )
+}
+
+/// Create column aliases using this function so we build everything in one place.
+/// We originally wanted indices, but we didn't end up using them.
+/// Leaving them here for now, but will probably remove them in the future.
+pub fn make_column_alias(name: String) -> ColumnAlias {
+    ColumnAlias {
+        unique_index: 0,
+        name,
+    }
+}
+/// Create table aliases using this function so they get a unique index.
+/// We originally wanted indices, but we didn't end up using them.
+/// Leaving them here for now, but will probably remove them in the future.
+pub fn make_table_alias(name: String) -> TableAlias {
+    TableAlias {
+        unique_index: 0,
+        name,
+    }
+}
+
+/// Create a table alias for order by column.
+/// Provide an index and a source table name (to point at the table being ordered),
+/// and get an alias.
+pub fn make_order_by_table_alias(index: usize, source_table_name: &String) -> TableAlias {
+    make_table_alias(format!("%ORDER_{}_FOR_{}", index, source_table_name))
+}
+
+/// Create a table alias for count aggregate order by column.
+/// Provide an index and a source table name /// (to point at the table being ordered),
+/// and get an alias.
+pub fn make_order_by_count_table_alias(index: usize, source_table_name: &String) -> TableAlias {
+    make_table_alias(format!("%ORDER_{}_COUNT_FOR_{}", index, source_table_name))
+}
+
+// SELECTs //
 
 /// Build a simple select with a select list and the rest are empty.
 pub fn simple_select(select_list: Vec<(ColumnAlias, Expression)>) -> Select {

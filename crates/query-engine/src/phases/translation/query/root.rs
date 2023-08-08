@@ -3,7 +3,6 @@
 use super::aggregates;
 use super::error::Error;
 use super::filtering;
-use super::helpers;
 use super::relationships;
 use super::sorting;
 use crate::phases::translation::sql;
@@ -22,7 +21,7 @@ pub fn translate_aggregate_query(
     relationships: &BTreeMap<String, models::Relationship>,
     query: &models::Query,
 ) -> Result<sql::ast::Select, Error> {
-    let table_alias: sql::ast::TableAlias = helpers::make_table_alias(table_name.clone());
+    let table_alias: sql::ast::TableAlias = sql::helpers::make_table_alias(table_name.clone());
 
     // translate aggregates to select list
     let aggregate_fields = query.aggregates.clone().ok_or(Error::NoFields)?;
@@ -63,7 +62,7 @@ pub fn translate_rows_query(
     let table_info = tables_info_map
         .get(table_name)
         .ok_or(Error::TableNotFound(table_name.clone()))?;
-    let table_alias: sql::ast::TableAlias = helpers::make_table_alias(table_name.clone());
+    let table_alias: sql::ast::TableAlias = sql::helpers::make_table_alias(table_name.clone());
     let table_alias_name: sql::ast::TableName = sql::ast::TableName::AliasedTable(table_alias);
 
     // join aliases
@@ -87,10 +86,10 @@ pub fn translate_rows_query(
                     .columns
                     .get(&column)
                     .ok_or(Error::ColumnNotFoundInTable(column, table_name.clone()))?;
-                Ok(helpers::make_column(
+                Ok(sql::helpers::make_column(
                     table_alias_name.clone(),
                     column_info.name.clone(),
-                    helpers::make_column_alias(alias),
+                    sql::helpers::make_column_alias(alias),
                 ))
             }
             models::Field::Relationship {
@@ -98,8 +97,8 @@ pub fn translate_rows_query(
                 relationship,
                 ..
             } => {
-                let table_alias = helpers::make_table_alias(alias.clone());
-                let column_alias = helpers::make_column_alias(alias);
+                let table_alias = sql::helpers::make_table_alias(alias.clone());
+                let column_alias = sql::helpers::make_column_alias(alias);
                 let column_name = sql::ast::ColumnName::AliasedColumn {
                     table: sql::ast::TableName::AliasedTable(table_alias.clone()),
                     name: column_alias.clone(),
@@ -154,7 +153,7 @@ fn translate_query_part(
         schema: table_info.schema_name.clone(),
         table: table_info.table_name.clone(),
     };
-    let table_alias: sql::ast::TableAlias = helpers::make_table_alias(table_name.clone());
+    let table_alias: sql::ast::TableAlias = sql::helpers::make_table_alias(table_name.clone());
     let table_alias_name: sql::ast::TableName =
         sql::ast::TableName::AliasedTable(table_alias.clone());
 

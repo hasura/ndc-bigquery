@@ -1,7 +1,6 @@
 //! Handle stuff related to relationships and joins.
 
 use super::error::Error;
-use super::helpers;
 
 use crate::metadata;
 use crate::phases::translation::sql;
@@ -101,12 +100,12 @@ pub fn translate_joins(
             // form a single JSON item shaped `{ rows: [], aggregates: {} }`
             // that matches the models::RowSet type
             let json_select = sql::helpers::select_rowset(
-                helpers::make_column_alias(alias.name.clone()),
-                helpers::make_table_alias(alias.name.clone()),
-                helpers::make_table_alias("rows".to_string()),
-                helpers::make_column_alias("rows".to_string()),
-                helpers::make_table_alias("aggregates".to_string()),
-                helpers::make_column_alias("aggregates".to_string()),
+                sql::helpers::make_column_alias(alias.name.clone()),
+                sql::helpers::make_table_alias(alias.name.clone()),
+                sql::helpers::make_table_alias("rows".to_string()),
+                sql::helpers::make_column_alias("rows".to_string()),
+                sql::helpers::make_table_alias("aggregates".to_string()),
+                sql::helpers::make_column_alias("aggregates".to_string()),
                 final_select_set,
             );
 
@@ -138,7 +137,7 @@ pub fn translate_column_mapping(
         .get(&relationship.target_collection)
         .ok_or(Error::TableNotFound(relationship.target_collection.clone()))?;
     let target_collection_alias: sql::ast::TableAlias =
-        helpers::make_table_alias(relationship.target_collection.clone());
+        sql::helpers::make_table_alias(relationship.target_collection.clone());
     let target_collection_alias_name: sql::ast::TableName =
         sql::ast::TableName::AliasedTable(target_collection_alias);
 

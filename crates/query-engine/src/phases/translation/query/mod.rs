@@ -3,7 +3,6 @@
 pub mod aggregates;
 pub mod error;
 pub mod filtering;
-pub mod helpers;
 pub mod relationships;
 pub mod root;
 pub mod sorting;
@@ -32,12 +31,12 @@ pub fn translate(
     // form a single JSON item shaped `{ rows: [], aggregates: {} }`
     // that matches the models::RowSet type
     let json_select = sql::helpers::select_rowset(
-        helpers::make_column_alias("universe".to_string()),
-        helpers::make_table_alias("universe".to_string()),
-        helpers::make_table_alias("rows".to_string()),
-        helpers::make_column_alias("rows".to_string()),
-        helpers::make_table_alias("aggregates".to_string()),
-        helpers::make_column_alias("aggregates".to_string()),
+        sql::helpers::make_column_alias("universe".to_string()),
+        sql::helpers::make_table_alias("universe".to_string()),
+        sql::helpers::make_table_alias("rows".to_string()),
+        sql::helpers::make_column_alias("rows".to_string()),
+        sql::helpers::make_table_alias("aggregates".to_string()),
+        sql::helpers::make_column_alias("aggregates".to_string()),
         select_set,
     );
 

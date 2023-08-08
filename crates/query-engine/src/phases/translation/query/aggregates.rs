@@ -1,7 +1,6 @@
 //! Handle aggregates translation.
 
 use super::error::Error;
-use super::helpers;
 use crate::phases::translation::sql;
 
 use indexmap::IndexMap;
@@ -17,7 +16,7 @@ pub fn translate(
         .map(|(alias, aggregation)| {
             let expression = match aggregation {
                 models::Aggregate::ColumnCount { column, distinct } => {
-                    let count_column_alias = helpers::make_column_alias(column);
+                    let count_column_alias = sql::helpers::make_column_alias(column);
                     if distinct {
                         sql::ast::Expression::Count(sql::ast::CountType::Distinct(
                             sql::ast::ColumnName::AliasedColumn {
@@ -40,7 +39,7 @@ pub fn translate(
                         args: vec![sql::ast::Expression::ColumnName(
                             sql::ast::ColumnName::AliasedColumn {
                                 table: table.clone(),
-                                name: helpers::make_column_alias(column),
+                                name: sql::helpers::make_column_alias(column),
                             },
                         )],
                     }
@@ -49,7 +48,7 @@ pub fn translate(
                     sql::ast::Expression::Count(sql::ast::CountType::Star)
                 }
             };
-            Ok((helpers::make_column_alias(alias), expression))
+            Ok((sql::helpers::make_column_alias(alias), expression))
         })
         .collect::<Result<Vec<_>, Error>>()
 }
