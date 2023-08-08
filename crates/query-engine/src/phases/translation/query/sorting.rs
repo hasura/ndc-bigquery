@@ -74,9 +74,7 @@ pub fn translate_order_by(
                                     // Build an alias to query the column from this select.
                                     let column_name = sql::ast::Expression::ColumnName(
                                         sql::ast::ColumnName::AliasedColumn {
-                                            table: sql::ast::TableName::AliasedTable(
-                                                table_alias.clone(),
-                                            ),
+                                            table: sql::ast::TableName::AliasedTable(table_alias),
                                             name: column_alias,
                                         },
                                     );
@@ -142,7 +140,7 @@ fn translate_order_by_target_for_column(
     let mut joins: Vec<sql::ast::LeftOuterJoinLateral> = vec![];
 
     // This will be the column we reference in the order by.
-    let selected_column_alias = helpers::make_column_alias(column_name.clone());
+    let selected_column_alias = helpers::make_column_alias(column_name);
 
     // Loop through relationships in reverse order,
     // building up new joins and replacing the selected column for the order by.
@@ -230,7 +228,7 @@ fn translate_order_by_target_for_column(
                     select.where_ = sql::ast::Where(join_condition);
 
                     select.from = Some(sql::ast::From::Table {
-                        name: target_collection_alias_name.clone(),
+                        name: target_collection_alias_name,
                         alias: target_collection_alias.clone(),
                     });
 
@@ -259,7 +257,7 @@ fn translate_order_by_target_for_column(
             // order by columns
             let selected_column_expr =
                 sql::ast::Expression::ColumnName(sql::ast::ColumnName::AliasedColumn {
-                    table: sql::ast::TableName::AliasedTable(last_table.clone()),
+                    table: sql::ast::TableName::AliasedTable(last_table),
                     name: selected_column_alias.clone(),
                 });
             // wrapping select

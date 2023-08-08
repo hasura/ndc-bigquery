@@ -35,7 +35,7 @@ pub fn translate_aggregate_query(
 
     // create all aggregate columns
     let aggregate_columns = aggregates::translate(
-        sql::ast::TableName::AliasedTable(table_alias.clone()),
+        sql::ast::TableName::AliasedTable(table_alias),
         aggregate_fields,
     )?;
 
@@ -64,8 +64,7 @@ pub fn translate_rows_query(
         .get(table_name)
         .ok_or(Error::TableNotFound(table_name.clone()))?;
     let table_alias: sql::ast::TableAlias = helpers::make_table_alias(table_name.clone());
-    let table_alias_name: sql::ast::TableName =
-        sql::ast::TableName::AliasedTable(table_alias.clone());
+    let table_alias_name: sql::ast::TableName = sql::ast::TableName::AliasedTable(table_alias);
 
     // join aliases
     let mut join_fields: Vec<(sql::ast::TableAlias, String, models::Query)> = vec![];
