@@ -25,7 +25,7 @@ log = "0.4.19"
 schemars = { version = "0.8.12", features = ["smol_str"] }
 serde = "1.0.179"
 serde_derive = "^1.0"
-serde_json = { version = "1.0.103", features = ["raw_value"] }
+serde_json = { version = "1.0.104", features = ["raw_value"] }
 sqlx = { version = "0.7.1", features = [ "json", "postgres", "runtime-tokio-rustls" ] }
 tokio = { version = "1.29.1", features = ["full"] }
 tracing = "0.1.37"
