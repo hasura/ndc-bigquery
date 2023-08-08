@@ -1,4 +1,5 @@
 use query_engine::phases::translation;
+use sqlformat;
 use std::fs;
 
 /// Run a query against the server, get the result, and compare against the snapshot.
@@ -25,5 +26,11 @@ pub fn test_translation(testname: &str) -> Result<String, translation::query::er
         .map(|(i, p)| (i + 1, p))
         .collect();
 
-    Ok(format!("{}\n\n{:?}", query.sql, params))
+    let pretty = sqlformat::format(
+        &query.sql,
+        &sqlformat::QueryParams::None,
+        sqlformat::FormatOptions::default(),
+    );
+
+    Ok(format!("{}\n\n{:?}", pretty, params))
 }

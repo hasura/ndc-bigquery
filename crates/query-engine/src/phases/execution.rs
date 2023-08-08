@@ -1,6 +1,7 @@
 /// Execute an execution plan against the database.
 use serde_json;
 
+use sqlformat;
 use sqlx;
 use sqlx::Row;
 use std::collections::BTreeMap;
@@ -102,7 +103,13 @@ pub async fn explain(
         }
     }
 
-    Ok((query.sql, results.join("\n")))
+    let pretty = sqlformat::format(
+        &query.sql,
+        &sqlformat::QueryParams::None,
+        sqlformat::FormatOptions::default(),
+    );
+
+    Ok((pretty, results.join("\n")))
 }
 
 /// Execute the query on one set of variables.

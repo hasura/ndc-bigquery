@@ -2,6 +2,26 @@
 source: crates/query-engine/tests/tests.rs
 expression: result
 ---
-SELECT row_to_json("universe") AS "universe" FROM (SELECT * FROM (SELECT coalesce(json_agg(row_to_json("rows")), '[]') AS "rows" FROM (SELECT "Album"."Title" AS "Title" FROM "public"."Album" AS "Album" LIMIT 5 OFFSET 3) AS "rows") AS "rows") AS "universe"
+SELECT
+  row_to_json("universe") AS "universe"
+FROM
+  (
+    SELECT
+      *
+    FROM
+      (
+        SELECT
+          coalesce(json_agg(row_to_json("rows")), '[]') AS "rows"
+        FROM
+          (
+            SELECT
+              "Album"."Title" AS "Title"
+            FROM
+              "public"."Album" AS "Album"
+            LIMIT
+              5 OFFSET 3
+          ) AS "rows"
+      ) AS "rows"
+  ) AS "universe"
 
 []
