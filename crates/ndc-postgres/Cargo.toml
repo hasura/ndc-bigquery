@@ -19,7 +19,7 @@ ndc-hub = { git = "https://github.com/hasura/ndc-hub.git", rev = "f2909c2" }
 query-engine = { path = "../query-engine" }
 
 async-trait = "0.1.68"
-clap = { version = "4.3.9", features = ["derive"] }
+clap = { version = "4.3.21", features = ["derive"] }
 indexmap = "1"
 log = "0.4.19"
 schemars = { version = "0.8.12", features = ["smol_str"] }
