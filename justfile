@@ -13,6 +13,7 @@ CHINOOK_DEPLOYMENT := "static/chinook-deployment.json"
 
 # run the connector
 run: start-dependencies
+  @echo "http://localhost:3001/ for grafana console"
   RUST_LOG=INFO \
     cargo run --release -- serve --configuration {{CHINOOK_DEPLOYMENT}}
 
@@ -48,6 +49,7 @@ run-in-docker: build-docker-with-nix start-dependencies
 
 # watch the code, then test and re-run on changes
 dev: start-dependencies
+  @echo "http://localhost:3001/ for grafana console"
   RUST_LOG=INFO \
     cargo watch -i "tests/snapshots/*" \
     -c \
@@ -92,12 +94,12 @@ generate-chinook-configuration:
   mkdir -p "$(dirname '{{CHINOOK_DEPLOYMENT}}')"
   cargo run -- generate-configuration '{{POSTGRESQL_CONNECTION_STRING}}' > '{{CHINOOK_DEPLOYMENT}}'
 
-# run postgres + jaeger
+# run postgres + grafana + prometheus + jaeger
 start-dependencies:
   # start jaeger, configured to listen to V3
   docker compose -f ../v3-engine/docker-compose.yaml up -d jaeger
-  # start our local postgres
-  docker compose up --wait postgres
+  # start everything else
+  docker compose up --wait
 
 # run the v3 engine binary, pointing it at our connector
 run-engine: start-dependencies

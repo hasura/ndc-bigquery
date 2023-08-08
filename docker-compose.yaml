@@ -26,3 +26,40 @@ services:
       interval: 5s
       timeout: 10s
       retries: 20
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    ports:
+      - 9090:9090
+    restart: unless-stopped
+    volumes:
+      - type: bind
+        source: ./metrics/prometheus/prometheus.yml
+        target: /etc/prometheus/prometheus.yml
+      - type: volume
+        source: prom_data
+        target: /prometheus
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - 3001:3000
+    restart: unless-stopped
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=grafana
+    volumes:
+      - type: bind
+        source: ./metrics/grafana
+        target: /etc/grafana/provisioning/datasources
+        read_only: true
+      - type: bind
+        source: ./metrics/grafana-data
+        target: /var/lib/grafana
+
+volumes:
+  prom_data:
