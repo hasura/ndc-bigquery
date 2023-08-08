@@ -1344,9 +1344,7 @@ dependencies = [
  "axum-test-helper",
  "clap",
  "env_logger",
- "indexmap 1.9.3",
  "insta",
- "log",
  "ndc-client",
  "ndc-hub",
  "prometheus",
@@ -1811,14 +1809,12 @@ checksum = "106dd99e98437432fed6519dedecfade6a06a73bb7b2a1e019fdd2bee5778d94"
 name = "query-engine"
 version = "0.1.0"
 dependencies = [
- "env_logger",
  "indexmap 1.9.3",
  "insta",
  "ndc-client",
  "schemars",
  "serde",
  "serde_json",
- "serde_with",
  "sqlformat",
  "sqlx",
  "tracing",

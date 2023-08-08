@@ -120,6 +120,7 @@
             pkgs.cargo-edit
             pkgs.cargo-flamegraph
             pkgs.cargo-insta
+            pkgs.cargo-machete
             pkgs.cargo-watch
             pkgs.just
             pkgs.k6
