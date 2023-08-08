@@ -1,123 +1,199 @@
 //! Handle filtering/where clauses translation.
 
+use super::error::Error;
+use crate::metadata;
 use crate::phases::translation::sql;
 
 use ndc_client::models;
 
+use std::collections::BTreeMap;
+
+/// Translate a boolean expression to a SQL expression.
 pub fn translate_expression(
+    tables_info: &metadata::TablesInfo,
+    relationships: &BTreeMap<String, models::Relationship>,
+    // table alias to query from
     table: &sql::ast::TableName,
+    // root table name for column lookup
+    root_table_name: &String,
     predicate: models::Expression,
-) -> sql::ast::Expression {
+) -> Result<sql::ast::Expression, Error> {
     match predicate {
         models::Expression::And { expressions } => expressions
             .into_iter()
-            .map(|expr| translate_expression(table, expr))
-            .fold(
+            .map(|expr| {
+                translate_expression(tables_info, relationships, table, root_table_name, expr)
+            })
+            .try_fold(
                 sql::ast::Expression::Value(sql::ast::Value::Bool(true)),
-                |acc, expr| sql::ast::Expression::And {
-                    left: Box::new(acc),
-                    right: Box::new(expr),
+                |acc, expr| {
+                    let right = expr?;
+                    Ok(sql::ast::Expression::And {
+                        left: Box::new(acc),
+                        right: Box::new(right),
+                    })
                 },
             ),
         models::Expression::Or { expressions } => expressions
             .into_iter()
-            .map(|expr| translate_expression(table, expr))
-            .fold(
+            .map(|expr| {
+                translate_expression(tables_info, relationships, table, root_table_name, expr)
+            })
+            .try_fold(
                 sql::ast::Expression::Value(sql::ast::Value::Bool(true)),
-                |acc, expr| sql::ast::Expression::Or {
-                    left: Box::new(acc),
-                    right: Box::new(expr),
+                |acc, expr| {
+                    let right = expr?;
+                    Ok(sql::ast::Expression::Or {
+                        left: Box::new(acc),
+                        right: Box::new(right),
+                    })
                 },
             ),
         models::Expression::Not { expression } => {
-            sql::ast::Expression::Not(Box::new(translate_expression(table, *expression)))
+            let expr = translate_expression(
+                tables_info,
+                relationships,
+                table,
+                root_table_name,
+                *expression,
+            )?;
+            Ok(sql::ast::Expression::Not(Box::new(expr)))
         }
         models::Expression::BinaryComparisonOperator {
             column,
             operator,
             value,
-        } => sql::ast::Expression::BinaryOperator {
-            left: Box::new(translate_comparison_target(table, *column)),
-            operator: match *operator {
-                models::BinaryComparisonOperator::Equal => sql::ast::BinaryOperator::Equals,
-                models::BinaryComparisonOperator::Other { name } =>
-                // the strings we're matching against here (ie 'like') are best guesses for now, will
-                // need to update these as find out more
-                {
-                    match &*name {
-                        "like" => sql::ast::BinaryOperator::Like,
-                        "nlike" => sql::ast::BinaryOperator::NotLike,
-                        "ilike" => sql::ast::BinaryOperator::CaseInsensitiveLike,
-                        "nilike" => sql::ast::BinaryOperator::NotCaseInsensitiveLike,
-                        "similar" => sql::ast::BinaryOperator::Similar,
-                        "nsimilar" => sql::ast::BinaryOperator::NotSimilar,
-                        "regex" => sql::ast::BinaryOperator::Regex,
-                        "nregex" => sql::ast::BinaryOperator::NotRegex,
-                        "iregex" => sql::ast::BinaryOperator::CaseInsensitiveRegex,
-                        "niregex" => sql::ast::BinaryOperator::NotCaseInsensitiveRegex,
-                        "lt" => sql::ast::BinaryOperator::LessThan,
-                        "lte" => sql::ast::BinaryOperator::LessThanOrEqualTo,
-                        "gt" => sql::ast::BinaryOperator::GreaterThan,
-                        "gte" => sql::ast::BinaryOperator::GreaterThanOrEqualTo,
-                        _ => sql::ast::BinaryOperator::Equals,
+        } => {
+            let left = translate_comparison_target(
+                tables_info,
+                relationships,
+                root_table_name,
+                table,
+                *column,
+            )?;
+            let right = translate_comparison_value(
+                tables_info,
+                relationships,
+                root_table_name,
+                table,
+                *value,
+            )?;
+            Ok(sql::ast::Expression::BinaryOperator {
+                left: Box::new(left),
+                operator: match *operator {
+                    models::BinaryComparisonOperator::Equal => sql::ast::BinaryOperator::Equals,
+                    models::BinaryComparisonOperator::Other { name } =>
+                    // the strings we're matching against here (ie 'like') are best guesses for now, will
+                    // need to update these as find out more
+                    {
+                        match &*name {
+                            "like" => sql::ast::BinaryOperator::Like,
+                            "nlike" => sql::ast::BinaryOperator::NotLike,
+                            "ilike" => sql::ast::BinaryOperator::CaseInsensitiveLike,
+                            "nilike" => sql::ast::BinaryOperator::NotCaseInsensitiveLike,
+                            "similar" => sql::ast::BinaryOperator::Similar,
+                            "nsimilar" => sql::ast::BinaryOperator::NotSimilar,
+                            "regex" => sql::ast::BinaryOperator::Regex,
+                            "nregex" => sql::ast::BinaryOperator::NotRegex,
+                            "iregex" => sql::ast::BinaryOperator::CaseInsensitiveRegex,
+                            "niregex" => sql::ast::BinaryOperator::NotCaseInsensitiveRegex,
+                            "lt" => sql::ast::BinaryOperator::LessThan,
+                            "lte" => sql::ast::BinaryOperator::LessThanOrEqualTo,
+                            "gt" => sql::ast::BinaryOperator::GreaterThan,
+                            "gte" => sql::ast::BinaryOperator::GreaterThanOrEqualTo,
+                            _ => sql::ast::BinaryOperator::Equals,
+                        }
                     }
-                }
-            },
-            right: Box::new(translate_comparison_value(table, *value)),
-        },
+                },
+                right: Box::new(right),
+            })
+        }
         models::Expression::BinaryArrayComparisonOperator {
             column,
             operator,
             values,
-        } => sql::ast::Expression::BinaryArrayOperator {
-            left: Box::new(translate_comparison_target(table, *column)),
-            operator: match *operator {
-                models::BinaryArrayComparisonOperator::In => sql::ast::BinaryArrayOperator::In,
-            },
-            right: values
+        } => {
+            let left = translate_comparison_target(
+                tables_info,
+                relationships,
+                root_table_name,
+                table,
+                *column.clone(),
+            )?;
+            let right = values
                 .iter()
-                .map(|value| translate_comparison_value(table, value.clone()))
-                .collect(),
-        },
+                .map(|value| {
+                    translate_comparison_value(
+                        tables_info,
+                        relationships,
+                        root_table_name,
+                        table,
+                        value.clone(),
+                    )
+                })
+                .collect::<Result<Vec<sql::ast::Expression>, Error>>()?;
+            Ok(sql::ast::Expression::BinaryArrayOperator {
+                left: Box::new(left),
+                operator: match *operator {
+                    models::BinaryArrayComparisonOperator::In => sql::ast::BinaryArrayOperator::In,
+                },
+                right,
+            })
+        }
 
         // dummy
-        _ => sql::ast::Expression::Value(sql::ast::Value::Bool(true)),
+        models::Expression::Exists {
+            in_collection,
+            predicate,
+        } => translate_exists_in_collection(tables_info, relationships, *in_collection, *predicate),
+        // dummy
+        models::Expression::UnaryComparisonOperator { .. } => {
+            todo!()
+        }
     }
 }
 
 /// translate a comparison target.
 fn translate_comparison_target(
+    _tables_info: &metadata::TablesInfo,
+    _relationships: &BTreeMap<String, models::Relationship>,
+    _root_table_name: &str,
     table: &sql::ast::TableName,
     column: models::ComparisonTarget,
-) -> sql::ast::Expression {
+) -> Result<sql::ast::Expression, Error> {
     match column {
-        models::ComparisonTarget::Column { name, .. } => {
-            sql::ast::Expression::ColumnName(sql::ast::ColumnName::TableColumn {
+        models::ComparisonTarget::Column { name, .. } => Ok(sql::ast::Expression::ColumnName(
+            sql::ast::ColumnName::TableColumn {
                 table: table.clone(),
                 name,
-            })
-        }
-        // dummy
-        _ => sql::ast::Expression::Value(sql::ast::Value::Bool(true)),
+            },
+        )),
+        models::ComparisonTarget::RootCollectionColumn { .. } => todo!(),
     }
 }
 
 /// translate a comparison value.
 fn translate_comparison_value(
+    tables_info: &metadata::TablesInfo,
+    relationships: &BTreeMap<String, models::Relationship>,
+    root_table_name: &str,
     table: &sql::ast::TableName,
     value: models::ComparisonValue,
-) -> sql::ast::Expression {
+) -> Result<sql::ast::Expression, Error> {
     match value {
-        models::ComparisonValue::Column { column } => translate_comparison_target(table, *column),
-        models::ComparisonValue::Scalar { value: json_value } => {
-            sql::ast::Expression::Value(translate_json_value(&json_value))
+        models::ComparisonValue::Column { column } => {
+            translate_comparison_target(tables_info, relationships, root_table_name, table, *column)
         }
+        models::ComparisonValue::Scalar { value: json_value } => Ok(sql::ast::Expression::Value(
+            translate_json_value(&json_value),
+        )),
         models::ComparisonValue::Variable { name: var } => {
-            sql::ast::Expression::Value(sql::ast::Value::Variable(var))
+            Ok(sql::ast::Expression::Value(sql::ast::Value::Variable(var)))
         }
     }
 }
 
+/// Convert a JSON value into a SQL value.
 fn translate_json_value(value: &serde_json::Value) -> sql::ast::Value {
     match value {
         serde_json::Value::Number(num) => {
@@ -132,5 +208,34 @@ fn translate_json_value(value: &serde_json::Value) -> sql::ast::Value {
         }
         // dummy
         _ => sql::ast::Value::Bool(true),
+    }
+}
+
+/// Translate an EXISTS clause into a SQL subquery of the following form:
+///
+/// > EXISTS (SELECT FROM <table> AS <alias> WHERE <predicate>)
+pub fn translate_exists_in_collection(
+    tables_info: &metadata::TablesInfo,
+    _relationships: &BTreeMap<String, models::Relationship>,
+    in_collection: models::ExistsInCollection,
+    _predicate: models::Expression,
+) -> Result<sql::ast::Expression, Error> {
+    match in_collection {
+        // ignore arguments for now
+        models::ExistsInCollection::Unrelated { collection, .. } => {
+            // get the unrelated table information from the metadata.
+            let metadata::TablesInfo(tables_info_map) = tables_info;
+            let _table_info = tables_info_map
+                .get(&collection)
+                .ok_or(Error::TableNotFound(collection.clone()))?;
+            // new alias for the table
+            let _table_alias: sql::ast::TableAlias =
+                sql::helpers::make_table_alias(collection.clone());
+
+            todo!()
+        }
+        models::ExistsInCollection::Related { .. } => {
+            todo!()
+        }
     }
 }

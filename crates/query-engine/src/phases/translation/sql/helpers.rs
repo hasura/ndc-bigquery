@@ -52,16 +52,6 @@ pub fn false_expr() -> Expression {
     Expression::Value(Value::Bool(false))
 }
 
-/// A table with the `public` schema.
-impl TableName {
-    pub fn public_table(tablename: String) -> TableName {
-        TableName::DBTable {
-            schema: "public".to_string(),
-            table: tablename,
-        }
-    }
-}
-
 // Aliasing //
 
 /// Generate a column expression refering to a specific table.

@@ -5,9 +5,8 @@ use super::error::Error;
 use super::filtering;
 use super::relationships;
 use super::sorting;
-use crate::phases::translation::sql;
-
 use crate::metadata;
+use crate::phases::translation::sql;
 
 use indexmap::IndexMap;
 use ndc_client::models;
@@ -191,9 +190,15 @@ fn translate_query_part(
 
     // translate where
     select.where_ = sql::ast::Where(match query.clone().predicate {
-        None => sql::ast::Expression::Value(sql::ast::Value::Bool(true)),
-        Some(predicate) => filtering::translate_expression(&table_alias_name, predicate),
-    });
+        None => Ok(sql::ast::Expression::Value(sql::ast::Value::Bool(true))),
+        Some(predicate) => filtering::translate_expression(
+            tables_info,
+            relationships,
+            &table_alias_name,
+            table_name,
+            predicate,
+        ),
+    }?);
 
     Ok(select)
 }
