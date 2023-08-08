@@ -1,14 +1,14 @@
 //! Configuration and state for our connector.
 
 use clap::Args;
+use ndc_hub::connector;
+use prometheus::core::{AtomicU64, GenericCounter};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use sqlx::postgres::PgPool;
 use sqlx::postgres::PgPoolOptions;
 use sqlx::Row;
 use thiserror::Error;
-
-use ndc_hub::connector;
 
 /// User configuration.
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize, JsonSchema)]
@@ -29,6 +29,13 @@ pub struct ConfigureArgs {
 #[derive(Debug, Clone)]
 pub struct State {
     pub pool: PgPool,
+    pub metrics: Metrics,
+}
+
+#[derive(Debug, Clone)]
+pub struct Metrics {
+    pub query_total: GenericCounter<AtomicU64>,
+    pub explain_total: GenericCounter<AtomicU64>,
 }
 
 /// Validate the user configuration.
@@ -43,14 +50,54 @@ pub async fn validate_raw_configuration(
     Ok(configuration.clone())
 }
 
+/// Create a new int counter metric and register it with the provided Prometheus Registry
+fn add_int_counter_metric(
+    metrics_registry: &mut prometheus::Registry,
+    metric_name: &str,
+    metric_description: &str,
+) -> Result<GenericCounter<AtomicU64>, connector::InitializationError> {
+    let int_counter =
+        prometheus::IntCounter::with_opts(prometheus::Opts::new(metric_name, metric_description))
+            .map_err(|prometheus_error| {
+            connector::InitializationError::Other(
+                InitializationError::PrometheusError(prometheus_error).into(),
+            )
+        })?;
+
+    metrics_registry
+        .register(Box::new(int_counter.clone()))
+        .map_err(|prometheus_error| {
+            connector::InitializationError::Other(
+                InitializationError::PrometheusError(prometheus_error).into(),
+            )
+        })?;
+
+    Ok(int_counter)
+}
+
 /// Create a connection pool and wrap it inside a connector State.
 pub async fn create_state(
     configuration: &DeploymentConfiguration,
+    metrics_registry: &mut prometheus::Registry,
 ) -> Result<State, connector::InitializationError> {
     let pool = create_pool(configuration).await.map_err(|e| {
         connector::InitializationError::Other(InitializationError::UnableToCreatePool(e).into())
     })?;
-    Ok(State { pool })
+
+    let query_total_counter =
+        add_int_counter_metric(metrics_registry, "query_total", "Total successful queries")?;
+
+    let explain_total_counter = add_int_counter_metric(
+        metrics_registry,
+        "explain_total",
+        "Total successful explains",
+    )?;
+
+    let metrics = Metrics {
+        query_total: query_total_counter,
+        explain_total: explain_total_counter,
+    };
+    Ok(State { pool, metrics })
 }
 
 /// Create a connection pool with default settings.
@@ -144,7 +191,7 @@ pub async fn configure(
                     -- this may be empty, in which case we coalesce with an empty object
                     coalesce(
                         (
-                            select 
+                            select
                                 json_object_agg(
                                     -- the name of the foreign key constraint
                                     c.constraint_name,
@@ -178,7 +225,7 @@ pub async fn configure(
                                     )
                                 )
                             from information_schema.table_constraints c
-                            join information_schema.referential_constraints rc on 
+                            join information_schema.referential_constraints rc on
                                 c.constraint_catalog = rc.constraint_catalog
                                 and c.constraint_schema = rc.constraint_schema
                                 and c.constraint_name = rc.constraint_name
@@ -231,4 +278,6 @@ enum ConfigurationError {
 enum InitializationError {
     #[error("unable to initialize connection pool: {0}")]
     UnableToCreatePool(sqlx::Error),
+    #[error("error initializing Prometheus metrics: {0}")]
+    PrometheusError(prometheus::Error),
 }

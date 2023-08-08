@@ -42,9 +42,9 @@ impl connector::Connector for Postgres {
     /// Initialize the connector state. Which is pretty much just initializing the pool.
     async fn try_init_state(
         configuration: &Self::Configuration,
-        _metrics: &mut prometheus::Registry,
+        metrics: &mut prometheus::Registry,
     ) -> Result<Self::State, connector::InitializationError> {
-        configuration::create_state(configuration).await
+        configuration::create_state(configuration, metrics).await
     }
 
     /// @todo: dummy for now
@@ -93,9 +93,9 @@ impl connector::Connector for Postgres {
         }?;
 
         // Execute an explain query.
-        let (query, plan) = match phases::execution::explain(&state.pool, plan).await {
-            Ok(plan) => Ok(plan),
-            Err(err) => Err(match err {
+        let (query, plan) = phases::execution::explain(&state.pool, plan)
+            .await
+            .map_err(|err| match err {
                 phases::execution::Error::Query(err) => {
                     tracing::error!("{}", err);
                     connector::ExplainError::Other(err.into())
@@ -104,8 +104,10 @@ impl connector::Connector for Postgres {
                     tracing::error!("{}", err);
                     connector::ExplainError::Other(err.to_string().into())
                 }
-            }),
-        }?;
+            })?;
+
+        // assuming explain succeeded, increment counter
+        state.metrics.explain_total.inc();
 
         let details =
             BTreeMap::from_iter([("SQL Query".into(), query), ("Execution Plan".into(), plan)]);
@@ -140,9 +142,9 @@ impl connector::Connector for Postgres {
         }?;
 
         // Execute the query.
-        let result = match phases::execution::execute(&state.pool, plan).await {
-            Ok(plan) => Ok(plan),
-            Err(err) => Err(match err {
+        let result = phases::execution::execute(&state.pool, plan)
+            .await
+            .map_err(|err| match err {
                 phases::execution::Error::Query(err) => {
                     tracing::error!("{}", err);
                     connector::QueryError::Other(err.into())
@@ -151,8 +153,10 @@ impl connector::Connector for Postgres {
                     tracing::error!("{}", err);
                     connector::QueryError::Other(err.to_string().into())
                 }
-            }),
-        }?;
+            })?;
+
+        // assuming query succeeded, increment counter
+        state.metrics.query_total.inc();
 
         Ok(result)
     }
