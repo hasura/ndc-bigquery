@@ -71,3 +71,9 @@ fn sorting_by_nested_relationship_column() {
     let result = common::test_translation("sorting_by_nested_relationship_column").unwrap();
     insta::assert_snapshot!(result);
 }
+
+#[test]
+fn sorting_by_relationship_count() {
+    let result = common::test_translation("sorting_by_relationship_count").unwrap();
+    insta::assert_snapshot!(result);
+}

@@ -6,6 +6,7 @@ pub enum Error {
     TableNotFound(String),
     ColumnNotFoundInTable(String, String),
     RelationshipNotFound(String),
+    EmptyPathForStarCountAggregate,
     NoFields,
     NotSupported(String),
 }
@@ -25,6 +26,9 @@ impl std::fmt::Display for Error {
             }
             Error::NotSupported(thing) => {
                 write!(f, "Queries containing {} are not supported.", thing)
+            }
+            Error::EmptyPathForStarCountAggregate => {
+                write!(f, "No path elements supplied for Star Count Aggregate")
             }
             Error::NoFields => {
                 write!(f, "No fields in request.")

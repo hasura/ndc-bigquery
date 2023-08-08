@@ -86,9 +86,40 @@ pub fn translate_order_by(
                         models::OrderByTarget::SingleColumnAggregate { .. } => Err(
                             Error::NotSupported("order by column aggregates".to_string()),
                         ),
-                        models::OrderByTarget::StarCountAggregate { .. } => Err(
-                            Error::NotSupported("order by star count aggregates".to_string()),
-                        ),
+                        models::OrderByTarget::StarCountAggregate { path } => {
+                            let (column_alias, select) = translate_order_by_star_count_aggregate(
+                                tables_info,
+                                relationships,
+                                source_table_alias,
+                                path,
+                            )?;
+
+                            // Give it a nice unique alias.
+                            let table_alias = sql::helpers::make_table_alias(format!(
+                                "%ORDER_{}_COUNT_{}",
+                                index, source_table_name
+                            ));
+
+                            // Build a join ...
+                            let new_join = sql::ast::LeftOuterJoinLateral {
+                                select: Box::new(select),
+                                alias: table_alias.clone(),
+                            };
+
+                            // ... push it to the accumulated joins.
+                            joins.push(sql::ast::Join::LeftOuterJoinLateral(new_join));
+
+                            // Build an alias to query the column from this select.
+                            let column_name = sql::ast::Expression::ColumnName(
+                                sql::ast::ColumnName::AliasedColumn {
+                                    table: sql::ast::TableName::AliasedTable(table_alias),
+                                    name: column_alias,
+                                },
+                            );
+
+                            // return the column to order by (from our fancy join)
+                            Ok(column_name)
+                        }
                     }?;
                     let direction = match order_by.order_direction {
                         models::OrderDirection::Asc => sql::ast::OrderByDirection::Asc,
@@ -105,6 +136,78 @@ pub fn translate_order_by(
                 joins,
             ))
         }
+    }
+}
+
+// a StarCountAggregate allows us to express stuff like "order albums by number of tracks they have",
+// ie order by a COUNT(*) over the items of an array relationship
+fn translate_order_by_star_count_aggregate(
+    tables_info: &metadata::TablesInfo,
+    relationships: &BTreeMap<String, models::Relationship>,
+    source_table_alias: &sql::ast::TableAlias,
+    path: &Vec<models::PathElement>,
+) -> Result<(sql::ast::ColumnAlias, sql::ast::Select), Error> {
+    // we can only do one level of star count aggregate atm
+    if path.len() > 1 {
+        Err(Error::NotSupported(
+            "star count for nested relationships".to_string(),
+        ))
+    } else {
+        Ok(())
+    }?;
+
+    match path.get(0) {
+        Some(path_element) => {
+            let models::PathElement {
+                relationship: relationship_name,
+                ..
+            } = path_element;
+
+            // examine the path elements' relationship.
+            let relationship = relationships
+                .get(relationship_name)
+                .ok_or(Error::RelationshipNotFound(relationship_name.clone()))?;
+
+            let target_collection_alias: sql::ast::TableAlias =
+                sql::helpers::make_table_alias(relationship.target_collection.clone());
+
+            let target_collection_alias_name: sql::ast::TableName =
+                sql::ast::TableName::AliasedTable(target_collection_alias.clone());
+
+            // make a very basic select COUNT(*) as "Count" FROM
+            // <nested-table> WHERE <join-conditions>
+            let column_alias = sql::helpers::make_column_alias("count".to_string());
+
+            let select_cols = vec![(
+                column_alias.clone(),
+                sql::ast::Expression::Count(sql::ast::CountType::Star),
+            )];
+
+            // build a select query from this table where join condition.
+            let mut select = sql::helpers::simple_select(select_cols);
+
+            // generate a condition for this join.
+            let join_condition = relationships::translate_column_mapping(
+                tables_info,
+                &relationship.source_collection_or_type,
+                source_table_alias,
+                sql::helpers::empty_where(),
+                relationship,
+            )?;
+
+            select.where_ = sql::ast::Where(join_condition);
+
+            select.from = Some(sql::ast::From::Table {
+                name: target_collection_alias_name,
+                alias: target_collection_alias,
+            });
+
+            // return the column to order by (from our fancy join)
+            Ok((column_alias, select))
+        }
+        None => Err(Error::NotSupported(
+            "order by star count aggregates".to_string(),
+        )),
     }
 }
 
