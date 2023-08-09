@@ -116,6 +116,12 @@ See [architecture.md](./architecture.md).
 request. This is because we parse the fields into a HashMap and cannot rely on
 the ordering, meaning the snapshots constantly change.
 
+## Testing metrics
+
+We have a Prometheus / Grafana set up in Docker. Run `just start-metrics` to
+start them, you can then navigation to `localhost:3001` for Grafana, or
+`localhost:9090` for Prometheus.
+
 ## Linting
 
 Run `just lint` to run clippy linter
