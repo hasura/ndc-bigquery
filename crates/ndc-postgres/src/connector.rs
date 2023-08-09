@@ -2,6 +2,7 @@
 /// for configuration and state as defined in `super::configuration`,
 /// and define the route handling for each route.
 use super::configuration;
+use super::metrics;
 use ndc_hub::connector;
 use query_engine::phases;
 
@@ -30,6 +31,15 @@ impl connector::Connector for Postgres {
         args: &Self::ConfigureArgs,
     ) -> Result<configuration::DeploymentConfiguration, connector::ConfigurationError> {
         configuration::configure(args).await
+    }
+
+    // update metrics in time for `/metrics` call
+    fn fetch_metrics(
+        _configuration: &configuration::DeploymentConfiguration,
+        state: &configuration::State,
+    ) -> Result<(), connector::FetchMetricsError> {
+        metrics::update_pool_metrics(&state.pool, &state.metrics);
+        Ok(())
     }
 
     /// Validate the config.

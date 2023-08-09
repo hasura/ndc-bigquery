@@ -1313,7 +1313,7 @@ dependencies = [
 [[package]]
 name = "ndc-hub"
 version = "0.1.0"
-source = "git+https://github.com/hasura/ndc-hub.git?rev=f2909c2#f2909c2297f659b1bfec117a74f295e870f23cb9"
+source = "git+https://github.com/hasura/ndc-hub.git?rev=5f08659#5f08659ca24e2c95c0e13c02933b71a5c8d11d3e"
 dependencies = [
  "async-trait",
  "axum",
