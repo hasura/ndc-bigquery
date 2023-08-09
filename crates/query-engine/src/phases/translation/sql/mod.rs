@@ -1,4 +1,5 @@
-/// Anything related to building and emitting SQL.
+//! Anything related to building and emitting SQL.
+
 pub mod ast;
 pub mod convert;
 pub mod execution_plan;

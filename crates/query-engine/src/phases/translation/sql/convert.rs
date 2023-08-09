@@ -1,4 +1,5 @@
-/// Convert a SQL AST to a low-level SQL string.
+//! Convert a SQL AST to a low-level SQL string.
+
 use super::ast::*;
 use super::helpers;
 use super::string::*;

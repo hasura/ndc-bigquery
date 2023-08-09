@@ -1,4 +1,6 @@
-/// Type definitions of a low-level SQL string representation.
+//! Type definitions of a low-level SQL string representation.
+
+/// A low-level builder for SQL.
 #[derive(Debug, PartialEq, Eq)]
 pub struct SQL {
     pub sql: String,

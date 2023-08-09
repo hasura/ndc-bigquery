@@ -1,9 +1,8 @@
-//! Metadata information regarding the database and tracekd information.
+//! Metadata information regarding the database and tracked information.
 
 use std::collections::{BTreeMap, BTreeSet};
 
 use schemars::JsonSchema;
-/// Metadata information regarding the database and tracekd information.
 use serde::{Deserialize, Serialize};
 
 /// Mapping from a graphql "table" name to its information.

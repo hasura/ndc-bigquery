@@ -1,6 +1,6 @@
-use query_engine::phases::translation;
-use sqlformat;
 use std::fs;
+
+use query_engine::phases::translation;
 
 /// Run a query against the server, get the result, and compare against the snapshot.
 pub fn test_translation(testname: &str) -> Result<String, translation::query::error::Error> {

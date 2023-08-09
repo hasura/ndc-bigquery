@@ -1,4 +1,5 @@
-/// Execute an execution plan against the database.
+//! Execute an execution plan against the database.
+
 use serde_json;
 
 use sqlformat;

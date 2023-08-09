@@ -1,4 +1,5 @@
-/// Type definitions of a SQL AST representation.
+//! Type definitions of a SQL AST representation.
+
 use std::collections::BTreeMap;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
