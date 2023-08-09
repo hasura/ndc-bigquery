@@ -1,0 +1,39 @@
+---
+source: crates/query-engine/tests/tests.rs
+expression: result
+---
+SELECT
+  row_to_json("universe") AS "universe"
+FROM
+  (
+    SELECT
+      *
+    FROM
+      (
+        SELECT
+          coalesce(json_agg(row_to_json("rows")), '[]') AS "rows"
+        FROM
+          (
+            SELECT
+              "album"."Title" AS "title"
+            FROM
+              "public"."Album" AS "album"
+            WHERE
+              EXISTS (
+                SELECT
+                FROM
+                  "public"."Artist" AS "artist"
+                WHERE
+                  (
+                    (
+                      true
+                      AND ("artist"."Name" = $1)
+                    )
+                    AND ("album"."ArtistId" = "artist"."ArtistId")
+                  )
+              )
+          ) AS "rows"
+      ) AS "rows"
+  ) AS "universe"
+
+[(1, String("Gilberto Gil"))]

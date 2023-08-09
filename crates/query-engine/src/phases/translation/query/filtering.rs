@@ -1,8 +1,10 @@
 //! Handle filtering/where clauses translation.
 
 use super::error::Error;
+use super::helpers::{RootAndCurrentTables, TableNameAndReference};
 use crate::metadata;
 use crate::phases::translation::sql;
+use crate::phases::translation::sql::helpers::simple_select;
 
 use ndc_client::models;
 
@@ -12,17 +14,14 @@ use std::collections::BTreeMap;
 pub fn translate_expression(
     tables_info: &metadata::TablesInfo,
     relationships: &BTreeMap<String, models::Relationship>,
-    // table alias to query from
-    table: &sql::ast::TableName,
-    // root table name for column lookup
-    root_table_name: &String,
+    root_and_current_tables: &RootAndCurrentTables,
     predicate: models::Expression,
 ) -> Result<sql::ast::Expression, Error> {
     match predicate {
         models::Expression::And { expressions } => expressions
             .into_iter()
             .map(|expr| {
-                translate_expression(tables_info, relationships, table, root_table_name, expr)
+                translate_expression(tables_info, relationships, root_and_current_tables, expr)
             })
             .try_fold(
                 sql::ast::Expression::Value(sql::ast::Value::Bool(true)),
@@ -37,7 +36,7 @@ pub fn translate_expression(
         models::Expression::Or { expressions } => expressions
             .into_iter()
             .map(|expr| {
-                translate_expression(tables_info, relationships, table, root_table_name, expr)
+                translate_expression(tables_info, relationships, root_and_current_tables, expr)
             })
             .try_fold(
                 sql::ast::Expression::Value(sql::ast::Value::Bool(true)),
@@ -53,8 +52,7 @@ pub fn translate_expression(
             let expr = translate_expression(
                 tables_info,
                 relationships,
-                table,
-                root_table_name,
+                root_and_current_tables,
                 *expression,
             )?;
             Ok(sql::ast::Expression::Not(Box::new(expr)))
@@ -67,15 +65,13 @@ pub fn translate_expression(
             let left = translate_comparison_target(
                 tables_info,
                 relationships,
-                root_table_name,
-                table,
+                root_and_current_tables,
                 *column,
             )?;
             let right = translate_comparison_value(
                 tables_info,
                 relationships,
-                root_table_name,
-                table,
+                root_and_current_tables,
                 *value,
             )?;
             Ok(sql::ast::Expression::BinaryOperator {
@@ -116,8 +112,7 @@ pub fn translate_expression(
             let left = translate_comparison_target(
                 tables_info,
                 relationships,
-                root_table_name,
-                table,
+                root_and_current_tables,
                 *column.clone(),
             )?;
             let right = values
@@ -126,8 +121,7 @@ pub fn translate_expression(
                     translate_comparison_value(
                         tables_info,
                         relationships,
-                        root_table_name,
-                        table,
+                        root_and_current_tables,
                         value.clone(),
                     )
                 })
@@ -145,15 +139,20 @@ pub fn translate_expression(
         models::Expression::Exists {
             in_collection,
             predicate,
-        } => translate_exists_in_collection(tables_info, relationships, *in_collection, *predicate),
+        } => translate_exists_in_collection(
+            tables_info,
+            relationships,
+            root_and_current_tables,
+            *in_collection,
+            *predicate,
+        ),
         // dummy
         models::Expression::UnaryComparisonOperator { column, operator } => match *operator {
             models::UnaryComparisonOperator::IsNull => {
                 let value = translate_comparison_target(
                     tables_info,
                     relationships,
-                    root_table_name,
-                    table,
+                    root_and_current_tables,
                     *column,
                 )?;
 
@@ -168,20 +167,63 @@ pub fn translate_expression(
 
 /// translate a comparison target.
 fn translate_comparison_target(
-    _tables_info: &metadata::TablesInfo,
+    tables_info: &metadata::TablesInfo,
     _relationships: &BTreeMap<String, models::Relationship>,
-    _root_table_name: &str,
-    table: &sql::ast::TableName,
+    root_and_current_tables: &RootAndCurrentTables,
     column: models::ComparisonTarget,
 ) -> Result<sql::ast::Expression, Error> {
     match column {
-        models::ComparisonTarget::Column { name, .. } => Ok(sql::ast::Expression::ColumnName(
-            sql::ast::ColumnName::TableColumn {
-                table: table.clone(),
-                name,
-            },
-        )),
-        models::ComparisonTarget::RootCollectionColumn { .. } => todo!(),
+        models::ComparisonTarget::Column { name, .. } => {
+            let RootAndCurrentTables { current_table, .. } = root_and_current_tables;
+            // get the unrelated table information from the metadata.
+            let metadata::TablesInfo(tables_info_map) = tables_info;
+            let table_info = tables_info_map
+                .get(&current_table.name)
+                .ok_or(Error::TableNotFound(current_table.name.clone()))?;
+
+            let metadata::ColumnInfo { name } =
+                table_info
+                    .columns
+                    .get(&name)
+                    .ok_or(Error::ColumnNotFoundInTable(
+                        name.clone(),
+                        current_table.name.clone(),
+                    ))?;
+
+            Ok(sql::ast::Expression::ColumnName(
+                sql::ast::ColumnName::TableColumn {
+                    table: sql::ast::TableName::AliasedTable(current_table.reference.clone()),
+                    name: name.to_string(),
+                },
+            ))
+        }
+
+        // Compare a column from the root table.
+        models::ComparisonTarget::RootCollectionColumn { name } => {
+            let RootAndCurrentTables { root_table, .. } = root_and_current_tables;
+            // get the unrelated table information from the metadata.
+            let metadata::TablesInfo(tables_info_map) = tables_info;
+            let table_info = tables_info_map
+                .get(&root_table.name)
+                .ok_or(Error::TableNotFound(root_table.name.to_string()))?;
+
+            // find the requested column in the tables columns.
+            let metadata::ColumnInfo { name } =
+                table_info
+                    .columns
+                    .get(&name)
+                    .ok_or(Error::ColumnNotFoundInTable(
+                        name.clone(),
+                        root_table.name.to_string(),
+                    ))?;
+
+            Ok(sql::ast::Expression::ColumnName(
+                sql::ast::ColumnName::TableColumn {
+                    table: sql::ast::TableName::AliasedTable(root_table.reference.clone()),
+                    name: name.to_string(),
+                },
+            ))
+        }
     }
 }
 
@@ -189,14 +231,16 @@ fn translate_comparison_target(
 fn translate_comparison_value(
     tables_info: &metadata::TablesInfo,
     relationships: &BTreeMap<String, models::Relationship>,
-    root_table_name: &str,
-    table: &sql::ast::TableName,
+    root_and_current_tables: &RootAndCurrentTables,
     value: models::ComparisonValue,
 ) -> Result<sql::ast::Expression, Error> {
     match value {
-        models::ComparisonValue::Column { column } => {
-            translate_comparison_target(tables_info, relationships, root_table_name, table, *column)
-        }
+        models::ComparisonValue::Column { column } => translate_comparison_target(
+            tables_info,
+            relationships,
+            root_and_current_tables,
+            *column,
+        ),
         models::ComparisonValue::Scalar { value: json_value } => Ok(sql::ast::Expression::Value(
             translate_json_value(&json_value),
         )),
@@ -229,23 +273,57 @@ fn translate_json_value(value: &serde_json::Value) -> sql::ast::Value {
 /// > EXISTS (SELECT FROM <table> AS <alias> WHERE <predicate>)
 pub fn translate_exists_in_collection(
     tables_info: &metadata::TablesInfo,
-    _relationships: &BTreeMap<String, models::Relationship>,
+    relationships: &BTreeMap<String, models::Relationship>,
+    root_and_current_tables: &RootAndCurrentTables,
     in_collection: models::ExistsInCollection,
-    _predicate: models::Expression,
+    predicate: models::Expression,
 ) -> Result<sql::ast::Expression, Error> {
     match in_collection {
         // ignore arguments for now
         models::ExistsInCollection::Unrelated { collection, .. } => {
             // get the unrelated table information from the metadata.
             let metadata::TablesInfo(tables_info_map) = tables_info;
-            let _table_info = tables_info_map
+            let table_info = tables_info_map
                 .get(&collection)
                 .ok_or(Error::TableNotFound(collection.clone()))?;
+
+            // db table name
+            let db_table_name: sql::ast::TableName = sql::ast::TableName::DBTable {
+                schema: table_info.schema_name.clone(),
+                table: table_info.table_name.clone(),
+            };
+
             // new alias for the table
-            let _table_alias: sql::ast::TableAlias =
+            let table_alias: sql::ast::TableAlias =
                 sql::helpers::make_table_alias(collection.clone());
 
-            todo!()
+            // build a SELECT querying this table with the relevant predicate.
+            let mut select = simple_select(vec![]);
+            select.from = Some(sql::ast::From::Table {
+                name: db_table_name.clone(),
+                alias: table_alias.clone(),
+            });
+
+            let new_root_and_current_tables = RootAndCurrentTables {
+                root_table: root_and_current_tables.root_table.clone(),
+                current_table: TableNameAndReference {
+                    reference: table_alias.clone(),
+                    name: collection.clone(),
+                },
+            };
+
+            let expr = translate_expression(
+                tables_info,
+                relationships,
+                &new_root_and_current_tables,
+                predicate,
+            )?;
+            select.where_ = sql::ast::Where(expr);
+
+            // > EXISTS (SELECT FROM <table> AS <alias> WHERE <predicate>)
+            Ok(sql::ast::Expression::Exists {
+                select: Box::new(select),
+            })
         }
         models::ExistsInCollection::Related { .. } => {
             todo!()

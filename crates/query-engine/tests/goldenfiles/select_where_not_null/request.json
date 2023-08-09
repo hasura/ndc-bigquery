@@ -17,7 +17,7 @@
         "operator": "is_null",
         "column": {
           "type": "column",
-          "name": "AlbumId",
+          "name": "Id",
           "path": []
         }
       }

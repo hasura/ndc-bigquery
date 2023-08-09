@@ -3,14 +3,14 @@
 pub mod aggregates;
 pub mod error;
 pub mod filtering;
+pub mod helpers;
 pub mod relationships;
 pub mod root;
 pub mod sorting;
 
+use crate::metadata;
 use crate::phases::translation::sql;
 use error::Error;
-
-use crate::metadata;
 
 use ndc_client::models;
 
@@ -23,7 +23,8 @@ pub fn translate(
 ) -> Result<sql::execution_plan::ExecutionPlan, Error> {
     let select_set = translate_query(
         tables_info,
-        &query_request.collection,
+        &None,
+        query_request.collection.clone(),
         &query_request.collection_relationships,
         query_request.query,
     )?;
@@ -53,7 +54,8 @@ pub fn translate(
 /// We return a SELECT for the 'rows' field and a SELECT for the 'aggregates' field.
 pub fn translate_query(
     tables_info: &metadata::TablesInfo,
-    table_name: &String,
+    root_table: &Option<helpers::TableNameAndReference>,
+    table_name: String,
     relationships: &BTreeMap<String, models::Relationship>,
     query: models::Query,
 ) -> Result<sql::helpers::SelectSet, Error> {
@@ -69,12 +71,12 @@ pub fn translate_query(
 
     // translate rows query. if there are no fields, make this a None
     let row_select: Option<sql::ast::Select> =
-        root::translate_rows_query(tables_info, table_name, relationships, &query)
+        root::translate_rows_query(tables_info, root_table, &table_name, relationships, &query)
             .map_or_else(map_no_fields_error_to_none, wrap_ok)?;
 
     // translate aggregate select. if there are no fields, make this a None
     let aggregate_select: Option<sql::ast::Select> =
-        root::translate_aggregate_query(tables_info, table_name, relationships, &query)
+        root::translate_aggregate_query(tables_info, root_table, table_name, relationships, &query)
             .map_or_else(map_no_fields_error_to_none, wrap_ok)?;
 
     match (row_select, aggregate_select) {

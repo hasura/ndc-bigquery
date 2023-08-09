@@ -1,4 +1,5 @@
 use super::error::Error;
+use super::helpers::{RootAndCurrentTables, TableNameAndReference};
 use super::relationships;
 use crate::phases::translation::sql;
 
@@ -13,8 +14,7 @@ use std::collections::BTreeMap;
 pub fn translate_order_by(
     tables_info: &metadata::TablesInfo,
     relationships: &BTreeMap<String, models::Relationship>,
-    source_table_alias: &sql::ast::TableAlias,
-    source_table_name: &String,
+    root_and_current_tables: &RootAndCurrentTables,
     order_by: &Option<models::OrderBy>,
 ) -> Result<(sql::ast::OrderBy, Vec<sql::ast::Join>), Error> {
     let mut joins: Vec<sql::ast::Join> = vec![];
@@ -44,7 +44,10 @@ pub fn translate_order_by(
                                     let column_name = sql::ast::Expression::ColumnName(
                                         sql::ast::ColumnName::AliasedColumn {
                                             table: sql::ast::TableName::AliasedTable(
-                                                source_table_alias.clone(),
+                                                root_and_current_tables
+                                                    .current_table
+                                                    .reference
+                                                    .clone(),
                                             ),
                                             name: column_alias,
                                         },
@@ -59,7 +62,7 @@ pub fn translate_order_by(
                                     // Give it a nice unique alias.
                                     let table_alias = sql::helpers::make_order_by_table_alias(
                                         index,
-                                        source_table_name,
+                                        &root_and_current_tables.current_table.name,
                                     );
 
                                     // Build a join and push it to the accumulated joins.
@@ -90,14 +93,14 @@ pub fn translate_order_by(
                             let (column_alias, select) = translate_order_by_star_count_aggregate(
                                 tables_info,
                                 relationships,
-                                source_table_alias,
+                                &root_and_current_tables.current_table,
                                 path,
                             )?;
 
                             // Give it a nice unique alias.
                             let table_alias = sql::helpers::make_table_alias(format!(
                                 "%ORDER_{}_COUNT_{}",
-                                index, source_table_name
+                                index, root_and_current_tables.current_table.name
                             ));
 
                             // Build a join ...
@@ -144,7 +147,7 @@ pub fn translate_order_by(
 fn translate_order_by_star_count_aggregate(
     tables_info: &metadata::TablesInfo,
     relationships: &BTreeMap<String, models::Relationship>,
-    source_table_alias: &sql::ast::TableAlias,
+    source_table: &TableNameAndReference,
     path: &Vec<models::PathElement>,
 ) -> Result<(sql::ast::ColumnAlias, sql::ast::Select), Error> {
     // we can only do one level of star count aggregate atm
@@ -189,8 +192,7 @@ fn translate_order_by_star_count_aggregate(
             // generate a condition for this join.
             let join_condition = relationships::translate_column_mapping(
                 tables_info,
-                &relationship.source_collection_or_type,
-                source_table_alias,
+                source_table,
                 sql::helpers::empty_where(),
                 relationship,
             )?;
@@ -316,11 +318,15 @@ fn translate_order_by_target_for_column(
                         .map(|source_col| sql::helpers::make_column_alias(source_col.to_string()))
                         .collect();
 
+                    let source_table = TableNameAndReference {
+                        name: relationship.source_collection_or_type.clone(),
+                        reference: source_table_alias,
+                    };
+
                     // generate a condition for this join.
                     let join_condition = relationships::translate_column_mapping(
                         tables_info,
-                        &relationship.source_collection_or_type,
-                        &source_table_alias,
+                        &source_table,
                         sql::helpers::empty_where(),
                         relationship,
                     )?;

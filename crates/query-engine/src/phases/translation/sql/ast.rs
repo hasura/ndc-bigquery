@@ -126,6 +126,9 @@ pub enum Expression {
         function: Function,
         args: Vec<Expression>,
     },
+    Exists {
+        select: Box<Select>,
+    },
     JsonBuildObject(BTreeMap<String, Box<Expression>>),
     // SELECT queries can appear in a select list if they return
     // one row. For now we can only do this with 'row_to_json'.

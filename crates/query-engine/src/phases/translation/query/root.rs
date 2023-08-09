@@ -3,6 +3,7 @@
 use super::aggregates;
 use super::error::Error;
 use super::filtering;
+use super::helpers::{RootAndCurrentTables, TableNameAndReference};
 use super::relationships;
 use super::sorting;
 use crate::metadata;
@@ -16,11 +17,18 @@ use std::collections::BTreeMap;
 /// Translate aggregates query to sql ast.
 pub fn translate_aggregate_query(
     tables_info: &metadata::TablesInfo,
-    table_name: &String,
+    root_table: &Option<TableNameAndReference>,
+    current_table_name: String,
     relationships: &BTreeMap<String, models::Relationship>,
     query: &models::Query,
 ) -> Result<sql::ast::Select, Error> {
-    let table_alias: sql::ast::TableAlias = sql::helpers::make_table_alias(table_name.clone());
+    let current_table_alias: sql::ast::TableAlias =
+        sql::helpers::make_table_alias(current_table_name.clone());
+
+    let current_table = TableNameAndReference {
+        name: current_table_name,
+        reference: current_table_alias,
+    };
 
     // translate aggregates to select list
     let aggregate_fields = query.aggregates.clone().ok_or(Error::NoFields)?;
@@ -33,7 +41,7 @@ pub fn translate_aggregate_query(
 
     // create all aggregate columns
     let aggregate_columns = aggregates::translate(
-        sql::ast::TableName::AliasedTable(table_alias),
+        sql::ast::TableName::AliasedTable(current_table.reference.clone()),
         aggregate_fields,
     )?;
 
@@ -41,7 +49,8 @@ pub fn translate_aggregate_query(
     // We don't add the limit afterwards.
     translate_query_part(
         tables_info,
-        table_name,
+        root_table,
+        &current_table,
         relationships,
         query,
         aggregate_columns,
@@ -52,17 +61,25 @@ pub fn translate_aggregate_query(
 /// Translate rows part of query to sql ast.
 pub fn translate_rows_query(
     tables_info: &metadata::TablesInfo,
-    table_name: &String,
+    root_table: &Option<TableNameAndReference>,
+    current_table_name: &str,
     relationships: &BTreeMap<String, models::Relationship>,
     query: &models::Query,
 ) -> Result<sql::ast::Select, Error> {
     let metadata::TablesInfo(tables_info_map) = tables_info;
     // find the table according to the metadata.
     let table_info = tables_info_map
-        .get(table_name)
-        .ok_or(Error::TableNotFound(table_name.clone()))?;
-    let table_alias: sql::ast::TableAlias = sql::helpers::make_table_alias(table_name.clone());
-    let table_alias_name: sql::ast::TableName = sql::ast::TableName::AliasedTable(table_alias);
+        .get(current_table_name)
+        .ok_or(Error::TableNotFound(current_table_name.to_string()))?;
+
+    let current_table_alias: sql::ast::TableAlias =
+        sql::helpers::make_table_alias(current_table_name.to_string());
+    let current_table = TableNameAndReference {
+        name: current_table_name.to_string(),
+        reference: current_table_alias,
+    };
+    let current_table_alias_name: sql::ast::TableName =
+        sql::ast::TableName::AliasedTable(current_table.reference.clone());
 
     // join aliases
     let mut join_fields: Vec<(sql::ast::TableAlias, String, models::Query)> = vec![];
@@ -81,12 +98,16 @@ pub fn translate_rows_query(
         .into_iter()
         .map(|(alias, field)| match field {
             models::Field::Column { column, .. } => {
-                let column_info = table_info
-                    .columns
-                    .get(&column)
-                    .ok_or(Error::ColumnNotFoundInTable(column, table_name.clone()))?;
+                let column_info =
+                    table_info
+                        .columns
+                        .get(&column)
+                        .ok_or(Error::ColumnNotFoundInTable(
+                            column,
+                            current_table_name.to_string(),
+                        ))?;
                 Ok(sql::helpers::make_column(
-                    table_alias_name.clone(),
+                    current_table_alias_name.clone(),
                     column_info.name.clone(),
                     sql::helpers::make_column_alias(alias),
                 ))
@@ -112,7 +133,8 @@ pub fn translate_rows_query(
     // We'll add the limit afterwards.
     let mut select = translate_query_part(
         tables_info,
-        table_name,
+        root_table,
+        &current_table,
         relationships,
         query,
         columns,
@@ -137,7 +159,8 @@ pub fn translate_rows_query(
 /// set the limit and offset so you want to do that after calling this function.
 fn translate_query_part(
     tables_info: &metadata::TablesInfo,
-    table_name: &String,
+    root_table: &Option<TableNameAndReference>,
+    current_table: &TableNameAndReference,
     relationships: &BTreeMap<String, models::Relationship>,
     query: &models::Query,
     columns: Vec<(sql::ast::ColumnAlias, sql::ast::Expression)>,
@@ -146,30 +169,37 @@ fn translate_query_part(
     let metadata::TablesInfo(tables_info_map) = tables_info;
     // find the table according to the metadata.
     let table_info = tables_info_map
-        .get(table_name)
-        .ok_or(Error::TableNotFound(table_name.clone()))?;
-    let table: sql::ast::TableName = sql::ast::TableName::DBTable {
+        .get(&current_table.name)
+        .ok_or(Error::TableNotFound(current_table.name.clone()))?;
+
+    let db_table: sql::ast::TableName = sql::ast::TableName::DBTable {
         schema: table_info.schema_name.clone(),
         table: table_info.table_name.clone(),
     };
-    let table_alias: sql::ast::TableAlias = sql::helpers::make_table_alias(table_name.clone());
-    let table_alias_name: sql::ast::TableName =
-        sql::ast::TableName::AliasedTable(table_alias.clone());
+
+    let root_table = match root_table {
+        None => current_table.clone(),
+        Some(root_table) => root_table.clone(),
+    };
+    // the root table and the current table are the same at this point
+    let root_and_current_tables = RootAndCurrentTables {
+        root_table,
+        current_table: current_table.clone(),
+    };
 
     // construct a simple select with the table name, alias, and selected columns.
     let mut select = sql::helpers::simple_select(columns);
 
     select.from = Some(sql::ast::From::Table {
-        name: table,
-        alias: table_alias.clone(),
+        name: db_table,
+        alias: current_table.reference.clone(),
     });
 
     // collect any joins for relationships
     let mut relationship_joins = relationships::translate_joins(
         relationships,
         tables_info,
-        &table_alias,
-        table_name,
+        &root_and_current_tables,
         join_fields,
     )?;
 
@@ -177,8 +207,7 @@ fn translate_query_part(
     let (order_by, order_by_joins) = sorting::translate_order_by(
         tables_info,
         relationships,
-        &table_alias,
-        table_name,
+        &root_and_current_tables,
         &query.order_by,
     )?;
 
@@ -194,8 +223,7 @@ fn translate_query_part(
         Some(predicate) => filtering::translate_expression(
             tables_info,
             relationships,
-            &table_alias_name,
-            table_name,
+            &root_and_current_tables,
             predicate,
         ),
     }?);

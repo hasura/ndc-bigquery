@@ -225,6 +225,12 @@ impl Expression {
                 }
                 sql.append_syntax(")");
             }
+            Expression::Exists { select } => {
+                sql.append_syntax("EXISTS ");
+                sql.append_syntax("(");
+                select.to_sql(sql);
+                sql.append_syntax(")");
+            }
             Expression::JsonBuildObject(map) => {
                 sql.append_syntax("json_build_object");
                 sql.append_syntax("(");

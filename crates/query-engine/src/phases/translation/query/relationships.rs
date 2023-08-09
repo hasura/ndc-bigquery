@@ -2,6 +2,7 @@
 
 use super::error::Error;
 
+use super::helpers::{RootAndCurrentTables, TableNameAndReference};
 use crate::metadata;
 use crate::phases::translation::sql;
 
@@ -13,8 +14,7 @@ use std::collections::BTreeMap;
 pub fn translate_joins(
     relationships: &BTreeMap<String, models::Relationship>,
     tables_info: &metadata::TablesInfo,
-    table_alias: &sql::ast::TableAlias,
-    table_name: &str,
+    root_and_current_tables: &RootAndCurrentTables,
     // We got these by processing the fields selection.
     join_fields: Vec<(sql::ast::TableAlias, String, models::Query)>,
 ) -> Result<Vec<sql::ast::Join>, Error> {
@@ -29,7 +29,8 @@ pub fn translate_joins(
             // process inner query and get the SELECTs for the 'rows' and 'aggregates' fields.
             let select_set = super::translate_query(
                 tables_info,
-                &relationship.target_collection,
+                &Some(root_and_current_tables.root_table.clone()),
+                relationship.target_collection.clone(),
                 relationships,
                 query,
             )?;
@@ -42,8 +43,7 @@ pub fn translate_joins(
 
                     row_select.where_ = sql::ast::Where(translate_column_mapping(
                         tables_info,
-                        table_name,
-                        table_alias,
+                        &root_and_current_tables.current_table,
                         row_expr,
                         relationship,
                     )?);
@@ -56,8 +56,7 @@ pub fn translate_joins(
 
                     aggregate_select.where_ = sql::ast::Where(translate_column_mapping(
                         tables_info,
-                        table_name,
-                        table_alias,
+                        &root_and_current_tables.current_table,
                         aggregate_expr,
                         relationship,
                     )?);
@@ -73,8 +72,7 @@ pub fn translate_joins(
 
                     row_select.where_ = sql::ast::Where(translate_column_mapping(
                         tables_info,
-                        table_name,
-                        table_alias,
+                        &root_and_current_tables.current_table,
                         row_expr,
                         relationship,
                     )?);
@@ -83,8 +81,7 @@ pub fn translate_joins(
 
                     aggregate_select.where_ = sql::ast::Where(translate_column_mapping(
                         tables_info,
-                        table_name,
-                        table_alias,
+                        &root_and_current_tables.current_table,
                         aggregate_expr,
                         relationship,
                     )?);
@@ -122,16 +119,15 @@ pub fn translate_joins(
 /// Given a relationship, turn it into a Where clause for a Join.
 pub fn translate_column_mapping(
     tables_info: &metadata::TablesInfo,
-    table_name: &str,
-    table_alias: &sql::ast::TableAlias,
+    current_table: &TableNameAndReference,
     expr: sql::ast::Expression,
     relationship: &models::Relationship,
 ) -> Result<sql::ast::Expression, Error> {
     let metadata::TablesInfo(tables_info_map) = tables_info;
 
     let table_info = tables_info_map
-        .get(table_name)
-        .ok_or(Error::TableNotFound(table_name.to_string()))?;
+        .get(&current_table.name)
+        .ok_or(Error::TableNotFound(current_table.name.to_string()))?;
 
     let target_collection_info = tables_info_map
         .get(&relationship.target_collection)
@@ -151,7 +147,7 @@ pub fn translate_column_mapping(
                     .get(source_col)
                     .ok_or(Error::ColumnNotFoundInTable(
                         source_col.clone(),
-                        table_name.to_string(),
+                        current_table.name.clone(),
                     ))?;
             let target_column_info = target_collection_info.columns.get(target_col).ok_or(
                 Error::ColumnNotFoundInTable(
@@ -162,7 +158,7 @@ pub fn translate_column_mapping(
             Ok(sql::ast::Expression::BinaryOperator {
                 left: Box::new(sql::ast::Expression::ColumnName(
                     sql::ast::ColumnName::TableColumn {
-                        table: sql::ast::TableName::AliasedTable(table_alias.clone()),
+                        table: sql::ast::TableName::AliasedTable(current_table.reference.clone()),
                         name: source_column_info.name.clone(),
                     },
                 )),
