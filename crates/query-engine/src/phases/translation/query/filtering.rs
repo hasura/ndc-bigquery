@@ -2,6 +2,7 @@
 
 use super::error::Error;
 use super::helpers::{RootAndCurrentTables, TableNameAndReference};
+use super::relationships;
 use crate::metadata;
 use crate::phases::translation::sql;
 use crate::phases::translation::sql::helpers::simple_select;
@@ -325,8 +326,78 @@ pub fn translate_exists_in_collection(
                 select: Box::new(select),
             })
         }
-        models::ExistsInCollection::Related { .. } => {
-            todo!()
+        // We get a relationship name in exists, query the target table directly,
+        // and build a WHERE clause that contains the join conditions and the specified
+        // EXISTS condition.
+        models::ExistsInCollection::Related { relationship, .. } => {
+            // get the relationship table
+            let relationship = relationships
+                .get(&relationship)
+                .ok_or(Error::RelationshipNotFound(relationship.clone()))?;
+
+            // I don't expect v3-engine to let us down, but just in case :)
+            if root_and_current_tables.current_table.name != relationship.source_collection_or_type
+            {
+                Err(Error::TableNotFound(
+                    relationship.source_collection_or_type.clone(),
+                ))
+            } else {
+                Ok(())
+            }?;
+
+            // get the unrelated table information from the metadata.
+            let metadata::TablesInfo(tables_info_map) = tables_info;
+            let table_info = tables_info_map
+                .get(&relationship.target_collection)
+                .ok_or(Error::TableNotFound(relationship.target_collection.clone()))?;
+
+            // relationship target db table name
+            let db_table_name: sql::ast::TableName = sql::ast::TableName::DBTable {
+                schema: table_info.schema_name.clone(),
+                table: table_info.table_name.clone(),
+            };
+
+            // new alias for the target table
+            let table_alias: sql::ast::TableAlias =
+                sql::helpers::make_table_alias(relationship.target_collection.clone());
+
+            // build a SELECT querying this table with the relevant predicate.
+            let mut select = simple_select(vec![]);
+            select.from = Some(sql::ast::From::Table {
+                name: db_table_name.clone(),
+                alias: table_alias.clone(),
+            });
+
+            let new_root_and_current_tables = RootAndCurrentTables {
+                root_table: root_and_current_tables.root_table.clone(),
+                current_table: TableNameAndReference {
+                    reference: table_alias.clone(),
+                    name: relationship.target_collection.clone(),
+                },
+            };
+
+            // exists condition
+            let exists_cond = translate_expression(
+                tables_info,
+                relationships,
+                &new_root_and_current_tables,
+                predicate,
+            )?;
+
+            // relationship where clause
+            let cond = relationships::translate_column_mapping(
+                tables_info,
+                &root_and_current_tables.current_table,
+                exists_cond,
+                relationship,
+            )?;
+
+            select.where_ = sql::ast::Where(cond);
+
+            // > EXISTS (SELECT FROM <table> AS <alias> WHERE <predicate>)
+            Ok(sql::ast::Expression::Exists {
+                select: Box::new(select),
+            })
         }
     }
 }

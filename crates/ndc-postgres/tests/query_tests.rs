@@ -150,6 +150,12 @@ mod predicates {
         let result = run_query("select_where_unrelated_exists").await;
         insta::assert_json_snapshot!(result);
     }
+
+    #[tokio::test]
+    async fn select_where_related_exists() {
+        let result = run_query("select_where_related_exists").await;
+        insta::assert_json_snapshot!(result);
+    }
 }
 
 mod sorting {

@@ -1,0 +1,29 @@
+{
+  "album": {
+    "schema_name": "public",
+    "table_name": "Album",
+    "columns": {
+      "id": {
+        "name": "AlbumId"
+      },
+      "title": {
+        "name": "Title"
+      },
+      "artist_id": {
+        "name": "ArtistId"
+      }
+    }
+  },
+  "artist": {
+    "schema_name": "public",
+    "table_name": "Artist",
+    "columns": {
+      "id": {
+        "name": "ArtistId"
+      },
+      "name": {
+        "name": "Name"
+      }
+    }
+  }
+}

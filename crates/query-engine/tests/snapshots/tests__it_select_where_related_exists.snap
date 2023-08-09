@@ -1,0 +1,63 @@
+---
+source: crates/query-engine/tests/tests.rs
+expression: result
+---
+SELECT
+  row_to_json("universe") AS "universe"
+FROM
+  (
+    SELECT
+      *
+    FROM
+      (
+        SELECT
+          coalesce(json_agg(row_to_json("rows")), '[]') AS "rows"
+        FROM
+          (
+            SELECT
+              "artist"."Name" AS "title",
+              "albums"."albums" AS "albums"
+            FROM
+              "public"."Artist" AS "artist"
+              LEFT OUTER JOIN LATERAL (
+                SELECT
+                  row_to_json("albums") AS "albums"
+                FROM
+                  (
+                    SELECT
+                      *
+                    FROM
+                      (
+                        SELECT
+                          coalesce(json_agg(row_to_json("rows")), '[]') AS "rows"
+                        FROM
+                          (
+                            SELECT
+                              "album"."Title" AS "title"
+                            FROM
+                              "public"."Album" AS "album"
+                            WHERE
+                              (
+                                true
+                                AND ("artist"."ArtistId" = "album"."ArtistId")
+                              )
+                          ) AS "rows"
+                      ) AS "rows"
+                  ) AS "albums"
+              ) AS "albums" ON ('true')
+            WHERE
+              EXISTS (
+                SELECT
+                FROM
+                  "public"."Album" AS "album"
+                WHERE
+                  (
+                    ("album"."Title" LIKE $1)
+                    AND ("artist"."ArtistId" = "album"."ArtistId")
+                  )
+              )
+          ) AS "rows"
+      ) AS "rows"
+  ) AS "universe"
+
+[(1, String("Supernatural"))]
