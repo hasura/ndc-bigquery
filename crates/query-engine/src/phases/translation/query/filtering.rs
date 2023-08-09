@@ -147,9 +147,22 @@ pub fn translate_expression(
             predicate,
         } => translate_exists_in_collection(tables_info, relationships, *in_collection, *predicate),
         // dummy
-        models::Expression::UnaryComparisonOperator { .. } => {
-            todo!()
-        }
+        models::Expression::UnaryComparisonOperator { column, operator } => match *operator {
+            models::UnaryComparisonOperator::IsNull => {
+                let value = translate_comparison_target(
+                    tables_info,
+                    relationships,
+                    root_table_name,
+                    table,
+                    *column,
+                )?;
+
+                Ok(sql::ast::Expression::UnaryOperator {
+                    column: Box::new(value),
+                    operator: sql::ast::UnaryOperator::IsNull,
+                })
+            }
+        },
     }
 }
 

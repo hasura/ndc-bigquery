@@ -13,6 +13,12 @@ fn it_select_where_string() {
 }
 
 #[test]
+fn it_select_where_not_null() {
+    let result = common::test_translation("select_where_not_null").unwrap();
+    insta::assert_snapshot!(result);
+}
+
+#[test]
 fn it_aggregate_count_albums() {
     let result = common::test_translation("aggregate_count_albums").unwrap();
     insta::assert_snapshot!(result);

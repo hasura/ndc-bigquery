@@ -208,6 +208,12 @@ impl Expression {
                 }
                 sql.append_syntax(")");
             }
+            Expression::UnaryOperator { column, operator } => {
+                sql.append_syntax("(");
+                column.to_sql(sql);
+                operator.to_sql(sql);
+                sql.append_syntax(")");
+            }
             Expression::FunctionCall { function, args } => {
                 function.to_sql(sql);
                 sql.append_syntax("(");
@@ -257,6 +263,14 @@ impl Type {
     pub fn to_sql(&self, sql: &mut SQL) {
         match self {
             Type::Json => sql.append_syntax("json"),
+        }
+    }
+}
+
+impl UnaryOperator {
+    pub fn to_sql(&self, sql: &mut SQL) {
+        match self {
+            UnaryOperator::IsNull => sql.append_syntax(" IS NULL "),
         }
     }
 }

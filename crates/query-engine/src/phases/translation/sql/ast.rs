@@ -118,6 +118,10 @@ pub enum Expression {
         operator: BinaryArrayOperator,
         right: Vec<Expression>,
     },
+    UnaryOperator {
+        column: Box<Expression>,
+        operator: UnaryOperator,
+    },
     FunctionCall {
         function: Function,
         args: Vec<Expression>,
@@ -135,6 +139,11 @@ pub enum Expression {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Type {
     Json,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum UnaryOperator {
+    IsNull,
 }
 
 // we should consider at least the list in `Hasura.Backends.Postgres.Translate.BoolExp`
