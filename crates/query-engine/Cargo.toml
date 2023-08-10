@@ -6,7 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-ndc-client = { git = "https://github.com/hasura/ndc-spec.git", rev = "f3a6759" }
+ndc-client = { git = "https://github.com/hasura/ndc-spec.git", tag = "v0.1.0-rc.1" }
 
 indexmap = "1"
 schemars = { version = "0.8.12", features = ["smol_str"] }

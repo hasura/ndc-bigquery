@@ -33,7 +33,15 @@ jobs:
         run: |
           cd benchmarks/component
           mkdir -p generated
-          docker compose run generate-configuration > generated/deployment.json
+          docker compose up --detach --wait agent-configuration
+          sleep 1
+          CONFIGURATION_SERVER_URL="http://$(docker compose port agent-configuration 9100)/"
+          curl -fsS "$CONFIGURATION_SERVER_URL" \
+            | jq --arg postgres_database_url 'postgresql://postgres:password@postgres' '. + {"postgres_database_url": $postgres_database_url}' \
+            | curl -fsS "$CONFIGURATION_SERVER_URL" -H 'Content-Type: application/json' -d @- \
+            | jq . \
+            | tee ./generated/deployment.json
+          docker compose down agent-configuration
 
       - name: Start the agent ▶️
         run: |

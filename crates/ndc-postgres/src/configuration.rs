@@ -1,7 +1,6 @@
 //! Configuration and state for our connector.
 
 use super::metrics;
-use clap::Args;
 use ndc_hub::connector;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
@@ -18,13 +17,6 @@ pub struct DeploymentConfiguration {
     pub tables: query_engine::metadata::TablesInfo,
 }
 
-/// Arguments for configuration?
-#[derive(Clone, Args)]
-pub struct ConfigureArgs {
-    #[arg()]
-    pub postgres_connection_string: String,
-}
-
 /// State for our connector.
 #[derive(Debug, Clone)]
 pub struct State {
@@ -35,11 +27,17 @@ pub struct State {
 /// Validate the user configuration.
 pub async fn validate_raw_configuration(
     configuration: &DeploymentConfiguration,
-) -> Result<DeploymentConfiguration, connector::ConfigurationError> {
+) -> Result<DeploymentConfiguration, connector::ValidateError> {
     if configuration.version != 1 {
-        return Err(connector::ConfigurationError::Other(
-            ConfigurationError::InvalidConfigVersion(configuration.version).into(),
-        ));
+        return Err(connector::ValidateError::ValidateError(vec![
+            connector::InvalidRange {
+                path: vec![connector::KeyOrIndex::Key("version".into())],
+                message: format!(
+                    "invalid configuration version, expected 1, got {0}",
+                    configuration.version
+                ),
+            },
+        ]));
     }
     Ok(configuration.clone())
 }
@@ -68,8 +66,8 @@ async fn create_pool(configuration: &DeploymentConfiguration) -> Result<PgPool, 
 /// Connect to the db and fetch the tables?
 /// Copied from the ndc-postgres repo.
 pub async fn configure(
-    args: &ConfigureArgs,
-) -> Result<DeploymentConfiguration, connector::ConfigurationError> {
+    args: &DeploymentConfiguration,
+) -> Result<DeploymentConfiguration, connector::UpdateConfigurationError> {
     // This requests the table configuration from the database.
     // The structure maps directly to `TableInfo`.
     //
@@ -202,32 +200,25 @@ pub async fn configure(
 
     let pool = PgPoolOptions::new()
         .max_connections(1)
-        .connect(&args.postgres_connection_string)
+        .connect(&args.postgres_database_url)
         .await
-        .map_err(|e| connector::ConfigurationError::Other(e.into()))?;
+        .map_err(|e| connector::UpdateConfigurationError::Other(e.into()))?;
 
     let query = sqlx::query(statement_string);
 
     let row = query
         .fetch_one(&pool)
         .await
-        .map_err(|e| connector::ConfigurationError::Other(e.into()))?;
+        .map_err(|e| connector::UpdateConfigurationError::Other(e.into()))?;
 
     let tables: query_engine::metadata::TablesInfo = serde_json::from_value(row.get(0))
-        .map_err(|e| connector::ConfigurationError::Other(e.into()))?;
+        .map_err(|e| connector::UpdateConfigurationError::Other(e.into()))?;
 
     Ok(DeploymentConfiguration {
         version: 1,
-        postgres_database_url: args.postgres_connection_string.clone(),
+        postgres_database_url: args.postgres_database_url.clone(),
         tables,
     })
-}
-
-/// User configuration error.
-#[derive(Debug, Error)]
-enum ConfigurationError {
-    #[error("invalid configuration version, expected 1, got {0}")]
-    InvalidConfigVersion(u32),
 }
 
 /// State initialization error.

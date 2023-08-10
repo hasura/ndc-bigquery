@@ -20,17 +20,27 @@ run: start-dependencies
 run-in-docker: build-docker-with-nix start-dependencies
   #!/usr/bin/env bash
   set -e -u
+
   configuration_file="$(mktemp)"
   trap 'rm -f "$configuration_file"' EXIT
+
   echo '> Generating the configuration...'
   docker run \
+    --name=postgres-ndc-configuration \
     --rm \
     --platform=linux/amd64 \
     --net='postgres-ndc_default' \
+    --publish='9100:9100' \
     {{CONNECTOR_IMAGE}} \
-    generate-configuration \
-    'postgresql://postgres:password@postgres' \
+    configuration serve
+  CONFIGURATION_SERVER_URL='http://localhost:9100/'
+  sleep 1
+  curl -fsS "$CONFIGURATION_SERVER_URL" \
+    | jq --arg postgres_database_url 'postgresql://postgres:password@postgres' '. + {"postgres_database_url": $postgres_database_url}' \
+    | curl -fsS "$CONFIGURATION_SERVER_URL" -H 'Content-Type: application/json' -d @- \
     > "$configuration_file"
+  docker stop postgres-ndc-configuration
+
   echo '> Starting the server...'
   docker run \
     --name=postgres-ndc \
@@ -89,8 +99,22 @@ test-integrated:
 
 # re-generate the deployment configuration file
 generate-chinook-configuration:
-  mkdir -p "$(dirname '{{CHINOOK_DEPLOYMENT}}')"
-  cargo run -- generate-configuration '{{POSTGRESQL_CONNECTION_STRING}}' > '{{CHINOOK_DEPLOYMENT}}'
+  #!/usr/bin/env bash
+  set -e -u
+
+  cargo run --quiet -- configuration serve &
+  CONFIGURATION_SERVER_PID=$!
+  trap "kill $CONFIGURATION_SERVER_PID" EXIT
+  sleep 1
+  if ! kill -0 "$CONFIGURATION_SERVER_PID"; then
+    echo >&2 'The server stopped abruptly.'
+    exit 1
+  fi
+  curl -fsS http://localhost:9100 \
+    | jq --arg postgres_database_url '{{POSTGRESQL_CONNECTION_STRING}}' '. + {"postgres_database_url": $postgres_database_url}' \
+    | curl -fsS http://localhost:9100 -H 'Content-Type: application/json' -d @- \
+    | jq . \
+    > '{{CHINOOK_DEPLOYMENT}}'
 
 # run postgres + jaeger
 start-dependencies:

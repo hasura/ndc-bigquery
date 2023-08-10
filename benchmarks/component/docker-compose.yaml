@@ -64,11 +64,13 @@ services:
       postgres:
         condition: service_started
 
-  generate-configuration:
+  agent-configuration:
     image: ghcr.io/hasura/postgres-agent-rs:dev
     command:
-      - generate-configuration
-      - "postgresql://postgres:password@postgres"
+      - configuration
+      - serve
+    ports:
+      - 9100
     depends_on:
       postgres:
         condition: service_started

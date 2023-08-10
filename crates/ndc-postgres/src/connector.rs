@@ -19,18 +19,25 @@ pub struct Postgres {}
 
 #[async_trait]
 impl connector::Connector for Postgres {
-    /// The type of command line arguments to generate a configuration
-    type ConfigureArgs = configuration::ConfigureArgs;
-    /// The type of unvalidated, raw configuration, as provided by the user.
+    /// RawConfiguration is what the user specifies as JSON
     type RawConfiguration = configuration::DeploymentConfiguration;
     /// The type of validated configuration
     type Configuration = configuration::DeploymentConfiguration;
     /// The type of unserializable state
     type State = configuration::State;
 
-    async fn configure(
-        args: &Self::ConfigureArgs,
-    ) -> Result<configuration::DeploymentConfiguration, connector::ConfigurationError> {
+    fn make_empty_configuration() -> Self::RawConfiguration {
+        configuration::DeploymentConfiguration {
+            version: 1,
+            postgres_database_url: "".into(),
+            tables: query_engine::metadata::TablesInfo(BTreeMap::new()),
+        }
+    }
+
+    /// Configure a configuration maybe?
+    async fn update_configuration(
+        args: &Self::RawConfiguration,
+    ) -> Result<configuration::DeploymentConfiguration, connector::UpdateConfigurationError> {
         configuration::configure(args).await
     }
 
@@ -38,7 +45,7 @@ impl connector::Connector for Postgres {
     /// returning a configuration error or a validated [`Connector::Configuration`].
     async fn validate_raw_configuration(
         configuration: &Self::RawConfiguration,
-    ) -> Result<Self::Configuration, connector::ConfigurationError> {
+    ) -> Result<Self::Configuration, connector::ValidateError> {
         configuration::validate_raw_configuration(configuration).await
     }
 
