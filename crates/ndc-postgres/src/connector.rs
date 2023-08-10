@@ -122,7 +122,7 @@ impl connector::Connector for Postgres {
         let query_engine::metadata::TablesInfo(tablesinfo) = &configuration.tables;
         let collections = tablesinfo
             .iter()
-            .map(|(table_name, _table)| ndc_client::models::CollectionInfo {
+            .map(|(table_name, table)| ndc_client::models::CollectionInfo {
                 name: table_name.clone(),
                 description: None,
                 arguments: BTreeMap::new(),
@@ -130,8 +130,46 @@ impl connector::Connector for Postgres {
                 insertable_columns: None,
                 updatable_columns: None,
                 deletable: false,
-                uniqueness_constraints: BTreeMap::new(),
-                foreign_keys: BTreeMap::new(),
+                uniqueness_constraints: table
+                    .uniqueness_constraints
+                    .0
+                    .iter()
+                    .map(
+                        |(
+                            constraint_name,
+                            query_engine::metadata::UniquenessConstraint(constraint_columns),
+                        )| {
+                            (
+                                constraint_name.clone(),
+                                ndc_client::models::UniquenessConstraint {
+                                    unique_columns: constraint_columns.iter().cloned().collect(),
+                                },
+                            )
+                        },
+                    )
+                    .collect(),
+                foreign_keys: table
+                    .foreign_relations
+                    .0
+                    .iter()
+                    .map(
+                        |(
+                            constraint_name,
+                            query_engine::metadata::ForeignRelation {
+                                foreign_table,
+                                column_mapping,
+                            },
+                        )| {
+                            (
+                                constraint_name.clone(),
+                                ndc_client::models::ForeignKeyConstraint {
+                                    foreign_collection: foreign_table.clone(),
+                                    column_mapping: column_mapping.clone(),
+                                },
+                            )
+                        },
+                    )
+                    .collect(),
             })
             .collect();
 

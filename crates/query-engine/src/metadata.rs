@@ -33,7 +33,7 @@ pub struct UniquenessConstraints(pub BTreeMap<String, UniquenessConstraint>);
 
 /// The set of columns that make up a uniqueness constraint.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
-pub struct UniquenessConstraint(BTreeSet<String>);
+pub struct UniquenessConstraint(pub BTreeSet<String>);
 
 /// A mapping from the name of a foreign key constraint to its value.
 #[derive(Debug, Clone, PartialEq, Eq, Default, Serialize, Deserialize, JsonSchema)]

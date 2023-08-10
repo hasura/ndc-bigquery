@@ -31,12 +31,40 @@ pub struct ExplainDetails {
 
 /// Run a query against the server, get the result, and compare against the snapshot.
 pub async fn run_explain(testname: &str) -> ExactExplainResponse {
-    let result = run_against_server("explain", testname).await;
-    serde_json::from_value(result).unwrap()
+    run_against_server("explain", testname).await
 }
 
-/// Run an action against the server, get the result, and compare against the snapshot.
-async fn run_against_server(action: &str, testname: &str) -> serde_json::Value {
+/// Run a query against the server, get the result, and compare against the snapshot.
+pub async fn get_schema() -> ndc_client::models::SchemaResponse {
+    make_request(|client| client.get("/schema")).await
+}
+
+/// Run an action against the server, and get the response.
+async fn run_against_server<Response: for<'a> serde::Deserialize<'a>>(
+    action: &str,
+    testname: &str,
+) -> Response {
+    let path = format!("/{}", action);
+    let body = match fs::read_to_string(format!("tests/goldenfiles/{}.json", testname)) {
+        Ok(body) => body,
+        Err(err) => {
+            println!("Error: {}", err);
+            panic!("error look up");
+        }
+    };
+    make_request(|client| {
+        client
+            .post(&path)
+            .header("Content-Type", "application/json")
+            .body(body)
+    })
+    .await
+}
+
+/// Make a single request against the server, and get the response.
+async fn make_request<Response: for<'a> serde::Deserialize<'a>>(
+    request: impl FnOnce(axum_test_helper::TestClient) -> axum_test_helper::RequestBuilder,
+) -> Response {
     let _ = env_logger::builder().is_test(true).try_init();
 
     // work out where the deployment configs live
@@ -48,31 +76,24 @@ async fn run_against_server(action: &str, testname: &str) -> serde_json::Value {
     )
     .await;
 
-    // create a fresh router
+    // create a fresh client
     let router = ndc_hub::default_main::create_router(state);
-
     let client = TestClient::new(router);
-    let request = match fs::read_to_string(format!("tests/goldenfiles/{}.json", testname)) {
-        Ok(request) => request,
-        Err(err) => {
-            println!("Error: {}", err);
-            panic!("error look up");
-        }
-    };
 
-    let url = format!("/{}", action);
+    // make the request
+    let response = request(client).send().await;
 
-    let res = client
-        .post(&url)
-        .body(request)
-        .header("Content-Type", "application/json")
-        .send()
-        .await;
+    // ensure we get a successful response
+    assert_eq!(
+        response.status(),
+        StatusCode::OK,
+        "Expected a successful response but got status {}.\nBody:\n{}",
+        response.status(),
+        response.text().await
+    );
 
-    assert_eq!(res.status(), StatusCode::OK);
-
-    //serde_json::Value::String(res.text().await)
-    res.json().await
+    // deserialize the response
+    response.json().await
 }
 
 /// Check if all keywords are contained in this vector of strings.
