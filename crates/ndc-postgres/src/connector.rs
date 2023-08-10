@@ -5,14 +5,16 @@
 //! The relevant types for configuration and state are defined in
 //! `super::configuration`.
 
-use super::configuration;
-use super::metrics;
-use ndc_hub::connector;
-use query_engine::phases;
+use std::collections::BTreeMap;
 
 use async_trait::async_trait;
 use ndc_client::models;
-use std::collections::BTreeMap;
+use ndc_hub::connector;
+
+use query_engine::phases;
+
+use super::configuration;
+use super::metrics;
 
 #[derive(Clone, Default)]
 pub struct Postgres {}
@@ -27,11 +29,7 @@ impl connector::Connector for Postgres {
     type State = configuration::State;
 
     fn make_empty_configuration() -> Self::RawConfiguration {
-        configuration::DeploymentConfiguration {
-            version: 1,
-            postgres_database_url: "".into(),
-            tables: query_engine::metadata::TablesInfo(BTreeMap::new()),
-        }
+        configuration::DeploymentConfiguration::empty()
     }
 
     /// Configure a configuration maybe?
@@ -115,19 +113,44 @@ impl connector::Connector for Postgres {
     /// This function implements the [schema endpoint](https://hasura.github.io/ndc-spec/specification/schema/index.html)
     /// from the NDC specification.
     async fn get_schema(
-        configuration: &Self::Configuration,
+        Self::Configuration {
+            tables: query_engine::metadata::TablesInfo(tables_info),
+            aggregate_functions: query_engine::metadata::AggregateFunctions(aggregate_functions),
+            ..
+        }: &Self::Configuration,
     ) -> Result<models::SchemaResponse, connector::SchemaError> {
-        let scalar_types = BTreeMap::from_iter([(
-            "any".into(),
-            ndc_client::models::ScalarType {
-                aggregate_functions: BTreeMap::new(),
-                comparison_operators: BTreeMap::new(),
-                update_operators: BTreeMap::new(),
-            },
-        )]);
+        // TODO: Technically, we should list all scalar types regardless of
+        // whether or not they have associated aggregate functions. However, as
+        // we only deal with two for now, and we can guarantee that they always
+        // have aggregate functions, we don't need to worry about this quite
+        // yet.
+        let scalar_types = aggregate_functions
+            .iter()
+            .map(|(scalar_type, aggregate_functions)| {
+                (
+                    scalar_type.to_string(),
+                    ndc_client::models::ScalarType {
+                        aggregate_functions: aggregate_functions
+                            .iter()
+                            .map(|(function_name, function_definition)| {
+                                (
+                                    function_name.clone(),
+                                    ndc_client::models::AggregateFunctionDefinition {
+                                        result_type: ndc_client::models::Type::Named {
+                                            name: function_definition.return_type.to_string(),
+                                        },
+                                    },
+                                )
+                            })
+                            .collect(),
+                        comparison_operators: BTreeMap::new(),
+                        update_operators: BTreeMap::new(),
+                    },
+                )
+            })
+            .collect();
 
-        let query_engine::metadata::TablesInfo(tablesinfo) = &configuration.tables;
-        let collections = tablesinfo
+        let collections = tables_info
             .iter()
             .map(|(table_name, table)| ndc_client::models::CollectionInfo {
                 name: table_name.clone(),
@@ -180,7 +203,7 @@ impl connector::Connector for Postgres {
             })
             .collect();
 
-        let object_types = BTreeMap::from_iter(tablesinfo.iter().map(|(table_name, table)| {
+        let object_types = BTreeMap::from_iter(tables_info.iter().map(|(table_name, table)| {
             let object_type = models::ObjectType {
                 description: None,
                 fields: BTreeMap::from_iter(table.columns.values().map(|column| {

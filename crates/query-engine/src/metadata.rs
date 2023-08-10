@@ -5,8 +5,23 @@ use std::collections::{BTreeMap, BTreeSet};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize, JsonSchema)]
+pub enum ScalarType {
+    Int,
+    String,
+}
+
+impl ToString for ScalarType {
+    fn to_string(&self) -> String {
+        match self {
+            Self::Int => "Int".to_string(),
+            Self::String => "String".to_string(),
+        }
+    }
+}
+
 /// Mapping from a graphql "table" name to its information.
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize, JsonSchema)]
 pub struct TablesInfo(pub BTreeMap<String, TableInfo>);
 
 /// Information about a database table (or any other kind of relation).
@@ -44,4 +59,13 @@ pub struct ForeignRelations(pub BTreeMap<String, ForeignRelation>);
 pub struct ForeignRelation {
     pub foreign_table: String,
     pub column_mapping: BTreeMap<String, String>,
+}
+
+/// All supported aggregate functions, grouped by type.
+#[derive(Debug, Clone, PartialEq, Eq, Default, Serialize, Deserialize, JsonSchema)]
+pub struct AggregateFunctions(pub BTreeMap<ScalarType, BTreeMap<String, AggregateFunction>>);
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+pub struct AggregateFunction {
+    pub return_type: ScalarType,
 }

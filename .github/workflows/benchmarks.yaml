@@ -31,10 +31,11 @@ jobs:
 
       - name: Generate the deployment configuration 🚧
         run: |
+          set -e -u -o pipefail
           cd benchmarks/component
           mkdir -p generated
           docker compose up --detach --wait agent-configuration
-          sleep 1
+          sleep 5
           CONFIGURATION_SERVER_URL="http://$(docker compose port agent-configuration 9100)/"
           curl -fsS "$CONFIGURATION_SERVER_URL" \
             | jq --arg postgres_database_url 'postgresql://postgres:password@postgres' '. + {"postgres_database_url": $postgres_database_url}' \

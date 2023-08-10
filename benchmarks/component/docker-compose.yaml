@@ -69,6 +69,7 @@ services:
     command:
       - configuration
       - serve
+    init: true
     ports:
       - 9100
     depends_on:

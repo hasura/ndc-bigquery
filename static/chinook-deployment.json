@@ -485,5 +485,83 @@
       },
       "foreign_relations": {}
     }
+  },
+  "aggregate_functions": {
+    "Int": {
+      "avg": {
+        "return_type": "Int"
+      },
+      "bit_and": {
+        "return_type": "Int"
+      },
+      "bit_or": {
+        "return_type": "Int"
+      },
+      "bit_xor": {
+        "return_type": "Int"
+      },
+      "count": {
+        "return_type": "Int"
+      },
+      "dense_rank": {
+        "return_type": "Int"
+      },
+      "max": {
+        "return_type": "Int"
+      },
+      "min": {
+        "return_type": "Int"
+      },
+      "ntile": {
+        "return_type": "Int"
+      },
+      "rank": {
+        "return_type": "Int"
+      },
+      "regr_count": {
+        "return_type": "Int"
+      },
+      "row_number": {
+        "return_type": "Int"
+      },
+      "st_clusterdbscan": {
+        "return_type": "Int"
+      },
+      "st_clusterkmeans": {
+        "return_type": "Int"
+      },
+      "stddev": {
+        "return_type": "Int"
+      },
+      "stddev_pop": {
+        "return_type": "Int"
+      },
+      "stddev_samp": {
+        "return_type": "Int"
+      },
+      "sum": {
+        "return_type": "Int"
+      },
+      "var_pop": {
+        "return_type": "Int"
+      },
+      "var_samp": {
+        "return_type": "Int"
+      },
+      "variance": {
+        "return_type": "Int"
+      }
+    },
+    "String": {
+      "max": {
+        "return_type": "String"
+      },
+      "min": {
+        "return_type": "String"
+      },
+      "string_agg": {
+        "return_type": "String"
+      }
+    }
   }
 }

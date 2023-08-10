@@ -4,8 +4,159 @@ expression: result
 ---
 {
   "scalar_types": {
-    "any": {
-      "aggregate_functions": {},
+    "Int": {
+      "aggregate_functions": {
+        "avg": {
+          "result_type": {
+            "type": "named",
+            "name": "Int"
+          }
+        },
+        "bit_and": {
+          "result_type": {
+            "type": "named",
+            "name": "Int"
+          }
+        },
+        "bit_or": {
+          "result_type": {
+            "type": "named",
+            "name": "Int"
+          }
+        },
+        "bit_xor": {
+          "result_type": {
+            "type": "named",
+            "name": "Int"
+          }
+        },
+        "count": {
+          "result_type": {
+            "type": "named",
+            "name": "Int"
+          }
+        },
+        "dense_rank": {
+          "result_type": {
+            "type": "named",
+            "name": "Int"
+          }
+        },
+        "max": {
+          "result_type": {
+            "type": "named",
+            "name": "Int"
+          }
+        },
+        "min": {
+          "result_type": {
+            "type": "named",
+            "name": "Int"
+          }
+        },
+        "ntile": {
+          "result_type": {
+            "type": "named",
+            "name": "Int"
+          }
+        },
+        "rank": {
+          "result_type": {
+            "type": "named",
+            "name": "Int"
+          }
+        },
+        "regr_count": {
+          "result_type": {
+            "type": "named",
+            "name": "Int"
+          }
+        },
+        "row_number": {
+          "result_type": {
+            "type": "named",
+            "name": "Int"
+          }
+        },
+        "st_clusterdbscan": {
+          "result_type": {
+            "type": "named",
+            "name": "Int"
+          }
+        },
+        "st_clusterkmeans": {
+          "result_type": {
+            "type": "named",
+            "name": "Int"
+          }
+        },
+        "stddev": {
+          "result_type": {
+            "type": "named",
+            "name": "Int"
+          }
+        },
+        "stddev_pop": {
+          "result_type": {
+            "type": "named",
+            "name": "Int"
+          }
+        },
+        "stddev_samp": {
+          "result_type": {
+            "type": "named",
+            "name": "Int"
+          }
+        },
+        "sum": {
+          "result_type": {
+            "type": "named",
+            "name": "Int"
+          }
+        },
+        "var_pop": {
+          "result_type": {
+            "type": "named",
+            "name": "Int"
+          }
+        },
+        "var_samp": {
+          "result_type": {
+            "type": "named",
+            "name": "Int"
+          }
+        },
+        "variance": {
+          "result_type": {
+            "type": "named",
+            "name": "Int"
+          }
+        }
+      },
+      "comparison_operators": {},
+      "update_operators": {}
+    },
+    "String": {
+      "aggregate_functions": {
+        "max": {
+          "result_type": {
+            "type": "named",
+            "name": "String"
+          }
+        },
+        "min": {
+          "result_type": {
+            "type": "named",
+            "name": "String"
+          }
+        },
+        "string_agg": {
+          "result_type": {
+            "type": "named",
+            "name": "String"
+          }
+        }
+      },
       "comparison_operators": {},
       "update_operators": {}
     }

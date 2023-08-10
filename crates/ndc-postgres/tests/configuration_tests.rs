@@ -4,7 +4,7 @@
 
 pub mod common;
 
-use std::{collections::BTreeMap, fs};
+use std::fs;
 
 use similar_asserts::assert_eq;
 
@@ -15,9 +15,8 @@ use crate::common::{get_deployment_file, POSTGRESQL_CONNECTION_STRING};
 #[tokio::test]
 async fn test_configure() {
     let args = configuration::DeploymentConfiguration {
-        version: 1,
         postgres_database_url: POSTGRESQL_CONNECTION_STRING.to_string(),
-        tables: query_engine::metadata::TablesInfo(BTreeMap::new()),
+        ..configuration::DeploymentConfiguration::empty()
     };
 
     let expected_value: serde_json::Value = {
