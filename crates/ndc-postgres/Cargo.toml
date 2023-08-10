@@ -15,7 +15,7 @@ path = "bin/main.rs"
 
 [dependencies]
 ndc-client = { git = "https://github.com/hasura/ndc-spec.git", tag = "v0.1.0-rc.1" }
-ndc-hub = { git = "https://github.com/hasura/ndc-hub.git", rev = "d0d6278" }
+ndc-hub = { git = "https://github.com/hasura/ndc-hub.git", tag = "v0.1.0-rc.1", package = "ndc-sdk" }
 query-engine = { path = "../query-engine" }
 
 async-trait = "0.1.68"
