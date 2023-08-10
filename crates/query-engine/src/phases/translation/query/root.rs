@@ -17,7 +17,6 @@ use std::collections::BTreeMap;
 /// Translate aggregates query to sql ast.
 pub fn translate_aggregate_query(
     tables_info: &metadata::TablesInfo,
-    root_table: &Option<TableNameAndReference>,
     current_table_name: String,
     relationships: &BTreeMap<String, models::Relationship>,
     query: &models::Query,
@@ -49,7 +48,6 @@ pub fn translate_aggregate_query(
     // We don't add the limit afterwards.
     translate_query_part(
         tables_info,
-        root_table,
         &current_table,
         relationships,
         query,
@@ -61,7 +59,6 @@ pub fn translate_aggregate_query(
 /// Translate rows part of query to sql ast.
 pub fn translate_rows_query(
     tables_info: &metadata::TablesInfo,
-    root_table: &Option<TableNameAndReference>,
     current_table_name: &str,
     relationships: &BTreeMap<String, models::Relationship>,
     query: &models::Query,
@@ -133,7 +130,6 @@ pub fn translate_rows_query(
     // We'll add the limit afterwards.
     let mut select = translate_query_part(
         tables_info,
-        root_table,
         &current_table,
         relationships,
         query,
@@ -159,7 +155,6 @@ pub fn translate_rows_query(
 /// set the limit and offset so you want to do that after calling this function.
 fn translate_query_part(
     tables_info: &metadata::TablesInfo,
-    root_table: &Option<TableNameAndReference>,
     current_table: &TableNameAndReference,
     relationships: &BTreeMap<String, models::Relationship>,
     query: &models::Query,
@@ -177,10 +172,8 @@ fn translate_query_part(
         table: table_info.table_name.clone(),
     };
 
-    let root_table = match root_table {
-        None => current_table.clone(),
-        Some(root_table) => root_table.clone(),
-    };
+    let root_table = current_table.clone();
+
     // the root table and the current table are the same at this point
     let root_and_current_tables = RootAndCurrentTables {
         root_table,

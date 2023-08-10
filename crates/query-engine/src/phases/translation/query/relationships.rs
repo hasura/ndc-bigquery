@@ -29,7 +29,6 @@ pub fn translate_joins(
             // process inner query and get the SELECTs for the 'rows' and 'aggregates' fields.
             let select_set = super::translate_query(
                 tables_info,
-                &Some(root_and_current_tables.root_table.clone()),
                 relationship.target_collection.clone(),
                 relationships,
                 query,
