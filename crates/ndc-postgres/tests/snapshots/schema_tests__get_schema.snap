@@ -1,5 +1,6 @@
 ---
 source: crates/ndc-postgres/tests/schema_tests.rs
+assertion_line: 6
 expression: result
 ---
 {
@@ -157,6 +158,11 @@ expression: result
           }
         }
       },
+      "comparison_operators": {},
+      "update_operators": {}
+    },
+    "any": {
+      "aggregate_functions": {},
       "comparison_operators": {},
       "update_operators": {}
     }
