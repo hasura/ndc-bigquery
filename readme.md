@@ -6,7 +6,7 @@
 
 1. Install [rustup](https://www.rust-lang.org/tools/install).
 2. Install additional tools:
-    - `cargo install watch cargo-insta`
+    - `cargo install cargo-watch cargo-insta`
     - `rustup component add rust-analyzer`
     - `rustup component add clippy`
     - `rustup component add rustfmt`
@@ -37,9 +37,8 @@ just run
 
 ### Develop
 
-1. Start the database sample: `just start-docker`
-2. Compile, run tests, and rerun server on file changes: `just dev`
-3. Query the connector via curl:
+1. Start the sample chinook postgres db, compile, run tests, and rerun server on file changes: `just dev`
+2. Query the connector via curl:
    ```
    curl -H "Content-Type: application/json" \
      --data "@crates/ndc-postgres/tests/goldenfiles/select_where_variable.json" \
@@ -112,10 +111,6 @@ See [architecture.md](./architecture.md).
 4. Run the tests using `just dev`
 5. Review the results using `cargo insta review`
 
-*warning* - SQL translation tests should aim to only contain one field or aggregate per
-request. This is because we parse the fields into a HashMap and cannot rely on
-the ordering, meaning the snapshots constantly change.
-
 ## Testing metrics
 
 We have a Prometheus / Grafana set up in Docker. Run `just start-metrics` to
@@ -133,4 +128,3 @@ run `just lint-apply` to attempt to autofix all linter suggestions
 Check your formatting is great with `just format-check`.
 
 Format all Rust code with `just format`.
-

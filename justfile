@@ -95,7 +95,7 @@ test-integrated:
     -H 'Host: example.hasura.app' \
     -H 'Content-Type: application/json' \
     http://localhost:3000/graphql \
-    -d '{ "query": "query { AlbumByID(id: 1) { title } } " }'
+    -d '{ "query": "query { AlbumByID(AlbumId: 1) { Title } } " }'
 
 # re-generate the deployment configuration file
 generate-chinook-configuration:
