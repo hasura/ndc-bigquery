@@ -475,5 +475,23 @@
         }
       }
     ]
+  },
+  {
+    "kind": "scalarTypeRepresentation",
+    "dataSource": "db",
+    "scalarType": "String",
+    "representation": "String"
+  },
+  {
+    "kind": "scalarTypeRepresentation",
+    "dataSource": "db",
+    "scalarType": "Int",
+    "representation": "Int"
+  },
+  {
+    "kind": "scalarTypeGraphqlExpression",
+    "dataSource": "db",
+    "scalarTypeName": "String",
+    "graphqlComparisonExpressionTypeName": "String_Comparison_Exp"
   }
 ]
