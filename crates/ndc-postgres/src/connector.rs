@@ -98,11 +98,11 @@ impl connector::Connector for Postgres {
             capabilities: models::Capabilities {
                 explain: Some(empty.clone()),
                 query: Some(models::QueryCapabilities {
-                    foreach: Some(empty),
+                    foreach: Some(empty.clone()),
                     order_by_aggregate: None,
                     relation_comparisons: None,
                 }),
-                relationships: None,
+                relationships: Some(empty),
                 mutations: None,
             },
         }
