@@ -30,7 +30,7 @@ mkdir -p generated
 cargo run --quiet --release -- configuration serve &
 AGENT_PID=$!
 echo "$AGENT_PID" > ./agent.pid
-sleep 1
+../../scripts/wait-until --timeout=30 --report -- nc -z localhost 9100
 if ! kill -0 "$AGENT_PID"; then
   echo >&2 'The agent stopped abruptly. Take a look at agent.log for details.'
   exit 1
@@ -47,7 +47,7 @@ cargo run --quiet --release -- serve --configuration=./generated/deployment.json
 AGENT_PID=$!
 echo "$AGENT_PID" > ./agent.pid
 echo >&2 "The agent is running with PID ${AGENT_PID}"
-sleep 1
+../../scripts/wait-until --timeout=30 --report -- nc -z localhost 8100
 if ! kill -0 "$AGENT_PID"; then
   echo >&2 'The agent stopped abruptly. Take a look at agent.log for details.'
   exit 1

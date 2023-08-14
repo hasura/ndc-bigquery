@@ -35,8 +35,9 @@ jobs:
           cd benchmarks/component
           mkdir -p generated
           docker compose up --detach --wait agent-configuration
-          sleep 5
-          CONFIGURATION_SERVER_URL="http://$(docker compose port agent-configuration 9100)/"
+          CONFIGURATION_SERVER_PORT="$(docker compose port agent-configuration 9100 | sed 's/.\+://')"
+          CONFIGURATION_SERVER_URL="http://localhost:${CONFIGURATION_SERVER_PORT}/"
+          ../../scripts/wait-until --timeout=30 --report -- nc -z localhost "$CONFIGURATION_SERVER_PORT"
           curl -fsS "$CONFIGURATION_SERVER_URL" \
             | jq --arg postgres_database_url 'postgresql://postgres:password@postgres' '. + {"postgres_database_url": $postgres_database_url}' \
             | curl -fsS "$CONFIGURATION_SERVER_URL" -H 'Content-Type: application/json' -d @- \

@@ -34,13 +34,13 @@ run-in-docker: build-docker-with-nix start-dependencies
     --publish='9100:9100' \
     {{CONNECTOR_IMAGE}} \
     configuration serve
+  trap 'docker stop postgres-ndc-configuration' EXIT
   CONFIGURATION_SERVER_URL='http://localhost:9100/'
-  sleep 5
+  ./scripts/wait-until --timeout=30 --report -- nc -z localhost 9100
   curl -fsS "$CONFIGURATION_SERVER_URL" \
     | jq --arg postgres_database_url 'postgresql://postgres:password@postgres' '. + {"postgres_database_url": $postgres_database_url}' \
     | curl -fsS "$CONFIGURATION_SERVER_URL" -H 'Content-Type: application/json' -d @- \
     > "$configuration_file"
-  docker stop postgres-ndc-configuration
 
   echo '> Starting the server...'
   docker run \
@@ -110,7 +110,7 @@ generate-chinook-configuration: build
   cargo run --quiet -- configuration serve &
   CONFIGURATION_SERVER_PID=$!
   trap "kill $CONFIGURATION_SERVER_PID" EXIT
-  sleep 5
+  ./scripts/wait-until --timeout=30 --report -- nc -z localhost 9100
   if ! kill -0 "$CONFIGURATION_SERVER_PID"; then
     echo >&2 'The server stopped abruptly.'
     exit 1

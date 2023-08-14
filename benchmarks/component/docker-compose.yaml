@@ -87,8 +87,20 @@ services:
     environment:
       POSTGRES_PASSWORD: "password"
     volumes:
-      - /var/lib/postgresql/data
-      - ../../static/chinook-postgres.sql:/docker-entrypoint-initdb.d/chinook-postgres.sql:ro
+      - type: tmpfs
+        target: /var/lib/postgresql/data
+      - type: bind
+        source: ../../static/chinook-postgres.sql
+        target: /docker-entrypoint-initdb.d/chinook-postgres.sql
+        read_only: true
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - psql -U "$${POSTGRES_USER:-postgres}" < /dev/null && sleep 5 && psql -U "$${POSTGRES_USER:-postgres}" < /dev/null
+      start_period: 5s
+      interval: 5s
+      timeout: 10s
+      retries: 20
 
   # k6 will push statistics to Prometheus
   prometheus:
@@ -114,7 +126,9 @@ services:
       - GF_AUTH_ANONYMOUS_ENABLED=true
       - GF_AUTH_BASIC_ENABLED=false
     volumes:
-      - ../grafana:/etc/grafana/provisioning/
+      - type: bind
+        source: ../grafana
+        target: /etc/grafana/provisioning
     depends_on:
       prometheus:
         condition: service_started
