@@ -25,7 +25,7 @@ serde = "1.0.179"
 serde_derive = "^1.0"
 serde_json = { version = "1.0.104", features = ["raw_value"] }
 sqlx = { version = "0.7.1", features = [ "json", "postgres", "runtime-tokio-rustls" ] }
-tokio = { version = "1.29.1", features = ["full"] }
+tokio = { version = "1.31.0", features = ["full"] }
 tracing = "0.1.37"
 prometheus = "0.13.3"
 thiserror = "1.0"
