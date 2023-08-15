@@ -8,13 +8,13 @@ pub mod relationships;
 pub mod root;
 pub mod sorting;
 
+use std::collections::BTreeMap;
+
+use ndc_hub::models;
+
 use crate::metadata;
 use crate::phases::translation::sql;
 use error::Error;
-
-use ndc_client::models;
-
-use std::collections::BTreeMap;
 
 /// Translate the incoming QueryRequest to an ExecutionPlan (SQL) to be run against the database.
 pub fn translate(

@@ -1,10 +1,11 @@
 //! Handle aggregates translation.
 
+use indexmap::IndexMap;
+
+use ndc_hub::models;
+
 use super::error::Error;
 use crate::phases::translation::sql;
-
-use indexmap::IndexMap;
-use ndc_client::models;
 
 /// Translate any aggregates we should include in the query into our SQL AST.
 pub fn translate(

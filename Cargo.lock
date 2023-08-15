@@ -1279,7 +1279,6 @@ dependencies = [
  "clap",
  "env_logger",
  "insta",
- "ndc-client",
  "ndc-sdk",
  "prometheus",
  "query-engine",
@@ -1789,7 +1788,7 @@ version = "0.1.0"
 dependencies = [
  "indexmap 1.9.3",
  "insta",
- "ndc-client",
+ "ndc-sdk",
  "schemars",
  "serde",
  "serde_json",

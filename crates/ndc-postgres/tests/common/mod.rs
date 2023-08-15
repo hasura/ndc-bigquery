@@ -35,7 +35,7 @@ pub async fn run_explain(testname: &str) -> ExactExplainResponse {
 }
 
 /// Run a query against the server, get the result, and compare against the snapshot.
-pub async fn get_schema() -> ndc_client::models::SchemaResponse {
+pub async fn get_schema() -> ndc_hub::models::SchemaResponse {
     make_request(|client| client.get("/schema")).await
 }
 

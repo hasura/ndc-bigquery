@@ -1,14 +1,13 @@
 //! Handle stuff related to relationships and joins.
 
-use super::error::Error;
+use std::collections::BTreeMap;
 
+use ndc_hub::models;
+
+use super::error::Error;
 use super::helpers::{RootAndCurrentTables, TableNameAndReference};
 use crate::metadata;
 use crate::phases::translation::sql;
-
-use ndc_client::models;
-
-use std::collections::BTreeMap;
 
 /// translate any joins we should include in the query into our SQL AST
 pub fn translate_joins(

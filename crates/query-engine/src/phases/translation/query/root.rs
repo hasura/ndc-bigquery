@@ -1,5 +1,11 @@
 //! Handle 'rows' and 'aggregates' translation.
 
+use std::collections::BTreeMap;
+
+use indexmap::IndexMap;
+
+use ndc_hub::models;
+
 use super::aggregates;
 use super::error::Error;
 use super::filtering;
@@ -8,11 +14,6 @@ use super::relationships;
 use super::sorting;
 use crate::metadata;
 use crate::phases::translation::sql;
-
-use indexmap::IndexMap;
-use ndc_client::models;
-
-use std::collections::BTreeMap;
 
 /// Translate aggregates query to sql ast.
 pub fn translate_aggregate_query(

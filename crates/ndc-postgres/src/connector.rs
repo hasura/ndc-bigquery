@@ -8,8 +8,8 @@
 use std::collections::BTreeMap;
 
 use async_trait::async_trait;
-use ndc_client::models;
 use ndc_hub::connector;
+use ndc_hub::models;
 
 use query_engine::phases;
 
@@ -124,37 +124,36 @@ impl connector::Connector for Postgres {
         // we only deal with two for now, and we can guarantee that they always
         // have aggregate functions, we don't need to worry about this quite
         // yet.
-        let mut scalar_types: BTreeMap<String, ndc_client::models::ScalarType> =
-            aggregate_functions
-                .iter()
-                .map(|(scalar_type, aggregate_functions)| {
-                    (
-                        scalar_type.to_string(),
-                        ndc_client::models::ScalarType {
-                            aggregate_functions: aggregate_functions
-                                .iter()
-                                .map(|(function_name, function_definition)| {
-                                    (
-                                        function_name.clone(),
-                                        ndc_client::models::AggregateFunctionDefinition {
-                                            result_type: ndc_client::models::Type::Named {
-                                                name: function_definition.return_type.to_string(),
-                                            },
+        let mut scalar_types: BTreeMap<String, models::ScalarType> = aggregate_functions
+            .iter()
+            .map(|(scalar_type, aggregate_functions)| {
+                (
+                    scalar_type.to_string(),
+                    models::ScalarType {
+                        aggregate_functions: aggregate_functions
+                            .iter()
+                            .map(|(function_name, function_definition)| {
+                                (
+                                    function_name.clone(),
+                                    models::AggregateFunctionDefinition {
+                                        result_type: models::Type::Named {
+                                            name: function_definition.return_type.to_string(),
                                         },
-                                    )
-                                })
-                                .collect(),
-                            comparison_operators: BTreeMap::new(),
-                            update_operators: BTreeMap::new(),
-                        },
-                    )
-                })
-                .collect();
+                                    },
+                                )
+                            })
+                            .collect(),
+                        comparison_operators: BTreeMap::new(),
+                        update_operators: BTreeMap::new(),
+                    },
+                )
+            })
+            .collect();
 
         // Stopgap solution to pass ndc-test
         scalar_types.insert(
             "any".into(),
-            ndc_client::models::ScalarType {
+            models::ScalarType {
                 aggregate_functions: BTreeMap::new(),
                 comparison_operators: BTreeMap::new(),
                 update_operators: BTreeMap::new(),
@@ -163,7 +162,7 @@ impl connector::Connector for Postgres {
 
         let collections = tables_info
             .iter()
-            .map(|(table_name, table)| ndc_client::models::CollectionInfo {
+            .map(|(table_name, table)| models::CollectionInfo {
                 name: table_name.clone(),
                 description: None,
                 arguments: BTreeMap::new(),
@@ -182,7 +181,7 @@ impl connector::Connector for Postgres {
                         )| {
                             (
                                 constraint_name.clone(),
-                                ndc_client::models::UniquenessConstraint {
+                                models::UniquenessConstraint {
                                     unique_columns: constraint_columns.iter().cloned().collect(),
                                 },
                             )
@@ -203,7 +202,7 @@ impl connector::Connector for Postgres {
                         )| {
                             (
                                 constraint_name.clone(),
-                                ndc_client::models::ForeignKeyConstraint {
+                                models::ForeignKeyConstraint {
                                     foreign_collection: foreign_table.clone(),
                                     column_mapping: column_mapping.clone(),
                                 },

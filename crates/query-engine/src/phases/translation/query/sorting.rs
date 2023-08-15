@@ -1,13 +1,12 @@
+use std::collections::BTreeMap;
+
+use ndc_hub::models;
+
 use super::error::Error;
 use super::helpers::{RootAndCurrentTables, TableNameAndReference};
 use super::relationships;
-use crate::phases::translation::sql;
-
 use crate::metadata;
-
-use ndc_client::models;
-
-use std::collections::BTreeMap;
+use crate::phases::translation::sql;
 
 /// Convert the order by fields from a QueryRequest to a SQL ORDER BY clause and potentially
 /// JOINs when we order by relationship fields.

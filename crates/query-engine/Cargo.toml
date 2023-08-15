@@ -3,10 +3,8 @@ name = "query-engine"
 version = "0.1.0"
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
-ndc-client = { git = "https://github.com/hasura/ndc-spec.git", tag = "v0.1.0-rc.1" }
+ndc-hub = { git = "https://github.com/hasura/ndc-hub.git", tag = "v0.1.0-rc.1", package = "ndc-sdk" }
 
 indexmap = "1"
 schemars = { version = "0.8.12", features = ["smol_str"] }

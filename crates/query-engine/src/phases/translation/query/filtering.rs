@@ -1,15 +1,15 @@
 //! Handle filtering/where clauses translation.
 
+use std::collections::BTreeMap;
+
+use ndc_hub::models;
+
 use super::error::Error;
 use super::helpers::{RootAndCurrentTables, TableNameAndReference};
 use super::relationships;
 use crate::metadata;
 use crate::phases::translation::sql;
 use crate::phases::translation::sql::helpers::simple_select;
-
-use ndc_client::models;
-
-use std::collections::BTreeMap;
 
 /// Translate a boolean expression to a SQL expression.
 pub fn translate_expression(

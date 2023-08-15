@@ -1,14 +1,15 @@
 //! Execute an execution plan against the database.
 
-use serde_json;
+use std::collections::BTreeMap;
 
+use serde_json;
 use sqlformat;
 use sqlx;
 use sqlx::Row;
-use std::collections::BTreeMap;
+
+use ndc_hub::models;
 
 use super::translation::sql;
-use ndc_client::models;
 
 /// Execute a query against postgres.
 pub async fn execute(
