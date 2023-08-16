@@ -20,12 +20,20 @@ create function pg_temp.data_type_to_scalar_type(information_schema.character_da
   immutable
   return
     case $1
-      when 'numeric' then 'Int'
-      when 'integer' then 'Int'
+      when 'boolean' then 'Boolean'
       when 'smallint' then 'Int'
+      when 'integer' then 'Int'
       when 'bigint' then 'Int'
+      when 'smallserial' then 'Int'
+      when 'serial' then 'Int'
+      when 'bigserial' then 'Int'
+      when 'decimal' then 'Float'
+      when 'numeric' then 'Float'
+      when 'real' then 'Float'
+      when 'double precision' then 'Float'
       when 'text' then 'String'
-      else null
+      when 'character varying' then 'String'
+      else 'any'
     end;
 
 select
@@ -56,7 +64,9 @@ from
                   json_build_object(
                     -- the column name
                     'name',
-                    c.column_name
+                    c.column_name,
+                    'type',
+                    pg_temp.data_type_to_scalar_type(c.data_type)
                   )
                 )
               from information_schema.columns c
@@ -177,7 +187,7 @@ from
         from information_schema.routines r
         where routine_schema in ('pg_catalog', 'public')
         and routine_type is null -- aggregate functions don't have a routine type
-        and pg_temp.data_type_to_scalar_type(data_type) is not null
+        and pg_temp.data_type_to_scalar_type(data_type) <> 'any'
         group by pg_temp.data_type_to_scalar_type(data_type)
       ) routines_by_type
   ) _aggregate_functions

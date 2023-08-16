@@ -4,13 +4,16 @@
     "table_name": "Album",
     "columns": {
       "AlbumId": {
-        "name": "AlbumId"
+        "name": "AlbumId",
+        "type": "Int"
       },
       "Title": {
-        "name": "Title"
+        "name": "Title",
+        "type": "String"
       },
       "ArtistId": {
-        "name": "ArtistId"
+        "name": "ArtistId",
+        "type": "Int"
       }
     }
   },
@@ -19,10 +22,12 @@
     "table_name": "Artist",
     "columns": {
       "ArtistId": {
-        "name": "ArtistId"
+        "name": "ArtistId",
+        "type": "Int"
       },
       "Name": {
-        "name": "Name"
+        "name": "Name",
+        "type": "String"
       }
     }
   },
@@ -31,13 +36,16 @@
     "table_name": "Track",
     "columns": {
       "TrackId": {
-        "name": "TrackId"
+        "name": "TrackId",
+        "type": "Int"
       },
       "Name": {
-        "name": "Name"
+        "name": "Name",
+        "type": "String"
       },
       "AlbumId": {
-        "name": "AlbumId"
+        "name": "AlbumId",
+        "type": "Int"
       }
     }
   }

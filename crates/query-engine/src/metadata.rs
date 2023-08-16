@@ -8,14 +8,21 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize, JsonSchema)]
 pub enum ScalarType {
     Int,
+    Float,
     String,
+    Boolean,
+    #[serde(rename = "any")]
+    Any,
 }
 
 impl ToString for ScalarType {
     fn to_string(&self) -> String {
         match self {
             Self::Int => "Int".to_string(),
+            Self::Float => "Float".to_string(),
             Self::String => "String".to_string(),
+            Self::Boolean => "Boolean".to_string(),
+            Self::Any => "any".to_string(),
         }
     }
 }
@@ -40,6 +47,7 @@ pub struct TableInfo {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
 pub struct ColumnInfo {
     pub name: String,
+    pub r#type: ScalarType,
 }
 
 /// A mapping from the name of a unique constraint to its value.

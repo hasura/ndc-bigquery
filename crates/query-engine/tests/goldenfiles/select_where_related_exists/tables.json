@@ -4,13 +4,16 @@
     "table_name": "Album",
     "columns": {
       "id": {
-        "name": "AlbumId"
+        "name": "AlbumId",
+        "type": "Int"
       },
       "title": {
-        "name": "Title"
+        "name": "Title",
+        "type": "String"
       },
       "artist_id": {
-        "name": "ArtistId"
+        "name": "ArtistId",
+        "type": "Int"
       }
     }
   },
@@ -19,10 +22,12 @@
     "table_name": "Artist",
     "columns": {
       "id": {
-        "name": "ArtistId"
+        "name": "ArtistId",
+        "type": "Int"
       },
       "name": {
-        "name": "Name"
+        "name": "Name",
+        "type": "String"
       }
     }
   }

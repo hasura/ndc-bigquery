@@ -182,7 +182,7 @@ fn translate_comparison_target(
                 .get(&current_table.name)
                 .ok_or(Error::TableNotFound(current_table.name.clone()))?;
 
-            let metadata::ColumnInfo { name } =
+            let metadata::ColumnInfo { name, .. } =
                 table_info
                     .columns
                     .get(&name)
@@ -209,7 +209,7 @@ fn translate_comparison_target(
                 .ok_or(Error::TableNotFound(root_table.name.to_string()))?;
 
             // find the requested column in the tables columns.
-            let metadata::ColumnInfo { name } =
+            let metadata::ColumnInfo { name, .. } =
                 table_info
                     .columns
                     .get(&name)

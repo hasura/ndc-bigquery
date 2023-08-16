@@ -150,7 +150,7 @@ impl connector::Connector for Postgres {
             })
             .collect();
 
-        // Stopgap solution to pass ndc-test
+        // Used for types we don't yet support
         scalar_types.insert(
             "any".into(),
             models::ScalarType {
@@ -222,7 +222,9 @@ impl connector::Connector for Postgres {
                         models::ObjectField {
                             arguments: BTreeMap::new(),
                             description: None,
-                            r#type: models::Type::Named { name: "any".into() },
+                            r#type: models::Type::Named {
+                                name: column.r#type.to_string(),
+                            },
                         },
                     )
                 })),

@@ -4,14 +4,182 @@ expression: result
 ---
 {
   "scalar_types": {
-    "Int": {
+    "Boolean": {
+      "aggregate_functions": {
+        "bool_and": {
+          "result_type": {
+            "type": "named",
+            "name": "Boolean"
+          }
+        },
+        "bool_or": {
+          "result_type": {
+            "type": "named",
+            "name": "Boolean"
+          }
+        },
+        "every": {
+          "result_type": {
+            "type": "named",
+            "name": "Boolean"
+          }
+        }
+      },
+      "comparison_operators": {},
+      "update_operators": {}
+    },
+    "Float": {
       "aggregate_functions": {
         "avg": {
           "result_type": {
             "type": "named",
-            "name": "Int"
+            "name": "Float"
           }
         },
+        "corr": {
+          "result_type": {
+            "type": "named",
+            "name": "Float"
+          }
+        },
+        "covar_pop": {
+          "result_type": {
+            "type": "named",
+            "name": "Float"
+          }
+        },
+        "covar_samp": {
+          "result_type": {
+            "type": "named",
+            "name": "Float"
+          }
+        },
+        "cume_dist": {
+          "result_type": {
+            "type": "named",
+            "name": "Float"
+          }
+        },
+        "max": {
+          "result_type": {
+            "type": "named",
+            "name": "Float"
+          }
+        },
+        "min": {
+          "result_type": {
+            "type": "named",
+            "name": "Float"
+          }
+        },
+        "percent_rank": {
+          "result_type": {
+            "type": "named",
+            "name": "Float"
+          }
+        },
+        "percentile_cont": {
+          "result_type": {
+            "type": "named",
+            "name": "Float"
+          }
+        },
+        "regr_avgx": {
+          "result_type": {
+            "type": "named",
+            "name": "Float"
+          }
+        },
+        "regr_avgy": {
+          "result_type": {
+            "type": "named",
+            "name": "Float"
+          }
+        },
+        "regr_intercept": {
+          "result_type": {
+            "type": "named",
+            "name": "Float"
+          }
+        },
+        "regr_r2": {
+          "result_type": {
+            "type": "named",
+            "name": "Float"
+          }
+        },
+        "regr_slope": {
+          "result_type": {
+            "type": "named",
+            "name": "Float"
+          }
+        },
+        "regr_sxx": {
+          "result_type": {
+            "type": "named",
+            "name": "Float"
+          }
+        },
+        "regr_sxy": {
+          "result_type": {
+            "type": "named",
+            "name": "Float"
+          }
+        },
+        "regr_syy": {
+          "result_type": {
+            "type": "named",
+            "name": "Float"
+          }
+        },
+        "stddev": {
+          "result_type": {
+            "type": "named",
+            "name": "Float"
+          }
+        },
+        "stddev_pop": {
+          "result_type": {
+            "type": "named",
+            "name": "Float"
+          }
+        },
+        "stddev_samp": {
+          "result_type": {
+            "type": "named",
+            "name": "Float"
+          }
+        },
+        "sum": {
+          "result_type": {
+            "type": "named",
+            "name": "Float"
+          }
+        },
+        "var_pop": {
+          "result_type": {
+            "type": "named",
+            "name": "Float"
+          }
+        },
+        "var_samp": {
+          "result_type": {
+            "type": "named",
+            "name": "Float"
+          }
+        },
+        "variance": {
+          "result_type": {
+            "type": "named",
+            "name": "Float"
+          }
+        }
+      },
+      "comparison_operators": {},
+      "update_operators": {}
+    },
+    "Int": {
+      "aggregate_functions": {
         "bit_and": {
           "result_type": {
             "type": "named",
@@ -90,43 +258,7 @@ expression: result
             "name": "Int"
           }
         },
-        "stddev": {
-          "result_type": {
-            "type": "named",
-            "name": "Int"
-          }
-        },
-        "stddev_pop": {
-          "result_type": {
-            "type": "named",
-            "name": "Int"
-          }
-        },
-        "stddev_samp": {
-          "result_type": {
-            "type": "named",
-            "name": "Int"
-          }
-        },
         "sum": {
-          "result_type": {
-            "type": "named",
-            "name": "Int"
-          }
-        },
-        "var_pop": {
-          "result_type": {
-            "type": "named",
-            "name": "Int"
-          }
-        },
-        "var_samp": {
-          "result_type": {
-            "type": "named",
-            "name": "Int"
-          }
-        },
-        "variance": {
           "result_type": {
             "type": "named",
             "name": "Int"
@@ -173,21 +305,21 @@ expression: result
           "arguments": {},
           "type": {
             "type": "named",
-            "name": "any"
+            "name": "Int"
           }
         },
         "ArtistId": {
           "arguments": {},
           "type": {
             "type": "named",
-            "name": "any"
+            "name": "Int"
           }
         },
         "Title": {
           "arguments": {},
           "type": {
             "type": "named",
-            "name": "any"
+            "name": "String"
           }
         }
       }
@@ -198,14 +330,14 @@ expression: result
           "arguments": {},
           "type": {
             "type": "named",
-            "name": "any"
+            "name": "Int"
           }
         },
         "Name": {
           "arguments": {},
           "type": {
             "type": "named",
-            "name": "any"
+            "name": "String"
           }
         }
       }
@@ -216,91 +348,91 @@ expression: result
           "arguments": {},
           "type": {
             "type": "named",
-            "name": "any"
+            "name": "String"
           }
         },
         "City": {
           "arguments": {},
           "type": {
             "type": "named",
-            "name": "any"
+            "name": "String"
           }
         },
         "Company": {
           "arguments": {},
           "type": {
             "type": "named",
-            "name": "any"
+            "name": "String"
           }
         },
         "Country": {
           "arguments": {},
           "type": {
             "type": "named",
-            "name": "any"
+            "name": "String"
           }
         },
         "CustomerId": {
           "arguments": {},
           "type": {
             "type": "named",
-            "name": "any"
+            "name": "Int"
           }
         },
         "Email": {
           "arguments": {},
           "type": {
             "type": "named",
-            "name": "any"
+            "name": "String"
           }
         },
         "Fax": {
           "arguments": {},
           "type": {
             "type": "named",
-            "name": "any"
+            "name": "String"
           }
         },
         "FirstName": {
           "arguments": {},
           "type": {
             "type": "named",
-            "name": "any"
+            "name": "String"
           }
         },
         "LastName": {
           "arguments": {},
           "type": {
             "type": "named",
-            "name": "any"
+            "name": "String"
           }
         },
         "Phone": {
           "arguments": {},
           "type": {
             "type": "named",
-            "name": "any"
+            "name": "String"
           }
         },
         "PostalCode": {
           "arguments": {},
           "type": {
             "type": "named",
-            "name": "any"
+            "name": "String"
           }
         },
         "State": {
           "arguments": {},
           "type": {
             "type": "named",
-            "name": "any"
+            "name": "String"
           }
         },
         "SupportRepId": {
           "arguments": {},
           "type": {
             "type": "named",
-            "name": "any"
+            "name": "Int"
           }
         }
       }
@@ -311,7 +443,7 @@ expression: result
           "arguments": {},
           "type": {
             "type": "named",
-            "name": "any"
+            "name": "String"
           }
         },
         "BirthDate": {
@@ -325,42 +457,42 @@ expression: result
           "arguments": {},
           "type": {
             "type": "named",
-            "name": "any"
+            "name": "String"
           }
         },
         "Country": {
           "arguments": {},
           "type": {
             "type": "named",
-            "name": "any"
+            "name": "String"
           }
         },
         "Email": {
           "arguments": {},
           "type": {
             "type": "named",
-            "name": "any"
+            "name": "String"
           }
         },
         "EmployeeId": {
           "arguments": {},
           "type": {
             "type": "named",
-            "name": "any"
+            "name": "Int"
           }
         },
         "Fax": {
           "arguments": {},
           "type": {
             "type": "named",
-            "name": "any"
+            "name": "String"
           }
         },
         "FirstName": {
           "arguments": {},
           "type": {
             "type": "named",
-            "name": "any"
+            "name": "String"
           }
         },
         "HireDate": {
@@ -374,42 +506,42 @@ expression: result
           "arguments": {},
           "type": {
             "type": "named",
-            "name": "any"
+            "name": "String"
           }
         },
         "Phone": {
           "arguments": {},
           "type": {
             "type": "named",
-            "name": "any"
+            "name": "String"
           }
         },
         "PostalCode": {
           "arguments": {},
           "type": {
             "type": "named",
-            "name": "any"
+            "name": "String"
           }
         },
         "ReportsTo": {
           "arguments": {},
           "type": {
             "type": "named",
-            "name": "any"
+            "name": "Int"
           }
         },
         "State": {
           "arguments": {},
           "type": {
             "type": "named",
-            "name": "any"
+            "name": "String"
           }
         },
         "Title": {
           "arguments": {},
           "type": {
             "type": "named",
-            "name": "any"
+            "name": "String"
           }
         }
       }
@@ -420,14 +552,14 @@ expression: result
           "arguments": {},
           "type": {
             "type": "named",
-            "name": "any"
+            "name": "Int"
           }
         },
         "Name": {
           "arguments": {},
           "type": {
             "type": "named",
-            "name": "any"
+            "name": "String"
           }
         }
       }
@@ -438,42 +570,42 @@ expression: result
           "arguments": {},
           "type": {
             "type": "named",
-            "name": "any"
+            "name": "String"
           }
         },
         "BillingCity": {
           "arguments": {},
           "type": {
             "type": "named",
-            "name": "any"
+            "name": "String"
           }
         },
         "BillingCountry": {
           "arguments": {},
           "type": {
             "type": "named",
-            "name": "any"
+            "name": "String"
           }
         },
         "BillingPostalCode": {
           "arguments": {},
           "type": {
             "type": "named",
-            "name": "any"
+            "name": "String"
           }
         },
         "BillingState": {
           "arguments": {},
           "type": {
             "type": "named",
-            "name": "any"
+            "name": "String"
           }
         },
         "CustomerId": {
           "arguments": {},
           "type": {
             "type": "named",
-            "name": "any"
+            "name": "Int"
           }
         },
         "InvoiceDate": {
@@ -487,14 +619,14 @@ expression: result
           "arguments": {},
           "type": {
             "type": "named",
-            "name": "any"
+            "name": "Int"
           }
         },
         "Total": {
           "arguments": {},
           "type": {
             "type": "named",
-            "name": "any"
+            "name": "Float"
           }
         }
       }
@@ -505,35 +637,35 @@ expression: result
           "arguments": {},
           "type": {
             "type": "named",
-            "name": "any"
+            "name": "Int"
           }
         },
         "InvoiceLineId": {
           "arguments": {},
           "type": {
             "type": "named",
-            "name": "any"
+            "name": "Int"
           }
         },
         "Quantity": {
           "arguments": {},
           "type": {
             "type": "named",
-            "name": "any"
+            "name": "Int"
           }
         },
         "TrackId": {
           "arguments": {},
           "type": {
             "type": "named",
-            "name": "any"
+            "name": "Int"
           }
         },
         "UnitPrice": {
           "arguments": {},
           "type": {
             "type": "named",
-            "name": "any"
+            "name": "Float"
           }
         }
       }
@@ -544,14 +676,14 @@ expression: result
           "arguments": {},
           "type": {
             "type": "named",
-            "name": "any"
+            "name": "Int"
           }
         },
         "Name": {
           "arguments": {},
           "type": {
             "type": "named",
-            "name": "any"
+            "name": "String"
           }
         }
       }
@@ -562,14 +694,14 @@ expression: result
           "arguments": {},
           "type": {
             "type": "named",
-            "name": "any"
+            "name": "String"
           }
         },
         "PlaylistId": {
           "arguments": {},
           "type": {
             "type": "named",
-            "name": "any"
+            "name": "Int"
           }
         }
       }
@@ -580,14 +712,14 @@ expression: result
           "arguments": {},
           "type": {
             "type": "named",
-            "name": "any"
+            "name": "Int"
           }
         },
         "TrackId": {
           "arguments": {},
           "type": {
             "type": "named",
-            "name": "any"
+            "name": "Int"
           }
         }
       }
@@ -598,63 +730,63 @@ expression: result
           "arguments": {},
           "type": {
             "type": "named",
-            "name": "any"
+            "name": "Int"
           }
         },
         "Bytes": {
           "arguments": {},
           "type": {
             "type": "named",
-            "name": "any"
+            "name": "Int"
           }
         },
         "Composer": {
           "arguments": {},
           "type": {
             "type": "named",
-            "name": "any"
+            "name": "String"
           }
         },
         "GenreId": {
           "arguments": {},
           "type": {
             "type": "named",
-            "name": "any"
+            "name": "Int"
           }
         },
         "MediaTypeId": {
           "arguments": {},
           "type": {
             "type": "named",
-            "name": "any"
+            "name": "Int"
           }
         },
         "Milliseconds": {
           "arguments": {},
           "type": {
             "type": "named",
-            "name": "any"
+            "name": "Int"
           }
         },
         "Name": {
           "arguments": {},
           "type": {
             "type": "named",
-            "name": "any"
+            "name": "String"
           }
         },
         "TrackId": {
           "arguments": {},
           "type": {
             "type": "named",
-            "name": "any"
+            "name": "Int"
           }
         },
         "UnitPrice": {
           "arguments": {},
           "type": {
             "type": "named",
-            "name": "any"
+            "name": "Float"
           }
         }
       }
@@ -665,7 +797,7 @@ expression: result
           "arguments": {},
           "type": {
             "type": "named",
-            "name": "any"
+            "name": "Int"
           }
         },
         "f_geography_column": {
@@ -700,14 +832,14 @@ expression: result
           "arguments": {},
           "type": {
             "type": "named",
-            "name": "any"
+            "name": "Int"
           }
         },
         "type": {
           "arguments": {},
           "type": {
             "type": "named",
-            "name": "any"
+            "name": "String"
           }
         }
       }
@@ -718,7 +850,7 @@ expression: result
           "arguments": {},
           "type": {
             "type": "named",
-            "name": "any"
+            "name": "Int"
           }
         },
         "f_geometry_column": {
@@ -732,7 +864,7 @@ expression: result
           "arguments": {},
           "type": {
             "type": "named",
-            "name": "any"
+            "name": "String"
           }
         },
         "f_table_name": {
@@ -753,14 +885,14 @@ expression: result
           "arguments": {},
           "type": {
             "type": "named",
-            "name": "any"
+            "name": "Int"
           }
         },
         "type": {
           "arguments": {},
           "type": {
             "type": "named",
-            "name": "any"
+            "name": "String"
           }
         }
       }
@@ -771,35 +903,35 @@ expression: result
           "arguments": {},
           "type": {
             "type": "named",
-            "name": "any"
+            "name": "String"
           }
         },
         "auth_srid": {
           "arguments": {},
           "type": {
             "type": "named",
-            "name": "any"
+            "name": "Int"
           }
         },
         "proj4text": {
           "arguments": {},
           "type": {
             "type": "named",
-            "name": "any"
+            "name": "String"
           }
         },
         "srid": {
           "arguments": {},
           "type": {
             "type": "named",
-            "name": "any"
+            "name": "Int"
           }
         },
         "srtext": {
           "arguments": {},
           "type": {
             "type": "named",
-            "name": "any"
+            "name": "String"
           }
         }
       }
