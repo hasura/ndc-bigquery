@@ -23,7 +23,7 @@
       },
       "foreign_relations": {
         "FK_AlbumArtistId": {
-          "foreign_table": "Album",
+          "foreign_table": "Artist",
           "column_mapping": {
             "ArtistId": "ArtistId"
           }
@@ -99,7 +99,7 @@
       },
       "foreign_relations": {
         "FK_CustomerSupportRepId": {
-          "foreign_table": "Customer",
+          "foreign_table": "Employee",
           "column_mapping": {
             "SupportRepId": "EmployeeId"
           }
@@ -227,7 +227,7 @@
       },
       "foreign_relations": {
         "FK_InvoiceCustomerId": {
-          "foreign_table": "Invoice",
+          "foreign_table": "Customer",
           "column_mapping": {
             "CustomerId": "CustomerId"
           }
@@ -261,13 +261,13 @@
       },
       "foreign_relations": {
         "FK_InvoiceLineInvoiceId": {
-          "foreign_table": "InvoiceLine",
+          "foreign_table": "Invoice",
           "column_mapping": {
             "InvoiceId": "InvoiceId"
           }
         },
         "FK_InvoiceLineTrackId": {
-          "foreign_table": "InvoiceLine",
+          "foreign_table": "Track",
           "column_mapping": {
             "TrackId": "TrackId"
           }
@@ -329,13 +329,13 @@
       },
       "foreign_relations": {
         "FK_PlaylistTrackPlaylistId": {
-          "foreign_table": "PlaylistTrack",
+          "foreign_table": "Playlist",
           "column_mapping": {
             "PlaylistId": "PlaylistId"
           }
         },
         "FK_PlaylistTrackTrackId": {
-          "foreign_table": "PlaylistTrack",
+          "foreign_table": "Track",
           "column_mapping": {
             "TrackId": "TrackId"
           }
@@ -381,19 +381,19 @@
       },
       "foreign_relations": {
         "FK_TrackAlbumId": {
-          "foreign_table": "Track",
+          "foreign_table": "Album",
           "column_mapping": {
             "AlbumId": "AlbumId"
           }
         },
         "FK_TrackGenreId": {
-          "foreign_table": "Track",
+          "foreign_table": "Genre",
           "column_mapping": {
             "GenreId": "GenreId"
           }
         },
         "FK_TrackMediaTypeId": {
-          "foreign_table": "Track",
+          "foreign_table": "MediaType",
           "column_mapping": {
             "MediaTypeId": "MediaTypeId"
           }

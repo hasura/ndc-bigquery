@@ -108,12 +108,12 @@ from
                     -- the name of the foreign relation
                     'foreign_table',
                     (
-                      select ft.table_name
-                      from information_schema.table_constraints ft
+                      select tu.table_name
+                      from information_schema.constraint_table_usage tu
                       where
-                        ft.constraint_catalog = rc.constraint_catalog
-                        and ft.constraint_schema = rc.constraint_schema
-                        and ft.constraint_name = rc.constraint_name
+                        tu.constraint_catalog = c.constraint_catalog
+                        and tu.constraint_schema = c.constraint_schema
+                        and tu.constraint_name = c.constraint_name
                     ),
                     -- a mapping from the local columns to the foreign columns
                     'column_mapping',

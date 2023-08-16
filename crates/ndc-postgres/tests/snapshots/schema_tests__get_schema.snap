@@ -1,6 +1,5 @@
 ---
 source: crates/ndc-postgres/tests/schema_tests.rs
-assertion_line: 6
 expression: result
 ---
 {
@@ -824,7 +823,7 @@ expression: result
           "column_mapping": {
             "ArtistId": "ArtistId"
           },
-          "foreign_collection": "Album"
+          "foreign_collection": "Artist"
         }
       }
     },
@@ -859,7 +858,7 @@ expression: result
           "column_mapping": {
             "SupportRepId": "EmployeeId"
           },
-          "foreign_collection": "Customer"
+          "foreign_collection": "Employee"
         }
       }
     },
@@ -915,7 +914,7 @@ expression: result
           "column_mapping": {
             "CustomerId": "CustomerId"
           },
-          "foreign_collection": "Invoice"
+          "foreign_collection": "Customer"
         }
       }
     },
@@ -936,13 +935,13 @@ expression: result
           "column_mapping": {
             "InvoiceId": "InvoiceId"
           },
-          "foreign_collection": "InvoiceLine"
+          "foreign_collection": "Invoice"
         },
         "FK_InvoiceLineTrackId": {
           "column_mapping": {
             "TrackId": "TrackId"
           },
-          "foreign_collection": "InvoiceLine"
+          "foreign_collection": "Track"
         }
       }
     },
@@ -992,13 +991,13 @@ expression: result
           "column_mapping": {
             "PlaylistId": "PlaylistId"
           },
-          "foreign_collection": "PlaylistTrack"
+          "foreign_collection": "Playlist"
         },
         "FK_PlaylistTrackTrackId": {
           "column_mapping": {
             "TrackId": "TrackId"
           },
-          "foreign_collection": "PlaylistTrack"
+          "foreign_collection": "Track"
         }
       }
     },
@@ -1019,19 +1018,19 @@ expression: result
           "column_mapping": {
             "AlbumId": "AlbumId"
           },
-          "foreign_collection": "Track"
+          "foreign_collection": "Album"
         },
         "FK_TrackGenreId": {
           "column_mapping": {
             "GenreId": "GenreId"
           },
-          "foreign_collection": "Track"
+          "foreign_collection": "Genre"
         },
         "FK_TrackMediaTypeId": {
           "column_mapping": {
             "MediaTypeId": "MediaTypeId"
           },
-          "foreign_collection": "Track"
+          "foreign_collection": "MediaType"
         }
       }
     },
