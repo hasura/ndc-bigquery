@@ -321,6 +321,33 @@
     }
   },
   {
+    "kind": "modelSelectPermissions",
+    "modelName": "Artists",
+    "selectPermissions": {
+      "admin": {
+        "fields": ["ArtistId", "Name"]
+      }
+    }
+  },
+  {
+    "kind": "modelSelectPermissions",
+    "modelName": "Albums",
+    "selectPermissions": {
+      "admin": {
+        "fields": ["AlbumId", "Title", "ArtistId"]
+      }
+    }
+  },
+  {
+    "kind": "modelSelectPermissions",
+    "modelName": "Tracks",
+    "selectPermissions": {
+      "admin": {
+        "fields": ["TrackId", "Name", "AlbumId"]
+      }
+    }
+  },
+  {
     "kind": "graphqlType",
     "typeName": "Artist",
     "graphqlTypeName": "Artist",
@@ -346,7 +373,10 @@
         "queryRootField": "ArtistByID",
         "uniqueIdentifier": ["ArtistId"]
       }
-    ]
+    ],
+    "selectMany": {
+      "queryRootField": "Artist"
+    }
   },
   {
     "kind": "modelGraphqlApi",
@@ -356,7 +386,10 @@
         "queryRootField": "AlbumByID",
         "uniqueIdentifier": ["AlbumId"]
       }
-    ]
+    ],
+    "selectMany": {
+      "queryRootField": "Album"
+    }
   },
   {
     "kind": "modelGraphqlApi",
@@ -366,7 +399,10 @@
         "queryRootField": "TrackByID",
         "uniqueIdentifier": ["TrackId"]
       }
-    ]
+    ],
+    "selectMany": {
+      "queryRootField": "Track"
+    }
   },
   {
     "kind": "relationship",
