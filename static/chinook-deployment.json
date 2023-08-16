@@ -598,33 +598,12 @@
       "rank": {
         "return_type": "Int"
       },
-      "regr_count": {
-        "return_type": "Int"
-      },
-      "row_number": {
-        "return_type": "Int"
-      },
-      "st_clusterdbscan": {
-        "return_type": "Int"
-      },
-      "st_clusterkmeans": {
-        "return_type": "Int"
-      },
       "sum": {
         "return_type": "Int"
       }
     },
     "Float": {
       "avg": {
-        "return_type": "Float"
-      },
-      "corr": {
-        "return_type": "Float"
-      },
-      "covar_pop": {
-        "return_type": "Float"
-      },
-      "covar_samp": {
         "return_type": "Float"
       },
       "cume_dist": {
@@ -637,33 +616,6 @@
         "return_type": "Float"
       },
       "percent_rank": {
-        "return_type": "Float"
-      },
-      "percentile_cont": {
-        "return_type": "Float"
-      },
-      "regr_avgx": {
-        "return_type": "Float"
-      },
-      "regr_avgy": {
-        "return_type": "Float"
-      },
-      "regr_intercept": {
-        "return_type": "Float"
-      },
-      "regr_r2": {
-        "return_type": "Float"
-      },
-      "regr_slope": {
-        "return_type": "Float"
-      },
-      "regr_sxx": {
-        "return_type": "Float"
-      },
-      "regr_sxy": {
-        "return_type": "Float"
-      },
-      "regr_syy": {
         "return_type": "Float"
       },
       "stddev": {
@@ -693,9 +645,6 @@
         "return_type": "String"
       },
       "min": {
-        "return_type": "String"
-      },
-      "string_agg": {
         "return_type": "String"
       }
     },

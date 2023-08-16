@@ -36,24 +36,6 @@ expression: result
             "name": "Float"
           }
         },
-        "corr": {
-          "result_type": {
-            "type": "named",
-            "name": "Float"
-          }
-        },
-        "covar_pop": {
-          "result_type": {
-            "type": "named",
-            "name": "Float"
-          }
-        },
-        "covar_samp": {
-          "result_type": {
-            "type": "named",
-            "name": "Float"
-          }
-        },
         "cume_dist": {
           "result_type": {
             "type": "named",
@@ -73,60 +55,6 @@ expression: result
           }
         },
         "percent_rank": {
-          "result_type": {
-            "type": "named",
-            "name": "Float"
-          }
-        },
-        "percentile_cont": {
-          "result_type": {
-            "type": "named",
-            "name": "Float"
-          }
-        },
-        "regr_avgx": {
-          "result_type": {
-            "type": "named",
-            "name": "Float"
-          }
-        },
-        "regr_avgy": {
-          "result_type": {
-            "type": "named",
-            "name": "Float"
-          }
-        },
-        "regr_intercept": {
-          "result_type": {
-            "type": "named",
-            "name": "Float"
-          }
-        },
-        "regr_r2": {
-          "result_type": {
-            "type": "named",
-            "name": "Float"
-          }
-        },
-        "regr_slope": {
-          "result_type": {
-            "type": "named",
-            "name": "Float"
-          }
-        },
-        "regr_sxx": {
-          "result_type": {
-            "type": "named",
-            "name": "Float"
-          }
-        },
-        "regr_sxy": {
-          "result_type": {
-            "type": "named",
-            "name": "Float"
-          }
-        },
-        "regr_syy": {
           "result_type": {
             "type": "named",
             "name": "Float"
@@ -234,30 +162,6 @@ expression: result
             "name": "Int"
           }
         },
-        "regr_count": {
-          "result_type": {
-            "type": "named",
-            "name": "Int"
-          }
-        },
-        "row_number": {
-          "result_type": {
-            "type": "named",
-            "name": "Int"
-          }
-        },
-        "st_clusterdbscan": {
-          "result_type": {
-            "type": "named",
-            "name": "Int"
-          }
-        },
-        "st_clusterkmeans": {
-          "result_type": {
-            "type": "named",
-            "name": "Int"
-          }
-        },
         "sum": {
           "result_type": {
             "type": "named",
@@ -277,12 +181,6 @@ expression: result
           }
         },
         "min": {
-          "result_type": {
-            "type": "named",
-            "name": "String"
-          }
-        },
-        "string_agg": {
           "result_type": {
             "type": "named",
             "name": "String"

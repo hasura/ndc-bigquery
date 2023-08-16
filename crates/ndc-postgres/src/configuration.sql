@@ -185,7 +185,15 @@ from
             )
           ) routines
         from information_schema.routines r
+        -- get the parameters count for a routine
+        left outer join lateral (
+          select count(*) as count
+            from information_schema.parameters parameters
+            where r.specific_name = parameters.specific_name
+          ) parameters on ('true')
         where routine_schema in ('pg_catalog', 'public')
+        -- include routines with only one parameter
+        and parameters.count = 1
         and routine_type is null -- aggregate functions don't have a routine type
         and pg_temp.data_type_to_scalar_type(data_type) <> 'any'
         group by pg_temp.data_type_to_scalar_type(data_type)
