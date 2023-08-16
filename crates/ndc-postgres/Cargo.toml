@@ -18,7 +18,6 @@ ndc-hub = { git = "https://github.com/hasura/ndc-hub.git", tag = "v0.1.0-rc.1", 
 query-engine = { path = "../query-engine" }
 
 async-trait = "0.1.73"
-clap = { version = "4.3.21", features = ["derive"] }
 schemars = { version = "0.8.12", features = ["smol_str"] }
 serde = "1.0.179"
 serde_derive = "^1.0"
@@ -30,8 +29,13 @@ prometheus = "0.13.3"
 thiserror = "1.0"
 
 [dev-dependencies]
+ndc-client = { git = "https://github.com/hasura/ndc-spec.git" }
+ndc-test = { git = "https://github.com/hasura/ndc-spec.git" }
+
 axum = "0.6.19"
 axum-test-helper = "0.3.0"
 insta = { version = "1.31.0", features = ["json"] }
 env_logger = "0.10.0"
+hyper = { version = "0.14.27", features = ["tcp"] }
+reqwest = "0.11.18"
 similar-asserts = "1.4.2"

@@ -4,7 +4,6 @@ use std::fs;
 use std::path::PathBuf;
 
 use axum::http::StatusCode;
-use axum_test_helper::TestClient;
 use serde_derive::Deserialize;
 
 use ndc_postgres::connector;
@@ -61,24 +60,12 @@ async fn run_against_server<Response: for<'a> serde::Deserialize<'a>>(
     .await
 }
 
-/// Make a single request against the server, and get the response.
+/// Make a single request against a new server, and get the response.
 async fn make_request<Response: for<'a> serde::Deserialize<'a>>(
     request: impl FnOnce(axum_test_helper::TestClient) -> axum_test_helper::RequestBuilder,
 ) -> Response {
-    let _ = env_logger::builder().is_test(true).try_init();
-
-    // work out where the deployment configs live
-    let test_deployment_file = get_deployment_file();
-
-    // initialise server state with the static configuration.
-    let state = ndc_hub::default_main::init_server_state::<connector::Postgres>(
-        test_deployment_file.display().to_string(),
-    )
-    .await;
-
-    // create a fresh client
-    let router = ndc_hub::default_main::create_router(state);
-    let client = TestClient::new(router);
+    let router = create_router().await;
+    let client = axum_test_helper::TestClient::new(router);
 
     // make the request
     let response = request(client).send().await;
@@ -94,6 +81,22 @@ async fn make_request<Response: for<'a> serde::Deserialize<'a>>(
 
     // deserialize the response
     response.json().await
+}
+
+/// Creates a router with a fresh state from the test deployment.
+pub async fn create_router() -> axum::Router {
+    let _ = env_logger::builder().is_test(true).try_init();
+
+    // work out where the deployment configs live
+    let test_deployment_file = get_deployment_file();
+
+    // initialise server state with the static configuration.
+    let state = ndc_hub::default_main::init_server_state::<connector::Postgres>(
+        test_deployment_file.display().to_string(),
+    )
+    .await;
+
+    ndc_hub::default_main::create_router(state)
 }
 
 /// Check if all keywords are contained in this vector of strings.
