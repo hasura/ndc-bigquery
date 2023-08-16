@@ -28,9 +28,9 @@ FROM
                     true
                     AND ("Artist"."ArtistId" = "Album"."ArtistId")
                   )
-              ) AS "%ORDER_0_COUNT_Artist" ON ('true')
+              ) AS "%ORDER_0_COUNT_FOR_Artist" ON ('true')
             ORDER BY
-              "%ORDER_0_COUNT_Artist"."count" DESC
+              "%ORDER_0_COUNT_FOR_Artist"."count" DESC
             LIMIT
               5
           ) AS "rows"

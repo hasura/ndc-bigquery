@@ -97,10 +97,10 @@ pub fn translate_order_by(
                             )?;
 
                             // Give it a nice unique alias.
-                            let table_alias = sql::helpers::make_table_alias(format!(
-                                "%ORDER_{}_COUNT_{}",
-                                index, root_and_current_tables.current_table.name
-                            ));
+                            let table_alias = sql::helpers::make_order_by_count_table_alias(
+                                index,
+                                &root_and_current_tables.current_table.name,
+                            );
 
                             // Build a join ...
                             let new_join = sql::ast::LeftOuterJoinLateral {

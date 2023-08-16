@@ -206,13 +206,11 @@ pub enum Value {
 /// aliases that we give to relations
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct TableAlias {
-    pub unique_index: u64,
     pub name: String,
 }
 /// aliases that we give to columns
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ColumnAlias {
-    pub unique_index: u64,
     pub name: String,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]

@@ -70,19 +70,13 @@ pub fn make_column(
 /// We originally wanted indices, but we didn't end up using them.
 /// Leaving them here for now, but will probably remove them in the future.
 pub fn make_column_alias(name: String) -> ColumnAlias {
-    ColumnAlias {
-        unique_index: 0,
-        name,
-    }
+    ColumnAlias { name }
 }
 /// Create table aliases using this function so they get a unique index.
 /// We originally wanted indices, but we didn't end up using them.
 /// Leaving them here for now, but will probably remove them in the future.
 pub fn make_table_alias(name: String) -> TableAlias {
-    TableAlias {
-        unique_index: 0,
-        name,
-    }
+    TableAlias { name }
 }
 
 /// Create a table alias for order by column.
