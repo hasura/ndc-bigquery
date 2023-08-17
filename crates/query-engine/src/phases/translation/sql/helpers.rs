@@ -79,6 +79,13 @@ pub fn make_table_alias(name: String) -> TableAlias {
     TableAlias { name }
 }
 
+/// Create a table alias for order by target part.
+/// Provide an index and a source table name (to disambiguate the table being queried),
+/// and get an alias.
+pub fn make_order_path_part_table_alias(index: usize, table_name: &String) -> TableAlias {
+    make_table_alias(format!("%ORDER_PATH_PART_{}_{}", index, table_name))
+}
+
 /// Create a table alias for order by column.
 /// Provide an index and a source table name (to point at the table being ordered),
 /// and get an alias.

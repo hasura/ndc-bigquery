@@ -20,19 +20,21 @@ FROM
               "public"."Artist" AS "Artist"
               LEFT OUTER JOIN LATERAL (
                 SELECT
-                  count("Album"."AlbumId") AS "AlbumId"
+                  count("%ORDER_PATH_PART_0_Album"."AlbumId") AS "AlbumId"
                 FROM
                   (
                     SELECT
-                      "Album"."AlbumId" AS "AlbumId"
+                      "%ORDER_PATH_PART_0_Album"."AlbumId" AS "AlbumId"
                     FROM
-                      "Album" AS "Album"
+                      "public"."Album" AS "%ORDER_PATH_PART_0_Album"
                     WHERE
                       (
                         true
-                        AND ("Artist"."ArtistId" = "Album"."ArtistId")
+                        AND (
+                          "Artist"."ArtistId" = "%ORDER_PATH_PART_0_Album"."ArtistId"
+                        )
                       )
-                  ) AS "Album"
+                  ) AS "%ORDER_PATH_PART_0_Album"
               ) AS "%ORDER_0_FOR_Artist" ON ('true')
             ORDER BY
               "%ORDER_0_FOR_Artist"."AlbumId" DESC

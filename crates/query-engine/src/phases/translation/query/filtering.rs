@@ -360,6 +360,8 @@ pub fn translate_exists_in_collection(
             // new alias for the target table
             let table_alias: sql::ast::TableAlias =
                 sql::helpers::make_table_alias(relationship.target_collection.clone());
+            let table_alias_name: sql::ast::TableName =
+                sql::ast::TableName::AliasedTable(table_alias.clone());
 
             // build a SELECT querying this table with the relevant predicate.
             let mut select = simple_select(vec![]);
@@ -388,7 +390,7 @@ pub fn translate_exists_in_collection(
             let cond = relationships::translate_column_mapping(
                 tables_info,
                 &root_and_current_tables.current_table,
-                &table_alias,
+                &table_alias_name,
                 exists_cond,
                 relationship,
             )?;

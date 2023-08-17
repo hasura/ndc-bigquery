@@ -154,7 +154,7 @@ fn translate_order_by_star_count_aggregate(
             let join_condition = relationships::translate_column_mapping(
                 tables_info,
                 source_table,
-                &target_collection_alias,
+                &target_collection_alias_name,
                 sql::helpers::empty_where(),
                 relationship,
             )?;
@@ -281,9 +281,14 @@ fn translate_order_by_target_for_column(
     //
     // We don't need the required columns for the first table because we get them for free
     // from the root table.
-    let (_, last_table) = path.iter().try_rfold(
+    //
+    // We give each table alias a unique name using an index to guard
+    // against the case of recursive relationships in path.
+    // For example a Reply referencing a preceding reply.
+    // Note: since we use rfold the index is decreasing.
+    let (_, last_table) = path.iter().enumerate().try_rfold(
         (vec![selected_column_alias.clone()], None),
-        |(required_cols, mut last_table), path_element| {
+        |(required_cols, mut last_table), (index, path_element)| {
             // destruct path_element into parts.
             let models::PathElement {
                 relationship: relationship_name,
@@ -303,11 +308,35 @@ fn translate_order_by_target_for_column(
                 models::RelationshipType::Object => Ok(()),
             }?;
 
-            let source_table_alias: sql::ast::TableAlias =
-                sql::helpers::make_table_alias(relationship.source_collection_or_type.clone());
+            let target_table_info = tables_info
+                .0 // unwrap a newtype :(
+                .get(&relationship.target_collection)
+                .ok_or(Error::TableNotFound(relationship.target_collection.clone()))?;
+
+            // relationship target db table name
+            let target_db_table_name: sql::ast::TableName = sql::ast::TableName::DBTable {
+                schema: target_table_info.schema_name.clone(),
+                table: target_table_info.table_name.clone(),
+            };
 
             let target_collection_alias: sql::ast::TableAlias =
-                sql::helpers::make_table_alias(relationship.target_collection.clone());
+                sql::helpers::make_order_path_part_table_alias(
+                    index,
+                    &relationship.target_collection,
+                );
+
+            // The source table is going to be defined using this index - 1 in the next iteration,
+            // unless it is the root source table.
+            let source_table_alias: sql::ast::TableAlias = if index > 0 {
+                sql::helpers::make_order_path_part_table_alias(
+                    index - 1,
+                    &relationship.source_collection_or_type,
+                )
+            // If this is not the first table in the path, it is already defined
+            // out side of this scope, so we don't index it.
+            } else {
+                sql::helpers::make_table_alias(relationship.source_collection_or_type.clone())
+            };
 
             let target_collection_alias_name: sql::ast::TableName =
                 sql::ast::TableName::AliasedTable(target_collection_alias.clone());
@@ -352,7 +381,7 @@ fn translate_order_by_target_for_column(
             let join_condition = relationships::translate_column_mapping(
                 tables_info,
                 &source_table,
-                &target_collection_alias,
+                &target_collection_alias_name,
                 sql::helpers::empty_where(),
                 relationship,
             )?;
@@ -363,7 +392,7 @@ fn translate_order_by_target_for_column(
             select.where_ = sql::ast::Where(join_condition);
 
             select.from = Some(sql::ast::From::Table {
-                name: target_collection_alias_name,
+                name: target_db_table_name,
                 alias: target_collection_alias.clone(),
             });
 
