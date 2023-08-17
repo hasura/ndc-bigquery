@@ -1,18 +1,14 @@
 //! Handle stuff related to relationships and joins.
 
-use std::collections::BTreeMap;
-
 use ndc_hub::models;
 
 use super::error::Error;
-use super::helpers::{RootAndCurrentTables, TableNameAndReference};
-use crate::metadata;
+use super::helpers::{Env, RootAndCurrentTables, TableNameAndReference};
 use crate::phases::translation::sql;
 
 /// translate any joins we should include in the query into our SQL AST
 pub fn translate_joins(
-    relationships: &BTreeMap<String, models::Relationship>,
-    tables_info: &metadata::TablesInfo,
+    env: &Env,
     root_and_current_tables: &RootAndCurrentTables,
     // We got these by processing the fields selection.
     join_fields: Vec<(sql::ast::TableAlias, String, models::Query)>,
@@ -21,17 +17,14 @@ pub fn translate_joins(
     join_fields
         .into_iter()
         .map(|(alias, relationship_name, query)| {
-            let relationship = relationships
+            let relationship = env
+                .relationships
                 .get(&relationship_name)
                 .ok_or(Error::RelationshipNotFound(relationship_name.clone()))?;
 
             // process inner query and get the SELECTs for the 'rows' and 'aggregates' fields.
-            let select_set = super::translate_query(
-                tables_info,
-                relationship.target_collection.clone(),
-                relationships,
-                query,
-            )?;
+            let select_set =
+                super::translate_query(env, relationship.target_collection.clone(), query)?;
 
             let target_collection_alias_name: sql::ast::TableName =
                 sql::ast::TableName::AliasedTable(sql::helpers::make_table_alias(
@@ -45,7 +38,7 @@ pub fn translate_joins(
                     let sql::ast::Where(row_expr) = row_select.where_;
 
                     row_select.where_ = sql::ast::Where(translate_column_mapping(
-                        tables_info,
+                        env,
                         &root_and_current_tables.current_table,
                         &target_collection_alias_name,
                         row_expr,
@@ -59,7 +52,7 @@ pub fn translate_joins(
                     let sql::ast::Where(aggregate_expr) = aggregate_select.where_;
 
                     aggregate_select.where_ = sql::ast::Where(translate_column_mapping(
-                        tables_info,
+                        env,
                         &root_and_current_tables.current_table,
                         &target_collection_alias_name,
                         aggregate_expr,
@@ -76,7 +69,7 @@ pub fn translate_joins(
                     let sql::ast::Where(row_expr) = row_select.where_;
 
                     row_select.where_ = sql::ast::Where(translate_column_mapping(
-                        tables_info,
+                        env,
                         &root_and_current_tables.current_table,
                         &target_collection_alias_name,
                         row_expr,
@@ -86,7 +79,7 @@ pub fn translate_joins(
                     let sql::ast::Where(aggregate_expr) = aggregate_select.where_;
 
                     aggregate_select.where_ = sql::ast::Where(translate_column_mapping(
-                        tables_info,
+                        env,
                         &root_and_current_tables.current_table,
                         &target_collection_alias_name,
                         aggregate_expr,
@@ -125,19 +118,23 @@ pub fn translate_joins(
 
 /// Given a relationship, turn it into a Where clause for a Join.
 pub fn translate_column_mapping(
-    tables_info: &metadata::TablesInfo,
+    env: &Env,
     current_table: &TableNameAndReference,
     target_collection_alias_name: &sql::ast::TableName,
     expr: sql::ast::Expression,
     relationship: &models::Relationship,
 ) -> Result<sql::ast::Expression, Error> {
-    let metadata::TablesInfo(tables_info_map) = tables_info;
-
-    let table_info = tables_info_map
+    let table_info = env
+        .metadata
+        .tables
+        .0
         .get(&current_table.name)
         .ok_or(Error::TableNotFound(current_table.name.to_string()))?;
 
-    let target_collection_info = tables_info_map
+    let target_collection_info = env
+        .metadata
+        .tables
+        .0
         .get(&relationship.target_collection)
         .ok_or(Error::TableNotFound(relationship.target_collection.clone()))?;
 

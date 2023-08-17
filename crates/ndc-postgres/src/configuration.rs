@@ -16,7 +16,7 @@ const CONFIGURATION_QUERY: &str = include_str!("configuration.sql");
 pub struct DeploymentConfiguration {
     pub version: u32,
     pub postgres_database_url: String,
-    pub tables: query_engine::metadata::TablesInfo,
+    pub metadata: query_engine::metadata::Metadata,
     pub aggregate_functions: query_engine::metadata::AggregateFunctions,
 }
 
@@ -25,7 +25,7 @@ impl DeploymentConfiguration {
         Self {
             version: CURRENT_VERSION,
             postgres_database_url: "".into(),
-            tables: query_engine::metadata::TablesInfo::default(),
+            metadata: query_engine::metadata::Metadata::default(),
             aggregate_functions: query_engine::metadata::AggregateFunctions::default(),
         }
     }
@@ -92,6 +92,7 @@ pub async fn configure(
 
     let tables: query_engine::metadata::TablesInfo = serde_json::from_value(row.get(0))
         .map_err(|e| connector::UpdateConfigurationError::Other(e.into()))?;
+
     let aggregate_functions: query_engine::metadata::AggregateFunctions =
         serde_json::from_value(row.get(1))
             .map_err(|e| connector::UpdateConfigurationError::Other(e.into()))?;
@@ -99,7 +100,7 @@ pub async fn configure(
     Ok(DeploymentConfiguration {
         version: 1,
         postgres_database_url: args.postgres_database_url.clone(),
-        tables,
+        metadata: query_engine::metadata::Metadata { tables },
         aggregate_functions,
     })
 }

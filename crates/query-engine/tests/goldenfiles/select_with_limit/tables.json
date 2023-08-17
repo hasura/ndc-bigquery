@@ -1,11 +1,13 @@
-{
-  "Album": {
-    "schema_name": "public",
-    "table_name": "Album",
-    "columns": {
-      "Title": {
-        "name": "Title",
-        "type": "String"
+{ "tables":
+  {
+    "Album": {
+      "schema_name": "public",
+      "table_name": "Album",
+      "columns": {
+        "Title": {
+          "name": "Title",
+          "type": "String"
+        }
       }
     }
   }

@@ -114,8 +114,8 @@ impl connector::Connector for Postgres {
     /// from the NDC specification.
     async fn get_schema(
         Self::Configuration {
-            tables: query_engine::metadata::TablesInfo(tables_info),
-            aggregate_functions: query_engine::metadata::AggregateFunctions(aggregate_functions),
+            metadata,
+            aggregate_functions,
             ..
         }: &Self::Configuration,
     ) -> Result<models::SchemaResponse, connector::SchemaError> {
@@ -125,6 +125,7 @@ impl connector::Connector for Postgres {
         // have aggregate functions, we don't need to worry about this quite
         // yet.
         let mut scalar_types: BTreeMap<String, models::ScalarType> = aggregate_functions
+            .0
             .iter()
             .map(|(scalar_type, aggregate_functions)| {
                 (
@@ -160,7 +161,9 @@ impl connector::Connector for Postgres {
             },
         );
 
-        let collections = tables_info
+        let collections = metadata
+            .tables
+            .0
             .iter()
             .map(|(table_name, table)| models::CollectionInfo {
                 name: table_name.clone(),
@@ -213,24 +216,25 @@ impl connector::Connector for Postgres {
             })
             .collect();
 
-        let object_types = BTreeMap::from_iter(tables_info.iter().map(|(table_name, table)| {
-            let object_type = models::ObjectType {
-                description: None,
-                fields: BTreeMap::from_iter(table.columns.values().map(|column| {
-                    (
-                        column.name.clone(),
-                        models::ObjectField {
-                            arguments: BTreeMap::new(),
-                            description: None,
-                            r#type: models::Type::Named {
-                                name: column.r#type.to_string(),
+        let object_types =
+            BTreeMap::from_iter(metadata.tables.0.iter().map(|(table_name, table)| {
+                let object_type = models::ObjectType {
+                    description: None,
+                    fields: BTreeMap::from_iter(table.columns.values().map(|column| {
+                        (
+                            column.name.clone(),
+                            models::ObjectField {
+                                arguments: BTreeMap::new(),
+                                description: None,
+                                r#type: models::Type::Named {
+                                    name: column.r#type.to_string(),
+                                },
                             },
-                        },
-                    )
-                })),
-            };
-            (table_name.clone(), object_type)
-        }));
+                        )
+                    })),
+                };
+                (table_name.clone(), object_type)
+            }));
 
         Ok(models::SchemaResponse {
             collections,
@@ -254,14 +258,14 @@ impl connector::Connector for Postgres {
         tracing::info!("{:?}", query_request);
 
         // Compile the query.
-        let plan = match phases::translation::query::translate(&configuration.tables, query_request)
-        {
-            Ok(plan) => Ok(plan),
-            Err(err) => {
-                tracing::error!("{}", err);
-                Err(connector::ExplainError::Other(err.to_string().into()))
-            }
-        }?;
+        let plan =
+            match phases::translation::query::translate(&configuration.metadata, query_request) {
+                Ok(plan) => Ok(plan),
+                Err(err) => {
+                    tracing::error!("{}", err);
+                    Err(connector::ExplainError::Other(err.to_string().into()))
+                }
+            }?;
 
         // Execute an explain query.
         let (query, plan) = phases::execution::explain(&state.pool, plan)
@@ -313,19 +317,19 @@ impl connector::Connector for Postgres {
         tracing::info!("{:?}", query_request);
 
         // Compile the query.
-        let plan = match phases::translation::query::translate(&configuration.tables, query_request)
-        {
-            Ok(plan) => Ok(plan),
-            Err(err) => {
-                tracing::error!("{}", err);
-                match err {
-                    phases::translation::query::error::Error::NotSupported(_) => {
-                        Err(connector::QueryError::UnsupportedOperation(err.to_string()))
+        let plan =
+            match phases::translation::query::translate(&configuration.metadata, query_request) {
+                Ok(plan) => Ok(plan),
+                Err(err) => {
+                    tracing::error!("{}", err);
+                    match err {
+                        phases::translation::query::error::Error::NotSupported(_) => {
+                            Err(connector::QueryError::UnsupportedOperation(err.to_string()))
+                        }
+                        _ => Err(connector::QueryError::InvalidRequest(err.to_string())),
                     }
-                    _ => Err(connector::QueryError::InvalidRequest(err.to_string())),
                 }
-            }
-        }?;
+            }?;
 
         // Execute the query.
         let result = phases::execution::execute(&state.pool, plan)

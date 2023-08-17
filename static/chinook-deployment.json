@@ -1,572 +1,574 @@
 {
   "version": 1,
   "postgres_database_url": "postgresql://postgres:password@localhost:64002",
-  "tables": {
-    "Album": {
-      "schema_name": "public",
-      "table_name": "Album",
-      "columns": {
-        "AlbumId": {
-          "name": "AlbumId",
-          "type": "Int"
+  "metadata": {
+    "tables": {
+      "Album": {
+        "schema_name": "public",
+        "table_name": "Album",
+        "columns": {
+          "AlbumId": {
+            "name": "AlbumId",
+            "type": "Int"
+          },
+          "ArtistId": {
+            "name": "ArtistId",
+            "type": "Int"
+          },
+          "Title": {
+            "name": "Title",
+            "type": "String"
+          }
         },
-        "ArtistId": {
-          "name": "ArtistId",
-          "type": "Int"
+        "uniqueness_constraints": {
+          "PK_Album": [
+            "AlbumId"
+          ]
         },
-        "Title": {
-          "name": "Title",
-          "type": "String"
-        }
-      },
-      "uniqueness_constraints": {
-        "PK_Album": [
-          "AlbumId"
-        ]
-      },
-      "foreign_relations": {
-        "FK_AlbumArtistId": {
-          "foreign_table": "Artist",
-          "column_mapping": {
-            "ArtistId": "ArtistId"
+        "foreign_relations": {
+          "FK_AlbumArtistId": {
+            "foreign_table": "Artist",
+            "column_mapping": {
+              "ArtistId": "ArtistId"
+            }
           }
         }
+      },
+      "Artist": {
+        "schema_name": "public",
+        "table_name": "Artist",
+        "columns": {
+          "ArtistId": {
+            "name": "ArtistId",
+            "type": "Int"
+          },
+          "Name": {
+            "name": "Name",
+            "type": "String"
+          }
+        },
+        "uniqueness_constraints": {
+          "PK_Artist": [
+            "ArtistId"
+          ]
+        },
+        "foreign_relations": {}
+      },
+      "Customer": {
+        "schema_name": "public",
+        "table_name": "Customer",
+        "columns": {
+          "Address": {
+            "name": "Address",
+            "type": "String"
+          },
+          "City": {
+            "name": "City",
+            "type": "String"
+          },
+          "Company": {
+            "name": "Company",
+            "type": "String"
+          },
+          "Country": {
+            "name": "Country",
+            "type": "String"
+          },
+          "CustomerId": {
+            "name": "CustomerId",
+            "type": "Int"
+          },
+          "Email": {
+            "name": "Email",
+            "type": "String"
+          },
+          "Fax": {
+            "name": "Fax",
+            "type": "String"
+          },
+          "FirstName": {
+            "name": "FirstName",
+            "type": "String"
+          },
+          "LastName": {
+            "name": "LastName",
+            "type": "String"
+          },
+          "Phone": {
+            "name": "Phone",
+            "type": "String"
+          },
+          "PostalCode": {
+            "name": "PostalCode",
+            "type": "String"
+          },
+          "State": {
+            "name": "State",
+            "type": "String"
+          },
+          "SupportRepId": {
+            "name": "SupportRepId",
+            "type": "Int"
+          }
+        },
+        "uniqueness_constraints": {
+          "PK_Customer": [
+            "CustomerId"
+          ]
+        },
+        "foreign_relations": {
+          "FK_CustomerSupportRepId": {
+            "foreign_table": "Employee",
+            "column_mapping": {
+              "SupportRepId": "EmployeeId"
+            }
+          }
+        }
+      },
+      "Employee": {
+        "schema_name": "public",
+        "table_name": "Employee",
+        "columns": {
+          "Address": {
+            "name": "Address",
+            "type": "String"
+          },
+          "BirthDate": {
+            "name": "BirthDate",
+            "type": "any"
+          },
+          "City": {
+            "name": "City",
+            "type": "String"
+          },
+          "Country": {
+            "name": "Country",
+            "type": "String"
+          },
+          "Email": {
+            "name": "Email",
+            "type": "String"
+          },
+          "EmployeeId": {
+            "name": "EmployeeId",
+            "type": "Int"
+          },
+          "Fax": {
+            "name": "Fax",
+            "type": "String"
+          },
+          "FirstName": {
+            "name": "FirstName",
+            "type": "String"
+          },
+          "HireDate": {
+            "name": "HireDate",
+            "type": "any"
+          },
+          "LastName": {
+            "name": "LastName",
+            "type": "String"
+          },
+          "Phone": {
+            "name": "Phone",
+            "type": "String"
+          },
+          "PostalCode": {
+            "name": "PostalCode",
+            "type": "String"
+          },
+          "ReportsTo": {
+            "name": "ReportsTo",
+            "type": "Int"
+          },
+          "State": {
+            "name": "State",
+            "type": "String"
+          },
+          "Title": {
+            "name": "Title",
+            "type": "String"
+          }
+        },
+        "uniqueness_constraints": {
+          "PK_Employee": [
+            "EmployeeId"
+          ]
+        },
+        "foreign_relations": {
+          "FK_EmployeeReportsTo": {
+            "foreign_table": "Employee",
+            "column_mapping": {
+              "ReportsTo": "EmployeeId"
+            }
+          }
+        }
+      },
+      "Genre": {
+        "schema_name": "public",
+        "table_name": "Genre",
+        "columns": {
+          "GenreId": {
+            "name": "GenreId",
+            "type": "Int"
+          },
+          "Name": {
+            "name": "Name",
+            "type": "String"
+          }
+        },
+        "uniqueness_constraints": {
+          "PK_Genre": [
+            "GenreId"
+          ]
+        },
+        "foreign_relations": {}
+      },
+      "Invoice": {
+        "schema_name": "public",
+        "table_name": "Invoice",
+        "columns": {
+          "BillingAddress": {
+            "name": "BillingAddress",
+            "type": "String"
+          },
+          "BillingCity": {
+            "name": "BillingCity",
+            "type": "String"
+          },
+          "BillingCountry": {
+            "name": "BillingCountry",
+            "type": "String"
+          },
+          "BillingPostalCode": {
+            "name": "BillingPostalCode",
+            "type": "String"
+          },
+          "BillingState": {
+            "name": "BillingState",
+            "type": "String"
+          },
+          "CustomerId": {
+            "name": "CustomerId",
+            "type": "Int"
+          },
+          "InvoiceDate": {
+            "name": "InvoiceDate",
+            "type": "any"
+          },
+          "InvoiceId": {
+            "name": "InvoiceId",
+            "type": "Int"
+          },
+          "Total": {
+            "name": "Total",
+            "type": "Float"
+          }
+        },
+        "uniqueness_constraints": {
+          "PK_Invoice": [
+            "InvoiceId"
+          ]
+        },
+        "foreign_relations": {
+          "FK_InvoiceCustomerId": {
+            "foreign_table": "Customer",
+            "column_mapping": {
+              "CustomerId": "CustomerId"
+            }
+          }
+        }
+      },
+      "InvoiceLine": {
+        "schema_name": "public",
+        "table_name": "InvoiceLine",
+        "columns": {
+          "InvoiceId": {
+            "name": "InvoiceId",
+            "type": "Int"
+          },
+          "InvoiceLineId": {
+            "name": "InvoiceLineId",
+            "type": "Int"
+          },
+          "Quantity": {
+            "name": "Quantity",
+            "type": "Int"
+          },
+          "TrackId": {
+            "name": "TrackId",
+            "type": "Int"
+          },
+          "UnitPrice": {
+            "name": "UnitPrice",
+            "type": "Float"
+          }
+        },
+        "uniqueness_constraints": {
+          "PK_InvoiceLine": [
+            "InvoiceLineId"
+          ]
+        },
+        "foreign_relations": {
+          "FK_InvoiceLineInvoiceId": {
+            "foreign_table": "Invoice",
+            "column_mapping": {
+              "InvoiceId": "InvoiceId"
+            }
+          },
+          "FK_InvoiceLineTrackId": {
+            "foreign_table": "Track",
+            "column_mapping": {
+              "TrackId": "TrackId"
+            }
+          }
+        }
+      },
+      "MediaType": {
+        "schema_name": "public",
+        "table_name": "MediaType",
+        "columns": {
+          "MediaTypeId": {
+            "name": "MediaTypeId",
+            "type": "Int"
+          },
+          "Name": {
+            "name": "Name",
+            "type": "String"
+          }
+        },
+        "uniqueness_constraints": {
+          "PK_MediaType": [
+            "MediaTypeId"
+          ]
+        },
+        "foreign_relations": {}
+      },
+      "Playlist": {
+        "schema_name": "public",
+        "table_name": "Playlist",
+        "columns": {
+          "Name": {
+            "name": "Name",
+            "type": "String"
+          },
+          "PlaylistId": {
+            "name": "PlaylistId",
+            "type": "Int"
+          }
+        },
+        "uniqueness_constraints": {
+          "PK_Playlist": [
+            "PlaylistId"
+          ]
+        },
+        "foreign_relations": {}
+      },
+      "PlaylistTrack": {
+        "schema_name": "public",
+        "table_name": "PlaylistTrack",
+        "columns": {
+          "PlaylistId": {
+            "name": "PlaylistId",
+            "type": "Int"
+          },
+          "TrackId": {
+            "name": "TrackId",
+            "type": "Int"
+          }
+        },
+        "uniqueness_constraints": {
+          "PK_PlaylistTrack": [
+            "PlaylistId",
+            "TrackId"
+          ]
+        },
+        "foreign_relations": {
+          "FK_PlaylistTrackPlaylistId": {
+            "foreign_table": "Playlist",
+            "column_mapping": {
+              "PlaylistId": "PlaylistId"
+            }
+          },
+          "FK_PlaylistTrackTrackId": {
+            "foreign_table": "Track",
+            "column_mapping": {
+              "TrackId": "TrackId"
+            }
+          }
+        }
+      },
+      "Track": {
+        "schema_name": "public",
+        "table_name": "Track",
+        "columns": {
+          "AlbumId": {
+            "name": "AlbumId",
+            "type": "Int"
+          },
+          "Bytes": {
+            "name": "Bytes",
+            "type": "Int"
+          },
+          "Composer": {
+            "name": "Composer",
+            "type": "String"
+          },
+          "GenreId": {
+            "name": "GenreId",
+            "type": "Int"
+          },
+          "MediaTypeId": {
+            "name": "MediaTypeId",
+            "type": "Int"
+          },
+          "Milliseconds": {
+            "name": "Milliseconds",
+            "type": "Int"
+          },
+          "Name": {
+            "name": "Name",
+            "type": "String"
+          },
+          "TrackId": {
+            "name": "TrackId",
+            "type": "Int"
+          },
+          "UnitPrice": {
+            "name": "UnitPrice",
+            "type": "Float"
+          }
+        },
+        "uniqueness_constraints": {
+          "PK_Track": [
+            "TrackId"
+          ]
+        },
+        "foreign_relations": {
+          "FK_TrackAlbumId": {
+            "foreign_table": "Album",
+            "column_mapping": {
+              "AlbumId": "AlbumId"
+            }
+          },
+          "FK_TrackGenreId": {
+            "foreign_table": "Genre",
+            "column_mapping": {
+              "GenreId": "GenreId"
+            }
+          },
+          "FK_TrackMediaTypeId": {
+            "foreign_table": "MediaType",
+            "column_mapping": {
+              "MediaTypeId": "MediaTypeId"
+            }
+          }
+        }
+      },
+      "geography_columns": {
+        "schema_name": "public",
+        "table_name": "geography_columns",
+        "columns": {
+          "coord_dimension": {
+            "name": "coord_dimension",
+            "type": "Int"
+          },
+          "f_geography_column": {
+            "name": "f_geography_column",
+            "type": "any"
+          },
+          "f_table_catalog": {
+            "name": "f_table_catalog",
+            "type": "any"
+          },
+          "f_table_name": {
+            "name": "f_table_name",
+            "type": "any"
+          },
+          "f_table_schema": {
+            "name": "f_table_schema",
+            "type": "any"
+          },
+          "srid": {
+            "name": "srid",
+            "type": "Int"
+          },
+          "type": {
+            "name": "type",
+            "type": "String"
+          }
+        },
+        "uniqueness_constraints": {},
+        "foreign_relations": {}
+      },
+      "geometry_columns": {
+        "schema_name": "public",
+        "table_name": "geometry_columns",
+        "columns": {
+          "coord_dimension": {
+            "name": "coord_dimension",
+            "type": "Int"
+          },
+          "f_geometry_column": {
+            "name": "f_geometry_column",
+            "type": "any"
+          },
+          "f_table_catalog": {
+            "name": "f_table_catalog",
+            "type": "String"
+          },
+          "f_table_name": {
+            "name": "f_table_name",
+            "type": "any"
+          },
+          "f_table_schema": {
+            "name": "f_table_schema",
+            "type": "any"
+          },
+          "srid": {
+            "name": "srid",
+            "type": "Int"
+          },
+          "type": {
+            "name": "type",
+            "type": "String"
+          }
+        },
+        "uniqueness_constraints": {},
+        "foreign_relations": {}
+      },
+      "spatial_ref_sys": {
+        "schema_name": "public",
+        "table_name": "spatial_ref_sys",
+        "columns": {
+          "auth_name": {
+            "name": "auth_name",
+            "type": "String"
+          },
+          "auth_srid": {
+            "name": "auth_srid",
+            "type": "Int"
+          },
+          "proj4text": {
+            "name": "proj4text",
+            "type": "String"
+          },
+          "srid": {
+            "name": "srid",
+            "type": "Int"
+          },
+          "srtext": {
+            "name": "srtext",
+            "type": "String"
+          }
+        },
+        "uniqueness_constraints": {
+          "spatial_ref_sys_pkey": [
+            "srid"
+          ]
+        },
+        "foreign_relations": {}
       }
-    },
-    "Artist": {
-      "schema_name": "public",
-      "table_name": "Artist",
-      "columns": {
-        "ArtistId": {
-          "name": "ArtistId",
-          "type": "Int"
-        },
-        "Name": {
-          "name": "Name",
-          "type": "String"
-        }
-      },
-      "uniqueness_constraints": {
-        "PK_Artist": [
-          "ArtistId"
-        ]
-      },
-      "foreign_relations": {}
-    },
-    "Customer": {
-      "schema_name": "public",
-      "table_name": "Customer",
-      "columns": {
-        "Address": {
-          "name": "Address",
-          "type": "String"
-        },
-        "City": {
-          "name": "City",
-          "type": "String"
-        },
-        "Company": {
-          "name": "Company",
-          "type": "String"
-        },
-        "Country": {
-          "name": "Country",
-          "type": "String"
-        },
-        "CustomerId": {
-          "name": "CustomerId",
-          "type": "Int"
-        },
-        "Email": {
-          "name": "Email",
-          "type": "String"
-        },
-        "Fax": {
-          "name": "Fax",
-          "type": "String"
-        },
-        "FirstName": {
-          "name": "FirstName",
-          "type": "String"
-        },
-        "LastName": {
-          "name": "LastName",
-          "type": "String"
-        },
-        "Phone": {
-          "name": "Phone",
-          "type": "String"
-        },
-        "PostalCode": {
-          "name": "PostalCode",
-          "type": "String"
-        },
-        "State": {
-          "name": "State",
-          "type": "String"
-        },
-        "SupportRepId": {
-          "name": "SupportRepId",
-          "type": "Int"
-        }
-      },
-      "uniqueness_constraints": {
-        "PK_Customer": [
-          "CustomerId"
-        ]
-      },
-      "foreign_relations": {
-        "FK_CustomerSupportRepId": {
-          "foreign_table": "Employee",
-          "column_mapping": {
-            "SupportRepId": "EmployeeId"
-          }
-        }
-      }
-    },
-    "Employee": {
-      "schema_name": "public",
-      "table_name": "Employee",
-      "columns": {
-        "Address": {
-          "name": "Address",
-          "type": "String"
-        },
-        "BirthDate": {
-          "name": "BirthDate",
-          "type": "any"
-        },
-        "City": {
-          "name": "City",
-          "type": "String"
-        },
-        "Country": {
-          "name": "Country",
-          "type": "String"
-        },
-        "Email": {
-          "name": "Email",
-          "type": "String"
-        },
-        "EmployeeId": {
-          "name": "EmployeeId",
-          "type": "Int"
-        },
-        "Fax": {
-          "name": "Fax",
-          "type": "String"
-        },
-        "FirstName": {
-          "name": "FirstName",
-          "type": "String"
-        },
-        "HireDate": {
-          "name": "HireDate",
-          "type": "any"
-        },
-        "LastName": {
-          "name": "LastName",
-          "type": "String"
-        },
-        "Phone": {
-          "name": "Phone",
-          "type": "String"
-        },
-        "PostalCode": {
-          "name": "PostalCode",
-          "type": "String"
-        },
-        "ReportsTo": {
-          "name": "ReportsTo",
-          "type": "Int"
-        },
-        "State": {
-          "name": "State",
-          "type": "String"
-        },
-        "Title": {
-          "name": "Title",
-          "type": "String"
-        }
-      },
-      "uniqueness_constraints": {
-        "PK_Employee": [
-          "EmployeeId"
-        ]
-      },
-      "foreign_relations": {
-        "FK_EmployeeReportsTo": {
-          "foreign_table": "Employee",
-          "column_mapping": {
-            "ReportsTo": "EmployeeId"
-          }
-        }
-      }
-    },
-    "Genre": {
-      "schema_name": "public",
-      "table_name": "Genre",
-      "columns": {
-        "GenreId": {
-          "name": "GenreId",
-          "type": "Int"
-        },
-        "Name": {
-          "name": "Name",
-          "type": "String"
-        }
-      },
-      "uniqueness_constraints": {
-        "PK_Genre": [
-          "GenreId"
-        ]
-      },
-      "foreign_relations": {}
-    },
-    "Invoice": {
-      "schema_name": "public",
-      "table_name": "Invoice",
-      "columns": {
-        "BillingAddress": {
-          "name": "BillingAddress",
-          "type": "String"
-        },
-        "BillingCity": {
-          "name": "BillingCity",
-          "type": "String"
-        },
-        "BillingCountry": {
-          "name": "BillingCountry",
-          "type": "String"
-        },
-        "BillingPostalCode": {
-          "name": "BillingPostalCode",
-          "type": "String"
-        },
-        "BillingState": {
-          "name": "BillingState",
-          "type": "String"
-        },
-        "CustomerId": {
-          "name": "CustomerId",
-          "type": "Int"
-        },
-        "InvoiceDate": {
-          "name": "InvoiceDate",
-          "type": "any"
-        },
-        "InvoiceId": {
-          "name": "InvoiceId",
-          "type": "Int"
-        },
-        "Total": {
-          "name": "Total",
-          "type": "Float"
-        }
-      },
-      "uniqueness_constraints": {
-        "PK_Invoice": [
-          "InvoiceId"
-        ]
-      },
-      "foreign_relations": {
-        "FK_InvoiceCustomerId": {
-          "foreign_table": "Customer",
-          "column_mapping": {
-            "CustomerId": "CustomerId"
-          }
-        }
-      }
-    },
-    "InvoiceLine": {
-      "schema_name": "public",
-      "table_name": "InvoiceLine",
-      "columns": {
-        "InvoiceId": {
-          "name": "InvoiceId",
-          "type": "Int"
-        },
-        "InvoiceLineId": {
-          "name": "InvoiceLineId",
-          "type": "Int"
-        },
-        "Quantity": {
-          "name": "Quantity",
-          "type": "Int"
-        },
-        "TrackId": {
-          "name": "TrackId",
-          "type": "Int"
-        },
-        "UnitPrice": {
-          "name": "UnitPrice",
-          "type": "Float"
-        }
-      },
-      "uniqueness_constraints": {
-        "PK_InvoiceLine": [
-          "InvoiceLineId"
-        ]
-      },
-      "foreign_relations": {
-        "FK_InvoiceLineInvoiceId": {
-          "foreign_table": "Invoice",
-          "column_mapping": {
-            "InvoiceId": "InvoiceId"
-          }
-        },
-        "FK_InvoiceLineTrackId": {
-          "foreign_table": "Track",
-          "column_mapping": {
-            "TrackId": "TrackId"
-          }
-        }
-      }
-    },
-    "MediaType": {
-      "schema_name": "public",
-      "table_name": "MediaType",
-      "columns": {
-        "MediaTypeId": {
-          "name": "MediaTypeId",
-          "type": "Int"
-        },
-        "Name": {
-          "name": "Name",
-          "type": "String"
-        }
-      },
-      "uniqueness_constraints": {
-        "PK_MediaType": [
-          "MediaTypeId"
-        ]
-      },
-      "foreign_relations": {}
-    },
-    "Playlist": {
-      "schema_name": "public",
-      "table_name": "Playlist",
-      "columns": {
-        "Name": {
-          "name": "Name",
-          "type": "String"
-        },
-        "PlaylistId": {
-          "name": "PlaylistId",
-          "type": "Int"
-        }
-      },
-      "uniqueness_constraints": {
-        "PK_Playlist": [
-          "PlaylistId"
-        ]
-      },
-      "foreign_relations": {}
-    },
-    "PlaylistTrack": {
-      "schema_name": "public",
-      "table_name": "PlaylistTrack",
-      "columns": {
-        "PlaylistId": {
-          "name": "PlaylistId",
-          "type": "Int"
-        },
-        "TrackId": {
-          "name": "TrackId",
-          "type": "Int"
-        }
-      },
-      "uniqueness_constraints": {
-        "PK_PlaylistTrack": [
-          "PlaylistId",
-          "TrackId"
-        ]
-      },
-      "foreign_relations": {
-        "FK_PlaylistTrackPlaylistId": {
-          "foreign_table": "Playlist",
-          "column_mapping": {
-            "PlaylistId": "PlaylistId"
-          }
-        },
-        "FK_PlaylistTrackTrackId": {
-          "foreign_table": "Track",
-          "column_mapping": {
-            "TrackId": "TrackId"
-          }
-        }
-      }
-    },
-    "Track": {
-      "schema_name": "public",
-      "table_name": "Track",
-      "columns": {
-        "AlbumId": {
-          "name": "AlbumId",
-          "type": "Int"
-        },
-        "Bytes": {
-          "name": "Bytes",
-          "type": "Int"
-        },
-        "Composer": {
-          "name": "Composer",
-          "type": "String"
-        },
-        "GenreId": {
-          "name": "GenreId",
-          "type": "Int"
-        },
-        "MediaTypeId": {
-          "name": "MediaTypeId",
-          "type": "Int"
-        },
-        "Milliseconds": {
-          "name": "Milliseconds",
-          "type": "Int"
-        },
-        "Name": {
-          "name": "Name",
-          "type": "String"
-        },
-        "TrackId": {
-          "name": "TrackId",
-          "type": "Int"
-        },
-        "UnitPrice": {
-          "name": "UnitPrice",
-          "type": "Float"
-        }
-      },
-      "uniqueness_constraints": {
-        "PK_Track": [
-          "TrackId"
-        ]
-      },
-      "foreign_relations": {
-        "FK_TrackAlbumId": {
-          "foreign_table": "Album",
-          "column_mapping": {
-            "AlbumId": "AlbumId"
-          }
-        },
-        "FK_TrackGenreId": {
-          "foreign_table": "Genre",
-          "column_mapping": {
-            "GenreId": "GenreId"
-          }
-        },
-        "FK_TrackMediaTypeId": {
-          "foreign_table": "MediaType",
-          "column_mapping": {
-            "MediaTypeId": "MediaTypeId"
-          }
-        }
-      }
-    },
-    "geography_columns": {
-      "schema_name": "public",
-      "table_name": "geography_columns",
-      "columns": {
-        "coord_dimension": {
-          "name": "coord_dimension",
-          "type": "Int"
-        },
-        "f_geography_column": {
-          "name": "f_geography_column",
-          "type": "any"
-        },
-        "f_table_catalog": {
-          "name": "f_table_catalog",
-          "type": "any"
-        },
-        "f_table_name": {
-          "name": "f_table_name",
-          "type": "any"
-        },
-        "f_table_schema": {
-          "name": "f_table_schema",
-          "type": "any"
-        },
-        "srid": {
-          "name": "srid",
-          "type": "Int"
-        },
-        "type": {
-          "name": "type",
-          "type": "String"
-        }
-      },
-      "uniqueness_constraints": {},
-      "foreign_relations": {}
-    },
-    "geometry_columns": {
-      "schema_name": "public",
-      "table_name": "geometry_columns",
-      "columns": {
-        "coord_dimension": {
-          "name": "coord_dimension",
-          "type": "Int"
-        },
-        "f_geometry_column": {
-          "name": "f_geometry_column",
-          "type": "any"
-        },
-        "f_table_catalog": {
-          "name": "f_table_catalog",
-          "type": "String"
-        },
-        "f_table_name": {
-          "name": "f_table_name",
-          "type": "any"
-        },
-        "f_table_schema": {
-          "name": "f_table_schema",
-          "type": "any"
-        },
-        "srid": {
-          "name": "srid",
-          "type": "Int"
-        },
-        "type": {
-          "name": "type",
-          "type": "String"
-        }
-      },
-      "uniqueness_constraints": {},
-      "foreign_relations": {}
-    },
-    "spatial_ref_sys": {
-      "schema_name": "public",
-      "table_name": "spatial_ref_sys",
-      "columns": {
-        "auth_name": {
-          "name": "auth_name",
-          "type": "String"
-        },
-        "auth_srid": {
-          "name": "auth_srid",
-          "type": "Int"
-        },
-        "proj4text": {
-          "name": "proj4text",
-          "type": "String"
-        },
-        "srid": {
-          "name": "srid",
-          "type": "Int"
-        },
-        "srtext": {
-          "name": "srtext",
-          "type": "String"
-        }
-      },
-      "uniqueness_constraints": {
-        "spatial_ref_sys_pkey": [
-          "srid"
-        ]
-      },
-      "foreign_relations": {}
     }
   },
   "aggregate_functions": {

@@ -8,23 +8,24 @@ pub mod relationships;
 pub mod root;
 pub mod sorting;
 
-use std::collections::BTreeMap;
-
 use ndc_hub::models;
 
 use crate::metadata;
+use crate::phases::translation::query::helpers::Env;
 use crate::phases::translation::sql;
 use error::Error;
 
 /// Translate the incoming QueryRequest to an ExecutionPlan (SQL) to be run against the database.
 pub fn translate(
-    tables_info: &metadata::TablesInfo,
+    metadata: &metadata::Metadata,
     query_request: models::QueryRequest,
 ) -> Result<sql::execution_plan::ExecutionPlan, Error> {
     let select_set = translate_query(
-        tables_info,
+        &Env {
+            metadata: metadata.clone(),
+            relationships: query_request.collection_relationships,
+        },
         query_request.collection.clone(),
-        &query_request.collection_relationships,
         query_request.query,
     )?;
 
@@ -52,9 +53,8 @@ pub fn translate(
 /// Translate a query to sql ast.
 /// We return a SELECT for the 'rows' field and a SELECT for the 'aggregates' field.
 pub fn translate_query(
-    tables_info: &metadata::TablesInfo,
+    env: &Env,
     table_name: String,
-    relationships: &BTreeMap<String, models::Relationship>,
     query: models::Query,
 ) -> Result<sql::helpers::SelectSet, Error> {
     // Error::NoFields becomes Ok(None)
@@ -68,13 +68,12 @@ pub fn translate_query(
     let wrap_ok = |a| Ok(Some(a));
 
     // translate rows query. if there are no fields, make this a None
-    let row_select: Option<sql::ast::Select> =
-        root::translate_rows_query(tables_info, &table_name, relationships, &query)
-            .map_or_else(map_no_fields_error_to_none, wrap_ok)?;
+    let row_select: Option<sql::ast::Select> = root::translate_rows_query(env, &table_name, &query)
+        .map_or_else(map_no_fields_error_to_none, wrap_ok)?;
 
     // translate aggregate select. if there are no fields, make this a None
     let aggregate_select: Option<sql::ast::Select> =
-        root::translate_aggregate_query(tables_info, table_name, relationships, &query)
+        root::translate_aggregate_query(env, table_name, &query)
             .map_or_else(map_no_fields_error_to_none, wrap_ok)?;
 
     match (row_select, aggregate_select) {

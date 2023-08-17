@@ -1,18 +1,14 @@
-use std::collections::BTreeMap;
-
 use ndc_hub::models;
 
 use super::error::Error;
-use super::helpers::{RootAndCurrentTables, TableNameAndReference};
+use super::helpers::{Env, RootAndCurrentTables, TableNameAndReference};
 use super::relationships;
-use crate::metadata;
 use crate::phases::translation::sql;
 
 /// Convert the order by fields from a QueryRequest to a SQL ORDER BY clause and potentially
 /// JOINs when we order by relationship fields.
 pub fn translate_order_by(
-    tables_info: &metadata::TablesInfo,
-    relationships: &BTreeMap<String, models::Relationship>,
+    env: &Env,
     root_and_current_tables: &RootAndCurrentTables,
     order_by: &Option<models::OrderBy>,
 ) -> Result<(sql::ast::OrderBy, Vec<sql::ast::Join>), Error> {
@@ -28,8 +24,7 @@ pub fn translate_order_by(
                 .map(|(index, order_by)| {
                     let target = match &order_by.target {
                         models::OrderByTarget::Column { name, path } => translate_order_by_target(
-                            tables_info,
-                            relationships,
+                            env,
                             root_and_current_tables,
                             index,
                             (name, path),
@@ -42,8 +37,7 @@ pub fn translate_order_by(
                             function,
                             path,
                         } => translate_order_by_target(
-                            tables_info,
-                            relationships,
+                            env,
                             root_and_current_tables,
                             index,
                             (column, path),
@@ -52,8 +46,7 @@ pub fn translate_order_by(
                         ),
                         models::OrderByTarget::StarCountAggregate { path } => {
                             let (column_alias, select) = translate_order_by_star_count_aggregate(
-                                tables_info,
-                                relationships,
+                                env,
                                 &root_and_current_tables.current_table,
                                 path,
                             )?;
@@ -106,8 +99,7 @@ pub fn translate_order_by(
 // a StarCountAggregate allows us to express stuff like "order albums by number of tracks they have",
 // ie order by a COUNT(*) over the items of an array relationship
 fn translate_order_by_star_count_aggregate(
-    tables_info: &metadata::TablesInfo,
-    relationships: &BTreeMap<String, models::Relationship>,
+    env: &Env,
     source_table: &TableNameAndReference,
     path: &[models::PathElement],
 ) -> Result<(sql::ast::ColumnAlias, sql::ast::Select), Error> {
@@ -128,7 +120,8 @@ fn translate_order_by_star_count_aggregate(
             } = path_element;
 
             // examine the path elements' relationship.
-            let relationship = relationships
+            let relationship = env
+                .relationships
                 .get(relationship_name)
                 .ok_or(Error::RelationshipNotFound(relationship_name.clone()))?;
 
@@ -152,7 +145,7 @@ fn translate_order_by_star_count_aggregate(
 
             // generate a condition for this join.
             let join_condition = relationships::translate_column_mapping(
-                tables_info,
+                env,
                 source_table,
                 &target_collection_alias_name,
                 sql::helpers::empty_where(),
@@ -178,8 +171,7 @@ fn translate_order_by_star_count_aggregate(
 /// Translate an order by target and add additional JOINs to the wrapping SELECT
 /// and return the expression used for the sort by the wrapping SELECT.
 fn translate_order_by_target(
-    tables_info: &metadata::TablesInfo,
-    relationships: &BTreeMap<String, models::Relationship>,
+    env: &Env,
     root_and_current_tables: &RootAndCurrentTables,
     index: usize,
     (column, path): (&str, &Vec<models::PathElement>),
@@ -188,13 +180,8 @@ fn translate_order_by_target(
     function: Option<String>,
     joins: &mut Vec<sql::ast::Join>,
 ) -> Result<sql::ast::Expression, Error> {
-    let (column_alias, optional_relationship_select) = translate_order_by_target_for_column(
-        tables_info,
-        relationships,
-        column.to_string(),
-        path,
-        function,
-    )?;
+    let (column_alias, optional_relationship_select) =
+        translate_order_by_target_for_column(env, column.to_string(), path, function)?;
 
     match optional_relationship_select {
         // The column is from the source table, we just need to query it directly
@@ -244,8 +231,7 @@ fn translate_order_by_target(
 /// (potentially a nested one using joins). Return that select query and the requested column alias.
 /// If the column is the root table's column, a `None` will be returned.
 fn translate_order_by_target_for_column(
-    tables_info: &metadata::TablesInfo,
-    relationships: &BTreeMap<String, models::Relationship>,
+    env: &Env,
     column_name: String,
     path: &[models::PathElement],
     function: Option<String>,
@@ -296,7 +282,8 @@ fn translate_order_by_target_for_column(
             } = path_element;
 
             // examine the path elements' relationship.
-            let relationship = relationships
+            let relationship = env
+                .relationships
                 .get(relationship_name)
                 .ok_or(Error::RelationshipNotFound(relationship_name.clone()))?;
 
@@ -308,7 +295,9 @@ fn translate_order_by_target_for_column(
                 models::RelationshipType::Object => Ok(()),
             }?;
 
-            let target_table_info = tables_info
+            let target_table_info = env
+                .metadata
+                .tables
                 .0 // unwrap a newtype :(
                 .get(&relationship.target_collection)
                 .ok_or(Error::TableNotFound(relationship.target_collection.clone()))?;
@@ -379,7 +368,7 @@ fn translate_order_by_target_for_column(
 
             // generate a condition for this join.
             let join_condition = relationships::translate_column_mapping(
-                tables_info,
+                env,
                 &source_table,
                 &target_collection_alias_name,
                 sql::helpers::empty_where(),

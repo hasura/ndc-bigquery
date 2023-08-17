@@ -1,6 +1,15 @@
 //! Helpers for processing the QueryRequest and building SQL.
 
+use crate::metadata;
 use crate::phases::translation::sql;
+use ndc_hub::models;
+use std::collections::BTreeMap;
+
+/// Static information from the query and metadata.
+pub struct Env {
+    pub metadata: metadata::Metadata,
+    pub relationships: BTreeMap<String, models::Relationship>,
+}
 
 /// For the root table in the query, and for the current table we are processing,
 /// We'd like to track what is their reference in the query (the name we can use to address them,

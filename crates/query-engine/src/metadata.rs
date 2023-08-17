@@ -27,7 +27,14 @@ impl ToString for ScalarType {
     }
 }
 
-/// Mapping from a graphql "table" name to its information.
+/// Metadata information.
+#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize, JsonSchema)]
+pub struct Metadata {
+    #[serde(default)]
+    pub tables: TablesInfo,
+}
+
+/// Mapping from a "table" name to its information.
 #[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize, JsonSchema)]
 pub struct TablesInfo(pub BTreeMap<String, TableInfo>);
 

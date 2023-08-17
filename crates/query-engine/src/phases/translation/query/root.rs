@@ -1,7 +1,5 @@
 //! Handle 'rows' and 'aggregates' translation.
 
-use std::collections::BTreeMap;
-
 use indexmap::IndexMap;
 
 use ndc_hub::models;
@@ -9,17 +7,15 @@ use ndc_hub::models;
 use super::aggregates;
 use super::error::Error;
 use super::filtering;
-use super::helpers::{RootAndCurrentTables, TableNameAndReference};
+use super::helpers::{Env, RootAndCurrentTables, TableNameAndReference};
 use super::relationships;
 use super::sorting;
-use crate::metadata;
 use crate::phases::translation::sql;
 
 /// Translate aggregates query to sql ast.
 pub fn translate_aggregate_query(
-    tables_info: &metadata::TablesInfo,
+    env: &Env,
     current_table_name: String,
-    relationships: &BTreeMap<String, models::Relationship>,
     query: &models::Query,
 ) -> Result<sql::ast::Select, Error> {
     let current_table_alias: sql::ast::TableAlias =
@@ -47,26 +43,20 @@ pub fn translate_aggregate_query(
 
     // create the select clause and the joins, order by, where clauses.
     // We don't add the limit afterwards.
-    translate_query_part(
-        tables_info,
-        &current_table,
-        relationships,
-        query,
-        aggregate_columns,
-        vec![],
-    )
+    translate_query_part(env, &current_table, query, aggregate_columns, vec![])
 }
 
 /// Translate rows part of query to sql ast.
 pub fn translate_rows_query(
-    tables_info: &metadata::TablesInfo,
+    env: &Env,
     current_table_name: &str,
-    relationships: &BTreeMap<String, models::Relationship>,
     query: &models::Query,
 ) -> Result<sql::ast::Select, Error> {
-    let metadata::TablesInfo(tables_info_map) = tables_info;
     // find the table according to the metadata.
-    let table_info = tables_info_map
+    let table_info = env
+        .metadata
+        .tables
+        .0
         .get(current_table_name)
         .ok_or(Error::TableNotFound(current_table_name.to_string()))?;
 
@@ -129,14 +119,7 @@ pub fn translate_rows_query(
 
     // create the select clause and the joins, order by, where clauses.
     // We'll add the limit afterwards.
-    let mut select = translate_query_part(
-        tables_info,
-        &current_table,
-        relationships,
-        query,
-        columns,
-        join_fields,
-    )?;
+    let mut select = translate_query_part(env, &current_table, query, columns, join_fields)?;
 
     // Add the limit.
     select.limit = sql::ast::Limit {
@@ -155,16 +138,17 @@ pub fn translate_rows_query(
 /// One thing that this doesn't do that you want to do for 'rows' and not 'aggregates' is
 /// set the limit and offset so you want to do that after calling this function.
 fn translate_query_part(
-    tables_info: &metadata::TablesInfo,
+    env: &Env,
     current_table: &TableNameAndReference,
-    relationships: &BTreeMap<String, models::Relationship>,
     query: &models::Query,
     columns: Vec<(sql::ast::ColumnAlias, sql::ast::Expression)>,
     join_fields: Vec<(sql::ast::TableAlias, String, models::Query)>,
 ) -> Result<sql::ast::Select, Error> {
-    let metadata::TablesInfo(tables_info_map) = tables_info;
     // find the table according to the metadata.
-    let table_info = tables_info_map
+    let table_info = env
+        .metadata
+        .tables
+        .0
         .get(&current_table.name)
         .ok_or(Error::TableNotFound(current_table.name.clone()))?;
 
@@ -190,20 +174,12 @@ fn translate_query_part(
     });
 
     // collect any joins for relationships
-    let mut relationship_joins = relationships::translate_joins(
-        relationships,
-        tables_info,
-        &root_and_current_tables,
-        join_fields,
-    )?;
+    let mut relationship_joins =
+        relationships::translate_joins(env, &root_and_current_tables, join_fields)?;
 
     // translate order_by
-    let (order_by, order_by_joins) = sorting::translate_order_by(
-        tables_info,
-        relationships,
-        &root_and_current_tables,
-        &query.order_by,
-    )?;
+    let (order_by, order_by_joins) =
+        sorting::translate_order_by(env, &root_and_current_tables, &query.order_by)?;
 
     relationship_joins.extend(order_by_joins);
 
@@ -214,12 +190,9 @@ fn translate_query_part(
     // translate where
     select.where_ = sql::ast::Where(match query.clone().predicate {
         None => Ok(sql::ast::Expression::Value(sql::ast::Value::Bool(true))),
-        Some(predicate) => filtering::translate_expression(
-            tables_info,
-            relationships,
-            &root_and_current_tables,
-            predicate,
-        ),
+        Some(predicate) => {
+            filtering::translate_expression(env, &root_and_current_tables, predicate)
+        }
     }?);
 
     Ok(select)

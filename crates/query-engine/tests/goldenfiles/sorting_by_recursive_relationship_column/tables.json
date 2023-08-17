@@ -1,37 +1,39 @@
-{
-  "Company": {
-    "schema_name": "public",
-    "table_name": "Company",
-    "columns": {
-      "CompanyId": {
-        "name": "CompanyId",
-        "type": "Int"
-      },
-      "Name": {
-        "name": "Name",
-        "type": "String"
-      },
-      "CEOId": {
-        "name": "CEOId",
-        "type": "Int"
+{ "tables":
+  {
+    "Company": {
+      "schema_name": "public",
+      "table_name": "Company",
+      "columns": {
+        "CompanyId": {
+          "name": "CompanyId",
+          "type": "Int"
+        },
+        "Name": {
+          "name": "Name",
+          "type": "String"
+        },
+        "CEOId": {
+          "name": "CEOId",
+          "type": "Int"
+        }
       }
-    }
-  },
-  "Person": {
-    "schema_name": "public",
-    "table_name": "Person",
-    "columns": {
-      "PersonId": {
-        "name": "PersonId",
-        "type": "Int"
-      },
-      "Name": {
-        "name": "Name",
-        "type": "String"
-      },
-      "ParentId": {
-        "name": "ParentId",
-        "type": "Int"
+    },
+    "Person": {
+      "schema_name": "public",
+      "table_name": "Person",
+      "columns": {
+        "PersonId": {
+          "name": "PersonId",
+          "type": "Int"
+        },
+        "Name": {
+          "name": "Name",
+          "type": "String"
+        },
+        "ParentId": {
+          "name": "ParentId",
+          "type": "Int"
+        }
       }
     }
   }
