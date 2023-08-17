@@ -27,66 +27,28 @@ pub fn translate_order_by(
                 .enumerate() // We enumerate to give each query a unique alias.
                 .map(|(index, order_by)| {
                     let target = match &order_by.target {
-                        models::OrderByTarget::Column { name, path } => {
-                            let (column_alias, optional_relationship_select) =
-                                translate_order_by_target_for_column(
-                                    tables_info,
-                                    relationships,
-                                    name.clone(),
-                                    path,
-                                )?;
+                        models::OrderByTarget::Column { name, path } => translate_order_by_target(
+                            tables_info,
+                            relationships,
+                            root_and_current_tables,
+                            index,
+                            (name, path),
+                            None,
+                            &mut joins,
+                        ),
 
-                            match optional_relationship_select {
-                                // The column is from the source table, we just need to query it directly
-                                // by refering to the table's alias.
-                                None => {
-                                    let column_name = sql::ast::Expression::ColumnName(
-                                        sql::ast::ColumnName::AliasedColumn {
-                                            table: sql::ast::TableName::AliasedTable(
-                                                root_and_current_tables
-                                                    .current_table
-                                                    .reference
-                                                    .clone(),
-                                            ),
-                                            name: column_alias,
-                                        },
-                                    );
-
-                                    Ok(column_name)
-                                }
-
-                                // The column is from a relationship table, we need to join with this
-                                // select query.
-                                Some(select) => {
-                                    // Give it a nice unique alias.
-                                    let table_alias = sql::helpers::make_order_by_table_alias(
-                                        index,
-                                        &root_and_current_tables.current_table.name,
-                                    );
-
-                                    // Build a join and push it to the accumulated joins.
-                                    let new_join = sql::ast::LeftOuterJoinLateral {
-                                        select: Box::new(select),
-                                        alias: table_alias.clone(),
-                                    };
-
-                                    joins.push(sql::ast::Join::LeftOuterJoinLateral(new_join));
-
-                                    // Build an alias to query the column from this select.
-                                    let column_name = sql::ast::Expression::ColumnName(
-                                        sql::ast::ColumnName::AliasedColumn {
-                                            table: sql::ast::TableName::AliasedTable(table_alias),
-                                            name: column_alias,
-                                        },
-                                    );
-
-                                    Ok(column_name)
-                                }
-                            }
-                        }
-
-                        models::OrderByTarget::SingleColumnAggregate { .. } => Err(
-                            Error::NotSupported("order by column aggregates".to_string()),
+                        models::OrderByTarget::SingleColumnAggregate {
+                            column,
+                            function,
+                            path,
+                        } => translate_order_by_target(
+                            tables_info,
+                            relationships,
+                            root_and_current_tables,
+                            index,
+                            (column, path),
+                            Some(function.clone()),
+                            &mut joins,
                         ),
                         models::OrderByTarget::StarCountAggregate { path } => {
                             let (column_alias, select) = translate_order_by_star_count_aggregate(
@@ -147,7 +109,7 @@ fn translate_order_by_star_count_aggregate(
     tables_info: &metadata::TablesInfo,
     relationships: &BTreeMap<String, models::Relationship>,
     source_table: &TableNameAndReference,
-    path: &Vec<models::PathElement>,
+    path: &[models::PathElement],
 ) -> Result<(sql::ast::ColumnAlias, sql::ast::Select), Error> {
     // we can only do one level of star count aggregate atm
     if path.len() > 1 {
@@ -212,6 +174,71 @@ fn translate_order_by_star_count_aggregate(
     }
 }
 
+/// Translate an order by target and add additional JOINs to the wrapping SELECT
+/// and return the expression used for the sort by the wrapping SELECT.
+fn translate_order_by_target(
+    tables_info: &metadata::TablesInfo,
+    relationships: &BTreeMap<String, models::Relationship>,
+    root_and_current_tables: &RootAndCurrentTables,
+    index: usize,
+    (column, path): (&str, &Vec<models::PathElement>),
+    // we expect function to be derived derived from the schema we publish by v3-engine,
+    // so no sql injection shenanigans should be possible.
+    function: Option<String>,
+    joins: &mut Vec<sql::ast::Join>,
+) -> Result<sql::ast::Expression, Error> {
+    let (column_alias, optional_relationship_select) = translate_order_by_target_for_column(
+        tables_info,
+        relationships,
+        column.to_string(),
+        path,
+        function,
+    )?;
+
+    match optional_relationship_select {
+        // The column is from the source table, we just need to query it directly
+        // by refering to the table's alias.
+        None => {
+            let column_name =
+                sql::ast::Expression::ColumnName(sql::ast::ColumnName::AliasedColumn {
+                    table: sql::ast::TableName::AliasedTable(
+                        root_and_current_tables.current_table.reference.clone(),
+                    ),
+                    name: column_alias,
+                });
+
+            Ok(column_name)
+        }
+
+        // The column is from a relationship table, we need to join with this
+        // select query.
+        Some(select) => {
+            // Give it a nice unique alias.
+            let table_alias = sql::helpers::make_order_by_table_alias(
+                index,
+                &root_and_current_tables.current_table.name,
+            );
+
+            // Build a join and push it to the accumulated joins.
+            let new_join = sql::ast::LeftOuterJoinLateral {
+                select: Box::new(select),
+                alias: table_alias.clone(),
+            };
+
+            joins.push(sql::ast::Join::LeftOuterJoinLateral(new_join));
+
+            // Build an alias to query the column from this select.
+            let column_name =
+                sql::ast::Expression::ColumnName(sql::ast::ColumnName::AliasedColumn {
+                    table: sql::ast::TableName::AliasedTable(table_alias),
+                    name: column_alias,
+                });
+
+            Ok(column_name)
+        }
+    }
+}
+
 /// Generate a SELECT query representing querying the requested column from a table
 /// (potentially a nested one using joins). Return that select query and the requested column alias.
 /// If the column is the root table's column, a `None` will be returned.
@@ -220,11 +247,12 @@ fn translate_order_by_target_for_column(
     relationships: &BTreeMap<String, models::Relationship>,
     column_name: String,
     path: &[models::PathElement],
+    function: Option<String>,
 ) -> Result<(sql::ast::ColumnAlias, Option<sql::ast::Select>), Error> {
     // We want to build a select query where "Track" is the root table, and "Artist"."Name"
     // is the column we need for the order by. Our query will look like this:
     //
-    // > ( SELECT "Artist"."Name" AS "Name" -- wanted column
+    // > ( SELECT "Artist"."Name" AS "Name" -- wanted column, might be wrapped with <function> if one is supplied
     // >   FROM
     // >     ( SELECT "Album"."ArtistId" ---- required for the next join condition
     // >       FROM "Album" AS "Album"
@@ -254,9 +282,7 @@ fn translate_order_by_target_for_column(
     // from the root table.
     let (_, last_table) = path.iter().try_rfold(
         (vec![selected_column_alias.clone()], None),
-        |(required_cols, last_table), path_element| {
-            let mut last_table = last_table; // make this mut
-
+        |(required_cols, mut last_table), path_element| {
             // destruct path_element into parts.
             let models::PathElement {
                 relationship: relationship_name,
@@ -269,90 +295,87 @@ fn translate_order_by_target_for_column(
                 .ok_or(Error::RelationshipNotFound(relationship_name.clone()))?;
 
             match relationship.relationship_type {
-                models::RelationshipType::Array => Err(Error::NotSupported(
+                models::RelationshipType::Array if function.is_none() => Err(Error::NotSupported(
                     "Cannot order by values in an array relationship".to_string(),
                 )),
-                models::RelationshipType::Object => {
-                    let source_table_alias: sql::ast::TableAlias = sql::helpers::make_table_alias(
-                        relationship.source_collection_or_type.clone(),
-                    );
+                models::RelationshipType::Array => Ok(()),
+                models::RelationshipType::Object => Ok(()),
+            }?;
 
-                    let target_collection_alias: sql::ast::TableAlias =
-                        sql::helpers::make_table_alias(relationship.target_collection.clone());
+            let source_table_alias: sql::ast::TableAlias =
+                sql::helpers::make_table_alias(relationship.source_collection_or_type.clone());
 
-                    let target_collection_alias_name: sql::ast::TableName =
-                        sql::ast::TableName::AliasedTable(target_collection_alias.clone());
+            let target_collection_alias: sql::ast::TableAlias =
+                sql::helpers::make_table_alias(relationship.target_collection.clone());
 
-                    // If last_table is None, we are just starting the loop, let's
-                    // put a pin on what the last table is, so we can wrap the joins
-                    // in a select querying this table.
-                    match last_table {
-                        None => last_table = Some(target_collection_alias.clone()),
-                        Some(_) => {}
-                    };
+            let target_collection_alias_name: sql::ast::TableName =
+                sql::ast::TableName::AliasedTable(target_collection_alias.clone());
 
-                    // we select the columns used for the next join or the requested column
-                    // for the order by.
-                    let select_cols: Vec<(sql::ast::ColumnAlias, sql::ast::Expression)> =
-                        required_cols
-                            .into_iter()
-                            .map(|target_col| {
-                                let new_table = target_collection_alias_name.clone();
-                                (
-                                    target_col.clone(),
-                                    sql::ast::Expression::ColumnName(
-                                        sql::ast::ColumnName::AliasedColumn {
-                                            table: new_table,
-                                            name: target_col,
-                                        },
-                                    ),
-                                )
-                            })
-                            .collect();
+            // If last_table is None, we are just starting the loop, let's
+            // put a pin on what the last table is, so we can wrap the joins
+            // in a select querying this table.
+            match last_table {
+                None => last_table = Some(target_collection_alias.clone()),
+                Some(_) => {}
+            };
 
-                    // We find the columns we need from the "previous" table so we can require them.
-                    let source_relationship_table_key_columns: Vec<_> = relationship
-                        .column_mapping
-                        .keys()
-                        .map(|source_col| sql::helpers::make_column_alias(source_col.to_string()))
-                        .collect();
+            // we select the columns used for the next join or the requested column
+            // for the order by.
+            let select_cols: Vec<(sql::ast::ColumnAlias, sql::ast::Expression)> = required_cols
+                .into_iter()
+                .map(|target_col| {
+                    let new_table = target_collection_alias_name.clone();
+                    (
+                        target_col.clone(),
+                        sql::ast::Expression::ColumnName(sql::ast::ColumnName::AliasedColumn {
+                            table: new_table,
+                            name: target_col,
+                        }),
+                    )
+                })
+                .collect();
 
-                    let source_table = TableNameAndReference {
-                        name: relationship.source_collection_or_type.clone(),
-                        reference: source_table_alias,
-                    };
+            // We find the columns we need from the "previous" table so we can require them.
+            let source_relationship_table_key_columns: Vec<_> = relationship
+                .column_mapping
+                .keys()
+                .map(|source_col| sql::helpers::make_column_alias(source_col.to_string()))
+                .collect();
 
-                    // generate a condition for this join.
-                    let join_condition = relationships::translate_column_mapping(
-                        tables_info,
-                        &source_table,
-                        sql::helpers::empty_where(),
-                        relationship,
-                    )?;
+            let source_table = TableNameAndReference {
+                name: relationship.source_collection_or_type.clone(),
+                reference: source_table_alias,
+            };
 
-                    // build a select query from this table where join condition.
-                    let mut select = sql::helpers::simple_select(select_cols);
+            // generate a condition for this join.
+            let join_condition = relationships::translate_column_mapping(
+                tables_info,
+                &source_table,
+                sql::helpers::empty_where(),
+                relationship,
+            )?;
 
-                    select.where_ = sql::ast::Where(join_condition);
+            // build a select query from this table where join condition.
+            let mut select = sql::helpers::simple_select(select_cols);
 
-                    select.from = Some(sql::ast::From::Table {
-                        name: target_collection_alias_name,
-                        alias: target_collection_alias.clone(),
-                    });
+            select.where_ = sql::ast::Where(join_condition);
 
-                    // build a join from it, and
-                    let join = sql::ast::LeftOuterJoinLateral {
-                        select: Box::new(select),
-                        alias: target_collection_alias,
-                    };
+            select.from = Some(sql::ast::From::Table {
+                name: target_collection_alias_name,
+                alias: target_collection_alias.clone(),
+            });
 
-                    // add the join to our pile'o'joins
-                    joins.push(join);
+            // build a join from it, and
+            let join = sql::ast::LeftOuterJoinLateral {
+                select: Box::new(select),
+                alias: target_collection_alias,
+            };
 
-                    // return the required columns for this table's join and the last table we found.
-                    Ok((source_relationship_table_key_columns, last_table))
-                }
-            }
+            // add the join to our pile'o'joins
+            joins.push(join);
+
+            // return the required columns for this table's join and the last table we found.
+            Ok((source_relationship_table_key_columns, last_table))
         },
     )?;
 
@@ -363,11 +386,22 @@ fn translate_order_by_target_for_column(
         // for the order by, and build a select of all the joins to select from.
         Some(last_table) => {
             // order by columns
-            let selected_column_expr =
+            let selected_column_name =
                 sql::ast::Expression::ColumnName(sql::ast::ColumnName::AliasedColumn {
                     table: sql::ast::TableName::AliasedTable(last_table),
                     name: selected_column_alias.clone(),
                 });
+
+            // if we got a function, we wrap the required column with
+            // a function call.
+            let selected_column_expr = match function {
+                None => selected_column_name,
+                Some(func) => sql::ast::Expression::FunctionCall {
+                    function: sql::ast::Function::Unknown(func),
+                    args: vec![selected_column_name],
+                },
+            };
+
             // wrapping select
             let mut select = sql::helpers::simple_select(vec![(
                 selected_column_alias.clone(),

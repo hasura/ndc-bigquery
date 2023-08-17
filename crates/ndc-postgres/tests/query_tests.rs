@@ -196,6 +196,12 @@ mod sorting {
         let result = run_query("select_order_by_artist_album_count").await;
         insta::assert_json_snapshot!(result);
     }
+
+    #[tokio::test]
+    async fn select_order_by_artist_album_count_agg() {
+        let result = run_query("select_order_by_artist_album_count_agg").await;
+        insta::assert_json_snapshot!(result);
+    }
 }
 
 mod aggregation {

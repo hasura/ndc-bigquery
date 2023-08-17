@@ -1,0 +1,45 @@
+---
+source: crates/query-engine/tests/tests.rs
+expression: result
+---
+SELECT
+  row_to_json("universe") AS "universe"
+FROM
+  (
+    SELECT
+      *
+    FROM
+      (
+        SELECT
+          coalesce(json_agg(row_to_json("rows")), '[]') AS "rows"
+        FROM
+          (
+            SELECT
+              "Artist"."Name" AS "Name"
+            FROM
+              "public"."Artist" AS "Artist"
+              LEFT OUTER JOIN LATERAL (
+                SELECT
+                  count("Album"."AlbumId") AS "AlbumId"
+                FROM
+                  (
+                    SELECT
+                      "Album"."AlbumId" AS "AlbumId"
+                    FROM
+                      "Album" AS "Album"
+                    WHERE
+                      (
+                        true
+                        AND ("Artist"."ArtistId" = "Album"."ArtistId")
+                      )
+                  ) AS "Album"
+              ) AS "%ORDER_0_FOR_Artist" ON ('true')
+            ORDER BY
+              "%ORDER_0_FOR_Artist"."AlbumId" DESC
+            LIMIT
+              3
+          ) AS "rows"
+      ) AS "rows"
+  ) AS "universe"
+
+[]

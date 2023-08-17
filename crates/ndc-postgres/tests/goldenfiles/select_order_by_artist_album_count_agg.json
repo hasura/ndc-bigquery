@@ -8,16 +8,16 @@
         "arguments": {}
       }
     },
-    "limit": 3,
     "order_by": {
       "elements": [
         {
-          "order_direction": "desc",
           "target": {
-            "type": "star_count_aggregate",
+            "type": "single_column_aggregate",
+            "column": "AlbumId",
+            "function": "count",
             "path": [
               {
-                "relationship": "ArtistAlbums",
+                "relationship": "ArtistAlbum",
                 "arguments": {},
                 "predicate": {
                   "type": "and",
@@ -25,14 +25,16 @@
                 }
               }
             ]
-          }
+          },
+          "order_direction": "desc"
         }
       ]
-    }
+    },
+    "limit": 3
   },
   "arguments": {},
   "collection_relationships": {
-    "ArtistAlbums": {
+    "ArtistAlbum": {
       "column_mapping": {
         "ArtistId": "ArtistId"
       },
