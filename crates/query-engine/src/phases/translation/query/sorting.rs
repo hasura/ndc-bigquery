@@ -154,6 +154,7 @@ fn translate_order_by_star_count_aggregate(
             let join_condition = relationships::translate_column_mapping(
                 tables_info,
                 source_table,
+                &target_collection_alias,
                 sql::helpers::empty_where(),
                 relationship,
             )?;
@@ -351,6 +352,7 @@ fn translate_order_by_target_for_column(
             let join_condition = relationships::translate_column_mapping(
                 tables_info,
                 &source_table,
+                &target_collection_alias,
                 sql::helpers::empty_where(),
                 relationship,
             )?;

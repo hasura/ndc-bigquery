@@ -388,6 +388,7 @@ pub fn translate_exists_in_collection(
             let cond = relationships::translate_column_mapping(
                 tables_info,
                 &root_and_current_tables.current_table,
+                &table_alias,
                 exists_cond,
                 relationship,
             )?;

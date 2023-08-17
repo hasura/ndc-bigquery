@@ -33,6 +33,9 @@ pub fn translate_joins(
                 query,
             )?;
 
+            let target_collection_alias: sql::ast::TableAlias =
+                sql::helpers::make_table_alias(relationship.target_collection.clone());
+
             // add join expressions to row / aggregate selects
             let final_select_set = match select_set {
                 // Only rows
@@ -42,6 +45,7 @@ pub fn translate_joins(
                     row_select.where_ = sql::ast::Where(translate_column_mapping(
                         tables_info,
                         &root_and_current_tables.current_table,
+                        &target_collection_alias,
                         row_expr,
                         relationship,
                     )?);
@@ -55,6 +59,7 @@ pub fn translate_joins(
                     aggregate_select.where_ = sql::ast::Where(translate_column_mapping(
                         tables_info,
                         &root_and_current_tables.current_table,
+                        &target_collection_alias,
                         aggregate_expr,
                         relationship,
                     )?);
@@ -71,6 +76,7 @@ pub fn translate_joins(
                     row_select.where_ = sql::ast::Where(translate_column_mapping(
                         tables_info,
                         &root_and_current_tables.current_table,
+                        &target_collection_alias,
                         row_expr,
                         relationship,
                     )?);
@@ -80,6 +86,7 @@ pub fn translate_joins(
                     aggregate_select.where_ = sql::ast::Where(translate_column_mapping(
                         tables_info,
                         &root_and_current_tables.current_table,
+                        &target_collection_alias,
                         aggregate_expr,
                         relationship,
                     )?);
@@ -118,6 +125,7 @@ pub fn translate_joins(
 pub fn translate_column_mapping(
     tables_info: &metadata::TablesInfo,
     current_table: &TableNameAndReference,
+    target_collection_alias: &sql::ast::TableAlias,
     expr: sql::ast::Expression,
     relationship: &models::Relationship,
 ) -> Result<sql::ast::Expression, Error> {
@@ -130,10 +138,8 @@ pub fn translate_column_mapping(
     let target_collection_info = tables_info_map
         .get(&relationship.target_collection)
         .ok_or(Error::TableNotFound(relationship.target_collection.clone()))?;
-    let target_collection_alias: sql::ast::TableAlias =
-        sql::helpers::make_table_alias(relationship.target_collection.clone());
     let target_collection_alias_name: sql::ast::TableName =
-        sql::ast::TableName::AliasedTable(target_collection_alias);
+        sql::ast::TableName::AliasedTable(target_collection_alias.clone());
 
     relationship
         .column_mapping
