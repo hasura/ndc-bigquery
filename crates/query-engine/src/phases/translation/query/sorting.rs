@@ -1,7 +1,7 @@
 use ndc_hub::models;
 
 use super::error::Error;
-use super::helpers::{Env, RootAndCurrentTables, TableNameAndReference};
+use super::helpers::{CollectionInfo, Env, RootAndCurrentTables, TableNameAndReference};
 use super::relationships;
 use crate::phases::translation::sql;
 
@@ -293,12 +293,15 @@ fn translate_order_by_target_for_column(
                 models::RelationshipType::Object => Ok(()),
             }?;
 
-            let target_table_info = env
-                .metadata
-                .tables
-                .0 // unwrap a newtype :(
-                .get(&relationship.target_collection)
-                .ok_or(Error::TableNotFound(relationship.target_collection.clone()))?;
+            let target_collection_info = env.lookup_collection(&relationship.target_collection)?;
+
+            // unpack table info for now.
+            let target_table_info = match target_collection_info {
+                CollectionInfo::Table { info, .. } => Ok(info),
+                CollectionInfo::NativeQuery { .. } => {
+                    Err(Error::NotSupported("Native Queries".to_string()))
+                }
+            }?;
 
             // relationship target db table name
             let target_db_table_name: sql::ast::TableName = sql::ast::TableName::DBTable {

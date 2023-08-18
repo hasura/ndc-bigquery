@@ -100,7 +100,10 @@ pub async fn configure(
     Ok(DeploymentConfiguration {
         version: 1,
         postgres_database_url: args.postgres_database_url.clone(),
-        metadata: query_engine::metadata::Metadata { tables },
+        metadata: query_engine::metadata::Metadata {
+            tables,
+            native_queries: query_engine::metadata::NativeQueries::default(),
+        },
         aggregate_functions,
     })
 }

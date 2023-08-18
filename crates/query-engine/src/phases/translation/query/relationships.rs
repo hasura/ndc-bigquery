@@ -124,38 +124,16 @@ pub fn translate_column_mapping(
     expr: sql::ast::Expression,
     relationship: &models::Relationship,
 ) -> Result<sql::ast::Expression, Error> {
-    let table_info = env
-        .metadata
-        .tables
-        .0
-        .get(&current_table.name)
-        .ok_or(Error::TableNotFound(current_table.name.to_string()))?;
+    let table_info = env.lookup_collection(&current_table.name)?;
 
-    let target_collection_info = env
-        .metadata
-        .tables
-        .0
-        .get(&relationship.target_collection)
-        .ok_or(Error::TableNotFound(relationship.target_collection.clone()))?;
+    let target_collection_info = env.lookup_collection(&relationship.target_collection)?;
 
     relationship
         .column_mapping
         .iter()
         .map(|(source_col, target_col)| {
-            let source_column_info =
-                table_info
-                    .columns
-                    .get(source_col)
-                    .ok_or(Error::ColumnNotFoundInTable(
-                        source_col.clone(),
-                        current_table.name.clone(),
-                    ))?;
-            let target_column_info = target_collection_info.columns.get(target_col).ok_or(
-                Error::ColumnNotFoundInTable(
-                    target_col.clone(),
-                    relationship.target_collection.clone(),
-                ),
-            )?;
+            let source_column_info = table_info.lookup_column(source_col)?;
+            let target_column_info = target_collection_info.lookup_column(target_col)?;
             Ok(sql::ast::Expression::BinaryOperator {
                 left: Box::new(sql::ast::Expression::ColumnName(
                     sql::ast::ColumnName::TableColumn {

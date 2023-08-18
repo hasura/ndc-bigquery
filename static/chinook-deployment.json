@@ -569,7 +569,8 @@
         },
         "foreign_relations": {}
       }
-    }
+    },
+    "native_queries": {}
   },
   "aggregate_functions": {
     "Int": {

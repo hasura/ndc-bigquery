@@ -3,7 +3,7 @@
 use ndc_hub::models;
 
 use super::error::Error;
-use super::helpers::{Env, RootAndCurrentTables, TableNameAndReference};
+use super::helpers::{CollectionInfo, Env, RootAndCurrentTables, TableNameAndReference};
 use super::relationships;
 use crate::metadata;
 use crate::phases::translation::sql;
@@ -135,21 +135,9 @@ fn translate_comparison_target(
         models::ComparisonTarget::Column { name, .. } => {
             let RootAndCurrentTables { current_table, .. } = root_and_current_tables;
             // get the unrelated table information from the metadata.
-            let table_info = env
-                .metadata
-                .tables
-                .0
-                .get(&current_table.name)
-                .ok_or(Error::TableNotFound(current_table.name.clone()))?;
+            let collection_info = env.lookup_collection(&current_table.name)?;
 
-            let metadata::ColumnInfo { name, .. } =
-                table_info
-                    .columns
-                    .get(&name)
-                    .ok_or(Error::ColumnNotFoundInTable(
-                        name.clone(),
-                        current_table.name.clone(),
-                    ))?;
+            let metadata::ColumnInfo { name, .. } = collection_info.lookup_column(&name)?;
 
             Ok(sql::ast::Expression::ColumnName(
                 sql::ast::ColumnName::TableColumn {
@@ -163,22 +151,10 @@ fn translate_comparison_target(
         models::ComparisonTarget::RootCollectionColumn { name } => {
             let RootAndCurrentTables { root_table, .. } = root_and_current_tables;
             // get the unrelated table information from the metadata.
-            let table_info = env
-                .metadata
-                .tables
-                .0
-                .get(&root_table.name)
-                .ok_or(Error::TableNotFound(root_table.name.to_string()))?;
+            let collection_info = env.lookup_collection(&root_table.name)?;
 
             // find the requested column in the tables columns.
-            let metadata::ColumnInfo { name, .. } =
-                table_info
-                    .columns
-                    .get(&name)
-                    .ok_or(Error::ColumnNotFoundInTable(
-                        name.clone(),
-                        root_table.name.to_string(),
-                    ))?;
+            let metadata::ColumnInfo { name, .. } = collection_info.lookup_column(&name)?;
 
             Ok(sql::ast::Expression::ColumnName(
                 sql::ast::ColumnName::TableColumn {
@@ -240,12 +216,15 @@ pub fn translate_exists_in_collection(
         // ignore arguments for now
         models::ExistsInCollection::Unrelated { collection, .. } => {
             // get the unrelated table information from the metadata.
-            let table_info = env
-                .metadata
-                .tables
-                .0
-                .get(&collection)
-                .ok_or(Error::TableNotFound(collection.clone()))?;
+            let collection_info = env.lookup_collection(&collection)?;
+
+            // unpack table info for now.
+            let table_info = match collection_info {
+                CollectionInfo::Table { info, .. } => Ok(info),
+                CollectionInfo::NativeQuery { .. } => {
+                    Err(Error::NotSupported("Native Queries".to_string()))
+                }
+            }?;
 
             // db table name
             let db_table_name: sql::ast::TableName = sql::ast::TableName::DBTable {
@@ -295,7 +274,7 @@ pub fn translate_exists_in_collection(
             // I don't expect v3-engine to let us down, but just in case :)
             if root_and_current_tables.current_table.name != relationship.source_collection_or_type
             {
-                Err(Error::TableNotFound(
+                Err(Error::CollectionNotFound(
                     relationship.source_collection_or_type.clone(),
                 ))
             } else {
@@ -303,12 +282,14 @@ pub fn translate_exists_in_collection(
             }?;
 
             // get the unrelated table information from the metadata.
-            let table_info = env
-                .metadata
-                .tables
-                .0
-                .get(&relationship.target_collection)
-                .ok_or(Error::TableNotFound(relationship.target_collection.clone()))?;
+            let collection_info = env.lookup_collection(&relationship.target_collection)?;
+            // unpack table info for now.
+            let table_info = match collection_info {
+                CollectionInfo::Table { info, .. } => Ok(info),
+                CollectionInfo::NativeQuery { .. } => {
+                    Err(Error::NotSupported("Native Queries".to_string()))
+                }
+            }?;
 
             // relationship target db table name
             let db_table_name: sql::ast::TableName = sql::ast::TableName::DBTable {

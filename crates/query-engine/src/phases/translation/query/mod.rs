@@ -21,10 +21,7 @@ pub fn translate(
     query_request: models::QueryRequest,
 ) -> Result<sql::execution_plan::ExecutionPlan, Error> {
     let select_set = translate_query(
-        &Env {
-            metadata: metadata.clone(),
-            relationships: query_request.collection_relationships,
-        },
+        &Env::new(metadata.clone(), query_request.collection_relationships),
         query_request.collection.clone(),
         query_request.query,
     )?;

@@ -32,6 +32,8 @@ impl ToString for ScalarType {
 pub struct Metadata {
     #[serde(default)]
     pub tables: TablesInfo,
+    #[serde(default)]
+    pub native_queries: NativeQueries,
 }
 
 /// Mapping from a "table" name to its information.
@@ -48,6 +50,19 @@ pub struct TableInfo {
     pub uniqueness_constraints: UniquenessConstraints,
     #[serde(default)]
     pub foreign_relations: ForeignRelations,
+}
+
+/// Metadata information of native queries.
+#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize, JsonSchema)]
+pub struct NativeQueries(pub BTreeMap<String, NativeQueryInfo>);
+
+/// Information about a database table (or any other kind of relation).
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+pub struct NativeQueryInfo {
+    pub sql: String,
+    pub columns: BTreeMap<String, ColumnInfo>,
+    #[serde(default)]
+    pub arguments: BTreeMap<String, ColumnInfo>,
 }
 
 /// Information about a database column.
