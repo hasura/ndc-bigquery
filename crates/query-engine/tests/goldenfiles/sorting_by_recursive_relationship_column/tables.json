@@ -1,5 +1,5 @@
-{ "tables":
-  {
+{
+  "tables": {
     "Company": {
       "schema_name": "public",
       "table_name": "Company",

@@ -42,7 +42,7 @@
             "operator": {
               "type": "equal"
             },
-			"value": {
+            "value": {
               "type": "column",
               "column": {
                 "type": "column",

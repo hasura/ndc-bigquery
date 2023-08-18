@@ -164,6 +164,11 @@ format:
 format-check:
   cargo fmt --all -- --check
 
+# Format all json test files
+format-tests:
+  ./scripts/format-with-jq.sh crates/ndc-postgres/tests/goldenfiles/*.json
+  ./scripts/format-with-jq.sh crates/query-engine/tests/goldenfiles/*/*.json
+
 # check the nix build works
 build-with-nix:
   nix build --print-build-logs

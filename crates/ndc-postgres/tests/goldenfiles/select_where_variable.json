@@ -27,5 +27,12 @@
   },
   "arguments": {},
   "collection_relationships": {},
-  "variables": [{"search": "%Garage%"}, {"search": "%Good%"}]
+  "variables": [
+    {
+      "search": "%Garage%"
+    },
+    {
+      "search": "%Good%"
+    }
+  ]
 }

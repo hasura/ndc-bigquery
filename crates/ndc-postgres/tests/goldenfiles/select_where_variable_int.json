@@ -31,5 +31,12 @@
   },
   "arguments": {},
   "collection_relationships": {},
-  "variables": [{"id": 35}, {"id": 222}]
+  "variables": [
+    {
+      "id": 35
+    },
+    {
+      "id": 222
+    }
+  ]
 }
