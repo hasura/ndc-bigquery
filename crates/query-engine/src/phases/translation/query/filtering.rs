@@ -153,7 +153,7 @@ fn translate_comparison_target(
 
             Ok(sql::ast::Expression::ColumnName(
                 sql::ast::ColumnName::TableColumn {
-                    table: sql::ast::TableName::AliasedTable(current_table.reference.clone()),
+                    table: current_table.reference.clone(),
                     name: name.to_string(),
                 },
             ))
@@ -182,7 +182,7 @@ fn translate_comparison_target(
 
             Ok(sql::ast::Expression::ColumnName(
                 sql::ast::ColumnName::TableColumn {
-                    table: sql::ast::TableName::AliasedTable(root_table.reference.clone()),
+                    table: root_table.reference.clone(),
                     name: name.to_string(),
                 },
             ))
@@ -256,6 +256,8 @@ pub fn translate_exists_in_collection(
             // new alias for the table
             let table_alias: sql::ast::TableAlias =
                 sql::helpers::make_table_alias(collection.clone());
+            let table_alias_name: sql::ast::TableName =
+                sql::ast::TableName::AliasedTable(table_alias.clone());
 
             // build a SELECT querying this table with the relevant predicate.
             let mut select = simple_select(vec![]);
@@ -267,7 +269,7 @@ pub fn translate_exists_in_collection(
             let new_root_and_current_tables = RootAndCurrentTables {
                 root_table: root_and_current_tables.root_table.clone(),
                 current_table: TableNameAndReference {
-                    reference: table_alias.clone(),
+                    reference: table_alias_name,
                     name: collection.clone(),
                 },
             };
@@ -330,7 +332,7 @@ pub fn translate_exists_in_collection(
             let new_root_and_current_tables = RootAndCurrentTables {
                 root_table: root_and_current_tables.root_table.clone(),
                 current_table: TableNameAndReference {
-                    reference: table_alias.clone(),
+                    reference: table_alias_name.clone(),
                     name: relationship.target_collection.clone(),
                 },
             };

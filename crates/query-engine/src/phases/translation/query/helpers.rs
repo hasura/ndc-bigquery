@@ -31,5 +31,5 @@ pub struct TableNameAndReference {
     /// Table name for column lookup
     pub name: String,
     /// Table alias to query from
-    pub reference: sql::ast::TableAlias,
+    pub reference: sql::ast::TableName,
 }

@@ -159,7 +159,7 @@ pub fn translate_column_mapping(
             Ok(sql::ast::Expression::BinaryOperator {
                 left: Box::new(sql::ast::Expression::ColumnName(
                     sql::ast::ColumnName::TableColumn {
-                        table: sql::ast::TableName::AliasedTable(current_table.reference.clone()),
+                        table: current_table.reference.clone(),
                         name: source_column_info.name.clone(),
                     },
                 )),

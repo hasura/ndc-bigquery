@@ -189,9 +189,7 @@ fn translate_order_by_target(
         None => {
             let column_name =
                 sql::ast::Expression::ColumnName(sql::ast::ColumnName::AliasedColumn {
-                    table: sql::ast::TableName::AliasedTable(
-                        root_and_current_tables.current_table.reference.clone(),
-                    ),
+                    table: root_and_current_tables.current_table.reference.clone(),
                     name: column_alias,
                 });
 
@@ -363,7 +361,7 @@ fn translate_order_by_target_for_column(
 
             let source_table = TableNameAndReference {
                 name: relationship.source_collection_or_type.clone(),
-                reference: source_table_alias,
+                reference: sql::ast::TableName::AliasedTable(source_table_alias),
             };
 
             // generate a condition for this join.

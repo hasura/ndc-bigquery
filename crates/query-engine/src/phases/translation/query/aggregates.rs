@@ -9,7 +9,7 @@ use crate::phases::translation::sql;
 
 /// Translate any aggregates we should include in the query into our SQL AST.
 pub fn translate(
-    table: sql::ast::TableName,
+    table: &sql::ast::TableName,
     aggregates: IndexMap<String, models::Aggregate>,
 ) -> Result<Vec<(sql::ast::ColumnAlias, sql::ast::Expression)>, Error> {
     aggregates
