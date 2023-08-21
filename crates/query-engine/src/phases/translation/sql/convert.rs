@@ -132,6 +132,15 @@ impl Join {
                 join.alias.to_sql(sql);
                 sql.append_syntax(" ON ('true') ");
             }
+            Join::InnerJoinLateral(join) => {
+                sql.append_syntax(" INNER JOIN LATERAL ");
+                sql.append_syntax("(");
+                join.select.to_sql(sql);
+                sql.append_syntax(")");
+                sql.append_syntax(" AS ");
+                join.alias.to_sql(sql);
+                sql.append_syntax(" ON ('true') ");
+            }
             Join::CrossJoin(join) => {
                 sql.append_syntax(" CROSS JOIN ");
                 sql.append_syntax("(");

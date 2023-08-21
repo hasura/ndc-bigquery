@@ -1,0 +1,110 @@
+{
+  "tables": {
+    "Album": {
+      "schema_name": "public",
+      "table_name": "Album",
+      "columns": {
+        "AlbumId": {
+          "name": "AlbumId",
+          "type": "Int"
+        },
+        "ArtistId": {
+          "name": "ArtistId",
+          "type": "Int"
+        },
+        "Title": {
+          "name": "Title",
+          "type": "String"
+        }
+      },
+      "uniqueness_constraints": {
+        "PK_Album": [
+          "AlbumId"
+        ]
+      },
+      "foreign_relations": {
+        "FK_AlbumArtistId": {
+          "foreign_table": "Album",
+          "column_mapping": {
+            "ArtistId": "ArtistId"
+          }
+        }
+      }
+    },
+    "Artist": {
+      "schema_name": "public",
+      "table_name": "Artist",
+      "columns": {
+        "ArtistId": {
+          "name": "ArtistId",
+          "type": "Int"
+        },
+        "Name": {
+          "name": "Name",
+          "type": "String"
+        }
+      },
+      "uniqueness_constraints": {
+        "PK_Artist": [
+          "ArtistId"
+        ]
+      },
+      "foreign_relations": {}
+    },
+    "Track": {
+      "schema_name": "public",
+      "table_name": "Track",
+      "columns": {
+        "AlbumId": {
+          "name": "AlbumId",
+          "type": "String"
+        },
+        "Bytes": {
+          "name": "Bytes",
+          "type": "String"
+        },
+        "Composer": {
+          "name": "Composer",
+          "type": "String"
+        },
+        "GenreId": {
+          "name": "GenreId",
+          "type": "Int"
+        },
+        "MediaTypeId": {
+          "name": "MediaTypeId",
+          "type": "Int"
+        },
+        "Milliseconds": {
+          "name": "Milliseconds",
+          "type": "Int"
+        },
+        "Name": {
+          "name": "Name",
+          "type": "String"
+        },
+        "TrackId": {
+          "name": "TrackId",
+          "type": "Int"
+        },
+        "UnitPrice": {
+          "name": "UnitPrice",
+          "type": "Float"
+        }
+      },
+      "uniqueness_constraints": {
+        "PK_Track": [
+          "TrackId"
+        ]
+      },
+      "foreign_relations": {
+        "FK_TrackAlbumId": {
+          "foreign_table": "Track",
+          "column_mapping": {
+            "AlbumId": "AlbumId"
+          }
+        }
+      }
+    }
+  }
+}

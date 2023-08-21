@@ -66,6 +66,20 @@ pub fn make_column(
     )
 }
 
+/// Create a table alias for boolean expressions.
+/// Provide state for fresh names and a source table name (to point at the table
+/// being filtered), and get an alias.
+pub fn make_boolean_expression_table_alias(
+    next_fresh_name: &mut u32,
+    source_table_name: &String,
+) -> TableAlias {
+    *next_fresh_name += 1;
+    make_table_alias(format!(
+        "%BOOLEXP_{}_FOR_{}",
+        next_fresh_name, source_table_name
+    ))
+}
+
 /// Create column aliases using this function so we build everything in one place.
 /// We originally wanted indices, but we didn't end up using them.
 /// Leaving them here for now, but will probably remove them in the future.

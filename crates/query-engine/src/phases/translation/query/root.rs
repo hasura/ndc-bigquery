@@ -198,17 +198,28 @@ fn translate_query_part(
 
     relationship_joins.extend(order_by_joins);
 
+    // translate where
+    let mut next_fresh_name = 0;
+    let (filter, filter_joins) = match query.clone().predicate {
+        None => Ok((
+            sql::ast::Expression::Value(sql::ast::Value::Bool(true)),
+            vec![],
+        )),
+        Some(predicate) => filtering::translate_expression(
+            env,
+            &mut next_fresh_name,
+            &root_and_current_tables,
+            predicate,
+        ),
+    }?;
+
+    select.where_ = sql::ast::Where(filter);
+
+    relationship_joins.extend(filter_joins);
+
     select.joins = relationship_joins;
 
     select.order_by = order_by;
-
-    // translate where
-    select.where_ = sql::ast::Where(match query.clone().predicate {
-        None => Ok(sql::ast::Expression::Value(sql::ast::Value::Bool(true))),
-        Some(predicate) => {
-            filtering::translate_expression(env, &root_and_current_tables, predicate)
-        }
-    }?);
 
     Ok(select)
 }

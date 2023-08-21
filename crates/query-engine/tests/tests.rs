@@ -1,6 +1,14 @@
 mod common;
 
 #[test]
+fn select_where_album_id_equals_self_nested_object_relationship() {
+    let result =
+        common::test_translation("select_where_album_id_equals_self_nested_object_relationship")
+            .unwrap();
+    insta::assert_snapshot!(result);
+}
+
+#[test]
 fn it_converts_select_with_limit() {
     let result = common::test_translation("select_with_limit").unwrap();
     insta::assert_snapshot!(result);

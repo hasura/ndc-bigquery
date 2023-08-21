@@ -1,0 +1,137 @@
+---
+source: crates/query-engine/tests/tests.rs
+expression: result
+---
+SELECT
+  row_to_json("universe") AS "universe"
+FROM
+  (
+    SELECT
+      *
+    FROM
+      (
+        SELECT
+          coalesce(json_agg(row_to_json("rows")), '[]') AS "rows"
+        FROM
+          (
+            SELECT
+              "Track"."Name" AS "track",
+              "Track"."AlbumId" AS "AlbumId",
+              "Album"."Album" AS "Album"
+            FROM
+              "public"."Track" AS "Track"
+              LEFT OUTER JOIN LATERAL (
+                SELECT
+                  row_to_json("Album") AS "Album"
+                FROM
+                  (
+                    SELECT
+                      *
+                    FROM
+                      (
+                        SELECT
+                          coalesce(json_agg(row_to_json("rows")), '[]') AS "rows"
+                        FROM
+                          (
+                            SELECT
+                              "Album"."Title" AS "album",
+                              "Artist"."Artist" AS "Artist"
+                            FROM
+                              "public"."Album" AS "Album"
+                              LEFT OUTER JOIN LATERAL (
+                                SELECT
+                                  row_to_json("Artist") AS "Artist"
+                                FROM
+                                  (
+                                    SELECT
+                                      *
+                                    FROM
+                                      (
+                                        SELECT
+                                          coalesce(json_agg(row_to_json("rows")), '[]') AS "rows"
+                                        FROM
+                                          (
+                                            SELECT
+                                              "Artist"."Name" AS "artist",
+                                              "Artist"."ArtistId" AS "ArtistId"
+                                            FROM
+                                              "public"."Artist" AS "Artist"
+                                            WHERE
+                                              (
+                                                true
+                                                AND ("Album"."ArtistId" = "Artist"."ArtistId")
+                                              )
+                                          ) AS "rows"
+                                      ) AS "rows"
+                                  ) AS "Artist"
+                              ) AS "Artist" ON ('true')
+                            WHERE
+                              (
+                                true
+                                AND ("Track"."AlbumId" = "Album"."AlbumId")
+                              )
+                          ) AS "rows"
+                      ) AS "rows"
+                  ) AS "Album"
+              ) AS "Album" ON ('true')
+              INNER JOIN LATERAL (
+                SELECT
+                  *
+                FROM
+                  "public"."Album" AS "%BOOLEXP_1_FOR_Album"
+                WHERE
+                  (
+                    (
+                      true
+                      AND ("%BOOLEXP_1_FOR_Album"."Title" = $1)
+                    )
+                    AND (
+                      "Track"."AlbumId" = "%BOOLEXP_1_FOR_Album"."AlbumId"
+                    )
+                  )
+              ) AS "%BOOLEXP_1_FOR_Album" ON ('true')
+              INNER JOIN LATERAL (
+                SELECT
+                  *
+                FROM
+                  "public"."Album" AS "%BOOLEXP_2_FOR_Album"
+                WHERE
+                  (
+                    (
+                      true
+                      AND ("%BOOLEXP_2_FOR_Album"."Title" = $2)
+                    )
+                    AND (
+                      "Track"."AlbumId" = "%BOOLEXP_2_FOR_Album"."AlbumId"
+                    )
+                  )
+              ) AS "%BOOLEXP_2_FOR_Album" ON ('true')
+              INNER JOIN LATERAL (
+                SELECT
+                  *
+                FROM
+                  "public"."Artist" AS "%BOOLEXP_3_FOR_Artist"
+                WHERE
+                  (
+                    (
+                      true
+                      AND ("%BOOLEXP_3_FOR_Artist"."Name" = $3)
+                    )
+                    AND (
+                      "%BOOLEXP_2_FOR_Album"."ArtistId" = "%BOOLEXP_3_FOR_Artist"."ArtistId"
+                    )
+                  )
+              ) AS "%BOOLEXP_3_FOR_Artist" ON ('true')
+            WHERE
+              (
+                "%BOOLEXP_1_FOR_Album"."AlbumId" > "%BOOLEXP_3_FOR_Artist"."ArtistId"
+              )
+            ORDER BY
+              "Track"."TrackId" ASC
+            LIMIT
+              5
+          ) AS "rows"
+      ) AS "rows"
+  ) AS "universe"
+
+[(1, String("The album title (1)")), (2, String("The album title (2)")), (3, String("The Artist name"))]

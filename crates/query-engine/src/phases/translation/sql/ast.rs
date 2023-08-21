@@ -53,6 +53,7 @@ pub enum From {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Join {
     LeftOuterJoinLateral(LeftOuterJoinLateral),
+    InnerJoinLateral(InnerJoinLateral),
     CrossJoin(CrossJoin),
 }
 
@@ -64,6 +65,12 @@ pub struct CrossJoin {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct LeftOuterJoinLateral {
+    pub select: Box<Select>,
+    pub alias: TableAlias,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct InnerJoinLateral {
     pub select: Box<Select>,
     pub alias: TableAlias,
 }
