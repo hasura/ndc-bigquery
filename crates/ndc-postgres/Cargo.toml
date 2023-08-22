@@ -19,7 +19,7 @@ query-engine = { path = "../query-engine" }
 
 async-trait = "0.1.73"
 schemars = { version = "0.8.12", features = ["smol_str"] }
-serde = "1.0.179"
+serde = "1.0.185"
 serde_derive = "^1.0"
 serde_json = { version = "1.0.104", features = ["raw_value"] }
 sqlx = { version = "0.7.1", features = [ "json", "postgres", "runtime-tokio-rustls" ] }
