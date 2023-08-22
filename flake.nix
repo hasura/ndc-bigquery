@@ -54,7 +54,7 @@
         };
 
         rustDevToolchain = rustToolchain.override {
-          extensions = [ "rust-analyzer" "clippy" ];
+          extensions = [ "rust-analyzer" "clippy" "rust-src" ];
         };
       in
       {
