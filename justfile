@@ -60,9 +60,9 @@ run-in-docker: build-docker-with-nix start-dependencies
 # watch the code, then test and re-run on changes
 dev: start-dependencies
   RUST_LOG=INFO \
-    cargo watch -i "tests/snapshots/*" \
+    cargo watch -i "**/snapshots/*" \
     -c \
-    -x test \
+    -x 'test --exclude e2e-tests --workspace' \
     -x clippy \
     -x 'run -- serve --configuration {{CHINOOK_DEPLOYMENT}}'
 
@@ -93,14 +93,6 @@ build:
 test: start-dependencies
   RUST_LOG=DEBUG \
     cargo test
-
-# run a standard request to check the service correctly integrates with the engine
-test-integrated:
-  curl -X POST \
-    -H 'Host: example.hasura.app' \
-    -H 'Content-Type: application/json' \
-    http://localhost:3000/graphql \
-    -d '{ "query": "query { AlbumByID(AlbumId: 1) { Title } } " }'
 
 # re-generate the deployment configuration file
 generate-chinook-configuration: build
