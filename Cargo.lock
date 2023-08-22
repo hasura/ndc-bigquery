@@ -1282,7 +1282,7 @@ dependencies = [
 [[package]]
 name = "ndc-client"
 version = "0.1.0"
-source = "git+https://github.com/hasura/ndc-spec.git#06dee2874e71f4e79448362b160655d52fbac2bf"
+source = "git+https://github.com/hasura/ndc-spec.git#fef9e27c20b29ee52f6fe918414e27c3290b3cd7"
 dependencies = [
  "async-trait",
  "indexmap 1.9.3",
@@ -1354,7 +1354,7 @@ dependencies = [
 [[package]]
 name = "ndc-test"
 version = "0.1.0"
-source = "git+https://github.com/hasura/ndc-spec.git#06dee2874e71f4e79448362b160655d52fbac2bf"
+source = "git+https://github.com/hasura/ndc-spec.git#fef9e27c20b29ee52f6fe918414e27c3290b3cd7"
 dependencies = [
  "clap",
  "indexmap 1.9.3",
