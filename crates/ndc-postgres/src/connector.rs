@@ -11,10 +11,10 @@ use async_trait::async_trait;
 use ndc_hub::connector;
 use ndc_hub::models;
 
-use query_engine::phases;
-
 use super::configuration;
 use super::metrics;
+use query_engine::phases;
+use tracing::{info_span, Instrument};
 
 #[derive(Clone, Default)]
 pub struct Postgres {}
@@ -36,7 +36,9 @@ impl connector::Connector for Postgres {
     async fn update_configuration(
         args: &Self::RawConfiguration,
     ) -> Result<configuration::DeploymentConfiguration, connector::UpdateConfigurationError> {
-        configuration::configure(args).await
+        configuration::configure(args)
+            .instrument(info_span!("Update configuration"))
+            .await
     }
 
     /// Validate the raw configuration provided by the user,
@@ -44,7 +46,9 @@ impl connector::Connector for Postgres {
     async fn validate_raw_configuration(
         configuration: &Self::RawConfiguration,
     ) -> Result<Self::Configuration, connector::ValidateError> {
-        configuration::validate_raw_configuration(configuration).await
+        configuration::validate_raw_configuration(configuration)
+            .instrument(info_span!("Validate raw configuration"))
+            .await
     }
 
     /// Initialize the connector's in-memory state.
@@ -58,7 +62,9 @@ impl connector::Connector for Postgres {
         configuration: &Self::Configuration,
         metrics: &mut prometheus::Registry,
     ) -> Result<Self::State, connector::InitializationError> {
-        configuration::create_state(configuration, metrics).await
+        configuration::create_state(configuration, metrics)
+            .instrument(info_span!("Initialise state"))
+            .await
     }
 
     /// Update any metrics from the state
@@ -258,17 +264,21 @@ impl connector::Connector for Postgres {
         tracing::info!("{:?}", query_request);
 
         // Compile the query.
-        let plan =
+        let plan = async {
             match phases::translation::query::translate(&configuration.metadata, query_request) {
                 Ok(plan) => Ok(plan),
                 Err(err) => {
                     tracing::error!("{}", err);
                     Err(connector::ExplainError::Other(err.to_string().into()))
                 }
-            }?;
+            }
+        }
+        .instrument(info_span!("Plan query"))
+        .await?;
 
         // Execute an explain query.
         let (query, plan) = phases::execution::explain(&state.pool, plan)
+            .instrument(info_span!("Explain query"))
             .await
             .map_err(|err| match err {
                 phases::execution::Error::Query(err) => {
@@ -317,7 +327,7 @@ impl connector::Connector for Postgres {
         tracing::info!("{:?}", query_request);
 
         // Compile the query.
-        let plan =
+        let plan = async {
             match phases::translation::query::translate(&configuration.metadata, query_request) {
                 Ok(plan) => Ok(plan),
                 Err(err) => {
@@ -329,10 +339,14 @@ impl connector::Connector for Postgres {
                         _ => Err(connector::QueryError::InvalidRequest(err.to_string())),
                     }
                 }
-            }?;
+            }
+        }
+        .instrument(info_span!("Plan query"))
+        .await?;
 
         // Execute the query.
         let result = phases::execution::execute(&state.pool, plan)
+            .instrument(info_span!("Execute query"))
             .await
             .map_err(|err| match err {
                 phases::execution::Error::Query(err) => {

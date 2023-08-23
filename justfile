@@ -60,6 +60,8 @@ run-in-docker: build-docker-with-nix start-dependencies
 # watch the code, then test and re-run on changes
 dev: start-dependencies
   RUST_LOG=INFO \
+    OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://localhost:4317 \
+    OTEL_SERVICE_NAME=postgres-ndc \
     cargo watch -i "**/snapshots/*" \
     -c \
     -x 'test --exclude e2e-tests --workspace' \
