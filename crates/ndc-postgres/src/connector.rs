@@ -5,15 +5,16 @@
 //! The relevant types for configuration and state are defined in
 //! `super::configuration`.
 
-use std::collections::BTreeMap;
-
 use async_trait::async_trait;
 use ndc_hub::connector;
 use ndc_hub::models;
 
 use super::configuration;
+use super::explain;
 use super::metrics;
-use query_engine::phases;
+use super::query;
+use super::schema;
+
 use tracing::{info_span, Instrument};
 
 #[derive(Clone, Default)]
@@ -119,136 +120,9 @@ impl connector::Connector for Postgres {
     /// This function implements the [schema endpoint](https://hasura.github.io/ndc-spec/specification/schema/index.html)
     /// from the NDC specification.
     async fn get_schema(
-        Self::Configuration {
-            metadata,
-            aggregate_functions,
-            ..
-        }: &Self::Configuration,
+        configuration: &Self::Configuration,
     ) -> Result<models::SchemaResponse, connector::SchemaError> {
-        // TODO: Technically, we should list all scalar types regardless of
-        // whether or not they have associated aggregate functions. However, as
-        // we only deal with two for now, and we can guarantee that they always
-        // have aggregate functions, we don't need to worry about this quite
-        // yet.
-        let mut scalar_types: BTreeMap<String, models::ScalarType> = aggregate_functions
-            .0
-            .iter()
-            .map(|(scalar_type, aggregate_functions)| {
-                (
-                    scalar_type.to_string(),
-                    models::ScalarType {
-                        aggregate_functions: aggregate_functions
-                            .iter()
-                            .map(|(function_name, function_definition)| {
-                                (
-                                    function_name.clone(),
-                                    models::AggregateFunctionDefinition {
-                                        result_type: models::Type::Named {
-                                            name: function_definition.return_type.to_string(),
-                                        },
-                                    },
-                                )
-                            })
-                            .collect(),
-                        comparison_operators: BTreeMap::new(),
-                        update_operators: BTreeMap::new(),
-                    },
-                )
-            })
-            .collect();
-
-        // Used for types we don't yet support
-        scalar_types.insert(
-            "any".into(),
-            models::ScalarType {
-                aggregate_functions: BTreeMap::new(),
-                comparison_operators: BTreeMap::new(),
-                update_operators: BTreeMap::new(),
-            },
-        );
-
-        let collections = metadata
-            .tables
-            .0
-            .iter()
-            .map(|(table_name, table)| models::CollectionInfo {
-                name: table_name.clone(),
-                description: None,
-                arguments: BTreeMap::new(),
-                collection_type: table_name.clone(),
-                insertable_columns: None,
-                updatable_columns: None,
-                deletable: false,
-                uniqueness_constraints: table
-                    .uniqueness_constraints
-                    .0
-                    .iter()
-                    .map(
-                        |(
-                            constraint_name,
-                            query_engine::metadata::UniquenessConstraint(constraint_columns),
-                        )| {
-                            (
-                                constraint_name.clone(),
-                                models::UniquenessConstraint {
-                                    unique_columns: constraint_columns.iter().cloned().collect(),
-                                },
-                            )
-                        },
-                    )
-                    .collect(),
-                foreign_keys: table
-                    .foreign_relations
-                    .0
-                    .iter()
-                    .map(
-                        |(
-                            constraint_name,
-                            query_engine::metadata::ForeignRelation {
-                                foreign_table,
-                                column_mapping,
-                            },
-                        )| {
-                            (
-                                constraint_name.clone(),
-                                models::ForeignKeyConstraint {
-                                    foreign_collection: foreign_table.clone(),
-                                    column_mapping: column_mapping.clone(),
-                                },
-                            )
-                        },
-                    )
-                    .collect(),
-            })
-            .collect();
-
-        let object_types =
-            BTreeMap::from_iter(metadata.tables.0.iter().map(|(table_name, table)| {
-                let object_type = models::ObjectType {
-                    description: None,
-                    fields: BTreeMap::from_iter(table.columns.values().map(|column| {
-                        (
-                            column.name.clone(),
-                            models::ObjectField {
-                                arguments: BTreeMap::new(),
-                                description: None,
-                                r#type: models::Type::Named {
-                                    name: column.r#type.to_string(),
-                                },
-                            },
-                        )
-                    })),
-                };
-                (table_name.clone(), object_type)
-            }));
-
-        Ok(models::SchemaResponse {
-            collections,
-            procedures: vec![],
-            functions: vec![],
-            object_types,
-            scalar_types,
-        })
+        schema::get_schema(configuration).await
     }
 
     /// Explain a query by creating an execution plan
@@ -260,46 +134,7 @@ impl connector::Connector for Postgres {
         state: &Self::State,
         query_request: models::QueryRequest,
     ) -> Result<models::ExplainResponse, connector::ExplainError> {
-        tracing::info!("{}", serde_json::to_string(&query_request).unwrap());
-        tracing::info!("{:?}", query_request);
-
-        // Compile the query.
-        let plan = async {
-            match phases::translation::query::translate(&configuration.metadata, query_request) {
-                Ok(plan) => Ok(plan),
-                Err(err) => {
-                    tracing::error!("{}", err);
-                    Err(connector::ExplainError::Other(err.to_string().into()))
-                }
-            }
-        }
-        .instrument(info_span!("Plan query"))
-        .await?;
-
-        // Execute an explain query.
-        let (query, plan) = phases::execution::explain(&state.pool, plan)
-            .instrument(info_span!("Explain query"))
-            .await
-            .map_err(|err| match err {
-                phases::execution::Error::Query(err) => {
-                    tracing::error!("{}", err);
-                    connector::ExplainError::Other(err.into())
-                }
-                phases::execution::Error::DB(err) => {
-                    tracing::error!("{}", err);
-                    connector::ExplainError::Other(err.to_string().into())
-                }
-            })?;
-
-        // assuming explain succeeded, increment counter
-        state.metrics.explain_total.inc();
-
-        let details =
-            BTreeMap::from_iter([("SQL Query".into(), query), ("Execution Plan".into(), plan)]);
-
-        let response = models::ExplainResponse { details };
-
-        Ok(response)
+        explain::explain(configuration, state, query_request).await
     }
 
     /// Execute a mutation
@@ -323,45 +158,6 @@ impl connector::Connector for Postgres {
         state: &Self::State,
         query_request: models::QueryRequest,
     ) -> Result<models::QueryResponse, connector::QueryError> {
-        tracing::info!("{}", serde_json::to_string(&query_request).unwrap());
-        tracing::info!("{:?}", query_request);
-
-        // Compile the query.
-        let plan = async {
-            match phases::translation::query::translate(&configuration.metadata, query_request) {
-                Ok(plan) => Ok(plan),
-                Err(err) => {
-                    tracing::error!("{}", err);
-                    match err {
-                        phases::translation::query::error::Error::NotSupported(_) => {
-                            Err(connector::QueryError::UnsupportedOperation(err.to_string()))
-                        }
-                        _ => Err(connector::QueryError::InvalidRequest(err.to_string())),
-                    }
-                }
-            }
-        }
-        .instrument(info_span!("Plan query"))
-        .await?;
-
-        // Execute the query.
-        let result = phases::execution::execute(&state.pool, plan)
-            .instrument(info_span!("Execute query"))
-            .await
-            .map_err(|err| match err {
-                phases::execution::Error::Query(err) => {
-                    tracing::error!("{}", err);
-                    connector::QueryError::Other(err.into())
-                }
-                phases::execution::Error::DB(err) => {
-                    tracing::error!("{}", err);
-                    connector::QueryError::Other(err.to_string().into())
-                }
-            })?;
-
-        // assuming query succeeded, increment counter
-        state.metrics.query_total.inc();
-
-        Ok(result)
+        query::query(configuration, state, query_request).await
     }
 }
