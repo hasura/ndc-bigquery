@@ -10,7 +10,10 @@ use similar_asserts::assert_eq;
 
 use ndc_postgres::configuration;
 
-use crate::common::{get_deployment_file, POSTGRESQL_CONNECTION_STRING};
+use crate::common::get_deployment_file;
+
+const POSTGRESQL_CONNECTION_STRING: &str = "postgresql://postgres:password@localhost:64002";
+const CHINOOK_DEPLOYMENT_PATH: &str = "static/chinook-deployment.json";
 
 #[tokio::test]
 async fn test_configure() {
@@ -20,7 +23,8 @@ async fn test_configure() {
     };
 
     let expected_value: serde_json::Value = {
-        let file = fs::File::open(get_deployment_file()).expect("fs::File::open");
+        let file =
+            fs::File::open(get_deployment_file(CHINOOK_DEPLOYMENT_PATH)).expect("fs::File::open");
         serde_json::from_reader(file).expect("serde_json::from_reader")
     };
 
