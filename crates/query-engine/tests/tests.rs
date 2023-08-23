@@ -115,3 +115,9 @@ fn sorting_by_nested_relationship_count() {
     let result = common::test_translation("sorting_by_nested_relationship_count").unwrap();
     insta::assert_snapshot!(result);
 }
+
+#[test]
+fn select_native_query() {
+    let result = common::test_translation("select_native_query").unwrap();
+    insta::assert_snapshot!(result);
+}

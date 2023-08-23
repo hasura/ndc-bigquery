@@ -9,7 +9,6 @@ pub enum Explain<'a> {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct With {
-    pub recursive: bool,
     pub common_table_expressions: Vec<CommonTableExpression>,
 }
 
@@ -17,8 +16,16 @@ pub struct With {
 pub struct CommonTableExpression {
     pub table_name: TableAlias,
     pub column_names: Option<Vec<ColumnAlias>>,
-    pub select: Box<Select>,
+    pub select: CTExpr,
 }
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum CTExpr {
+    Raw(Raw),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Raw(pub String);
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Select {

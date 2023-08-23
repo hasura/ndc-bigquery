@@ -3,12 +3,14 @@
 use ndc_hub::models;
 
 use super::error::Error;
-use super::helpers::{Env, RootAndCurrentTables, TableNameAndReference};
+use super::helpers::{Env, RootAndCurrentTables, State, TableNameAndReference};
+use super::root;
 use crate::phases::translation::sql;
 
 /// translate any joins we should include in the query into our SQL AST
 pub fn translate_joins(
     env: &Env,
+    state: &mut State,
     root_and_current_tables: &RootAndCurrentTables,
     // We got these by processing the fields selection.
     join_fields: Vec<(sql::ast::TableAlias, String, models::Query)>,
@@ -17,19 +19,15 @@ pub fn translate_joins(
     join_fields
         .into_iter()
         .map(|(alias, relationship_name, query)| {
-            let relationship = env
-                .relationships
-                .get(&relationship_name)
-                .ok_or(Error::RelationshipNotFound(relationship_name.clone()))?;
+            let relationship = env.lookup_relationship(&relationship_name)?;
+
+            // create a from clause and get a reference of inner query.
+            let (target_collection, from_clause) =
+                root::make_from_clause_and_reference(&relationship.target_collection, env, state)?;
 
             // process inner query and get the SELECTs for the 'rows' and 'aggregates' fields.
             let select_set =
-                super::translate_query(env, relationship.target_collection.clone(), query)?;
-
-            let target_collection_alias_name: sql::ast::TableName =
-                sql::ast::TableName::AliasedTable(sql::helpers::make_table_alias(
-                    relationship.target_collection.clone(),
-                ));
+                super::translate_query(env, state, &target_collection, &from_clause, query)?;
 
             // add join expressions to row / aggregate selects
             let final_select_set = match select_set {
@@ -40,7 +38,7 @@ pub fn translate_joins(
                     row_select.where_ = sql::ast::Where(translate_column_mapping(
                         env,
                         &root_and_current_tables.current_table,
-                        &target_collection_alias_name,
+                        &target_collection.reference,
                         row_expr,
                         relationship,
                     )?);
@@ -54,7 +52,7 @@ pub fn translate_joins(
                     aggregate_select.where_ = sql::ast::Where(translate_column_mapping(
                         env,
                         &root_and_current_tables.current_table,
-                        &target_collection_alias_name,
+                        &target_collection.reference,
                         aggregate_expr,
                         relationship,
                     )?);
@@ -71,7 +69,7 @@ pub fn translate_joins(
                     row_select.where_ = sql::ast::Where(translate_column_mapping(
                         env,
                         &root_and_current_tables.current_table,
-                        &target_collection_alias_name,
+                        &target_collection.reference,
                         row_expr,
                         relationship,
                     )?);
@@ -81,7 +79,7 @@ pub fn translate_joins(
                     aggregate_select.where_ = sql::ast::Where(translate_column_mapping(
                         env,
                         &root_and_current_tables.current_table,
-                        &target_collection_alias_name,
+                        &target_collection.reference,
                         aggregate_expr,
                         relationship,
                     )?);

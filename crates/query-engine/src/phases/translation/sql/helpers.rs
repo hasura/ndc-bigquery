@@ -14,7 +14,6 @@ pub enum SelectSet {
 /// An empty `WITH` clause.
 pub fn empty_with() -> With {
     With {
-        recursive: false,
         common_table_expressions: vec![],
     }
 }
@@ -112,6 +111,10 @@ pub fn make_order_by_table_alias(index: usize, source_table_name: &String) -> Ta
 /// and get an alias.
 pub fn make_order_by_count_table_alias(index: usize, source_table_name: &String) -> TableAlias {
     make_table_alias(format!("%ORDER_{}_COUNT_FOR_{}", index, source_table_name))
+}
+
+pub fn make_native_query_table_alias(index: usize, name: &String) -> TableAlias {
+    make_table_alias(format!("%NATIVE_QUERY_{}_FOR_{}", index, name))
 }
 
 // SELECTs //

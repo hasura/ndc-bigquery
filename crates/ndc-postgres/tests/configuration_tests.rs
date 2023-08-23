@@ -25,7 +25,17 @@ async fn test_configure() {
     let expected_value: serde_json::Value = {
         let file =
             fs::File::open(get_deployment_file(CHINOOK_DEPLOYMENT_PATH)).expect("fs::File::open");
-        serde_json::from_reader(file).expect("serde_json::from_reader")
+        let mut result: serde_json::Value =
+            serde_json::from_reader(file).expect("serde_json::from_reader");
+
+        // native queries cannot be configured from the database alone,
+        // so we ignore the native queries in the configuration file
+        // for the purpose of comparing the checked in file with the comparison.
+        result["metadata"]["native_queries"]
+            .as_object_mut()
+            .unwrap()
+            .clear();
+        result
     };
 
     let actual = configuration::configure(&args)

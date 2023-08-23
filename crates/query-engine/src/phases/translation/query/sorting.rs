@@ -120,10 +120,7 @@ fn translate_order_by_star_count_aggregate(
             } = path_element;
 
             // examine the path elements' relationship.
-            let relationship = env
-                .relationships
-                .get(relationship_name)
-                .ok_or(Error::RelationshipNotFound(relationship_name.clone()))?;
+            let relationship = env.lookup_relationship(relationship_name)?;
 
             let target_collection_alias: sql::ast::TableAlias =
                 sql::helpers::make_table_alias(relationship.target_collection.clone());
@@ -280,10 +277,7 @@ fn translate_order_by_target_for_column(
             } = path_element;
 
             // examine the path elements' relationship.
-            let relationship = env
-                .relationships
-                .get(relationship_name)
-                .ok_or(Error::RelationshipNotFound(relationship_name.clone()))?;
+            let relationship = env.lookup_relationship(relationship_name)?;
 
             match relationship.relationship_type {
                 models::RelationshipType::Array if function.is_none() => Err(Error::NotSupported(

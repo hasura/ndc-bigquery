@@ -570,7 +570,21 @@
         "foreign_relations": {}
       }
     },
-    "native_queries": {}
+    "native_queries": {
+      "artist": {
+        "sql": "SELECT * FROM public.\"Artist\"",
+        "columns": {
+          "ArtistId": {
+            "name": "ArtistId",
+            "type": "Int"
+          },
+          "Name": {
+            "name": "Name",
+            "type": "String"
+          }
+        }
+      }
+	}
   },
   "aggregate_functions": {
     "Int": {

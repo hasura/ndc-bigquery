@@ -11,9 +11,6 @@ impl With {
         if self.common_table_expressions.is_empty() {
         } else {
             sql.append_syntax("WITH ");
-            if self.recursive {
-                sql.append_syntax("RECURSIVE ");
-            }
 
             let ctes = &self.common_table_expressions;
             for (index, cte) in ctes.iter().enumerate() {
@@ -42,7 +39,23 @@ impl CommonTableExpression {
 
         sql.append_syntax(" AS (");
         self.select.to_sql(sql);
-        sql.append_syntax(")");
+        // the newline is important because a native query might end with a comment
+        sql.append_syntax("\n)");
+    }
+}
+
+impl CTExpr {
+    pub fn to_sql(&self, sql: &mut SQL) {
+        match self {
+            CTExpr::Raw(raw) => raw.to_sql(sql),
+        }
+    }
+}
+
+impl Raw {
+    pub fn to_sql(&self, sql: &mut SQL) {
+        let Raw(text) = self;
+        sql.append_syntax(text);
     }
 }
 
@@ -77,6 +90,8 @@ impl SelectList {
 
 impl Select {
     pub fn to_sql(&self, sql: &mut SQL) {
+        self.with.to_sql(sql);
+
         sql.append_syntax("SELECT ");
 
         self.select_list.to_sql(sql);
