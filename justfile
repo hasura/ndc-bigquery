@@ -94,7 +94,7 @@ build:
 # run all tests
 test: start-dependencies
   RUST_LOG=DEBUG \
-    cargo test
+    cargo test --workspace --exclude=e2e-tests
 
 # re-generate the deployment configuration file
 generate-chinook-configuration: build

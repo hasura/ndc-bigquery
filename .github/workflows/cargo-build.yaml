@@ -3,52 +3,36 @@ on: [push]
 name: Postgres NDC build
 
 jobs:
-  build_and_test:
+  build:
     name: Build Postgres NDC
     runs-on: ubuntu-latest
+    env:
+      CARGO_NET_GIT_FETCH_WITH_CLI: "true"
+      RUSTFLAGS: "-D warnings" # fail on warnings
     steps:
       - uses: actions/checkout@v3
 
-      - name: Install Protoc
+      - name: install protoc
         uses: arduino/setup-protoc@v2
         with:
           version: "23.3"
 
-      - uses: actions/checkout@v3
+      - name: install tools
+        run: |
+          rustup show
 
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
+      - uses: Swatinem/rust-cache@v2
 
-      - uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-
-      - name: build
-        uses: actions-rs/cargo@v1
-        with:
-          command: build
-          args: --release --all-features
-        env:
-          CARGO_NET_GIT_FETCH_WITH_CLI: "true"
-          # fail on warnings
-          RUSTFLAGS: "-D warnings"
+      - name: build crates
+        run: |
+          cargo build --release --all-features
 
       - name: lint
-        uses: actions-rs/cargo@v1
-        with:
-          command: clippy
-        env:
-          CARGO_NET_GIT_FETCH_WITH_CLI: "true"
-          # fail on warnings
-          RUSTFLAGS: "-D warnings"
+        run: |
+          cargo clippy --release -- --deny=clippy::all
 
       # scream into Slack if something goes wrong
-      - name: Report Status
+      - name: report status
         if: github.ref == 'refs/heads/main'
         uses: ravsamhq/notify-slack-action@v2
         with:

@@ -3,41 +3,47 @@ on: [push]
 name: Postgres NDC tests
 
 jobs:
-  build_and_test:
+  test:
     name: Test Postgres NDC
     runs-on: ubuntu-latest
+    env:
+      CARGO_NET_GIT_FETCH_WITH_CLI: "true"
+      RUSTFLAGS: "-D warnings" # fail on warnings
     steps:
-      - name: Install Protoc
+      - uses: actions/checkout@v3
+
+      - name: install protoc
         uses: arduino/setup-protoc@v2
         with:
           version: "23.3"
 
-      - uses: actions/checkout@v3
-
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
+      - name: install tools
+        run: |
+          rustup show
 
       - uses: Swatinem/rust-cache@v2
 
-      - uses: isbang/compose-action@v1.5.1
+      - name: build crates
+        run: |
+          cargo build --all-targets
+
+      - name: start dependencies
+        uses: isbang/compose-action@v1.5.1
         with:
           compose-file: "./docker-compose.yaml"
           down-flags: "--volumes"
           services: |
             postgres
 
-      - uses: actions-rs/cargo@v1
-        with:
-          command: test
-          args: --exclude e2e-tests --workspace
+      - name: run tests
+        run: |
+          cargo test --release --workspace --exclude=e2e-tests
         env:
           POSTGRESQL_CONNECTION_STRING: postgresql://postgres:password@localhost:64002
           RUST_LOG: INFO
-          CARGO_NET_GIT_FETCH_WITH_CLI: "true"
 
       # scream into Slack if something goes wrong
-      - name: Report Status
+      - name: report status
         if: github.ref == 'refs/heads/main'
         uses: ravsamhq/notify-slack-action@v2
         with:
