@@ -29,7 +29,10 @@
   outputs = { self, nixpkgs, flake-utils, crane, rust-overlay, advisory-db }:
     flake-utils.lib.eachDefaultSystem (localSystem:
       let
-        pkgs = nixpkgs.legacyPackages.${localSystem};
+        pkgs = import nixpkgs {
+          system = localSystem;
+          overlays = [ rust-overlay.overlays.default ];
+        };
 
         # Edit ./nix/postgres-agent.nix to adjust library and buildtime
         # dependencies or other build configuration for postgres-agent
@@ -51,10 +54,6 @@
         postgres-agent-aarch64-linux = cargoBuild {
           inherit crateExpression nixpkgs crane rust-overlay localSystem;
           crossSystem = "aarch64-linux";
-        };
-
-        rustDevToolchain = rustToolchain.override {
-          extensions = [ "rust-analyzer" "clippy" "rust-src" ];
         };
       in
       {
@@ -126,7 +125,7 @@
             pkgs.k6
             pkgs.pkg-config
             pkgs.rnix-lsp
-            rustDevToolchain
+            rustToolchain
           ];
         };
       });

@@ -28,7 +28,7 @@
 let
   pkgs = import nixpkgs {
     inherit crossSystem localSystem;
-    overlays = [ (import rust-overlay) ];
+    overlays = [ rust-overlay.overlays.default ];
   };
 
   # `hostPlatform` is the cross-compilation output platform;
@@ -56,7 +56,7 @@ let
   # `pkgs.pkgsBuildHost` to get packages that run at build time (so run on the
   # build platform), and that produce outputs for the host platform which is the
   # cross-compilation target.
-  rustToolchain = pkgs.pkgsBuildHost.rust-bin.stable.latest.default.override {
+  rustToolchain = (pkgs.pkgsBuildHost.rust-bin.fromRustupToolchainFile ../rust-toolchain.toml).override {
     targets = [ buildTarget ];
   };
 
