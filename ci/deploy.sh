@@ -6,8 +6,6 @@
 #
 set -euo pipefail
 
-IMAGE_PATH=ghcr.io/hasura/postgres-agent-rs
-
 if [ -z "${1+x}" ]; then
     echo "Expected argument of the form refs/heads/<branch name> or refs/tags/<tag name>."
     echo "(In a Github workflow the variable github.ref has this format)"
@@ -15,6 +13,7 @@ if [ -z "${1+x}" ]; then
 fi
 
 github_ref="$1"
+image_path="$2"
 
 # Assumes that the given ref is a branch name. Sets a tag for a docker image of
 # the form:
@@ -68,6 +67,8 @@ function set_docker_tags {
     fi
 }
 
+# expects to find a tar file in ./result
+# as the result of `nix build .#docker-postgres` or similar
 function maybe_publish {
     local input="$1"
     set_docker_tags "$input"
@@ -78,7 +79,6 @@ function maybe_publish {
 
     echo "Will publish docker image with tags: ${docker_tags[*]}"
 
-    nix build .#docker --print-build-logs # writes a tar file to ./result
     ls -lh result
     local image_archive
     image_archive=docker-archive://"$(readlink -f result)"
@@ -86,8 +86,8 @@ function maybe_publish {
 
     for tag in "${docker_tags[@]}"; do
         echo
-        echo "Pushing docker://$IMAGE_PATH:$tag"
-        skopeo copy "$image_archive" docker://"$IMAGE_PATH:$tag"
+        echo "Pushing docker://$image_path:$tag"
+        skopeo copy "$image_archive" docker://"$image_path:$tag"
     done
 }
 

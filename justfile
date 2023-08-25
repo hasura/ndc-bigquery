@@ -178,3 +178,11 @@ build-docker-with-nix:
     echo 'nix build | docker load'
     docker load < "$(nix build --no-link --print-out-paths '.#dockerDev')"
   fi
+
+# check the docker build works
+build-arch64-docker-with-nix:
+  #!/usr/bin/env bash
+  if [[ '{{CONNECTOR_IMAGE_TAG}}' == 'dev' ]]; then
+    echo 'nix build | docker load'
+    docker load < "$(nix build --no-link --print-out-paths '.#docker-postgres-aarch64-linux')"
+  fi

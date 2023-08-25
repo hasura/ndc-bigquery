@@ -83,21 +83,31 @@
           postgres-agent-x86_64-linux = postgres-agent-x86_64-linux;
           postgres-agent-aarch64-linux = postgres-agent-aarch64-linux;
 
-          docker = pkgs.callPackage ./nix/docker.nix { inherit postgres-agent; };
+          docker = pkgs.callPackage ./nix/docker.nix {
+            inherit postgres-agent;
+            binary-name = "ndc-postgres";
+            image-name = "ghcr/io/hasura/postgres-agent-rs";
+          };
 
           dockerDev = pkgs.callPackage ./nix/docker.nix {
             inherit postgres-agent;
+            binary-name = "ndc-postgres";
+            image-name = "ghcr/io/hasura/postgres-agent-rs";
             tag = "dev";
           };
 
-          docker-x86_64-linux = pkgs.callPackage ./nix/docker.nix {
-            postgres-agent = postgres-agent-x86_64-linux;
+          docker-postgres-x86_64-linux = pkgs.callPackage ./nix/docker.nix {
+            ndc-agent = postgres-agent-x86_64-linux;
             architecture = "amd64";
+            binary-name = "ndc-postgres";
+            image-name = "ghcr/io/hasura/postgres-agent-rs";
           };
 
-          docker-aarch64-linux = pkgs.callPackage ./nix/docker.nix {
-            postgres-agent = postgres-agent-aarch64-linux;
+          docker-postgres-aarch64-linux = pkgs.callPackage ./nix/docker.nix {
+            ndc-agent = postgres-agent-aarch64-linux;
             architecture = "arm64";
+            binary-name = "ndc-postgres";
+            image-name = "ghcr/io/hasura/postgres-agent-rs";
           };
 
           publish-docker-image = pkgs.writeShellApplication {

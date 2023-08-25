@@ -28,8 +28,8 @@ let
       isJsonFile = path: _type: builtins.match ".*json" path != null;
       isSqlFile = path: _type: builtins.match ".*sql" path != null;
       isSourceFile = path: type:
-        isJsonFile path type 
-        || isSqlFile path type 
+        isJsonFile path type
+        || isSqlFile path type
         || craneLib.filterCargoSources path type;
     in
     lib.cleanSourceWith { src = craneLib.path ./..; filter = isSourceFile; };

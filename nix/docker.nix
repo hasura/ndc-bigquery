@@ -1,21 +1,22 @@
 # This is a function that returns a derivation for a docker image.
-{ postgres-agent
+{ ndc-agent
+, binary-name
 , dockerTools
 , lib
 , architecture ? null
-, name ? "ghcr.io/hasura/postgres-agent-rs"
+, image-name
 , tag ? null # defaults to the output hash
 , extraConfig ? { } # see config options at: https://github.com/moby/moby/blob/master/image/spec/v1.2.md#image-json-field-descriptions
 }:
 
 let
   args = {
-    inherit name;
+    name = image-name;
     created = "now";
 
     config = {
       Entrypoint = [
-        "${postgres-agent}/bin/ndc-postgres"
+        "${ndc-agent}/bin/${binary-name}"
       ];
       ExposedPorts = { "8100/tcp" = { }; };
     } // extraConfig;
