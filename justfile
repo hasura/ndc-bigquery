@@ -11,6 +11,9 @@ CHINOOK_DEPLOYMENT := "static/chinook-deployment.json"
 #   You can use `main` instead, by running:
 #     just --set CONNECTOR_IMAGE_TAG dev-main <targets>
 
+# check everything
+check: build lint format-check test
+
 # run the connector
 run: start-dependencies
   RUST_LOG=INFO \
