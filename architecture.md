@@ -16,7 +16,7 @@ API:
 
 ```rs
 pub fn translate(
-    tables_info: &metadata::TablesInfo,
+    metadata: &metadata::Metadata,
     query_request: models::QueryRequest,
 ) -> Result<ExecutionPlan, Error>
 ```
@@ -33,12 +33,13 @@ pub async fn execute(
 The translation step is essentially side-effect free - we use information from the request, as well as the information
 about the metadata to translate the query request into steps to run against the database.
 
-This process is currently found in the [phases/translation.rs](/crates/query-engine/src/phases/translation.rs) file, and the API
-is the following function:
+This process is currently found in the [phases/translation/query/](/crates/query-engine/src/phases/translation/query/) directory
+and are split to several modules roughly mimicing the query parts as they are specified in the spec. The API
+is the following function in the [mod.rs](/crates/query-engine/src/phases/translation/query/mod.rs) file:
 
 ```rs
 pub fn translate(
-    tables_info: &metadata::TablesInfo,
+    metadata: &metadata::Metadata,
     query_request: models::QueryRequest,
 ) -> Result<ExecutionPlan, Error>
 ```
@@ -153,3 +154,21 @@ and contain all infrastructure code to a single module - `tests/common/mod.rs` (
 We do this so that we will notice when it grows too large and requires some explicit and calculated attention.
 
 We would also like, in general, to keep infrastructure code to the required minimum, and not add things we'll need to maintain before using them.
+
+### Consider the generated SQL
+
+When working on a feature or fixing a bug, consider the generated SQL first.
+What does it currently look like? What would you like it to look like?
+
+Compose a simplified yet runnable example and run it against the database (`just repl-postgres` can be helpful here),
+find a query that returns the results you expect, examine edge cases, and then consider the rust implementation of this idea.
+
+### General coding style ideas
+
+- Use meaningful names (not shorthands). No need to skimp on vowels.
+- Comment code with intention and reasons when those are not trivial. Comment modules, functions and types with a summary of what they are supposed to do.
+  Often writing summary comments helps us understand our code better and where it can be improved.
+- Avoid using dummy values. Prefer throwing an error when in doubt.
+- Prefer to avoid generics, traits and macros if possible. The majority of functions and types have a single usecase, and the ones that have multiple
+  use-cases probably don't have more than a handful of them. Duplicating code is often cheaper than the wrong abstraction, and we can always refactor.
+  Simple functions can go a long way.
