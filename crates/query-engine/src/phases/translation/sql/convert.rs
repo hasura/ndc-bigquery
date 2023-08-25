@@ -25,7 +25,7 @@ impl With {
 
 impl CommonTableExpression {
     pub fn to_sql(&self, sql: &mut SQL) {
-        self.table_name.to_sql(sql);
+        self.alias.to_sql(sql);
         match &self.column_names {
             None => {}
             Some(names) => {
@@ -47,15 +47,21 @@ impl CommonTableExpression {
 impl CTExpr {
     pub fn to_sql(&self, sql: &mut SQL) {
         match self {
-            CTExpr::Raw(raw) => raw.to_sql(sql),
+            CTExpr::RawSql(raw_vec) => {
+                for item in raw_vec {
+                    item.to_sql(sql);
+                }
+            }
         }
     }
 }
 
-impl Raw {
+impl RawSql {
     pub fn to_sql(&self, sql: &mut SQL) {
-        let Raw(text) = self;
-        sql.append_syntax(text);
+        match self {
+            RawSql::RawText(text) => sql.append_syntax(text),
+            RawSql::Value(value) => value.to_sql(sql),
+        }
     }
 }
 
@@ -368,6 +374,7 @@ impl Value {
             Value::Variable(v) => sql.append_param(Param::Variable(v.clone())),
             Value::Bool(true) => sql.append_syntax("true"),
             Value::Bool(false) => sql.append_syntax("false"),
+            Value::Null => sql.append_syntax("null"),
             Value::Array(items) => {
                 sql.append_syntax("ARRAY [");
                 for (index, item) in items.iter().enumerate() {

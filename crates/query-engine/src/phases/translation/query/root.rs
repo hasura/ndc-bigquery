@@ -176,6 +176,7 @@ fn translate_query_part(
 /// Create a from clause from a collection name and its reference.
 pub fn make_from_clause_and_reference(
     collection_name: &str,
+    arguments: &BTreeMap<String, models::Argument>,
     env: &Env,
     state: &mut State,
 ) -> Result<(TableNameAndReference, sql::ast::From), Error> {
@@ -186,8 +187,7 @@ pub fn make_from_clause_and_reference(
 
     // find the table according to the metadata.
     let collection_info = env.lookup_collection(collection_name)?;
-    // unpack table info for now.
-    let from_clause = make_from_clause(state, &collection_alias, &collection_info)?;
+    let from_clause = make_from_clause(state, &collection_alias, &collection_info, arguments)?;
 
     let current_table = TableNameAndReference {
         name: collection_name.to_string(),
@@ -202,6 +202,7 @@ fn make_from_clause(
     state: &mut State,
     current_table_alias: &sql::ast::TableAlias,
     collection_info: &CollectionInfo,
+    arguments: &BTreeMap<String, models::Argument>,
 ) -> Result<sql::ast::From, Error> {
     match &collection_info {
         CollectionInfo::Table { info, .. } => {
@@ -218,8 +219,7 @@ fn make_from_clause(
 
         CollectionInfo::NativeQuery { name, info } => {
             let aliased_table =
-				// not adding arguments at the moment.
-                state.insert_native_query(name.clone(), info.clone(), BTreeMap::new());
+                state.insert_native_query(name.clone(), info.clone(), arguments.clone());
             Ok(sql::ast::From::Table {
                 name: aliased_table,
                 alias: current_table_alias.clone(),

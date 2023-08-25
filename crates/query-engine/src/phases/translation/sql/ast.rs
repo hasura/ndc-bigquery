@@ -14,18 +14,21 @@ pub struct With {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CommonTableExpression {
-    pub table_name: TableAlias,
+    pub alias: TableAlias,
     pub column_names: Option<Vec<ColumnAlias>>,
     pub select: CTExpr,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum CTExpr {
-    Raw(Raw),
+    RawSql(Vec<RawSql>),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct Raw(pub String);
+pub enum RawSql {
+    RawText(String),
+    Value(Value),
+}
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Select {
@@ -212,6 +215,7 @@ pub enum Value {
     Int4(i32),
     Bool(bool),
     String(String),
+    Null,
     Array(Vec<Value>),
     EmptyJsonArray,
     Variable(String),

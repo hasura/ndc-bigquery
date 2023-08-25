@@ -5,6 +5,7 @@ use ndc_hub::models;
 use super::error::Error;
 use super::helpers::{CollectionInfo, Env, RootAndCurrentTables, State, TableNameAndReference};
 use super::relationships;
+use super::values;
 use crate::metadata;
 use crate::phases::translation::sql;
 use crate::phases::translation::sql::helpers::simple_select;
@@ -414,31 +415,13 @@ fn translate_comparison_value(
             *column,
         ),
         models::ComparisonValue::Scalar { value: json_value } => Ok((
-            sql::ast::Expression::Value(translate_json_value(&json_value)),
+            sql::ast::Expression::Value(values::translate_json_value(&json_value)?),
             vec![],
         )),
         models::ComparisonValue::Variable { name: var } => Ok((
             sql::ast::Expression::Value(sql::ast::Value::Variable(var)),
             vec![],
         )),
-    }
-}
-
-/// Convert a JSON value into a SQL value.
-fn translate_json_value(value: &serde_json::Value) -> sql::ast::Value {
-    match value {
-        serde_json::Value::Number(num) => {
-            sql::ast::Value::Int4(num.as_i64().unwrap().try_into().unwrap())
-        }
-        serde_json::Value::Bool(b) => sql::ast::Value::Bool(*b),
-        serde_json::Value::String(s) => sql::ast::Value::String(s.to_string()),
-        serde_json::Value::Array(items) => {
-            let inner_values: Vec<sql::ast::Value> =
-                items.iter().map(translate_json_value).collect();
-            sql::ast::Value::Array(inner_values)
-        }
-        // dummy
-        _ => sql::ast::Value::Bool(true),
     }
 }
 

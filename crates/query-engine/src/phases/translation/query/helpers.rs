@@ -23,8 +23,15 @@ pub struct State {
 struct NativeQueries {
     /// native queries that receive different arguments should result in different CTEs,
     /// and be used via a AliasedTable in the query.
-    native_queries: Vec<(metadata::NativeQueryInfo, sql::ast::TableAlias)>,
+    native_queries: Vec<NativeQueryInfo>,
     index: usize,
+}
+
+/// Information we store about a native query call.
+pub struct NativeQueryInfo {
+    pub info: metadata::NativeQueryInfo,
+    pub arguments: BTreeMap<String, models::Argument>,
+    pub alias: sql::ast::TableAlias,
 }
 
 /// For the root table in the query, and for the current table we are processing,
@@ -159,7 +166,7 @@ impl State {
     }
 
     /// Fetch the tracked native queries used in the query plan and their table alias.
-    pub fn get_native_queries(self) -> Vec<(metadata::NativeQueryInfo, sql::ast::TableAlias)> {
+    pub fn get_native_queries(self) -> Vec<NativeQueryInfo> {
         self.native_queries.native_queries
     }
 }
@@ -177,12 +184,16 @@ impl NativeQueries {
         &mut self,
         name: String,
         info: metadata::NativeQueryInfo,
-        _arguments: BTreeMap<String, models::Argument>,
+        arguments: BTreeMap<String, models::Argument>,
     ) -> sql::ast::TableName {
         let index = self.index;
         self.index += 1;
         let alias = sql::helpers::make_native_query_table_alias(index, &name);
-        self.native_queries.push((info, alias.clone()));
+        self.native_queries.push(NativeQueryInfo {
+            info,
+            arguments,
+            alias: alias.clone(),
+        });
         sql::ast::TableName::AliasedTable(alias)
     }
 }

@@ -1,0 +1,33 @@
+---
+source: crates/query-engine/tests/tests.rs
+expression: result
+---
+WITH "%NATIVE_QUERY_0_FOR_artist_by_name" AS (
+  SELECT
+    *
+  FROM
+    public."Artist"
+  WHERE
+    "Name" = $1
+)
+SELECT
+  row_to_json("universe") AS "universe"
+FROM
+  (
+    SELECT
+      *
+    FROM
+      (
+        SELECT
+          coalesce(json_agg(row_to_json("rows")), '[]') AS "rows"
+        FROM
+          (
+            SELECT
+              "artist_by_name"."ArtistId" AS "Id"
+            FROM
+              "%NATIVE_QUERY_0_FOR_artist_by_name" AS "artist_by_name"
+          ) AS "rows"
+      ) AS "rows"
+  ) AS "universe"
+
+[(1, String("Rush"))]

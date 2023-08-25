@@ -1,6 +1,7 @@
 //! Handle stuff related to relationships and joins.
 
 use ndc_hub::models;
+use std::collections::BTreeMap;
 
 use super::error::Error;
 use super::helpers::{Env, RootAndCurrentTables, State, TableNameAndReference};
@@ -22,8 +23,12 @@ pub fn translate_joins(
             let relationship = env.lookup_relationship(&relationship_name)?;
 
             // create a from clause and get a reference of inner query.
-            let (target_collection, from_clause) =
-                root::make_from_clause_and_reference(&relationship.target_collection, env, state)?;
+            let (target_collection, from_clause) = root::make_from_clause_and_reference(
+                &relationship.target_collection,
+                &BTreeMap::new(),
+                env,
+                state,
+            )?;
 
             // process inner query and get the SELECTs for the 'rows' and 'aggregates' fields.
             let select_set =

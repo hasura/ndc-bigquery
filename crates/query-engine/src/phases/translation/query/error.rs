@@ -6,6 +6,7 @@ pub enum Error {
     CollectionNotFound(String),
     ColumnNotFoundInCollection(String, String),
     RelationshipNotFound(String),
+    ArgumentNotFound(String),
     EmptyPathForStarCountAggregate,
     NoFields,
     NotSupported(String),
@@ -25,6 +26,9 @@ impl std::fmt::Display for Error {
             ),
             Error::RelationshipNotFound(relationship_name) => {
                 write!(f, "Relationship '{}' not found.", relationship_name)
+            }
+            Error::ArgumentNotFound(argument) => {
+                write!(f, "Argument '{}' not found.", argument)
             }
             Error::NotSupported(thing) => {
                 write!(f, "Queries containing {} are not supported.", thing)

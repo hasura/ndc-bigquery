@@ -116,8 +116,24 @@ fn sorting_by_nested_relationship_count() {
     insta::assert_snapshot!(result);
 }
 
-#[test]
-fn select_native_query() {
-    let result = common::test_translation("select_native_query").unwrap();
-    insta::assert_snapshot!(result);
+mod native_queries {
+    use crate::common;
+
+    #[test]
+    fn select_artist() {
+        let result = common::test_translation("native_queries/select_artist").unwrap();
+        insta::assert_snapshot!(result);
+    }
+
+    #[test]
+    fn select_artist_by_id() {
+        let result = common::test_translation("native_queries/select_artist_by_id").unwrap();
+        insta::assert_snapshot!(result);
+    }
+
+    #[test]
+    fn select_artist_by_name() {
+        let result = common::test_translation("native_queries/select_artist_by_name").unwrap();
+        insta::assert_snapshot!(result);
+    }
 }

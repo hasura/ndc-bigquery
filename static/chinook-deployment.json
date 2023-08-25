@@ -583,6 +583,25 @@
             "type": "String"
           }
         }
+      },
+      "artist_by_id": {
+        "sql": "SELECT * FROM public.\"Artist\" WHERE \"ArtistId\" = {{id}}",
+        "columns": {
+          "ArtistId": {
+            "name": "ArtistId",
+            "type": "Int"
+          },
+          "Name": {
+            "name": "Name",
+            "type": "String"
+          }
+        },
+        "arguments": {
+          "id": {
+            "name": "id",
+            "type": "Int"
+          }
+        }
       }
 	}
   },

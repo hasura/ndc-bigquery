@@ -8,6 +8,7 @@ mod native_queries;
 mod relationships;
 mod root;
 mod sorting;
+mod values;
 
 use ndc_hub::models;
 
@@ -23,8 +24,12 @@ pub fn translate(
 ) -> Result<sql::execution_plan::ExecutionPlan, Error> {
     let env = Env::new(metadata.clone(), query_request.collection_relationships);
     let mut state = State::new();
-    let (current_table, from_clause) =
-        root::make_from_clause_and_reference(&query_request.collection, &env, &mut state)?;
+    let (current_table, from_clause) = root::make_from_clause_and_reference(
+        &query_request.collection,
+        &query_request.arguments,
+        &env,
+        &mut state,
+    )?;
 
     let select_set = translate_query(
         &env,
@@ -48,7 +53,7 @@ pub fn translate(
 
     // add native queries if there are any
     json_select.with = sql::ast::With {
-        common_table_expressions: native_queries::translate(state),
+        common_table_expressions: native_queries::translate(state)?,
     };
 
     // log and return
