@@ -3,8 +3,41 @@ on: [push]
 name: Postgres NDC tests
 
 jobs:
-  test:
-    name: Test Postgres NDC
+  test-query-engine:
+    name: Test query-engine
+    runs-on: ubuntu-latest
+    env:
+      CARGO_NET_GIT_FETCH_WITH_CLI: "true"
+      RUSTFLAGS: "-D warnings" # fail on warnings
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: install tools
+        run: |
+          rustup show
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: run tests
+        run: |
+          cargo test --release -p query-engine
+        env:
+          RUST_LOG: INFO
+
+      # scream into Slack if something goes wrong
+      - name: report status
+        if: github.ref == 'refs/heads/main'
+        uses: ravsamhq/notify-slack-action@v2
+        with:
+          status: ${{ job.status }}
+          notify_when: failure
+          notification_title: '😧 Error on <{repo_url}|{repo}>'
+          message_format: '🐴 *{workflow}* {status_message} for <{repo_url}|{repo}>'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.BROKEN_BUILD_SLACK_WEBHOOK_URL }}
+
+  test-postgres-ndc:
+    name: Test ndc-postgres
     runs-on: ubuntu-latest
     env:
       CARGO_NET_GIT_FETCH_WITH_CLI: "true"
@@ -23,10 +56,6 @@ jobs:
 
       - uses: Swatinem/rust-cache@v2
 
-      - name: build crates
-        run: |
-          cargo build --all-targets
-
       - name: start dependencies
         uses: isbang/compose-action@v1.5.1
         with:
@@ -37,7 +66,7 @@ jobs:
 
       - name: run tests
         run: |
-          cargo test --release --workspace --exclude=e2e-tests
+          cargo test --release -p ndc-postgres
         env:
           POSTGRESQL_CONNECTION_STRING: postgresql://postgres:password@localhost:64002
           RUST_LOG: INFO
