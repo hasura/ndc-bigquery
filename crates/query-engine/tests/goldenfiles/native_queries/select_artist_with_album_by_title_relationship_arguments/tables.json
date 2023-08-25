@@ -1,0 +1,45 @@
+{
+  "native_queries": {
+    "artist": {
+      "sql": "SELECT * FROM public.\"Artist\"",
+      "columns": {
+        "ArtistId": {
+          "name": "ArtistId",
+          "type": "Int"
+        },
+        "Name": {
+          "name": "Name",
+          "type": "String"
+        }
+      },
+      "arguments": {}
+    },
+    "album_by_title": {
+      "sql": "SELECT * FROM public.\"Album\" WHERE \"Title\" LIKE {{title}} AND \"AlbumId\" < {{id}}",
+      "columns": {
+        "AlbumId": {
+          "name": "AlbumId",
+          "type": "Int"
+        },
+        "Title": {
+          "name": "Title",
+          "type": "String"
+        },
+        "ArtistId": {
+          "name": "ArtistId",
+          "type": "Int"
+        }
+      },
+      "arguments": {
+        "id": {
+          "name": "id",
+          "type": "Int"
+        },
+        "title": {
+          "name": "title",
+          "type": "String"
+        }
+      }
+    }
+  }
+}

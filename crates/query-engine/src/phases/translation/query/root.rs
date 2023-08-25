@@ -56,7 +56,7 @@ pub fn translate_rows_query(
     let collection_info = env.lookup_collection(&current_table.name)?;
 
     // join aliases
-    let mut join_fields: Vec<(sql::ast::TableAlias, String, models::Query)> = vec![];
+    let mut join_fields: Vec<relationships::JoinFieldInfo> = vec![];
 
     // translate fields to select list
     let fields = query.fields.clone().ok_or(Error::NoFields)?;
@@ -82,7 +82,7 @@ pub fn translate_rows_query(
             models::Field::Relationship {
                 query,
                 relationship,
-                ..
+                arguments,
             } => {
                 let table_alias = sql::helpers::make_table_alias(alias.clone());
                 let column_alias = sql::helpers::make_column_alias(alias);
@@ -90,7 +90,12 @@ pub fn translate_rows_query(
                     table: sql::ast::TableName::AliasedTable(table_alias.clone()),
                     name: column_alias.clone(),
                 };
-                join_fields.push((table_alias, relationship, *query));
+                join_fields.push(relationships::JoinFieldInfo {
+                    alias: table_alias,
+                    relationship_name: relationship,
+                    arguments,
+                    query: *query,
+                });
                 Ok((column_alias, sql::ast::Expression::ColumnName(column_name)))
             }
         })
@@ -124,7 +129,7 @@ fn translate_query_part(
     current_table: &TableNameAndReference,
     query: &models::Query,
     columns: Vec<(sql::ast::ColumnAlias, sql::ast::Expression)>,
-    join_fields: Vec<(sql::ast::TableAlias, String, models::Query)>,
+    join_fields: Vec<relationships::JoinFieldInfo>,
 ) -> Result<sql::ast::Select, Error> {
     let root_table = current_table.clone();
 

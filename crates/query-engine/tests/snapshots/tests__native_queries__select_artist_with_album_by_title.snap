@@ -1,0 +1,70 @@
+---
+source: crates/query-engine/tests/tests.rs
+expression: result
+---
+WITH "%NATIVE_QUERY_0_FOR_artist" AS (
+  SELECT
+    *
+  FROM
+    public."Artist"
+),
+"%NATIVE_QUERY_1_FOR_album_by_title" AS (
+  SELECT
+    *
+  FROM
+    public."Album"
+  WHERE
+    "Title" LIKE $1
+)
+SELECT
+  row_to_json("universe") AS "universe"
+FROM
+  (
+    SELECT
+      *
+    FROM
+      (
+        SELECT
+          coalesce(json_agg(row_to_json("rows")), '[]') AS "rows"
+        FROM
+          (
+            SELECT
+              "artist"."Name" AS "Name",
+              "Albums"."Albums" AS "Albums"
+            FROM
+              "%NATIVE_QUERY_0_FOR_artist" AS "artist"
+              LEFT OUTER JOIN LATERAL (
+                SELECT
+                  row_to_json("Albums") AS "Albums"
+                FROM
+                  (
+                    SELECT
+                      *
+                    FROM
+                      (
+                        SELECT
+                          coalesce(json_agg(row_to_json("rows")), '[]') AS "rows"
+                        FROM
+                          (
+                            SELECT
+                              "album_by_title"."Title" AS "title"
+                            FROM
+                              "%NATIVE_QUERY_1_FOR_album_by_title" AS "album_by_title"
+                            WHERE
+                              (
+                                true
+                                AND (
+                                  "artist"."ArtistId" = "album_by_title"."ArtistId"
+                                )
+                              )
+                          ) AS "rows"
+                      ) AS "rows"
+                  ) AS "Albums"
+              ) AS "Albums" ON ('true')
+            LIMIT
+              5
+          ) AS "rows"
+      ) AS "rows"
+  ) AS "universe"
+
+[(1, String("%Rock%"))]

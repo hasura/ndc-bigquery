@@ -9,31 +9,63 @@ use super::helpers::{Env, RootAndCurrentTables, State, TableNameAndReference};
 use super::root;
 use crate::phases::translation::sql;
 
+pub struct JoinFieldInfo {
+    pub alias: sql::ast::TableAlias,
+    pub relationship_name: String,
+    pub arguments: BTreeMap<String, models::RelationshipArgument>,
+    pub query: models::Query,
+}
+
 /// translate any joins we should include in the query into our SQL AST
 pub fn translate_joins(
     env: &Env,
     state: &mut State,
     root_and_current_tables: &RootAndCurrentTables,
     // We got these by processing the fields selection.
-    join_fields: Vec<(sql::ast::TableAlias, String, models::Query)>,
+    join_fields: Vec<JoinFieldInfo>,
 ) -> Result<Vec<sql::ast::Join>, Error> {
     // traverse and build a join.
     join_fields
         .into_iter()
-        .map(|(alias, relationship_name, query)| {
-            let relationship = env.lookup_relationship(&relationship_name)?;
+        .map(|join_field| {
+            let relationship = env.lookup_relationship(&join_field.relationship_name)?;
+            // these are arguments defined in the relationship definition.
+            let relationship_arguments: BTreeMap<String, models::Argument> = relationship
+                .arguments
+                .clone()
+                .into_iter()
+                .map(|(key, argument)| {
+                    Ok((key, relationship_argument_to_argument(argument.clone())?))
+                })
+                .collect::<Result<BTreeMap<String, models::Argument>, Error>>()?;
+
+            // these are arguments defined when calling the relationship.
+            let caller_arguments: BTreeMap<String, models::Argument> = join_field
+                .arguments
+                .into_iter()
+                .map(|(key, argument)| Ok((key, relationship_argument_to_argument(argument)?)))
+                .collect::<Result<BTreeMap<String, models::Argument>, Error>>()?;
+
+            let mut arguments = relationship_arguments;
+            // we assume that the caller arguments can override the relationship definition arguments.
+            arguments.extend(caller_arguments);
 
             // create a from clause and get a reference of inner query.
             let (target_collection, from_clause) = root::make_from_clause_and_reference(
                 &relationship.target_collection,
-                &BTreeMap::new(),
+                &arguments,
                 env,
                 state,
             )?;
 
             // process inner query and get the SELECTs for the 'rows' and 'aggregates' fields.
-            let select_set =
-                super::translate_query(env, state, &target_collection, &from_clause, query)?;
+            let select_set = super::translate_query(
+                env,
+                state,
+                &target_collection,
+                &from_clause,
+                join_field.query,
+            )?;
 
             // add join expressions to row / aggregate selects
             let final_select_set = match select_set {
@@ -101,8 +133,8 @@ pub fn translate_joins(
             // form a single JSON item shaped `{ rows: [], aggregates: {} }`
             // that matches the models::RowSet type
             let json_select = sql::helpers::select_rowset(
-                sql::helpers::make_column_alias(alias.name.clone()),
-                sql::helpers::make_table_alias(alias.name.clone()),
+                sql::helpers::make_column_alias(join_field.alias.name.clone()),
+                sql::helpers::make_table_alias(join_field.alias.name.clone()),
                 sql::helpers::make_table_alias("rows".to_string()),
                 sql::helpers::make_column_alias("rows".to_string()),
                 sql::helpers::make_table_alias("aggregates".to_string()),
@@ -113,7 +145,7 @@ pub fn translate_joins(
             Ok(sql::ast::Join::LeftOuterJoinLateral(
                 sql::ast::LeftOuterJoinLateral {
                     select: Box::new(json_select),
-                    alias,
+                    alias: join_field.alias,
                 },
             ))
         })
@@ -161,4 +193,18 @@ pub fn translate_column_mapping(
                 right: Box::new(op),
             })
         })
+}
+
+/// We don't support relationships column arguments yet, so for now we convert to a regular argument
+/// and throw an error on the column case. Will be fixed in the future.
+fn relationship_argument_to_argument(
+    argument: models::RelationshipArgument,
+) -> Result<models::Argument, Error> {
+    match argument {
+        models::RelationshipArgument::Literal { value } => Ok(models::Argument::Literal { value }),
+        models::RelationshipArgument::Variable { name } => Ok(models::Argument::Variable { name }),
+        models::RelationshipArgument::Column { .. } => Err(Error::NotSupported(
+            "relationship column arguments".to_string(),
+        )),
+    }
 }

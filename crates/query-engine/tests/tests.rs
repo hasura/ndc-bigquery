@@ -136,4 +136,20 @@ mod native_queries {
         let result = common::test_translation("native_queries/select_artist_by_name").unwrap();
         insta::assert_snapshot!(result);
     }
+
+    #[test]
+    fn select_artist_with_album_by_title() {
+        let result =
+            common::test_translation("native_queries/select_artist_with_album_by_title").unwrap();
+        insta::assert_snapshot!(result);
+    }
+
+    #[test]
+    fn select_artist_with_album_by_title_relationship_arguments() {
+        let result = common::test_translation(
+            "native_queries/select_artist_with_album_by_title_relationship_arguments",
+        )
+        .unwrap();
+        insta::assert_snapshot!(result);
+    }
 }
