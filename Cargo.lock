@@ -1318,6 +1318,7 @@ dependencies = [
  "serde_json",
  "similar-asserts",
  "sqlx",
+ "tests-common",
  "thiserror",
  "tokio",
  "tracing",
@@ -2657,6 +2658,20 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "be55cf8942feac5c765c2c993422806843c9a9a45d4d5c407ad6dd2ea95eb9b6"
 dependencies = [
  "winapi-util",
+]
+
+[[package]]
+name = "tests-common"
+version = "0.1.0"
+dependencies = [
+ "axum",
+ "axum-test-helper",
+ "ndc-sdk",
+ "reqwest",
+ "serde",
+ "serde_derive",
+ "serde_json",
+ "tracing",
 ]
 
 [[package]]

@@ -10,7 +10,7 @@ use similar_asserts::assert_eq;
 
 use ndc_postgres::configuration;
 
-use crate::common::get_deployment_file;
+use tests_common::deployment::get_deployment_file;
 
 const POSTGRESQL_CONNECTION_STRING: &str = "postgresql://postgres:password@localhost:64002";
 const CHINOOK_DEPLOYMENT_PATH: &str = "static/chinook-deployment.json";

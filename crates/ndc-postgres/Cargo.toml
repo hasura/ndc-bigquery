@@ -31,6 +31,7 @@ thiserror = "1.0"
 [dev-dependencies]
 ndc-client = { git = "https://github.com/hasura/ndc-spec.git" }
 ndc-test = { git = "https://github.com/hasura/ndc-spec.git" }
+tests-common = { path = "../tests-common" }
 
 axum = "0.6.19"
 axum-test-helper = "0.3.0"

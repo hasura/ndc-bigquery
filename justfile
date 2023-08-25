@@ -160,7 +160,7 @@ format-check:
 
 # Format all json test files
 format-tests:
-  ./scripts/format-with-jq.sh crates/ndc-postgres/tests/goldenfiles/*.json
+  ./scripts/format-with-jq.sh crates/tests-common/goldenfiles/*.json
   ./scripts/format-with-jq.sh crates/query-engine/tests/goldenfiles/*/*.json
   ./scripts/format-with-jq.sh crates/query-engine/tests/goldenfiles/*/*/*.json
 

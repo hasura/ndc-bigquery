@@ -6,4 +6,5 @@ members = [
   "crates/e2e-tests",
   "crates/ndc-postgres",
   "crates/query-engine",
+  "crates/tests-common"
 ]
