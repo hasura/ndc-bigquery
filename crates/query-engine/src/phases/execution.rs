@@ -7,7 +7,7 @@ use sqlformat;
 use sqlx;
 use sqlx::Row;
 
-use ndc_hub::models;
+use ndc_sdk::models;
 
 use super::translation::sql;
 

@@ -14,7 +14,7 @@ name = "ndc-postgres"
 path = "bin/main.rs"
 
 [dependencies]
-ndc-hub = { git = "https://github.com/hasura/ndc-hub.git", tag = "v0.1.0-rc.1", package = "ndc-sdk" }
+ndc-sdk = { git = "https://github.com/hasura/ndc-hub.git", tag = "v0.1.0-rc.1" }
 query-engine = { path = "../query-engine" }
 
 async-trait = "0.1.73"

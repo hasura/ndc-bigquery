@@ -1,9 +1,12 @@
 //! Metrics setup and update for our connector.
+//!
+use std::time::Duration;
+
+use prometheus::core::{AtomicF64, AtomicI64, AtomicU64, GenericCounter, GenericGauge};
+
+use ndc_sdk::connector;
 
 use super::configuration::InitializationError;
-use ndc_hub::connector;
-use prometheus::core::{AtomicF64, AtomicI64, AtomicU64, GenericCounter, GenericGauge};
-use std::time::Duration;
 
 #[derive(Debug, Clone)]
 pub struct Metrics {

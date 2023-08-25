@@ -1,7 +1,8 @@
 //! Handle stuff related to relationships and joins.
 
-use ndc_hub::models;
 use std::collections::BTreeMap;
+
+use ndc_sdk::models;
 
 use super::error::Error;
 use super::helpers::{Env, RootAndCurrentTables, State, TableNameAndReference};

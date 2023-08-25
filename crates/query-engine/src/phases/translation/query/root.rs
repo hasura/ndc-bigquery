@@ -1,9 +1,10 @@
 //! Handle 'rows' and 'aggregates' translation.
 
-use indexmap::IndexMap;
 use std::collections::BTreeMap;
 
-use ndc_hub::models;
+use indexmap::IndexMap;
+
+use ndc_sdk::models;
 
 use super::aggregates;
 use super::error::Error;

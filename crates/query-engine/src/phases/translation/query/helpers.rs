@@ -1,10 +1,12 @@
 //! Helpers for processing the QueryRequest and building SQL.
 
+use std::collections::BTreeMap;
+
+use ndc_sdk::models;
+
 use crate::metadata;
 use crate::phases::translation::query::error::Error;
 use crate::phases::translation::sql;
-use ndc_hub::models;
-use std::collections::BTreeMap;
 
 /// Static information from the query and metadata.
 pub struct Env {

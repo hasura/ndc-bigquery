@@ -6,16 +6,16 @@
 //! `super::configuration`.
 
 use async_trait::async_trait;
-use ndc_hub::connector;
-use ndc_hub::models;
+use tracing::{info_span, Instrument};
+
+use ndc_sdk::connector;
+use ndc_sdk::models;
 
 use super::configuration;
 use super::explain;
 use super::metrics;
 use super::query;
 use super::schema;
-
-use tracing::{info_span, Instrument};
 
 #[derive(Clone, Default)]
 pub struct Postgres {}

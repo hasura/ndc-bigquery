@@ -1,9 +1,10 @@
-use ndc_hub::connector;
-use ndc_hub::models;
+use tracing::{info_span, Instrument};
+
+use ndc_sdk::connector;
+use ndc_sdk::models;
+use query_engine::phases;
 
 use super::configuration;
-use query_engine::phases;
-use tracing::{info_span, Instrument};
 
 /// Execute a query
 ///

@@ -10,7 +10,7 @@ mod root;
 mod sorting;
 mod values;
 
-use ndc_hub::models;
+use ndc_sdk::models;
 
 use crate::metadata;
 use crate::phases::translation::query::helpers::{Env, State, TableNameAndReference};

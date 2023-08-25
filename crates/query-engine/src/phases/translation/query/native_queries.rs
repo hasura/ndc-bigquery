@@ -1,6 +1,6 @@
 //! Handle native queries translation after building the query.
 
-use ndc_hub::models;
+use ndc_sdk::models;
 
 use super::error::Error;
 use super::helpers::State;

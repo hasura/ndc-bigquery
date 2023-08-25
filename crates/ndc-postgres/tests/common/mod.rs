@@ -34,7 +34,7 @@ pub async fn run_explain(deployment_path: &str, testname: &str) -> ExactExplainR
 }
 
 /// Run a query against the server, get the result, and compare against the snapshot.
-pub async fn get_schema(deployment_path: &str) -> ndc_hub::models::SchemaResponse {
+pub async fn get_schema(deployment_path: &str) -> ndc_sdk::models::SchemaResponse {
     make_request(deployment_path, |client| client.get("/schema")).await
 }
 
@@ -93,12 +93,12 @@ pub async fn create_router(deployment_path: &str) -> axum::Router {
     let test_deployment_file = get_deployment_file(deployment_path);
 
     // initialise server state with the static configuration.
-    let state = ndc_hub::default_main::init_server_state::<connector::Postgres>(
+    let state = ndc_sdk::default_main::init_server_state::<connector::Postgres>(
         test_deployment_file.display().to_string(),
     )
     .await;
 
-    ndc_hub::default_main::create_router(state)
+    ndc_sdk::default_main::create_router(state)
 }
 
 /// Check if all keywords are contained in this vector of strings.

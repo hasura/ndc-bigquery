@@ -1,12 +1,14 @@
 //! Configuration and state for our connector.
 
-use super::metrics;
-use ndc_hub::connector;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use sqlx::postgres::{PgConnection, PgPool, PgPoolOptions};
 use sqlx::{Connection, Executor, Row};
 use thiserror::Error;
+
+use ndc_sdk::connector;
+
+use super::metrics;
 
 const CURRENT_VERSION: u32 = 1;
 const CONFIGURATION_QUERY: &str = include_str!("configuration.sql");

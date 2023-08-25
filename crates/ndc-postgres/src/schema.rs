@@ -1,7 +1,7 @@
 use std::collections::BTreeMap;
 
-use ndc_hub::connector;
-use ndc_hub::models;
+use ndc_sdk::connector;
+use ndc_sdk::models;
 
 use super::configuration;
 
