@@ -303,3 +303,34 @@ mod relationships {
         insta::assert_json_snapshot!(result);
     }
 }
+
+mod native_queries {
+    use super::common::create_router;
+    use super::run_query;
+
+    #[tokio::test]
+    async fn select_artist() {
+        let result = run_query(create_router().await, "native_queries/select_artist").await;
+        insta::assert_json_snapshot!(result);
+    }
+
+    #[tokio::test]
+    async fn select_artists_below_id() {
+        let result = run_query(
+            create_router().await,
+            "native_queries/select_artists_below_id",
+        )
+        .await;
+        insta::assert_json_snapshot!(result);
+    }
+
+    #[tokio::test]
+    async fn select_artist_with_album_by_title_relationship_arguments() {
+        let result = run_query(
+            create_router().await,
+            "native_queries/select_artist_with_album_by_title_relationship_arguments",
+        )
+        .await;
+        insta::assert_json_snapshot!(result);
+    }
+}

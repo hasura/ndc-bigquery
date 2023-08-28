@@ -584,8 +584,8 @@
           }
         }
       },
-      "artist_by_id": {
-        "sql": "SELECT * FROM public.\"Artist\" WHERE \"ArtistId\" = {{id}}",
+      "artist_below_id": {
+        "sql": "SELECT * FROM public.\"Artist\" WHERE \"ArtistId\" < {{id}}",
         "columns": {
           "ArtistId": {
             "name": "ArtistId",
@@ -600,6 +600,33 @@
           "id": {
             "name": "id",
             "type": "Int"
+          }
+        }
+      },
+      "album_by_title": {
+        "sql": "SELECT * FROM public.\"Album\" WHERE \"Title\" LIKE {{title}} AND \"AlbumId\" < {{id}}",
+        "columns": {
+          "AlbumId": {
+            "name": "AlbumId",
+            "type": "Int"
+          },
+          "Title": {
+            "name": "Title",
+            "type": "String"
+          },
+          "ArtistId": {
+            "name": "ArtistId",
+            "type": "Int"
+          }
+        },
+        "arguments": {
+          "id": {
+            "name": "id",
+            "type": "Int"
+          },
+          "title": {
+            "name": "title",
+            "type": "String"
           }
         }
       }
