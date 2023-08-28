@@ -37,8 +37,8 @@ create function pg_temp.data_type_to_scalar_type(information_schema.character_da
     end;
 
 select
-  tables, -- maps to `TableInfo`
-  aggregate_functions -- maps to `AggregateFunctions`
+  coalesce(tables, '{}'), -- maps to `TableInfo`
+  coalesce(aggregate_functions, '{}') -- maps to `AggregateFunctions`
 from
   (
     select
