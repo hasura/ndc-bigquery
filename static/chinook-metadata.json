@@ -227,7 +227,7 @@
     "kind": "modelSource",
     "modelName": "Artists",
     "dataSource": "db",
-    "table": "Artist",
+    "collection": "Artist",
     "typeMappings": {
       "Artist": {
         "fieldMappings": {
@@ -250,7 +250,7 @@
     "kind": "modelSource",
     "modelName": "Albums",
     "dataSource": "db",
-    "table": "Album",
+    "collection": "Album",
     "typeMappings": {
       "Album": {
         "fieldMappings": {
@@ -276,7 +276,7 @@
     "kind": "modelSource",
     "modelName": "Tracks",
     "dataSource": "db",
-    "table": "Track",
+    "collection": "Track",
     "typeMappings": {
       "Track": {
         "fieldMappings": {
@@ -296,7 +296,7 @@
   {
     "kind": "typeOutputPermissions",
     "typeName": "Artist",
-    "outputPermissions": {
+    "permissions": {
       "admin": {
         "fields": ["ArtistId", "Name"]
       }
@@ -305,7 +305,7 @@
   {
     "kind": "typeOutputPermissions",
     "typeName": "Album",
-    "outputPermissions": {
+    "permissions": {
       "admin": {
         "fields": ["AlbumId", "Title", "ArtistId"]
       }
@@ -314,7 +314,7 @@
   {
     "kind": "typeOutputPermissions",
     "typeName": "Track",
-    "outputPermissions": {
+    "permissions": {
       "admin": {
         "fields": ["TrackId", "Name", "AlbumId"]
       }
@@ -323,7 +323,7 @@
   {
     "kind": "modelSelectPermissions",
     "modelName": "Artists",
-    "selectPermissions": {
+    "permissions": {
       "admin": {
         "fields": ["ArtistId", "Name"]
       }
@@ -332,7 +332,7 @@
   {
     "kind": "modelSelectPermissions",
     "modelName": "Albums",
-    "selectPermissions": {
+    "permissions": {
       "admin": {
         "fields": ["AlbumId", "Title", "ArtistId"]
       }
@@ -341,7 +341,7 @@
   {
     "kind": "modelSelectPermissions",
     "modelName": "Tracks",
-    "selectPermissions": {
+    "permissions": {
       "admin": {
         "fields": ["TrackId", "Name", "AlbumId"]
       }
