@@ -34,13 +34,16 @@
           overlays = [ rust-overlay.overlays.default ];
         };
 
-        # Edit ./nix/postgres-agent.nix to adjust library and buildtime
+        # Edit ./nix/ndc-agent.nix to adjust library and buildtime
         # dependencies or other build configuration for postgres-agent
-        crateExpression = import ./nix/postgres-agent.nix;
+        crateExpression = import ./nix/ndc-agent.nix;
+
+        # cockroachExpression = import ./nix/cockroach-agent.nix;
         cargoBuild = import ./nix/cargo-build.nix;
 
         # Build for the architecture and OS that is running the build
         postgres-agent = cargoBuild {
+          binary-name = "ndc-postgres";
           inherit crateExpression nixpkgs crane rust-overlay localSystem;
         };
 
@@ -48,11 +51,31 @@
 
         postgres-agent-x86_64-linux = cargoBuild {
           inherit crateExpression nixpkgs crane rust-overlay localSystem;
+          binary-name = "ndc-postgres";
           crossSystem = "x86_64-linux";
         };
 
         postgres-agent-aarch64-linux = cargoBuild {
           inherit crateExpression nixpkgs crane rust-overlay localSystem;
+          binary-name = "ndc-postgres";
+          crossSystem = "aarch64-linux";
+        };
+
+        # Build for the architecture and OS that is running the build
+        cockroach-agent = cargoBuild {
+          binary-name = "ndc-cockroach";
+          inherit crateExpression nixpkgs crane rust-overlay localSystem;
+        };
+
+        cockroach-agent-x86_64-linux = cargoBuild {
+          inherit crateExpression nixpkgs crane rust-overlay localSystem;
+          binary-name = "ndc-cockroach";
+          crossSystem = "x86_64-linux";
+        };
+
+        cockroach-agent-aarch64-linux = cargoBuild {
+          inherit crateExpression nixpkgs crane rust-overlay localSystem;
+          binary-name = "ndc-cockroach";
           crossSystem = "aarch64-linux";
         };
       in
@@ -80,8 +103,6 @@
 
         packages = {
           default = postgres-agent;
-          postgres-agent-x86_64-linux = postgres-agent-x86_64-linux;
-          postgres-agent-aarch64-linux = postgres-agent-aarch64-linux;
 
           docker = pkgs.callPackage ./nix/docker.nix {
             ndc-agent = postgres-agent;
@@ -96,6 +117,11 @@
             tag = "dev";
           };
 
+          /* postgres ndc targets */
+          postgres-agent = postgres-agent;
+          postgres-agent-x86_64-linux = postgres-agent-x86_64-linux;
+          postgres-agent-aarch64-linux = postgres-agent-aarch64-linux;
+
           docker-postgres-x86_64-linux = pkgs.callPackage ./nix/docker.nix {
             ndc-agent = postgres-agent-x86_64-linux;
             architecture = "amd64";
@@ -108,6 +134,33 @@
             architecture = "arm64";
             binary-name = "ndc-postgres";
             image-name = "ghcr.io/hasura/postgres-agent-rs";
+          };
+
+          /* cockroach ndc targets */
+          cockroach-agent = cockroach-agent;
+          cockroach-agent-x86_64-linux = cockroach-agent-x86_64-linux;
+          cockroach-agent-aarch64-linux = cockroach-agent-aarch64-linux;
+
+          /* build Docker for Cockroach with whatever the local dev env is */
+          docker-cockroach-dev = pkgs.callPackage ./nix/docker.nix {
+            ndc-agent = cockroach-agent;
+            binary-name = "ndc-cockroach";
+            image-name = "ghcr.io/hasura/cockroach-agent-rs";
+            tag = "dev";
+          };
+
+          docker-cockroach-x86_64-linux = pkgs.callPackage ./nix/docker.nix {
+            ndc-agent = cockroach-agent-x86_64-linux;
+            architecture = "amd64";
+            binary-name = "ndc-cockroach";
+            image-name = "ghcr.io/hasura/cockroach-agent-rs";
+          };
+
+          docker-cockroach-aarch64-linux = pkgs.callPackage ./nix/docker.nix {
+            ndc-agent = cockroach-agent-aarch64-linux;
+            architecture = "arm64";
+            binary-name = "ndc-cockroach";
+            image-name = "ghcr.io/hasura/cockroach-agent-rs";
           };
 
           publish-docker-image = pkgs.writeShellApplication {

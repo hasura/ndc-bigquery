@@ -4,7 +4,10 @@ CONNECTOR_IMAGE_NAME := "ghcr.io/hasura/postgres-agent-rs"
 CONNECTOR_IMAGE_TAG := "dev"
 CONNECTOR_IMAGE := CONNECTOR_IMAGE_NAME + ":" + CONNECTOR_IMAGE_TAG
 POSTGRESQL_CONNECTION_STRING := "postgresql://postgres:password@localhost:64002"
-CHINOOK_DEPLOYMENT := "static/chinook-deployment.json"
+POSTGRES_CHINOOK_DEPLOYMENT := "static/chinook-deployment.json"
+
+COCKROACH_CHINOOK_DEPLOYMENT := "static/cockroach/chinook-deployment.json"
+COCKROACH_CONNECTION_STRING := "postgresql://postgres:password@localhost:64003"
 
 # Notes:
 # * Building Docker images will not work on macOS.
@@ -17,7 +20,7 @@ check: build lint format-check test
 # run the connector
 run: start-dependencies
   RUST_LOG=INFO \
-    cargo run --release -- serve --configuration {{CHINOOK_DEPLOYMENT}}
+    cargo run --release -- serve --configuration {{POSTGRES_CHINOOK_DEPLOYMENT}}
 
 # run the connector inside a Docker image
 run-in-docker: build-docker-with-nix start-dependencies
@@ -67,28 +70,40 @@ dev: start-dependencies
     OTEL_SERVICE_NAME=postgres-ndc \
     cargo watch -i "**/snapshots/*" \
     -c \
-    -x 'test --exclude e2e-tests --workspace' \
+    -x 'test --exclude ndc-cockroach e2e-tests --workspace' \
     -x clippy \
-    -x 'run -- serve --configuration {{CHINOOK_DEPLOYMENT}}'
+    -x 'run --bin ndc-postgres -- serve --configuration {{POSTGRES_CHINOOK_DEPLOYMENT}}'
+
+# watch the code, then test and re-run on changes
+dev-cockroach: start-cockroach-dependencies
+  RUST_LOG=INFO \
+    OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://localhost:4317 \
+    OTEL_SERVICE_NAME=cockroach-ndc \
+    cargo watch -i "**/snapshots/*" \
+    -c \
+    -x 'test -p query-engine' \
+    -x 'test -p ndc-cockroach' \
+    -x clippy \
+    -x 'run --bin ndc-cockroach -- serve --configuration {{COCKROACH_CHINOOK_DEPLOYMENT}}'
 
 # watch the code, and re-run on changes
 watch-run: start-dependencies
   RUST_LOG=DEBUG \
     cargo watch -i "tests/snapshots/*" \
     -c \
-    -x 'run -- serve --configuration {{CHINOOK_DEPLOYMENT}}'
+    -x 'run -- serve --configuration {{POSTGRES_CHINOOK_DEPLOYMENT}}'
 
 # Run ndc-postgres with rust-gdb.
 debug: start-dependencies
   cargo build
   RUST_LOG=DEBUG \
-    rust-gdb --args target/debug/ndc-postgres serve --configuration {{CHINOOK_DEPLOYMENT}}
+    rust-gdb --args target/debug/ndc-postgres serve --configuration {{POSTGRES_CHINOOK_DEPLOYMENT}}
 
 # Run the server and produce a flamegraph profile
 flamegraph: start-dependencies
   RUST_LOG=DEBUG \
     cargo flamegraph --dev -- \
-    serve --configuration {{CHINOOK_DEPLOYMENT}}
+    serve --configuration {{POSTGRES_CHINOOK_DEPLOYMENT}}
 
 # build everything
 build:
@@ -116,7 +131,7 @@ generate-chinook-configuration: build
     | jq --arg postgres_database_url '{{POSTGRESQL_CONNECTION_STRING}}' '. + {"postgres_database_url": $postgres_database_url}' \
     | curl -fsS http://localhost:9100 -H 'Content-Type: application/json' -d @- \
     | jq . \
-    > '{{CHINOOK_DEPLOYMENT}}'
+    > '{{POSTGRES_CHINOOK_DEPLOYMENT}}'
 
 # run postgres + jaeger
 start-dependencies:
@@ -124,6 +139,13 @@ start-dependencies:
   docker compose -f ../v3-engine/docker-compose.yaml up -d jaeger
   # start postgres
   docker compose up --wait postgres
+
+# run cockroach + jaeger
+start-cockroach-dependencies:
+  # start jaeger, configured to listen to V3
+  docker compose -f ../v3-engine/docker-compose.yaml up -d jaeger
+  # start cockroach
+  docker compose up --wait cockroach
 
 # run prometheus + grafana
 start-metrics:
@@ -167,9 +189,10 @@ format-tests:
   ./scripts/format-with-jq.sh crates/query-engine/tests/goldenfiles/*/*.json
   ./scripts/format-with-jq.sh crates/query-engine/tests/goldenfiles/*/*/*.json
 
-# check the nix build works
+# check the nix builds work
 build-with-nix:
-  nix build --print-build-logs
+  nix build '.#postgres-agent' --print-build-logs
+  nix build '.#cockroach-agent' --print-build-logs
 
 # check the docker build works
 build-docker-with-nix:
@@ -179,10 +202,19 @@ build-docker-with-nix:
     docker load < "$(nix build --no-link --print-out-paths '.#dockerDev')"
   fi
 
-# check the docker build works
+# check the Postgres arm64 docker build works
 build-arch64-docker-with-nix:
   #!/usr/bin/env bash
   if [[ '{{CONNECTOR_IMAGE_TAG}}' == 'dev' ]]; then
     echo 'nix build | docker load'
-    docker load < "$(nix build --no-link --print-out-paths '.#docker-postgres-aarch64-linux')"
+    docker load < "$(nix build --system aarch64-linux --no-link --print-out-paths '.#docker-postgres-aarch64-linux')"
   fi
+
+# check the Cockroach arm64 docker build works
+build-cockroach-arch64-docker-with-nix:
+  #!/usr/bin/env bash
+  if [[ '{{CONNECTOR_IMAGE_TAG}}' == 'dev' ]]; then
+    echo 'nix build | docker load'
+    docker load < "$(nix build --system aarch64-linux --no-link --print-out-paths '.#docker-cockroach-aarch64-linux')"
+  fi
+

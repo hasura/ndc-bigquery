@@ -27,6 +27,34 @@ services:
       timeout: 10s
       retries: 20
 
+  cockroach:
+    image: cockroachdb/cockroach:latest-v22.2
+    command:
+      - start-single-node
+      - --insecure
+      - --accept-sql-without-tls
+    init: true # doesn't shut down properly without this
+    ports:
+      - 64003:26257
+    environment:
+      COCKROACH_USER: "postgres"
+      COCKROACH_DATABASE: "password"
+    volumes:
+      - type: tmpfs
+        target: /cockroach/cockroach-data
+      - type: bind
+        source: ./static/chinook-postgres.sql
+        target: /docker-entrypoint-initdb.d/chinook-postgres.sql
+        read_only: true
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - cockroach sql --insecure --execute "select 1;"
+      start_period: 5s
+      interval: 5s
+      timeout: 10s
+      retries: 20
+
   prometheus:
     image: prom/prometheus
     container_name: prometheus

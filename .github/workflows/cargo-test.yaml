@@ -82,3 +82,50 @@ jobs:
           message_format: '🐴 *{workflow}* {status_message} for <{repo_url}|{repo}>'
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.BROKEN_BUILD_SLACK_WEBHOOK_URL }}
+
+  test-cockroach-ndc:
+    name: Test ndc-cockroach
+    runs-on: ubuntu-latest
+    env:
+      CARGO_NET_GIT_FETCH_WITH_CLI: "true"
+      RUSTFLAGS: "-D warnings" # fail on warnings
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: install protoc
+        uses: arduino/setup-protoc@v2
+        with:
+          version: "23.3"
+
+      - name: install tools
+        run: |
+          rustup show
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: start dependencies
+        uses: isbang/compose-action@v1.5.1
+        with:
+          compose-file: "./docker-compose.yaml"
+          down-flags: "--volumes"
+          services: |
+            cockroach
+
+      - name: run tests
+        run: |
+          cargo test --release -p ndc-cockroach
+        env:
+          POSTGRESQL_CONNECTION_STRING: postgresql://postgres:password@localhost:64003
+          RUST_LOG: INFO
+
+      # scream into Slack if something goes wrong
+      - name: report status
+        if: github.ref == 'refs/heads/main'
+        uses: ravsamhq/notify-slack-action@v2
+        with:
+          status: ${{ job.status }}
+          notify_when: failure
+          notification_title: '😧 Error on <{repo_url}|{repo}>'
+          message_format: '🐴 *{workflow}* {status_message} for <{repo_url}|{repo}>'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.BROKEN_BUILD_SLACK_WEBHOOK_URL }}

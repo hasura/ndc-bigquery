@@ -22,6 +22,7 @@
 , crane
 , rust-overlay
 , localSystem
+, binary-name
 , crossSystem ? localSystem
 }:
 
@@ -85,7 +86,7 @@ let
   # Call the given crateExpression to build the crate - or rather to get
   # a derivation that will build the crate.
   crate = pkgs.callPackage crateExpression {
-    inherit craneLib staticallyLinked;
+    inherit craneLib staticallyLinked binary-name;
   };
 in
 # Override the derivation to add cross-compilation and static linking environment variables.

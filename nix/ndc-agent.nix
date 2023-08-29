@@ -20,6 +20,7 @@
 , protobuf
 , stdenv
 , pkgsStatic
+, binary-name
 }:
 
 let
@@ -37,7 +38,7 @@ let
   buildArgs = {
     inherit src;
 
-    pname = "postgres-ndc";
+    pname = binary-name;
 
     buildInputs = [
       openssl
@@ -69,6 +70,7 @@ let
     (buildArgs // {
       inherit cargoArtifacts;
       doCheck = false;
+      cargoExtraArgs = "--locked --bin ${binary-name}";
     });
 in
 crate.overrideAttrs (prev: {
