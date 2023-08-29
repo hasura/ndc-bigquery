@@ -2,6 +2,7 @@ use std::collections::BTreeMap;
 
 use ndc_sdk::connector;
 use ndc_sdk::models;
+use query_engine::metadata;
 
 use super::configuration;
 
@@ -16,37 +17,48 @@ pub async fn get_schema(
         ..
     }: &configuration::DeploymentConfiguration,
 ) -> Result<models::SchemaResponse, connector::SchemaError> {
-    // TODO: Technically, we should list all scalar types regardless of
-    // whether or not they have associated aggregate functions. However, as
-    // we only deal with two for now, and we can guarantee that they always
-    // have aggregate functions, we don't need to worry about this quite
-    // yet.
-    let mut scalar_types: BTreeMap<String, models::ScalarType> = aggregate_functions
-        .0
-        .iter()
-        .map(|(scalar_type, aggregate_functions)| {
-            (
-                scalar_type.to_string(),
-                models::ScalarType {
-                    aggregate_functions: aggregate_functions
-                        .iter()
-                        .map(|(function_name, function_definition)| {
-                            (
-                                function_name.clone(),
-                                models::AggregateFunctionDefinition {
-                                    result_type: models::Type::Named {
-                                        name: function_definition.return_type.to_string(),
-                                    },
+    let mut scalar_types: BTreeMap<String, models::ScalarType> = enum_iterator::all::<
+        metadata::ScalarType,
+    >()
+    .map(|scalar_type| {
+        (
+            scalar_type.to_string(),
+            models::ScalarType {
+                aggregate_functions: aggregate_functions
+                    .0
+                    .get(&scalar_type)
+                    .unwrap_or(&BTreeMap::new())
+                    .iter()
+                    .map(|(function_name, function_definition)| {
+                        (
+                            function_name.clone(),
+                            models::AggregateFunctionDefinition {
+                                result_type: models::Type::Named {
+                                    name: function_definition.return_type.to_string(),
                                 },
-                            )
-                        })
-                        .collect(),
-                    comparison_operators: BTreeMap::new(),
-                    update_operators: BTreeMap::new(),
-                },
-            )
-        })
-        .collect();
+                            },
+                        )
+                    })
+                    .collect(),
+                comparison_operators: scalar_type
+                    .comparison_operators()
+                    .into_iter()
+                    .map(|operator| {
+                        (
+                            operator.to_string(),
+                            models::ComparisonOperatorDefinition {
+                                argument_type: models::Type::Named {
+                                    name: operator.rhs_argument_type(scalar_type).to_string(),
+                                },
+                            },
+                        )
+                    })
+                    .collect(),
+                update_operators: BTreeMap::new(),
+            },
+        )
+    })
+    .collect();
 
     // Used for types we don't yet support
     scalar_types.insert(

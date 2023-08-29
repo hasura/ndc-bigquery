@@ -167,19 +167,18 @@ pub enum UnaryOperator {
     IsNull,
 }
 
-// we should consider at least the list in `Hasura.Backends.Postgres.Translate.BoolExp`
-// have skipped column checks for now, ie, CEQ, CNE, CGT etc
-// have skipped casts for now
-// we'd like to remove all the Not variants internally, but first we'll check there are no
-// performance implications
-#[derive(Debug, Clone, PartialEq, Eq)]
+// We are almost certainly missing operators:
+//   * we should consider at least the list in `Hasura.Backends.Postgres.Translate.BoolExp`
+//   * we have skipped column checks for now, ie, CEQ, CNE, CGT etc
+//   * we have skipped casts for now
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BinaryOperator {
     Equals,
     NotEquals,
-    GreaterThan,
     LessThan,
-    GreaterThanOrEqualTo,
     LessThanOrEqualTo,
+    GreaterThan,
+    GreaterThanOrEqualTo,
     Like,
     NotLike,
     CaseInsensitiveLike,

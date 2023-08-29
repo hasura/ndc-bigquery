@@ -4,6 +4,7 @@ use ndc_sdk::models;
 
 use super::error::Error;
 use super::helpers::{CollectionInfo, Env, RootAndCurrentTables, State, TableNameAndReference};
+use super::operators;
 use super::relationships;
 use super::values;
 use crate::metadata;
@@ -95,35 +96,7 @@ pub fn translate_expression(
             Ok((
                 sql::ast::Expression::BinaryOperator {
                     left: Box::new(left),
-                    operator: match *operator {
-                        models::BinaryComparisonOperator::Equal => sql::ast::BinaryOperator::Equals,
-                        models::BinaryComparisonOperator::Other { name } =>
-                        // The strings we're matching against here (ie 'like')
-                        // are best guesses for now. We will need to update
-                        // these as we discover more.
-                        // We need to keep these in sync with documentation.
-                        {
-                            match name.as_str() {
-                                "eq" => sql::ast::BinaryOperator::Equals,
-                                "neq" => sql::ast::BinaryOperator::NotEquals,
-                                "lt" => sql::ast::BinaryOperator::LessThan,
-                                "lte" => sql::ast::BinaryOperator::LessThanOrEqualTo,
-                                "gt" => sql::ast::BinaryOperator::GreaterThan,
-                                "gte" => sql::ast::BinaryOperator::GreaterThanOrEqualTo,
-                                "like" => sql::ast::BinaryOperator::Like,
-                                "nlike" => sql::ast::BinaryOperator::NotLike,
-                                "ilike" => sql::ast::BinaryOperator::CaseInsensitiveLike,
-                                "nilike" => sql::ast::BinaryOperator::NotCaseInsensitiveLike,
-                                "similar" => sql::ast::BinaryOperator::Similar,
-                                "nsimilar" => sql::ast::BinaryOperator::NotSimilar,
-                                "regex" => sql::ast::BinaryOperator::Regex,
-                                "nregex" => sql::ast::BinaryOperator::NotRegex,
-                                "iregex" => sql::ast::BinaryOperator::CaseInsensitiveRegex,
-                                "niregex" => sql::ast::BinaryOperator::NotCaseInsensitiveRegex,
-                                _ => sql::ast::BinaryOperator::Equals,
-                            }
-                        }
-                    },
+                    operator: operators::translate_operator(operator.as_ref())?,
                     right: Box::new(right),
                 },
                 joins,

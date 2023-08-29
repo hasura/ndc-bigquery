@@ -1,10 +1,12 @@
 //! Translate an incoming `QueryRequest`.
 
-mod aggregates;
 pub mod error;
+
+mod aggregates;
 mod filtering;
 mod helpers;
 mod native_queries;
+mod operators;
 mod relationships;
 mod root;
 mod sorting;

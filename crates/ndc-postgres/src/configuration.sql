@@ -13,7 +13,8 @@
 -- We therefore make a set of assumptions about these. We may wish to rewrite
 -- this using the `pg_catalog` tables instead.
 
--- this is a temporary function for mapping SQL data types to GraphQL scalar types
+-- This is a temporary function for mapping SQL data types to GraphQL scalar types.
+-- When updating this, update the documentation accordingly.
 create function pg_temp.data_type_to_scalar_type(information_schema.character_data)
   returns varchar
   language sql

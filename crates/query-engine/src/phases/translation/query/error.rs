@@ -7,6 +7,7 @@ pub enum Error {
     ColumnNotFoundInCollection(String, String),
     RelationshipNotFound(String),
     ArgumentNotFound(String),
+    OperatorNotFound(String),
     EmptyPathForStarCountAggregate,
     NoFields,
     NotSupported(String),
@@ -29,6 +30,9 @@ impl std::fmt::Display for Error {
             }
             Error::ArgumentNotFound(argument) => {
                 write!(f, "Argument '{}' not found.", argument)
+            }
+            Error::OperatorNotFound(operator) => {
+                write!(f, "Operator '{}' not found.", operator)
             }
             Error::NotSupported(thing) => {
                 write!(f, "Queries containing {} are not supported.", thing)
