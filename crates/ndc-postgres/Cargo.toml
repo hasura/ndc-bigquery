@@ -14,7 +14,7 @@ name = "ndc-postgres"
 path = "bin/main.rs"
 
 [dependencies]
-ndc-sdk = { git = "https://github.com/hasura/ndc-hub.git", tag = "v0.1.0-rc.1" }
+ndc-sdk = { git = "https://github.com/hasura/ndc-hub.git", rev = "ab0585d", package = "ndc-sdk" }
 query-engine = { path = "../query-engine" }
 
 async-trait = "0.1.73"
@@ -29,8 +29,8 @@ prometheus = "0.13.3"
 thiserror = "1.0"
 
 [dev-dependencies]
-ndc-client = { git = "https://github.com/hasura/ndc-spec.git" }
-ndc-test = { git = "https://github.com/hasura/ndc-spec.git" }
+ndc-client = { git = "https://github.com/hasura/ndc-spec.git", tag = "v0.1.0-rc.2" }
+ndc-test = { git = "https://github.com/hasura/ndc-spec.git" ,tag = "v0.1.0-rc.2" }
 tests-common = { path = "../tests-common" }
 
 axum = "0.6.19"
