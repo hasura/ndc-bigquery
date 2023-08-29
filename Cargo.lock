@@ -1282,11 +1282,11 @@ dependencies = [
 [[package]]
 name = "ndc-client"
 version = "0.1.0"
-source = "git+https://github.com/hasura/ndc-spec.git#fef9e27c20b29ee52f6fe918414e27c3290b3cd7"
+source = "git+https://github.com/hasura/ndc-spec.git#5a6ee92c2756d7359bfe835eb3b477cb1ee5da23"
 dependencies = [
  "async-trait",
  "indexmap 1.9.3",
- "opentelemetry 0.18.0",
+ "opentelemetry 0.20.0",
  "reqwest",
  "schemars",
  "serde",
@@ -1355,7 +1355,7 @@ dependencies = [
 [[package]]
 name = "ndc-test"
 version = "0.1.0"
-source = "git+https://github.com/hasura/ndc-spec.git#fef9e27c20b29ee52f6fe918414e27c3290b3cd7"
+source = "git+https://github.com/hasura/ndc-spec.git#5a6ee92c2756d7359bfe835eb3b477cb1ee5da23"
 dependencies = [
  "clap",
  "indexmap 1.9.3",
