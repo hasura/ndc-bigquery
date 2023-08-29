@@ -80,8 +80,8 @@ See [architecture.md](./architecture.md).
 
 ## Write a database execution test
 
-1. Create a new file under `crates/ndc-postgres/tests/goldenfiles/<your-test-name>.json`
-2. Create a new test in `crates/ndc-postgres/tests/tests.rs` that looks like this:
+1. Create a new file under `crates/tests-common/goldenfiles/<your-test-name>.json`
+2. Create a new test in `crates/ndc-postgres/tests/query_tests.rs` that looks like this:
    ```rs
    #[tokio::test]
    async fn select_5() {
