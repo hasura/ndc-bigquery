@@ -316,6 +316,7 @@ impl BinaryOperator {
     pub fn to_sql(&self, sql: &mut SQL) {
         match self {
             BinaryOperator::Equals => sql.append_syntax(" = "),
+            BinaryOperator::NotEquals => sql.append_syntax(" <> "),
             BinaryOperator::GreaterThan => sql.append_syntax(" > "),
             BinaryOperator::GreaterThanOrEqualTo => sql.append_syntax(" >= "),
             BinaryOperator::LessThan => sql.append_syntax(" < "),

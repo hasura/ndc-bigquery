@@ -29,6 +29,18 @@ mod predicates {
     use super::run_query;
 
     #[tokio::test]
+    async fn select_where_name_eq() {
+        let result = run_query(create_router().await, "select_where_name_eq").await;
+        insta::assert_json_snapshot!(result);
+    }
+
+    #[tokio::test]
+    async fn select_where_name_neq() {
+        let result = run_query(create_router().await, "select_where_name_neq").await;
+        insta::assert_json_snapshot!(result);
+    }
+
+    #[tokio::test]
     async fn select_where_name_like() {
         let result = run_query(create_router().await, "select_where_name_like").await;
         insta::assert_json_snapshot!(result);

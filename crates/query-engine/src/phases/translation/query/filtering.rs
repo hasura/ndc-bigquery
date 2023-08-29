@@ -98,10 +98,18 @@ pub fn translate_expression(
                     operator: match *operator {
                         models::BinaryComparisonOperator::Equal => sql::ast::BinaryOperator::Equals,
                         models::BinaryComparisonOperator::Other { name } =>
-                        // the strings we're matching against here (ie 'like') are best guesses for now, will
-                        // need to update these as find out more
+                        // The strings we're matching against here (ie 'like')
+                        // are best guesses for now. We will need to update
+                        // these as we discover more.
+                        // We need to keep these in sync with documentation.
                         {
-                            match &*name {
+                            match name.as_str() {
+                                "eq" => sql::ast::BinaryOperator::Equals,
+                                "neq" => sql::ast::BinaryOperator::NotEquals,
+                                "lt" => sql::ast::BinaryOperator::LessThan,
+                                "lte" => sql::ast::BinaryOperator::LessThanOrEqualTo,
+                                "gt" => sql::ast::BinaryOperator::GreaterThan,
+                                "gte" => sql::ast::BinaryOperator::GreaterThanOrEqualTo,
                                 "like" => sql::ast::BinaryOperator::Like,
                                 "nlike" => sql::ast::BinaryOperator::NotLike,
                                 "ilike" => sql::ast::BinaryOperator::CaseInsensitiveLike,
@@ -112,10 +120,6 @@ pub fn translate_expression(
                                 "nregex" => sql::ast::BinaryOperator::NotRegex,
                                 "iregex" => sql::ast::BinaryOperator::CaseInsensitiveRegex,
                                 "niregex" => sql::ast::BinaryOperator::NotCaseInsensitiveRegex,
-                                "lt" => sql::ast::BinaryOperator::LessThan,
-                                "lte" => sql::ast::BinaryOperator::LessThanOrEqualTo,
-                                "gt" => sql::ast::BinaryOperator::GreaterThan,
-                                "gte" => sql::ast::BinaryOperator::GreaterThanOrEqualTo,
                                 _ => sql::ast::BinaryOperator::Equals,
                             }
                         }

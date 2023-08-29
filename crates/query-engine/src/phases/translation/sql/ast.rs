@@ -175,6 +175,7 @@ pub enum UnaryOperator {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum BinaryOperator {
     Equals,
+    NotEquals,
     GreaterThan,
     LessThan,
     GreaterThanOrEqualTo,
