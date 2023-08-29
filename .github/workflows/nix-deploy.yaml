@@ -74,7 +74,7 @@ jobs:
         run: nix build .#docker-postgres-x86_64-linux
 
       - name: Deploy 🚀
-        run: nix run .#publish-docker-image ${{ github.ref }} ghrc.io/hasura/postgres-agent-rs
+        run: nix run .#publish-docker-image ${{ github.ref }} ghcr.io/hasura/postgres-agent-rs
 
       # scream into Slack if something goes wrong
       - name: Report Status
