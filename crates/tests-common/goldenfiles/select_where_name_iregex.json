@@ -23,7 +23,7 @@
       },
       "operator": {
         "type": "other",
-        "name": "iregex"
+        "name": "_iregex"
       },
       "value": {
         "type": "scalar",

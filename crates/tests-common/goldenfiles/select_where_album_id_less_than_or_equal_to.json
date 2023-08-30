@@ -22,7 +22,7 @@
       },
       "operator": {
         "type": "other",
-        "name": "lte"
+        "name": "_lte"
       },
       "value": {
         "type": "scalar",

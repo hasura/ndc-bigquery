@@ -70,7 +70,7 @@ dev: start-dependencies
     OTEL_SERVICE_NAME=postgres-ndc \
     cargo watch -i "**/snapshots/*" \
     -c \
-    -x 'test --exclude ndc-cockroach e2e-tests --workspace' \
+    -x 'test --workspace --exclude=ndc-cockroach --exclude=e2e-tests' \
     -x clippy \
     -x 'run --bin ndc-postgres -- serve --configuration {{POSTGRES_CHINOOK_DEPLOYMENT}}'
 
@@ -112,7 +112,7 @@ build:
 # run all tests
 test: start-dependencies
   RUST_LOG=DEBUG \
-    cargo test --workspace --exclude=e2e-tests
+    cargo test --workspace --exclude=ndc-cockroach --exclude=e2e-tests
 
 # re-generate the deployment configuration file
 generate-chinook-configuration: build

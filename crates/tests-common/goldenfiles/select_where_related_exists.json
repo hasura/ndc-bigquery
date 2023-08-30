@@ -38,7 +38,7 @@
         },
         "operator": {
           "type": "other",
-          "name": "like"
+          "name": "_like"
         },
         "value": {
           "type": "scalar",

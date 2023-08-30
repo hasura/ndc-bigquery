@@ -77,7 +77,7 @@
       },
       "operator": {
         "type": "other",
-        "name": "gt"
+        "name": "_gt"
       },
       "value": {
         "type": "column",

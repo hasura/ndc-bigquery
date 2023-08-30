@@ -22,7 +22,7 @@
       },
       "operator": {
         "type": "other",
-        "name": "ilike"
+        "name": "_ilike"
       },
       "value": {
         "type": "scalar",

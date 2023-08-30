@@ -23,7 +23,7 @@
       },
       "operator": {
         "type": "other",
-        "name": "nsimilar"
+        "name": "_nsimilar"
       },
       "value": {
         "type": "scalar",

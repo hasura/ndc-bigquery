@@ -27,7 +27,7 @@ POSTGRESQL_SOCKET="$(docker compose port postgres 5432)"
 
 info 'Generating the deployment configuration'
 mkdir -p generated
-cargo run --quiet --release -- configuration serve &
+cargo run --bin ndc-postgres --quiet --release -- configuration serve &
 AGENT_PID=$!
 echo "$AGENT_PID" > ./agent.pid
 ../../scripts/wait-until --timeout=30 --report -- nc -z localhost 9100
@@ -43,7 +43,7 @@ kill "$AGENT_PID"
 rm -f ./agent.pid
 
 info 'Starting the agent'
-cargo run --quiet --release -- serve --configuration=./generated/deployment.json >& agent.log &
+cargo run --bin ndc-postgres --quiet --release -- serve --configuration=./generated/deployment.json >& agent.log &
 AGENT_PID=$!
 echo "$AGENT_PID" > ./agent.pid
 echo >&2 "The agent is running with PID ${AGENT_PID}"

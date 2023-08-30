@@ -23,7 +23,7 @@
       },
       "operator": {
         "type": "other",
-        "name": "niregex"
+        "name": "_niregex"
       },
       "value": {
         "type": "scalar",

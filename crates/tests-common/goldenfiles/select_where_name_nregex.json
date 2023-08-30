@@ -23,7 +23,7 @@
       },
       "operator": {
         "type": "other",
-        "name": "nregex"
+        "name": "_nregex"
       },
       "value": {
         "type": "scalar",

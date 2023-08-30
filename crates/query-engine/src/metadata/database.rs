@@ -108,22 +108,22 @@ impl BinaryOperator {
     /// The name of the binary operator exposed via the schema.
     pub fn name(&self) -> &'static str {
         match self {
-            Self::Equals => "eq",
-            Self::NotEquals => "neq",
-            Self::LessThan => "lt",
-            Self::LessThanOrEqualTo => "lte",
-            Self::GreaterThan => "gt",
-            Self::GreaterThanOrEqualTo => "gte",
-            Self::Like => "like",
-            Self::NotLike => "nlike",
-            Self::CaseInsensitiveLike => "ilike",
-            Self::NotCaseInsensitiveLike => "nilike",
-            Self::Similar => "similar",
-            Self::NotSimilar => "nsimilar",
-            Self::Regex => "regex",
-            Self::NotRegex => "nregex",
-            Self::CaseInsensitiveRegex => "iregex",
-            Self::NotCaseInsensitiveRegex => "niregex",
+            Self::Equals => "_eq",
+            Self::NotEquals => "_neq",
+            Self::LessThan => "_lt",
+            Self::LessThanOrEqualTo => "_lte",
+            Self::GreaterThan => "_gt",
+            Self::GreaterThanOrEqualTo => "_gte",
+            Self::Like => "_like",
+            Self::NotLike => "_nlike",
+            Self::CaseInsensitiveLike => "_ilike",
+            Self::NotCaseInsensitiveLike => "_nilike",
+            Self::Similar => "_similar",
+            Self::NotSimilar => "_nsimilar",
+            Self::Regex => "_regex",
+            Self::NotRegex => "_nregex",
+            Self::CaseInsensitiveRegex => "_iregex",
+            Self::NotCaseInsensitiveRegex => "_niregex",
         }
     }
 

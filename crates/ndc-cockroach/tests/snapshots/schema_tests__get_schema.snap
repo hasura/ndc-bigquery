@@ -26,37 +26,37 @@ expression: result
         }
       },
       "comparison_operators": {
-        "eq": {
+        "_eq": {
           "argument_type": {
             "type": "named",
             "name": "Boolean"
           }
         },
-        "gt": {
+        "_gt": {
           "argument_type": {
             "type": "named",
             "name": "Boolean"
           }
         },
-        "gte": {
+        "_gte": {
           "argument_type": {
             "type": "named",
             "name": "Boolean"
           }
         },
-        "lt": {
+        "_lt": {
           "argument_type": {
             "type": "named",
             "name": "Boolean"
           }
         },
-        "lte": {
+        "_lte": {
           "argument_type": {
             "type": "named",
             "name": "Boolean"
           }
         },
-        "neq": {
+        "_neq": {
           "argument_type": {
             "type": "named",
             "name": "Boolean"
@@ -141,37 +141,37 @@ expression: result
         }
       },
       "comparison_operators": {
-        "eq": {
+        "_eq": {
           "argument_type": {
             "type": "named",
             "name": "Float"
           }
         },
-        "gt": {
+        "_gt": {
           "argument_type": {
             "type": "named",
             "name": "Float"
           }
         },
-        "gte": {
+        "_gte": {
           "argument_type": {
             "type": "named",
             "name": "Float"
           }
         },
-        "lt": {
+        "_lt": {
           "argument_type": {
             "type": "named",
             "name": "Float"
           }
         },
-        "lte": {
+        "_lte": {
           "argument_type": {
             "type": "named",
             "name": "Float"
           }
         },
-        "neq": {
+        "_neq": {
           "argument_type": {
             "type": "named",
             "name": "Float"
@@ -244,37 +244,37 @@ expression: result
         }
       },
       "comparison_operators": {
-        "eq": {
+        "_eq": {
           "argument_type": {
             "type": "named",
             "name": "Int"
           }
         },
-        "gt": {
+        "_gt": {
           "argument_type": {
             "type": "named",
             "name": "Int"
           }
         },
-        "gte": {
+        "_gte": {
           "argument_type": {
             "type": "named",
             "name": "Int"
           }
         },
-        "lt": {
+        "_lt": {
           "argument_type": {
             "type": "named",
             "name": "Int"
           }
         },
-        "lte": {
+        "_lte": {
           "argument_type": {
             "type": "named",
             "name": "Int"
           }
         },
-        "neq": {
+        "_neq": {
           "argument_type": {
             "type": "named",
             "name": "Int"
@@ -299,97 +299,97 @@ expression: result
         }
       },
       "comparison_operators": {
-        "eq": {
+        "_eq": {
           "argument_type": {
             "type": "named",
             "name": "String"
           }
         },
-        "gt": {
+        "_gt": {
           "argument_type": {
             "type": "named",
             "name": "String"
           }
         },
-        "gte": {
+        "_gte": {
           "argument_type": {
             "type": "named",
             "name": "String"
           }
         },
-        "ilike": {
+        "_ilike": {
           "argument_type": {
             "type": "named",
             "name": "String"
           }
         },
-        "iregex": {
+        "_iregex": {
           "argument_type": {
             "type": "named",
             "name": "String"
           }
         },
-        "like": {
+        "_like": {
           "argument_type": {
             "type": "named",
             "name": "String"
           }
         },
-        "lt": {
+        "_lt": {
           "argument_type": {
             "type": "named",
             "name": "String"
           }
         },
-        "lte": {
+        "_lte": {
           "argument_type": {
             "type": "named",
             "name": "String"
           }
         },
-        "neq": {
+        "_neq": {
           "argument_type": {
             "type": "named",
             "name": "String"
           }
         },
-        "nilike": {
+        "_nilike": {
           "argument_type": {
             "type": "named",
             "name": "String"
           }
         },
-        "niregex": {
+        "_niregex": {
           "argument_type": {
             "type": "named",
             "name": "String"
           }
         },
-        "nlike": {
+        "_nlike": {
           "argument_type": {
             "type": "named",
             "name": "String"
           }
         },
-        "nregex": {
+        "_nregex": {
           "argument_type": {
             "type": "named",
             "name": "String"
           }
         },
-        "nsimilar": {
+        "_nsimilar": {
           "argument_type": {
             "type": "named",
             "name": "String"
           }
         },
-        "regex": {
+        "_regex": {
           "argument_type": {
             "type": "named",
             "name": "String"
           }
         },
-        "similar": {
+        "_similar": {
           "argument_type": {
             "type": "named",
             "name": "String"

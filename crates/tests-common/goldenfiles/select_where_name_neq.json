@@ -22,7 +22,7 @@
       },
       "operator": {
         "type": "other",
-        "name": "neq"
+        "name": "_neq"
       },
       "value": {
         "type": "scalar",

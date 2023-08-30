@@ -21,7 +21,7 @@
           },
           "operator": {
             "type": "other",
-            "name": "nilike"
+            "name": "_nilike"
           },
           "value": {
             "type": "scalar",
