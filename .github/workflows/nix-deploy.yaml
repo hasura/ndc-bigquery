@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - djh/update-cargo-lock
     tags:
       - "v*"
 

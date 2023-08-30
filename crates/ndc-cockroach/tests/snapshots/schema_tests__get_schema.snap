@@ -25,7 +25,44 @@ expression: result
           }
         }
       },
-      "comparison_operators": {},
+      "comparison_operators": {
+        "eq": {
+          "argument_type": {
+            "type": "named",
+            "name": "Boolean"
+          }
+        },
+        "gt": {
+          "argument_type": {
+            "type": "named",
+            "name": "Boolean"
+          }
+        },
+        "gte": {
+          "argument_type": {
+            "type": "named",
+            "name": "Boolean"
+          }
+        },
+        "lt": {
+          "argument_type": {
+            "type": "named",
+            "name": "Boolean"
+          }
+        },
+        "lte": {
+          "argument_type": {
+            "type": "named",
+            "name": "Boolean"
+          }
+        },
+        "neq": {
+          "argument_type": {
+            "type": "named",
+            "name": "Boolean"
+          }
+        }
+      },
       "update_operators": {}
     },
     "Float": {
@@ -103,7 +140,44 @@ expression: result
           }
         }
       },
-      "comparison_operators": {},
+      "comparison_operators": {
+        "eq": {
+          "argument_type": {
+            "type": "named",
+            "name": "Float"
+          }
+        },
+        "gt": {
+          "argument_type": {
+            "type": "named",
+            "name": "Float"
+          }
+        },
+        "gte": {
+          "argument_type": {
+            "type": "named",
+            "name": "Float"
+          }
+        },
+        "lt": {
+          "argument_type": {
+            "type": "named",
+            "name": "Float"
+          }
+        },
+        "lte": {
+          "argument_type": {
+            "type": "named",
+            "name": "Float"
+          }
+        },
+        "neq": {
+          "argument_type": {
+            "type": "named",
+            "name": "Float"
+          }
+        }
+      },
       "update_operators": {}
     },
     "Int": {
@@ -169,7 +243,44 @@ expression: result
           }
         }
       },
-      "comparison_operators": {},
+      "comparison_operators": {
+        "eq": {
+          "argument_type": {
+            "type": "named",
+            "name": "Int"
+          }
+        },
+        "gt": {
+          "argument_type": {
+            "type": "named",
+            "name": "Int"
+          }
+        },
+        "gte": {
+          "argument_type": {
+            "type": "named",
+            "name": "Int"
+          }
+        },
+        "lt": {
+          "argument_type": {
+            "type": "named",
+            "name": "Int"
+          }
+        },
+        "lte": {
+          "argument_type": {
+            "type": "named",
+            "name": "Int"
+          }
+        },
+        "neq": {
+          "argument_type": {
+            "type": "named",
+            "name": "Int"
+          }
+        }
+      },
       "update_operators": {}
     },
     "String": {
@@ -187,7 +298,104 @@ expression: result
           }
         }
       },
-      "comparison_operators": {},
+      "comparison_operators": {
+        "eq": {
+          "argument_type": {
+            "type": "named",
+            "name": "String"
+          }
+        },
+        "gt": {
+          "argument_type": {
+            "type": "named",
+            "name": "String"
+          }
+        },
+        "gte": {
+          "argument_type": {
+            "type": "named",
+            "name": "String"
+          }
+        },
+        "ilike": {
+          "argument_type": {
+            "type": "named",
+            "name": "String"
+          }
+        },
+        "iregex": {
+          "argument_type": {
+            "type": "named",
+            "name": "String"
+          }
+        },
+        "like": {
+          "argument_type": {
+            "type": "named",
+            "name": "String"
+          }
+        },
+        "lt": {
+          "argument_type": {
+            "type": "named",
+            "name": "String"
+          }
+        },
+        "lte": {
+          "argument_type": {
+            "type": "named",
+            "name": "String"
+          }
+        },
+        "neq": {
+          "argument_type": {
+            "type": "named",
+            "name": "String"
+          }
+        },
+        "nilike": {
+          "argument_type": {
+            "type": "named",
+            "name": "String"
+          }
+        },
+        "niregex": {
+          "argument_type": {
+            "type": "named",
+            "name": "String"
+          }
+        },
+        "nlike": {
+          "argument_type": {
+            "type": "named",
+            "name": "String"
+          }
+        },
+        "nregex": {
+          "argument_type": {
+            "type": "named",
+            "name": "String"
+          }
+        },
+        "nsimilar": {
+          "argument_type": {
+            "type": "named",
+            "name": "String"
+          }
+        },
+        "regex": {
+          "argument_type": {
+            "type": "named",
+            "name": "String"
+          }
+        },
+        "similar": {
+          "argument_type": {
+            "type": "named",
+            "name": "String"
+          }
+        }
+      },
       "update_operators": {}
     },
     "any": {
