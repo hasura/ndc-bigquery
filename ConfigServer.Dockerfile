@@ -14,7 +14,7 @@ ENV RUSTFLAGS="-C link-arg=-fuse-ld=lld"
 
 COPY . .
 
-RUN cargo build --release --all-targets
+RUN cargo build --release --bin ndc-postgres
 
 ## Copy the binaries and serve the configuration server
 FROM debian:buster-slim as ndc-postgres
