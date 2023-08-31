@@ -41,6 +41,8 @@
         # cockroachExpression = import ./nix/cockroach-agent.nix;
         cargoBuild = import ./nix/cargo-build.nix;
 
+        ### POSTGRES ###
+
         # Build for the architecture and OS that is running the build
         postgres-agent = cargoBuild {
           binary-name = "ndc-postgres";
@@ -61,6 +63,8 @@
           crossSystem = "aarch64-linux";
         };
 
+        ### COCKROACH ###
+
         # Build for the architecture and OS that is running the build
         cockroach-agent = cargoBuild {
           binary-name = "ndc-cockroach";
@@ -78,6 +82,27 @@
           binary-name = "ndc-cockroach";
           crossSystem = "aarch64-linux";
         };
+
+        ### CITUS ###
+
+        # Build for the architecture and OS that is running the build
+        citus-agent = cargoBuild {
+          binary-name = "ndc-citus";
+          inherit crateExpression nixpkgs crane rust-overlay localSystem;
+        };
+
+        citus-agent-x86_64-linux = cargoBuild {
+          inherit crateExpression nixpkgs crane rust-overlay localSystem;
+          binary-name = "ndc-citus";
+          crossSystem = "x86_64-linux";
+        };
+
+        citus-agent-aarch64-linux = cargoBuild {
+          inherit crateExpression nixpkgs crane rust-overlay localSystem;
+          binary-name = "ndc-citus";
+          crossSystem = "aarch64-linux";
+        };
+
       in
       {
         checks = {
@@ -161,6 +186,33 @@
             architecture = "arm64";
             binary-name = "ndc-cockroach";
             image-name = "ghcr.io/hasura/cockroach-agent-rs";
+          };
+
+          /* citus ndc targets */
+          citus-agent = citus-agent;
+          citus-agent-x86_64-linux = citus-agent-x86_64-linux;
+          citus-agent-aarch64-linux = citus-agent-aarch64-linux;
+
+          /* build Docker for Citus with whatever the local dev env is */
+          docker-citus-dev = pkgs.callPackage ./nix/docker.nix {
+            ndc-agent = citus-agent;
+            binary-name = "ndc-citus";
+            image-name = "ghcr.io/hasura/citus-agent-rs";
+            tag = "dev";
+          };
+
+          docker-citus-x86_64-linux = pkgs.callPackage ./nix/docker.nix {
+            ndc-agent = citus-agent-x86_64-linux;
+            architecture = "amd64";
+            binary-name = "ndc-citus";
+            image-name = "ghcr.io/hasura/citus-agent-rs";
+          };
+
+          docker-citus-aarch64-linux = pkgs.callPackage ./nix/docker.nix {
+            ndc-agent = citus-agent-aarch64-linux;
+            architecture = "arm64";
+            binary-name = "ndc-citus";
+            image-name = "ghcr.io/hasura/citus-agent-rs";
           };
 
           publish-docker-image = pkgs.writeShellApplication {

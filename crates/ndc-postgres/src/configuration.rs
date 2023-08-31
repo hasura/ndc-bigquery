@@ -63,6 +63,7 @@ pub async fn create_state(
     configuration: &DeploymentConfiguration,
     metrics_registry: &mut prometheus::Registry,
 ) -> Result<State, connector::InitializationError> {
+    tracing::info!("{:?}", configuration);
     let pool = create_pool(configuration).await.map_err(|e| {
         connector::InitializationError::Other(InitializationError::UnableToCreatePool(e).into())
     })?;

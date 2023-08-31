@@ -3,11 +3,15 @@ set shell := ["bash", "-c"]
 CONNECTOR_IMAGE_NAME := "ghcr.io/hasura/postgres-agent-rs"
 CONNECTOR_IMAGE_TAG := "dev"
 CONNECTOR_IMAGE := CONNECTOR_IMAGE_NAME + ":" + CONNECTOR_IMAGE_TAG
+
 POSTGRESQL_CONNECTION_STRING := "postgresql://postgres:password@localhost:64002"
 POSTGRES_CHINOOK_DEPLOYMENT := "static/chinook-deployment.json"
 
-COCKROACH_CHINOOK_DEPLOYMENT := "static/cockroach/chinook-deployment.json"
 COCKROACH_CONNECTION_STRING := "postgresql://postgres:password@localhost:64003"
+COCKROACH_CHINOOK_DEPLOYMENT := "static/cockroach/chinook-deployment.json"
+
+CITUS_CONNECTION_STRING := "postgresql://postgres:password@localhost:64004?sslmode=disable"
+CITUS_CHINOOK_DEPLOYMENT := "static/citus/chinook-deployment.json"
 
 # Notes:
 # * Building Docker images will not work on macOS.
@@ -70,7 +74,7 @@ dev: start-dependencies
     OTEL_SERVICE_NAME=postgres-ndc \
     cargo watch -i "**/snapshots/*" \
     -c \
-    -x 'test --workspace --exclude=ndc-cockroach --exclude=e2e-tests' \
+    -x 'test -p query-engine -p ndc-postgres' \
     -x clippy \
     -x 'run --bin ndc-postgres -- serve --configuration {{POSTGRES_CHINOOK_DEPLOYMENT}}'
 
@@ -81,10 +85,20 @@ dev-cockroach: start-cockroach-dependencies
     OTEL_SERVICE_NAME=cockroach-ndc \
     cargo watch -i "**/snapshots/*" \
     -c \
-    -x 'test -p query-engine' \
-    -x 'test -p ndc-cockroach' \
+    -x 'test -p query-engine -p ndc-cockroach' \
     -x clippy \
     -x 'run --bin ndc-cockroach -- serve --configuration {{COCKROACH_CHINOOK_DEPLOYMENT}}'
+
+# watch the code, then test and re-run on changes
+dev-citus: start-citus-dependencies
+  RUST_LOG=INFO \
+    OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://localhost:4317 \
+    OTEL_SERVICE_NAME=citus-ndc \
+    cargo watch -i "**/snapshots/*" \
+    -c \
+    -x 'test -p query-engine -p ndc-citus' \
+    -x clippy \
+    -x 'run --bin ndc-citus -- serve --configuration {{CITUS_CHINOOK_DEPLOYMENT}}'
 
 # watch the code, and re-run on changes
 watch-run: start-dependencies
@@ -112,7 +126,7 @@ build:
 # run all tests
 test: start-dependencies
   RUST_LOG=DEBUG \
-    cargo test --workspace --exclude=ndc-cockroach --exclude=e2e-tests
+    cargo test -p query-engine -p ndc-postgres
 
 # re-generate the deployment configuration file
 generate-chinook-configuration: build
@@ -147,6 +161,13 @@ start-cockroach-dependencies:
   # start cockroach
   docker compose up --wait cockroach
 
+# run citus + jaeger
+start-citus-dependencies:
+  # start jaeger, configured to listen to V3
+  docker compose -f ../v3-engine/docker-compose.yaml up -d jaeger
+  # start citus
+  docker compose up --wait citus
+
 # run prometheus + grafana
 start-metrics:
   @echo "http://localhost:3001/ for grafana console"
@@ -167,6 +188,16 @@ run-engine: start-dependencies
 repl-postgres:
   @docker compose up --wait postgres
   psql {{POSTGRESQL_CONNECTION_STRING}}
+
+# start a cockroach docker image and connect to it using psql
+repl-cockroach:
+  @docker compose up --wait cockroach
+  psql {{COCKROACH_CONNECTION_STRING}}
+
+# start a citus docker image and connect to it using psql
+repl-citus:
+  @docker compose up --wait citus
+  psql {{CITUS_CONNECTION_STRING}}
 
 # run `clippy` linter
 lint *FLAGS:

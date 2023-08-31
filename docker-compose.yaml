@@ -55,6 +55,33 @@ services:
       timeout: 10s
       retries: 20
 
+  citus:
+    image: citusdata/citus:11.3.0
+    platform: linux/amd64
+    command:
+      - -F # turn fsync off for speed
+      - -N 1000 # increase max connections from 100 so we can run more HGEs
+      - "-cclient_min_messages=error"
+    ports:
+      - 64004:5432
+    environment:
+      POSTGRES_PASSWORD: "password" # you probably want to override this
+    volumes:
+      - type: tmpfs
+        target: /var/lib/postgresql/data
+      - type: bind
+        source: ./static/chinook-postgres.sql
+        target: /docker-entrypoint-initdb.d/chinook-postgres.sql
+        read_only: true
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - psql -U "$${POSTGRES_USER:-postgres}" < /dev/null && sleep 5 && psql -U "$${POSTGRES_USER:-postgres}" < /dev/null
+      start_period: 5s
+      interval: 5s
+      timeout: 10s
+      retries: 20
+
   prometheus:
     image: prom/prometheus
     container_name: prometheus

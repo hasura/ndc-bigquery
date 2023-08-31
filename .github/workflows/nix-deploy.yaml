@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - djh/ndc-citus # remove before merge pls
     tags:
       - "v*"
 
@@ -28,6 +29,13 @@ jobs:
               "artifact_path": "result/bin/ndc-cockroach",
               "docker_build_command":"docker-cockroach-x86_64-linux",
               "docker_image_name": "ghcr.io/hasura/cockroach-agent-rs"
+            },
+            {
+              "build_command": "citus-agent-x86_64-linux",
+              "binary_artifact_name": "hasura-citus-agent-rs",
+              "artifact_path": "result/bin/ndc-citus",
+              "docker_build_command":"docker-citus-x86_64-linux",
+              "docker_image_name": "ghcr.io/hasura/citus-agent-rs"
             }
           ]
 

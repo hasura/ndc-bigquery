@@ -1278,6 +1278,35 @@ dependencies = [
 ]
 
 [[package]]
+name = "ndc-citus"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "axum",
+ "axum-test-helper",
+ "env_logger",
+ "hyper",
+ "insta",
+ "ndc-client",
+ "ndc-postgres",
+ "ndc-sdk",
+ "ndc-test",
+ "prometheus",
+ "query-engine",
+ "reqwest",
+ "schemars",
+ "serde",
+ "serde_derive",
+ "serde_json",
+ "similar-asserts",
+ "sqlx",
+ "tests-common",
+ "thiserror",
+ "tokio",
+ "tracing",
+]
+
+[[package]]
 name = "ndc-client"
 version = "0.1.0"
 source = "git+https://github.com/hasura/ndc-spec.git?tag=v0.1.0-rc.2#5a6ee92c2756d7359bfe835eb3b477cb1ee5da23"
