@@ -1,18 +1,16 @@
 agents:
   queue: "aws-v3-build-node-common"
 steps:
-  - block: ":three_button_mouse: Click here to start the release"
-    key: "artifact-release-gate"
-    prompt: "Are you sure?"
-
   - label: ":docker: Build and push docker image"
-    depends_on:
-      - step: "artifact-release-gate"
+    key: build-and-push-docker-image
     command: |
       set -eu -o pipefail
 
       TAG=$(git log -1 '--format=format:%h' --abbrev=9)
       DOCKER_TAG=$$DOCKER_REGISTRY/$$DOCKER_REPO:$$TAG
+
+      echo "~~~ :buildkite: Storing release version in metadata"
+      buildkite-agent meta-data set "release-version" "$$TAG"
 
       echo "~~~ :docker: Configuring docker gcr helper"
       docker-credential-gcr configure-docker --registries=$$DOCKER_REGISTRY
@@ -43,5 +41,25 @@ steps:
           repos:
             - config:
                 - url: git@github.com:hasura/postgres-ndc.git
+          delete_checkout: true
+          interpolate_checkout_path: "$BUILDKITE_BUILD_CHECKOUT_PATH/$BUILDKITE_BUILD_ID/$BUILDKITE_JOB_ID"
+
+  - label: ":kubernetes: Release to staging"
+    key: release-to-staging
+    depends_on:
+      - step: build-and-push-docker-image
+    command: .buildkite/scripts/release-component.sh "ndc-postgres-config-server"
+    plugins:
+      - hasura/smooth-secrets#v1.3.2:
+          secrets:
+            - strategy: aws-secrets-manager
+              key: github-deploy-keys/ddn-cloud-read-write
+              type: ssh
+              region: us-east-2
+      - hasura/smooth-checkout#v4.3.2:
+          repos:
+            - config:
+                - url: git@github.com:hasura/ddn-cloud.git
+                  ref: staging
           delete_checkout: true
           interpolate_checkout_path: "$BUILDKITE_BUILD_CHECKOUT_PATH/$BUILDKITE_BUILD_ID/$BUILDKITE_JOB_ID"
