@@ -13,6 +13,7 @@ use ndc_sdk::models;
 
 use super::configuration;
 use super::explain;
+use super::health;
 use super::metrics;
 use super::query;
 use super::schema;
@@ -89,9 +90,9 @@ impl connector::Connector for Postgres {
     /// is able to reach its data source over the network.
     async fn health_check(
         _configuration: &Self::Configuration,
-        _state: &Self::State,
+        state: &Self::State,
     ) -> Result<(), connector::HealthError> {
-        Ok(())
+        health::health_check(&state.pool).await
     }
 
     /// Get the connector's capabilities.

@@ -12,7 +12,7 @@ use async_trait::async_trait;
 use ndc_sdk::connector;
 use ndc_sdk::models;
 
-use ndc_postgres::{configuration, explain, metrics, query, schema};
+use ndc_postgres::{configuration, explain, health, metrics, query, schema};
 
 use tracing::{info_span, Instrument};
 
@@ -88,9 +88,9 @@ impl connector::Connector for Cockroach {
     /// is able to reach its data source over the network.
     async fn health_check(
         _configuration: &Self::Configuration,
-        _state: &Self::State,
+        state: &Self::State,
     ) -> Result<(), connector::HealthError> {
-        Ok(())
+        health::health_check(&state.pool).await
     }
 
     /// Get the connector's capabilities.
