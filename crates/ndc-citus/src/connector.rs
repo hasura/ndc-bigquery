@@ -12,7 +12,7 @@ use async_trait::async_trait;
 use ndc_sdk::connector;
 use ndc_sdk::models;
 
-use ndc_postgres::{configuration, explain, health, metrics, query, schema};
+use ndc_postgres::{capabilities, configuration, explain, health, metrics, query, schema};
 
 use tracing::{info_span, Instrument};
 
@@ -98,20 +98,7 @@ impl connector::Connector for Citus {
     /// This function implements the [capabilities endpoint](https://hasura.github.io/ndc-spec/specification/capabilities.html)
     /// from the NDC specification.
     async fn get_capabilities() -> models::CapabilitiesResponse {
-        let empty = serde_json::to_value(()).unwrap();
-        models::CapabilitiesResponse {
-            versions: "^0.0.0".into(),
-            capabilities: models::Capabilities {
-                explain: Some(empty.clone()),
-                query: Some(models::QueryCapabilities {
-                    foreach: Some(empty.clone()),
-                    order_by_aggregate: None,
-                    relation_comparisons: None,
-                }),
-                relationships: Some(empty),
-                mutations: None,
-            },
-        }
+        capabilities::get_capabilities()
     }
 
     /// Get the connector's schema.

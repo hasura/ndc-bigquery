@@ -11,12 +11,7 @@ use tracing::{info_span, Instrument};
 use ndc_sdk::connector;
 use ndc_sdk::models;
 
-use super::configuration;
-use super::explain;
-use super::health;
-use super::metrics;
-use super::query;
-use super::schema;
+use super::{capabilities, configuration, explain, health, metrics, query, schema};
 
 #[derive(Clone, Default)]
 pub struct Postgres {}
@@ -100,20 +95,7 @@ impl connector::Connector for Postgres {
     /// This function implements the [capabilities endpoint](https://hasura.github.io/ndc-spec/specification/capabilities.html)
     /// from the NDC specification.
     async fn get_capabilities() -> models::CapabilitiesResponse {
-        let empty = serde_json::to_value(()).unwrap();
-        models::CapabilitiesResponse {
-            versions: "^0.0.0".into(),
-            capabilities: models::Capabilities {
-                explain: Some(empty.clone()),
-                query: Some(models::QueryCapabilities {
-                    foreach: Some(empty.clone()),
-                    order_by_aggregate: None,
-                    relation_comparisons: None,
-                }),
-                relationships: Some(empty),
-                mutations: None,
-            },
-        }
+        capabilities::get_capabilities()
     }
 
     /// Get the connector's schema.
