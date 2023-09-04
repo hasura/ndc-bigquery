@@ -1,0 +1,622 @@
+{
+  "version": 1,
+  "postgres_database_url": "postgresql://postgres:password@localhost:64002",
+  "metadata": {
+    "tables": {
+      "Album": {
+        "schema_name": "public",
+        "table_name": "Album",
+        "columns": {
+          "AlbumId": {
+            "name": "AlbumId",
+            "type": "Int"
+          },
+          "ArtistId": {
+            "name": "ArtistId",
+            "type": "Int"
+          },
+          "Title": {
+            "name": "Title",
+            "type": "String"
+          }
+        },
+        "uniqueness_constraints": {
+          "Album_pkey": [
+            "AlbumId"
+          ]
+        },
+        "foreign_relations": {
+          "FK_AlbumArtistId": {
+            "foreign_table": "Artist",
+            "column_mapping": {
+              "ArtistId": "ArtistId"
+            }
+          }
+        }
+      },
+      "Artist": {
+        "schema_name": "public",
+        "table_name": "Artist",
+        "columns": {
+          "ArtistId": {
+            "name": "ArtistId",
+            "type": "Int"
+          },
+          "Name": {
+            "name": "Name",
+            "type": "String"
+          }
+        },
+        "uniqueness_constraints": {
+          "Artist_pkey": [
+            "ArtistId"
+          ]
+        },
+        "foreign_relations": {}
+      },
+      "Customer": {
+        "schema_name": "public",
+        "table_name": "Customer",
+        "columns": {
+          "Address": {
+            "name": "Address",
+            "type": "String"
+          },
+          "City": {
+            "name": "City",
+            "type": "String"
+          },
+          "Company": {
+            "name": "Company",
+            "type": "String"
+          },
+          "Country": {
+            "name": "Country",
+            "type": "String"
+          },
+          "CustomerId": {
+            "name": "CustomerId",
+            "type": "Int"
+          },
+          "Email": {
+            "name": "Email",
+            "type": "String"
+          },
+          "Fax": {
+            "name": "Fax",
+            "type": "String"
+          },
+          "FirstName": {
+            "name": "FirstName",
+            "type": "String"
+          },
+          "LastName": {
+            "name": "LastName",
+            "type": "String"
+          },
+          "Phone": {
+            "name": "Phone",
+            "type": "String"
+          },
+          "PostalCode": {
+            "name": "PostalCode",
+            "type": "String"
+          },
+          "State": {
+            "name": "State",
+            "type": "String"
+          },
+          "SupportRepId": {
+            "name": "SupportRepId",
+            "type": "Int"
+          }
+        },
+        "uniqueness_constraints": {
+          "Customer_pkey": [
+            "CustomerId"
+          ]
+        },
+        "foreign_relations": {
+          "FK_CustomerSupportRepId": {
+            "foreign_table": "Employee",
+            "column_mapping": {
+              "SupportRepId": "EmployeeId"
+            }
+          }
+        }
+      },
+      "Employee": {
+        "schema_name": "public",
+        "table_name": "Employee",
+        "columns": {
+          "Address": {
+            "name": "Address",
+            "type": "String"
+          },
+          "BirthDate": {
+            "name": "BirthDate",
+            "type": "any"
+          },
+          "City": {
+            "name": "City",
+            "type": "String"
+          },
+          "Country": {
+            "name": "Country",
+            "type": "String"
+          },
+          "Email": {
+            "name": "Email",
+            "type": "String"
+          },
+          "EmployeeId": {
+            "name": "EmployeeId",
+            "type": "Int"
+          },
+          "Fax": {
+            "name": "Fax",
+            "type": "String"
+          },
+          "FirstName": {
+            "name": "FirstName",
+            "type": "String"
+          },
+          "HireDate": {
+            "name": "HireDate",
+            "type": "any"
+          },
+          "LastName": {
+            "name": "LastName",
+            "type": "String"
+          },
+          "Phone": {
+            "name": "Phone",
+            "type": "String"
+          },
+          "PostalCode": {
+            "name": "PostalCode",
+            "type": "String"
+          },
+          "ReportsTo": {
+            "name": "ReportsTo",
+            "type": "Int"
+          },
+          "State": {
+            "name": "State",
+            "type": "String"
+          },
+          "Title": {
+            "name": "Title",
+            "type": "String"
+          }
+        },
+        "uniqueness_constraints": {
+          "Employee_pkey": [
+            "EmployeeId"
+          ]
+        },
+        "foreign_relations": {
+          "FK_EmployeeReportsTo": {
+            "foreign_table": "Employee",
+            "column_mapping": {
+              "ReportsTo": "EmployeeId"
+            }
+          }
+        }
+      },
+      "Genre": {
+        "schema_name": "public",
+        "table_name": "Genre",
+        "columns": {
+          "GenreId": {
+            "name": "GenreId",
+            "type": "Int"
+          },
+          "Name": {
+            "name": "Name",
+            "type": "String"
+          }
+        },
+        "uniqueness_constraints": {
+          "Genre_pkey": [
+            "GenreId"
+          ]
+        },
+        "foreign_relations": {}
+      },
+      "Invoice": {
+        "schema_name": "public",
+        "table_name": "Invoice",
+        "columns": {
+          "BillingAddress": {
+            "name": "BillingAddress",
+            "type": "String"
+          },
+          "BillingCity": {
+            "name": "BillingCity",
+            "type": "String"
+          },
+          "BillingCountry": {
+            "name": "BillingCountry",
+            "type": "String"
+          },
+          "BillingPostalCode": {
+            "name": "BillingPostalCode",
+            "type": "String"
+          },
+          "BillingState": {
+            "name": "BillingState",
+            "type": "String"
+          },
+          "CustomerId": {
+            "name": "CustomerId",
+            "type": "Int"
+          },
+          "InvoiceDate": {
+            "name": "InvoiceDate",
+            "type": "any"
+          },
+          "InvoiceId": {
+            "name": "InvoiceId",
+            "type": "Int"
+          },
+          "Total": {
+            "name": "Total",
+            "type": "Float"
+          }
+        },
+        "uniqueness_constraints": {
+          "Invoice_pkey": [
+            "InvoiceId"
+          ]
+        },
+        "foreign_relations": {
+          "FK_InvoiceCustomerId": {
+            "foreign_table": "Customer",
+            "column_mapping": {
+              "CustomerId": "CustomerId"
+            }
+          }
+        }
+      },
+      "InvoiceLine": {
+        "schema_name": "public",
+        "table_name": "InvoiceLine",
+        "columns": {
+          "InvoiceId": {
+            "name": "InvoiceId",
+            "type": "Int"
+          },
+          "InvoiceLineId": {
+            "name": "InvoiceLineId",
+            "type": "Int"
+          },
+          "Quantity": {
+            "name": "Quantity",
+            "type": "Int"
+          },
+          "TrackId": {
+            "name": "TrackId",
+            "type": "Int"
+          },
+          "UnitPrice": {
+            "name": "UnitPrice",
+            "type": "Float"
+          }
+        },
+        "uniqueness_constraints": {
+          "InvoiceLine_pkey": [
+            "InvoiceLineId"
+          ]
+        },
+        "foreign_relations": {
+          "FK_InvoiceLineInvoiceId": {
+            "foreign_table": "Invoice",
+            "column_mapping": {
+              "InvoiceId": "InvoiceId"
+            }
+          },
+          "FK_InvoiceLineTrackId": {
+            "foreign_table": "Track",
+            "column_mapping": {
+              "TrackId": "TrackId"
+            }
+          }
+        }
+      },
+      "MediaType": {
+        "schema_name": "public",
+        "table_name": "MediaType",
+        "columns": {
+          "MediaTypeId": {
+            "name": "MediaTypeId",
+            "type": "Int"
+          },
+          "Name": {
+            "name": "Name",
+            "type": "String"
+          }
+        },
+        "uniqueness_constraints": {
+          "MediaType_pkey": [
+            "MediaTypeId"
+          ]
+        },
+        "foreign_relations": {}
+      },
+      "Playlist": {
+        "schema_name": "public",
+        "table_name": "Playlist",
+        "columns": {
+          "Name": {
+            "name": "Name",
+            "type": "String"
+          },
+          "PlaylistId": {
+            "name": "PlaylistId",
+            "type": "Int"
+          }
+        },
+        "uniqueness_constraints": {
+          "Playlist_pkey": [
+            "PlaylistId"
+          ]
+        },
+        "foreign_relations": {}
+      },
+      "PlaylistTrack": {
+        "schema_name": "public",
+        "table_name": "PlaylistTrack",
+        "columns": {
+          "PlaylistId": {
+            "name": "PlaylistId",
+            "type": "Int"
+          },
+          "TrackId": {
+            "name": "TrackId",
+            "type": "Int"
+          }
+        },
+        "uniqueness_constraints": {
+          "PK_PlaylistTrack": [
+            "PlaylistId",
+            "TrackId"
+          ]
+        },
+        "foreign_relations": {
+          "FK_PlaylistTrackPlaylistId": {
+            "foreign_table": "Playlist",
+            "column_mapping": {
+              "PlaylistId": "PlaylistId"
+            }
+          },
+          "FK_PlaylistTrackTrackId": {
+            "foreign_table": "Track",
+            "column_mapping": {
+              "TrackId": "TrackId"
+            }
+          }
+        }
+      },
+      "Track": {
+        "schema_name": "public",
+        "table_name": "Track",
+        "columns": {
+          "AlbumId": {
+            "name": "AlbumId",
+            "type": "Int"
+          },
+          "Bytes": {
+            "name": "Bytes",
+            "type": "Int"
+          },
+          "Composer": {
+            "name": "Composer",
+            "type": "String"
+          },
+          "GenreId": {
+            "name": "GenreId",
+            "type": "Int"
+          },
+          "MediaTypeId": {
+            "name": "MediaTypeId",
+            "type": "Int"
+          },
+          "Milliseconds": {
+            "name": "Milliseconds",
+            "type": "Int"
+          },
+          "Name": {
+            "name": "Name",
+            "type": "String"
+          },
+          "TrackId": {
+            "name": "TrackId",
+            "type": "Int"
+          },
+          "UnitPrice": {
+            "name": "UnitPrice",
+            "type": "Float"
+          }
+        },
+        "uniqueness_constraints": {
+          "Track_pkey": [
+            "TrackId"
+          ]
+        },
+        "foreign_relations": {
+          "FK_TrackAlbumId": {
+            "foreign_table": "Album",
+            "column_mapping": {
+              "AlbumId": "AlbumId"
+            }
+          },
+          "FK_TrackGenreId": {
+            "foreign_table": "Genre",
+            "column_mapping": {
+              "GenreId": "GenreId"
+            }
+          },
+          "FK_TrackMediaTypeId": {
+            "foreign_table": "MediaType",
+            "column_mapping": {
+              "MediaTypeId": "MediaTypeId"
+            }
+          }
+        }
+      }
+    },
+    "native_queries": {
+      "artist": {
+        "sql": "SELECT * FROM public.\"Artist\"",
+        "columns": {
+          "ArtistId": {
+            "name": "ArtistId",
+            "type": "Int"
+          },
+          "Name": {
+            "name": "Name",
+            "type": "String"
+          }
+        }
+      },
+      "artist_below_id": {
+        "sql": "SELECT * FROM public.\"Artist\" WHERE \"ArtistId\" < {{id}}",
+        "columns": {
+          "ArtistId": {
+            "name": "ArtistId",
+            "type": "Int"
+          },
+          "Name": {
+            "name": "Name",
+            "type": "String"
+          }
+        },
+        "arguments": {
+          "id": {
+            "name": "id",
+            "type": "Int"
+          }
+        }
+      },
+      "album_by_title": {
+        "sql": "SELECT * FROM public.\"Album\" WHERE \"Title\" LIKE {{title}} AND \"AlbumId\" < {{id}}",
+        "columns": {
+          "AlbumId": {
+            "name": "AlbumId",
+            "type": "Int"
+          },
+          "Title": {
+            "name": "Title",
+            "type": "String"
+          },
+          "ArtistId": {
+            "name": "ArtistId",
+            "type": "Int"
+          }
+        },
+        "arguments": {
+          "id": {
+            "name": "id",
+            "type": "Int"
+          },
+          "title": {
+            "name": "title",
+            "type": "String"
+          }
+        }
+      }
+    }
+  },
+  "aggregate_functions": {
+    "Int": {
+      "bit_and": {
+        "return_type": "Int"
+      },
+      "bit_or": {
+        "return_type": "Int"
+      },
+      "bit_xor": {
+        "return_type": "Int"
+      },
+      "count": {
+        "return_type": "Int"
+      },
+      "dense_rank": {
+        "return_type": "Int"
+      },
+      "max": {
+        "return_type": "Int"
+      },
+      "min": {
+        "return_type": "Int"
+      },
+      "ntile": {
+        "return_type": "Int"
+      },
+      "rank": {
+        "return_type": "Int"
+      },
+      "sum": {
+        "return_type": "Int"
+      }
+    },
+    "Float": {
+      "avg": {
+        "return_type": "Float"
+      },
+      "cume_dist": {
+        "return_type": "Float"
+      },
+      "max": {
+        "return_type": "Float"
+      },
+      "min": {
+        "return_type": "Float"
+      },
+      "percent_rank": {
+        "return_type": "Float"
+      },
+      "stddev": {
+        "return_type": "Float"
+      },
+      "stddev_pop": {
+        "return_type": "Float"
+      },
+      "stddev_samp": {
+        "return_type": "Float"
+      },
+      "sum": {
+        "return_type": "Float"
+      },
+      "var_pop": {
+        "return_type": "Float"
+      },
+      "var_samp": {
+        "return_type": "Float"
+      },
+      "variance": {
+        "return_type": "Float"
+      }
+    },
+    "String": {
+      "max": {
+        "return_type": "String"
+      },
+      "min": {
+        "return_type": "String"
+      }
+    },
+    "Boolean": {
+      "bool_and": {
+        "return_type": "Boolean"
+      },
+      "bool_or": {
+        "return_type": "Boolean"
+      },
+      "every": {
+        "return_type": "Boolean"
+      }
+    }
+  }
+}

@@ -35,7 +35,15 @@ jobs:
               "artifact_path": "result/bin/ndc-citus",
               "docker_build_command":"docker-citus-x86_64-linux",
               "docker_image_name": "ghcr.io/hasura/citus-agent-rs"
+            },
+            {
+              "build_command": "aurora-agent-x86_64-linux",
+              "binary_artifact_name": "hasura-aurora-agent-rs",
+              "artifact_path": "result/bin/ndc-aurora",
+              "docker_build_command":"docker-aurora-x86_64-linux",
+              "docker_image_name": "ghcr.io/hasura/aurora-agent-rs"
             }
+
           ]
 
     steps:

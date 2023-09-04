@@ -13,6 +13,9 @@ COCKROACH_CHINOOK_DEPLOYMENT := "static/cockroach/chinook-deployment.json"
 CITUS_CONNECTION_STRING := "postgresql://postgres:password@localhost:64004?sslmode=disable"
 CITUS_CHINOOK_DEPLOYMENT := "static/citus/chinook-deployment.json"
 
+# AURORA_CONNECTION_STRING := env_var("AURORA_CONNECTION_STRING")
+AURORA_CHINOOK_DEPLOYMENT := "static/aurora/chinook-deployment.json"
+
 # Notes:
 # * Building Docker images will not work on macOS.
 #   You can use `main` instead, by running:
@@ -100,6 +103,17 @@ dev-citus: start-citus-dependencies
     -x clippy \
     -x 'run --bin ndc-citus -- serve --configuration {{CITUS_CHINOOK_DEPLOYMENT}}'
 
+# watch the code, then test and re-run on changes
+dev-aurora: start-aurora-dependencies
+  RUST_LOG=INFO \
+    OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://localhost:4317 \
+    OTEL_SERVICE_NAME=citus-ndc \
+    cargo watch -i "**/snapshots/*" \
+    -c \
+    -x 'test -p query-engine -p ndc-aurora' \
+    -x clippy \
+    -x 'run --bin ndc-aurora -- serve --configuration {{AURORA_CHINOOK_DEPLOYMENT}}'
+
 # watch the code, and re-run on changes
 watch-run: start-dependencies
   RUST_LOG=DEBUG \
@@ -167,6 +181,17 @@ start-citus-dependencies:
   docker compose -f ../v3-engine/docker-compose.yaml up -d jaeger
   # start citus
   docker compose up --wait citus
+
+# setup aurora + jaeger
+# aurora is a big different, the 'setup' step is taking the
+# `AURORA_CONNECTION_STRING` and inserting it into a new copy of the deployment
+start-aurora-dependencies:
+  # start jaeger, configured to listen to V3
+  docker compose -f ../v3-engine/docker-compose.yaml up -d jaeger
+  # splice `AURORA_CONNECTION_STRING` into
+  cat static/aurora/chinook-deployment-template.json \
+    | jq '.postgres_database_url=(env | .AURORA_CONNECTION_STRING)' \
+    >> {{ AURORA_CHINOOK_DEPLOYMENT }}
 
 # run prometheus + grafana
 start-metrics:

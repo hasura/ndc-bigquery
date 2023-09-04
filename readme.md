@@ -49,6 +49,13 @@ Among the docker containers is a Jaeger instance for tracing/debugging, accessib
 
 See [debugging.md](./debugging.md).
 
+### Other Postgres flavours
+
+You can also run `just dev-citus`, `just dev-cockroach` or `just dev-aurora`.
+
+Aurora runs against a static AWS instance, so you'll need to set the `AURORA_CONNECTION_STRING` environment variable
+to a valid connection string.
+
 ### Profile
 
 We can produce a flamegraph using `just flamegraph` using [flamegraph-rs](https://github.com/flamegraph-rs/flamegraph). Follow the installation instructions.

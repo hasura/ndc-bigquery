@@ -176,3 +176,51 @@ jobs:
           message_format: '🐴 *{workflow}* {status_message} for <{repo_url}|{repo}>'
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.BROKEN_BUILD_SLACK_WEBHOOK_URL }}
+
+  test-aurora-ndc:
+    name: Test ndc-aurora
+    runs-on: ubuntu-latest
+    env:
+      CARGO_NET_GIT_FETCH_WITH_CLI: "true"
+      RUSTFLAGS: "-D warnings" # fail on warnings
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: install protoc
+        uses: arduino/setup-protoc@v2
+        with:
+          version: "23.3"
+
+      - name: setup deployment
+        env:
+          AURORA_CONNECTION_STRING: ${{ secrets.AURORA_CONNECTION_STRING }}
+        run: |
+          # take connection string from env, create deployment file with it
+          cat static/aurora/chinook-deployment-template.json \
+            | jq '.postgres_database_url=(env | .AURORA_CONNECTION_STRING)' \
+           > static/aurora/chinook-deployment.json
+
+      - name: install tools
+        run: |
+          rustup show
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: run tests
+        run: |
+          cargo test --release -p ndc-aurora
+        env:
+          RUST_LOG: INFO
+          AURORA_CONNECTION_STRING: ${{ secrets.AURORA_CONNECTION_STRING }}
+
+      # scream into Slack if something goes wrong
+      - name: report status
+        if: github.ref == 'refs/heads/main'
+        uses: ravsamhq/notify-slack-action@v2
+        with:
+          status: ${{ job.status }}
+          notify_when: failure
+          notification_title: '😧 Error on <{repo_url}|{repo}>'
+          message_format: '🐴 *{workflow}* {status_message} for <{repo_url}|{repo}>'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.BROKEN_BUILD_SLACK_WEBHOOK_URL }}

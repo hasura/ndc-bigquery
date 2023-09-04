@@ -103,6 +103,27 @@
           crossSystem = "aarch64-linux";
         };
 
+        ### AURORA ###
+
+        # Build for the architecture and OS that is running the build
+        aurora-agent = cargoBuild {
+          binary-name = "ndc-aurora";
+          inherit crateExpression nixpkgs crane rust-overlay localSystem;
+        };
+
+        aurora-agent-x86_64-linux = cargoBuild {
+          inherit crateExpression nixpkgs crane rust-overlay localSystem;
+          binary-name = "ndc-aurora";
+          crossSystem = "x86_64-linux";
+        };
+
+        aurora-agent-aarch64-linux = cargoBuild {
+          inherit crateExpression nixpkgs crane rust-overlay localSystem;
+          binary-name = "ndc-aurora";
+          crossSystem = "aarch64-linux";
+        };
+
+
       in
       {
         checks = {
@@ -214,6 +235,34 @@
             binary-name = "ndc-citus";
             image-name = "ghcr.io/hasura/citus-agent-rs";
           };
+
+          /* aurora ndc targets */
+          aurora-agent = aurora-agent;
+          aurora-agent-x86_64-linux = aurora-agent-x86_64-linux;
+          aurora-agent-aarch64-linux = aurora-agent-aarch64-linux;
+
+          /* build Docker for Citus with whatever the local dev env is */
+          docker-aurora-dev = pkgs.callPackage ./nix/docker.nix {
+            ndc-agent = aurora-agent;
+            binary-name = "ndc-aurora";
+            image-name = "ghcr.io/hasura/aurora-agent-rs";
+            tag = "dev";
+          };
+
+          docker-aurora-x86_64-linux = pkgs.callPackage ./nix/docker.nix {
+            ndc-agent = aurora-agent-x86_64-linux;
+            architecture = "amd64";
+            binary-name = "ndc-aurora";
+            image-name = "ghcr.io/hasura/aurora-agent-rs";
+          };
+
+          docker-aurora-aarch64-linux = pkgs.callPackage ./nix/docker.nix {
+            ndc-agent = aurora-agent-aarch64-linux;
+            architecture = "arm64";
+            binary-name = "ndc-aurora";
+            image-name = "ghcr.io/hasura/aurora-agent-rs";
+          };
+
 
           publish-docker-image = pkgs.writeShellApplication {
             name = "publish-docker-image";
