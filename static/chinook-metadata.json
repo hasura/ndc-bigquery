@@ -131,8 +131,8 @@
                 "id": {
                   "description": "The cyling id",
                   "type": {
-                      "type": "named",
-                      "name": "Int"
+                    "type": "named",
+                    "name": "Int"
                   }
                 }
               },
@@ -199,8 +199,8 @@
             "id": {
               "description": "The ceiling id",
               "type": {
-                  "type": "named",
-                  "name": "Int"
+                "type": "named",
+                "name": "Int"
               }
             }
           },

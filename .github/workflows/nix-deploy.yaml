@@ -9,7 +9,7 @@ on:
 
 jobs:
   build_and_deploy:
-    name: build and deploy 
+    name: build and deploy
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -19,31 +19,30 @@ jobs:
               "build_command": "postgres-agent-x86_64-linux",
               "binary_artifact_name": "hasura-postgres-agent-rs",
               "artifact_path": "result/bin/ndc-postgres",
-              "docker_build_command":"docker-postgres-x86_64-linux",
-              "docker_image_name": "ghcr.io/hasura/postgres-agent-rs"
+              "docker_build_command": "docker-postgres-x86_64-linux",
+              "docker_image_name": "ghcr.io/hasura/postgres-agent-rs",
             },
             {
               "build_command": "cockroach-agent-x86_64-linux",
               "binary_artifact_name": "hasura-cockroach-agent-rs",
               "artifact_path": "result/bin/ndc-cockroach",
-              "docker_build_command":"docker-cockroach-x86_64-linux",
-              "docker_image_name": "ghcr.io/hasura/cockroach-agent-rs"
+              "docker_build_command": "docker-cockroach-x86_64-linux",
+              "docker_image_name": "ghcr.io/hasura/cockroach-agent-rs",
             },
             {
               "build_command": "citus-agent-x86_64-linux",
               "binary_artifact_name": "hasura-citus-agent-rs",
               "artifact_path": "result/bin/ndc-citus",
-              "docker_build_command":"docker-citus-x86_64-linux",
-              "docker_image_name": "ghcr.io/hasura/citus-agent-rs"
+              "docker_build_command": "docker-citus-x86_64-linux",
+              "docker_image_name": "ghcr.io/hasura/citus-agent-rs",
             },
             {
               "build_command": "aurora-agent-x86_64-linux",
               "binary_artifact_name": "hasura-aurora-agent-rs",
               "artifact_path": "result/bin/ndc-aurora",
-              "docker_build_command":"docker-aurora-x86_64-linux",
-              "docker_image_name": "ghcr.io/hasura/aurora-agent-rs"
-            }
-
+              "docker_build_command": "docker-aurora-x86_64-linux",
+              "docker_image_name": "ghcr.io/hasura/aurora-agent-rs",
+            },
           ]
 
     steps:

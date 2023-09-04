@@ -119,9 +119,7 @@
         "justifyMode": "auto",
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
+          "calcs": ["lastNotNull"],
           "fields": "",
           "values": false
         },
@@ -211,9 +209,7 @@
       "id": 112,
       "options": {
         "legend": {
-          "calcs": [
-            "lastNotNull"
-          ],
+          "calcs": ["lastNotNull"],
           "displayMode": "list",
           "placement": "bottom",
           "showLegend": true
@@ -277,9 +273,7 @@
       "options": {
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": [
-            "mean"
-          ],
+          "calcs": ["mean"],
           "fields": "",
           "values": false
         },
@@ -406,10 +400,7 @@
   "refresh": "5s",
   "schemaVersion": 37,
   "style": "dark",
-  "tags": [
-    "prometheus",
-    "k6"
-  ],
+  "tags": ["prometheus", "k6"],
   "templating": {
     "list": [
       {

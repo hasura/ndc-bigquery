@@ -21,9 +21,7 @@
           }
         },
         "uniqueness_constraints": {
-          "PK_Album": [
-            "AlbumId"
-          ]
+          "PK_Album": ["AlbumId"]
         },
         "foreign_relations": {
           "FK_AlbumArtistId": {
@@ -48,9 +46,7 @@
           }
         },
         "uniqueness_constraints": {
-          "PK_Artist": [
-            "ArtistId"
-          ]
+          "PK_Artist": ["ArtistId"]
         },
         "foreign_relations": {}
       },
@@ -112,9 +108,7 @@
           }
         },
         "uniqueness_constraints": {
-          "PK_Customer": [
-            "CustomerId"
-          ]
+          "PK_Customer": ["CustomerId"]
         },
         "foreign_relations": {
           "FK_CustomerSupportRepId": {
@@ -191,9 +185,7 @@
           }
         },
         "uniqueness_constraints": {
-          "PK_Employee": [
-            "EmployeeId"
-          ]
+          "PK_Employee": ["EmployeeId"]
         },
         "foreign_relations": {
           "FK_EmployeeReportsTo": {
@@ -218,9 +210,7 @@
           }
         },
         "uniqueness_constraints": {
-          "PK_Genre": [
-            "GenreId"
-          ]
+          "PK_Genre": ["GenreId"]
         },
         "foreign_relations": {}
       },
@@ -266,9 +256,7 @@
           }
         },
         "uniqueness_constraints": {
-          "PK_Invoice": [
-            "InvoiceId"
-          ]
+          "PK_Invoice": ["InvoiceId"]
         },
         "foreign_relations": {
           "FK_InvoiceCustomerId": {
@@ -305,9 +293,7 @@
           }
         },
         "uniqueness_constraints": {
-          "PK_InvoiceLine": [
-            "InvoiceLineId"
-          ]
+          "PK_InvoiceLine": ["InvoiceLineId"]
         },
         "foreign_relations": {
           "FK_InvoiceLineInvoiceId": {
@@ -338,9 +324,7 @@
           }
         },
         "uniqueness_constraints": {
-          "PK_MediaType": [
-            "MediaTypeId"
-          ]
+          "PK_MediaType": ["MediaTypeId"]
         },
         "foreign_relations": {}
       },
@@ -358,9 +342,7 @@
           }
         },
         "uniqueness_constraints": {
-          "PK_Playlist": [
-            "PlaylistId"
-          ]
+          "PK_Playlist": ["PlaylistId"]
         },
         "foreign_relations": {}
       },
@@ -378,10 +360,7 @@
           }
         },
         "uniqueness_constraints": {
-          "PK_PlaylistTrack": [
-            "PlaylistId",
-            "TrackId"
-          ]
+          "PK_PlaylistTrack": ["PlaylistId", "TrackId"]
         },
         "foreign_relations": {
           "FK_PlaylistTrackPlaylistId": {
@@ -440,9 +419,7 @@
           }
         },
         "uniqueness_constraints": {
-          "PK_Track": [
-            "TrackId"
-          ]
+          "PK_Track": ["TrackId"]
         },
         "foreign_relations": {
           "FK_TrackAlbumId": {
@@ -563,9 +540,7 @@
           }
         },
         "uniqueness_constraints": {
-          "spatial_ref_sys_pkey": [
-            "srid"
-          ]
+          "spatial_ref_sys_pkey": ["srid"]
         },
         "foreign_relations": {}
       }
@@ -630,7 +605,7 @@
           }
         }
       }
-	}
+    }
   },
   "aggregate_functions": {
     "Int": {

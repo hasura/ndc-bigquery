@@ -154,9 +154,7 @@
         "footer": {
           "countRows": false,
           "fields": "",
-          "reducer": [
-            "sum"
-          ],
+          "reducer": ["sum"],
           "show": false
         },
         "frameIndex": 4,
@@ -489,9 +487,7 @@
         "justifyMode": "center",
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": [
-            "max"
-          ],
+          "calcs": ["max"],
           "fields": "",
           "values": false
         },
@@ -587,9 +583,7 @@
         "justifyMode": "center",
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": [
-            "max"
-          ],
+          "calcs": ["max"],
           "fields": "",
           "values": false
         },
@@ -686,9 +680,7 @@
         "justifyMode": "center",
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
+          "calcs": ["lastNotNull"],
           "fields": "",
           "values": false
         },
@@ -784,9 +776,7 @@
         "justifyMode": "center",
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
+          "calcs": ["lastNotNull"],
           "fields": "",
           "values": false
         },
@@ -926,10 +916,7 @@
               {
                 "id": "custom.lineStyle",
                 "value": {
-                  "dash": [
-                    10,
-                    10
-                  ],
+                  "dash": [10, 10],
                   "fill": "dash"
                 }
               },
@@ -1076,19 +1063,12 @@
       "interval": "5",
       "options": {
         "legend": {
-          "calcs": [
-            "min",
-            "mean",
-            "max",
-            "lastNotNull"
-          ],
+          "calcs": ["min", "mean", "max", "lastNotNull"],
           "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
         },
-        "timezones": [
-          "browser"
-        ],
+        "timezones": ["browser"],
         "tooltip": {
           "mode": "multi",
           "sort": "none"
@@ -1223,9 +1203,7 @@
         "justifyMode": "center",
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
+          "calcs": ["lastNotNull"],
           "fields": "",
           "values": false
         },
@@ -1504,9 +1482,7 @@
         "justifyMode": "center",
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
+          "calcs": ["lastNotNull"],
           "fields": "",
           "values": false
         },
@@ -1620,9 +1596,7 @@
         "justifyMode": "center",
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
+          "calcs": ["lastNotNull"],
           "fields": "",
           "values": false
         },
@@ -1753,9 +1727,7 @@
           "countRows": false,
           "enablePagination": true,
           "fields": "",
-          "reducer": [
-            "sum"
-          ],
+          "reducer": ["sum"],
           "show": false
         },
         "frameIndex": 2,
@@ -1791,39 +1763,27 @@
           "options": {
             "fields": {
               "Value": {
-                "aggregations": [
-                  "lastNotNull"
-                ],
+                "aggregations": ["lastNotNull"],
                 "operation": "aggregate"
               },
               "Value #A": {
-                "aggregations": [
-                  "lastNotNull"
-                ],
+                "aggregations": ["lastNotNull"],
                 "operation": "aggregate"
               },
               "Value #B": {
-                "aggregations": [
-                  "lastNotNull"
-                ],
+                "aggregations": ["lastNotNull"],
                 "operation": "aggregate"
               },
               "Value #C": {
-                "aggregations": [
-                  "lastNotNull"
-                ],
+                "aggregations": ["lastNotNull"],
                 "operation": "aggregate"
               },
               "Value #D": {
-                "aggregations": [
-                  "lastNotNull"
-                ],
+                "aggregations": ["lastNotNull"],
                 "operation": "aggregate"
               },
               "Value #E": {
-                "aggregations": [
-                  "lastNotNull"
-                ],
+                "aggregations": ["lastNotNull"],
                 "operation": "aggregate"
               },
               "Value #F": {
@@ -1962,9 +1922,7 @@
         "footer": {
           "countRows": false,
           "fields": "",
-          "reducer": [
-            "sum"
-          ],
+          "reducer": ["sum"],
           "show": false
         },
         "frameIndex": 1,
@@ -1990,39 +1948,27 @@
           "options": {
             "fields": {
               "Value": {
-                "aggregations": [
-                  "lastNotNull"
-                ],
+                "aggregations": ["lastNotNull"],
                 "operation": "aggregate"
               },
               "Value #A": {
-                "aggregations": [
-                  "lastNotNull"
-                ],
+                "aggregations": ["lastNotNull"],
                 "operation": "aggregate"
               },
               "Value #B": {
-                "aggregations": [
-                  "lastNotNull"
-                ],
+                "aggregations": ["lastNotNull"],
                 "operation": "aggregate"
               },
               "Value #C": {
-                "aggregations": [
-                  "lastNotNull"
-                ],
+                "aggregations": ["lastNotNull"],
                 "operation": "aggregate"
               },
               "Value #D": {
-                "aggregations": [
-                  "lastNotNull"
-                ],
+                "aggregations": ["lastNotNull"],
                 "operation": "aggregate"
               },
               "Value #E": {
-                "aggregations": [
-                  "lastNotNull"
-                ],
+                "aggregations": ["lastNotNull"],
                 "operation": "aggregate"
               },
               "Value #F": {
@@ -2637,9 +2583,7 @@
         "footer": {
           "countRows": false,
           "fields": "",
-          "reducer": [
-            "sum"
-          ],
+          "reducer": ["sum"],
           "show": false
         },
         "frameIndex": 1,
@@ -2728,34 +2672,23 @@
           "options": {
             "fields": {
               "Value": {
-                "aggregations": [
-                  "min",
-                  "max"
-                ],
+                "aggregations": ["min", "max"],
                 "operation": "aggregate"
               },
               "Value #A": {
-                "aggregations": [
-                  "lastNotNull"
-                ],
+                "aggregations": ["lastNotNull"],
                 "operation": "aggregate"
               },
               "Value #B": {
-                "aggregations": [
-                  "lastNotNull"
-                ],
+                "aggregations": ["lastNotNull"],
                 "operation": "aggregate"
               },
               "Value #C": {
-                "aggregations": [
-                  "lastNotNull"
-                ],
+                "aggregations": ["lastNotNull"],
                 "operation": "aggregate"
               },
               "Value #D": {
-                "aggregations": [
-                  "lastNotNull"
-                ],
+                "aggregations": ["lastNotNull"],
                 "operation": "aggregate"
               },
               "Value #E": {
@@ -2763,9 +2696,7 @@
                 "operation": "aggregate"
               },
               "Value #F": {
-                "aggregations": [
-                  "lastNotNull"
-                ],
+                "aggregations": ["lastNotNull"],
                 "operation": "aggregate"
               },
               "method": {
@@ -2909,9 +2840,7 @@
       "interval": "1s",
       "options": {
         "legend": {
-          "calcs": [
-            "lastNotNull"
-          ],
+          "calcs": ["lastNotNull"],
           "displayMode": "table",
           "placement": "right",
           "showLegend": true,
@@ -3149,9 +3078,7 @@
         "footer": {
           "countRows": false,
           "fields": "",
-          "reducer": [
-            "sum"
-          ],
+          "reducer": ["sum"],
           "show": false
         },
         "frameIndex": 1,
@@ -3236,39 +3163,27 @@
           "options": {
             "fields": {
               "Value": {
-                "aggregations": [
-                  "lastNotNull"
-                ],
+                "aggregations": ["lastNotNull"],
                 "operation": "aggregate"
               },
               "Value #A": {
-                "aggregations": [
-                  "lastNotNull"
-                ],
+                "aggregations": ["lastNotNull"],
                 "operation": "aggregate"
               },
               "Value #B": {
-                "aggregations": [
-                  "lastNotNull"
-                ],
+                "aggregations": ["lastNotNull"],
                 "operation": "aggregate"
               },
               "Value #C": {
-                "aggregations": [
-                  "lastNotNull"
-                ],
+                "aggregations": ["lastNotNull"],
                 "operation": "aggregate"
               },
               "Value #D": {
-                "aggregations": [
-                  "lastNotNull"
-                ],
+                "aggregations": ["lastNotNull"],
                 "operation": "aggregate"
               },
               "Value #E": {
-                "aggregations": [
-                  "lastNotNull"
-                ],
+                "aggregations": ["lastNotNull"],
                 "operation": "aggregate"
               },
               "Value #F": {
@@ -3474,9 +3389,7 @@
         "footer": {
           "countRows": false,
           "fields": "",
-          "reducer": [
-            "sum"
-          ],
+          "reducer": ["sum"],
           "show": false
         },
         "frameIndex": 1,
@@ -3561,39 +3474,27 @@
           "options": {
             "fields": {
               "Value": {
-                "aggregations": [
-                  "lastNotNull"
-                ],
+                "aggregations": ["lastNotNull"],
                 "operation": "aggregate"
               },
               "Value #A": {
-                "aggregations": [
-                  "lastNotNull"
-                ],
+                "aggregations": ["lastNotNull"],
                 "operation": "aggregate"
               },
               "Value #B": {
-                "aggregations": [
-                  "lastNotNull"
-                ],
+                "aggregations": ["lastNotNull"],
                 "operation": "aggregate"
               },
               "Value #C": {
-                "aggregations": [
-                  "lastNotNull"
-                ],
+                "aggregations": ["lastNotNull"],
                 "operation": "aggregate"
               },
               "Value #D": {
-                "aggregations": [
-                  "lastNotNull"
-                ],
+                "aggregations": ["lastNotNull"],
                 "operation": "aggregate"
               },
               "Value #E": {
-                "aggregations": [
-                  "lastNotNull"
-                ],
+                "aggregations": ["lastNotNull"],
                 "operation": "aggregate"
               },
               "Value #F": {
@@ -3780,10 +3681,7 @@
               {
                 "id": "custom.lineStyle",
                 "value": {
-                  "dash": [
-                    10,
-                    10
-                  ],
+                  "dash": [10, 10],
                   "fill": "dash"
                 }
               },
@@ -3930,19 +3828,12 @@
       "interval": "5",
       "options": {
         "legend": {
-          "calcs": [
-            "min",
-            "mean",
-            "max",
-            "lastNotNull"
-          ],
+          "calcs": ["min", "mean", "max", "lastNotNull"],
           "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
         },
-        "timezones": [
-          "browser"
-        ],
+        "timezones": ["browser"],
         "tooltip": {
           "mode": "multi",
           "sort": "none"
@@ -4015,10 +3906,7 @@
   "revision": 1,
   "schemaVersion": 38,
   "style": "dark",
-  "tags": [
-    "prometheus",
-    "k6"
-  ],
+  "tags": ["prometheus", "k6"],
   "templating": {
     "list": [
       {

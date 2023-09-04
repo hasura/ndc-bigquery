@@ -31,8 +31,8 @@ jobs:
         with:
           status: ${{ job.status }}
           notify_when: failure
-          notification_title: '😧 Error on <{repo_url}|{repo}>'
-          message_format: '🐴 *{workflow}* {status_message} for <{repo_url}|{repo}>'
+          notification_title: "😧 Error on <{repo_url}|{repo}>"
+          message_format: "🐴 *{workflow}* {status_message} for <{repo_url}|{repo}>"
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.BROKEN_BUILD_SLACK_WEBHOOK_URL }}
 
@@ -78,8 +78,8 @@ jobs:
         with:
           status: ${{ job.status }}
           notify_when: failure
-          notification_title: '😧 Error on <{repo_url}|{repo}>'
-          message_format: '🐴 *{workflow}* {status_message} for <{repo_url}|{repo}>'
+          notification_title: "😧 Error on <{repo_url}|{repo}>"
+          message_format: "🐴 *{workflow}* {status_message} for <{repo_url}|{repo}>"
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.BROKEN_BUILD_SLACK_WEBHOOK_URL }}
 
@@ -125,8 +125,8 @@ jobs:
         with:
           status: ${{ job.status }}
           notify_when: failure
-          notification_title: '😧 Error on <{repo_url}|{repo}>'
-          message_format: '🐴 *{workflow}* {status_message} for <{repo_url}|{repo}>'
+          notification_title: "😧 Error on <{repo_url}|{repo}>"
+          message_format: "🐴 *{workflow}* {status_message} for <{repo_url}|{repo}>"
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.BROKEN_BUILD_SLACK_WEBHOOK_URL }}
 
@@ -172,8 +172,8 @@ jobs:
         with:
           status: ${{ job.status }}
           notify_when: failure
-          notification_title: '😧 Error on <{repo_url}|{repo}>'
-          message_format: '🐴 *{workflow}* {status_message} for <{repo_url}|{repo}>'
+          notification_title: "😧 Error on <{repo_url}|{repo}>"
+          message_format: "🐴 *{workflow}* {status_message} for <{repo_url}|{repo}>"
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.BROKEN_BUILD_SLACK_WEBHOOK_URL }}
 
@@ -220,7 +220,7 @@ jobs:
         with:
           status: ${{ job.status }}
           notify_when: failure
-          notification_title: '😧 Error on <{repo_url}|{repo}>'
-          message_format: '🐴 *{workflow}* {status_message} for <{repo_url}|{repo}>'
+          notification_title: "😧 Error on <{repo_url}|{repo}>"
+          message_format: "🐴 *{workflow}* {status_message} for <{repo_url}|{repo}>"
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.BROKEN_BUILD_SLACK_WEBHOOK_URL }}

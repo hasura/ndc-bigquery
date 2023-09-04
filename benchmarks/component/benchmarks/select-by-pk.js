@@ -57,7 +57,7 @@ export const options = {
     },
   },
   thresholds: {
-    "checks": [
+    checks: [
       {
         threshold: "rate == 1",
         abortOnFail: true,

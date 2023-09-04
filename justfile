@@ -231,19 +231,15 @@ lint *FLAGS:
 lint-apply *FLAGS:
   cargo clippy --fix {{FLAGS}}
 
-# run rustfmt on everything
+# reformat everything
 format:
   cargo fmt --all
+  prettier --write .
 
 # is everything formatted?
 format-check:
   cargo fmt --all -- --check
-
-# Format all json test files
-format-tests:
-  ./scripts/format-with-jq.sh crates/tests-common/goldenfiles/*.json
-  ./scripts/format-with-jq.sh crates/query-engine/tests/goldenfiles/*/*.json
-  ./scripts/format-with-jq.sh crates/query-engine/tests/goldenfiles/*/*/*.json
+  prettier --check .
 
 # check the nix builds work
 build-with-nix:

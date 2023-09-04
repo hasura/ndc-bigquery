@@ -4,16 +4,17 @@
 
 ### Prequisites
 
-1. Install [rustup](https://www.rust-lang.org/tools/install).
+1. Install [rustup](https://www.rust-lang.org/tools/install)
 2. Install additional tools:
-    - `cargo install cargo-watch cargo-insta`
+   - `cargo install cargo-watch cargo-insta`
 3. Install [just](https://github.com/casey/just)
-4. Install [Docker](https://www.docker.com/)
-5. Install protoc. Here are a few options:
-    - `brew install protobuf`
-    - `apt-get install protobuf-compiler`
-    - `dnf install protobuf-compiler`
-6. Clone [v3-engine](https://github.com/hasura/v3-engine) in a directory near this one:
+4. Install [Prettier](https://prettier.io/)
+5. Install [Docker](https://www.docker.com/)
+6. Install protoc. Here are a few options:
+   - `brew install protobuf`
+   - `apt-get install protobuf-compiler`
+   - `dnf install protobuf-compiler`
+7. Clone [v3-engine](https://github.com/hasura/v3-engine) in a directory near this one:
    ```
    (cd .. && git clone git@github.com:hasura/v3-engine.git)
    ```
@@ -39,8 +40,8 @@ just run
    ```
    curl -H "Content-Type: application/json" \
      --data "@crates/ndc-postgres/tests/goldenfiles/select_where_variable.json" \
-	 http://localhost:8100/query \
-	 | jq
+     http://localhost:8100/query \
+     | jq
    ```
 
 Among the docker containers is a Jaeger instance for tracing/debugging, accessible at http://127.0.0.1:4002.
@@ -75,7 +76,6 @@ See [architecture.md](./architecture.md).
 1. Run `just dev` (or `just run`)
 2. Run `just run-engine`
 3. Connect to GraphiQL at http://localhost:3000 and run a query:
-
    ```graphql
    query {
      AlbumByID(AlbumId: 35) {

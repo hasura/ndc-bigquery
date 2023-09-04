@@ -111,7 +111,6 @@ The query execution receives a pool and a plan and executes it against postgres.
 back to the caller of the function.
 The code can be found in [phases/execution.rs](/crates/query-engine/src/phases/execution.rs)
 
-
 ```rs
 pub async fn execute(
     pool: sqlx::PgPool,

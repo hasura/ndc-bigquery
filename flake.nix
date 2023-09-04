@@ -287,6 +287,7 @@
             pkgs.cargo-watch
             pkgs.just
             pkgs.k6
+            pkgs.nodePackages.prettier
             pkgs.pkg-config
             pkgs.rnix-lsp
             rustToolchain

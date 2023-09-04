@@ -247,9 +247,7 @@
         "footer": {
           "countRows": false,
           "fields": "",
-          "reducer": [
-            "sum"
-          ],
+          "reducer": ["sum"],
           "show": false
         },
         "showHeader": true,
@@ -333,37 +331,26 @@
           "options": {
             "fields": {
               "Time": {
-                "aggregations": [
-                  "min",
-                  "max"
-                ],
+                "aggregations": ["min", "max"],
                 "operation": "aggregate"
               },
               "Value": {
                 "aggregations": []
               },
               "Value #B": {
-                "aggregations": [
-                  "lastNotNull"
-                ],
+                "aggregations": ["lastNotNull"],
                 "operation": "aggregate"
               },
               "Value #C": {
-                "aggregations": [
-                  "lastNotNull"
-                ],
+                "aggregations": ["lastNotNull"],
                 "operation": "aggregate"
               },
               "Value #D": {
-                "aggregations": [
-                  "lastNotNull"
-                ],
+                "aggregations": ["lastNotNull"],
                 "operation": "aggregate"
               },
               "Value #E": {
-                "aggregations": [
-                  "lastNotNull"
-                ],
+                "aggregations": ["lastNotNull"],
                 "operation": "aggregate"
               },
               "artifact": {
@@ -432,9 +419,7 @@
             },
             "mode": "binary",
             "reduce": {
-              "include": [
-                "Time (max)"
-              ],
+              "include": ["Time (max)"],
               "reducer": "sum"
             }
           }
@@ -497,10 +482,7 @@
   "revision": 1,
   "schemaVersion": 38,
   "style": "dark",
-  "tags": [
-    "prometheus",
-    "k6"
-  ],
+  "tags": ["prometheus", "k6"],
   "templating": {
     "list": [
       {

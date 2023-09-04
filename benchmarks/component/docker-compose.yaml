@@ -4,7 +4,7 @@ name: postgres-ndc-component-benchmarks
 
 services:
   benchmark:
-    image: grafana/k6 
+    image: grafana/k6
     environment:
       AGENT_SOCKET: "agent:8100"
       OUTPUT_DIRECTORY: "/home/k6/output"
@@ -32,7 +32,7 @@ services:
         condition: service_completed_successfully
 
   benchmark-output-init:
-    image: grafana/k6 
+    image: grafana/k6
     entrypoint:
       - sh
       - -c
