@@ -1,50 +1,50 @@
 {
   "tables": {
-    "Album": {
+    "album": {
       "schema_name": "public",
       "table_name": "Album",
       "columns": {
-        "AlbumId": {
+        "album_id": {
           "name": "AlbumId",
           "type": "Int"
         },
-        "Title": {
+        "title": {
           "name": "Title",
           "type": "String"
         },
-        "ArtistId": {
+        "artist_id": {
           "name": "ArtistId",
           "type": "Int"
         }
       }
     },
-    "Artist": {
+    "artist": {
       "schema_name": "public",
       "table_name": "Artist",
       "columns": {
-        "ArtistId": {
+        "artist_id": {
           "name": "ArtistId",
           "type": "Int"
         },
-        "Name": {
+        "name": {
           "name": "Name",
           "type": "String"
         }
       }
     },
-    "Track": {
+    "track": {
       "schema_name": "public",
       "table_name": "Track",
       "columns": {
-        "TrackId": {
+        "track_id": {
           "name": "TrackId",
           "type": "Int"
         },
-        "Name": {
+        "name": {
           "name": "Name",
           "type": "String"
         },
-        "AlbumId": {
+        "album_id": {
           "name": "AlbumId",
           "type": "Int"
         }

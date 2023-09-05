@@ -177,25 +177,20 @@ fn translate_order_by_target(
     function: Option<String>,
     joins: &mut Vec<sql::ast::Join>,
 ) -> Result<sql::ast::Expression, Error> {
-    let (column_alias, optional_relationship_select) =
-        translate_order_by_target_for_column(env, column.to_string(), path, function)?;
+    let column_or_relationship_select = translate_order_by_target_for_column(
+        env,
+        root_and_current_tables,
+        column.to_string(),
+        path,
+        function,
+    )?;
 
-    match optional_relationship_select {
-        // The column is from the source table, we just need to query it directly
-        // by refering to the table's alias.
-        None => {
-            let column_name =
-                sql::ast::Expression::ColumnName(sql::ast::ColumnName::AliasedColumn {
-                    table: root_and_current_tables.current_table.reference.clone(),
-                    name: column_alias,
-                });
+    match column_or_relationship_select {
+        // The column is from the source table, we just need to query it directly.
+        ColumnOrSelect::Column(column_name) => Ok(sql::ast::Expression::ColumnName(column_name)),
 
-            Ok(column_name)
-        }
-
-        // The column is from a relationship table, we need to join with this
-        // select query.
-        Some(select) => {
+        // The column is from a relationship table, we need to join with this select query.
+        ColumnOrSelect::Select { column, select } => {
             // Give it a nice unique alias.
             let table_alias = sql::helpers::make_order_by_table_alias(
                 index,
@@ -214,7 +209,7 @@ fn translate_order_by_target(
             let column_name =
                 sql::ast::Expression::ColumnName(sql::ast::ColumnName::AliasedColumn {
                     table: sql::ast::TableName::AliasedTable(table_alias),
-                    name: column_alias,
+                    name: column,
                 });
 
             Ok(column_name)
@@ -222,15 +217,27 @@ fn translate_order_by_target(
     }
 }
 
+/// Used as the return type of `translate_order_by_target_for_column`.
+enum ColumnOrSelect {
+    /// Column represents a target column that is reference from the outer select.
+    Column(sql::ast::ColumnName),
+    /// Select represents a select query which contain the requested column.
+    Select {
+        column: sql::ast::ColumnAlias,
+        select: sql::ast::Select,
+    },
+}
+
 /// Generate a SELECT query representing querying the requested column from a table
-/// (potentially a nested one using joins). Return that select query and the requested column alias.
-/// If the column is the root table's column, a `None` will be returned.
+/// (potentially a nested one using joins). The requested column if the path is empty,
+/// or a select query describing how to reach the column.
 fn translate_order_by_target_for_column(
     env: &Env,
+    root_and_current_tables: &RootAndCurrentTables,
     column_name: String,
     path: &[models::PathElement],
     function: Option<String>,
-) -> Result<(sql::ast::ColumnAlias, Option<sql::ast::Select>), Error> {
+) -> Result<ColumnOrSelect, Error> {
     // We want to build a select query where "Track" is the root table, and "Artist"."Name"
     // is the column we need for the order by. Our query will look like this:
     //
@@ -252,9 +259,6 @@ fn translate_order_by_target_for_column(
     // We will add joins according to the path element.
     let mut joins: Vec<sql::ast::LeftOuterJoinLateral> = vec![];
 
-    // This will be the column we reference in the order by.
-    let selected_column_alias = sql::helpers::make_column_alias(column_name);
-
     // Loop through relationships in reverse order,
     // building up new joins and replacing the selected column for the order by.
     // for each step in the loop we get the required columns (used as keys in the join),
@@ -268,7 +272,7 @@ fn translate_order_by_target_for_column(
     // For example a Reply referencing a preceding reply.
     // Note: since we use rfold the index is decreasing.
     let (_, last_table) = path.iter().enumerate().try_rfold(
-        (vec![selected_column_alias.clone()], None),
+        (vec![column_name.clone()], None),
         |(required_cols, mut last_table), (index, path_element)| {
             // destruct path_element into parts.
             let models::PathElement {
@@ -290,8 +294,8 @@ fn translate_order_by_target_for_column(
             let target_collection_info = env.lookup_collection(&relationship.target_collection)?;
 
             // unpack table info for now.
-            let target_table_info = match target_collection_info {
-                CollectionInfo::Table { info, .. } => Ok(info),
+            let (target_table_info, target_table_name) = match target_collection_info {
+                CollectionInfo::Table { info, name } => Ok((info, name)),
                 CollectionInfo::NativeQuery { .. } => {
                     Err(Error::NotSupported("Native Queries".to_string()))
                 }
@@ -329,7 +333,12 @@ fn translate_order_by_target_for_column(
             // put a pin on what the last table is, so we can wrap the joins
             // in a select querying this table.
             match last_table {
-                None => last_table = Some(target_collection_alias.clone()),
+                None => {
+                    last_table = Some((
+                        target_collection_alias.clone(),
+                        relationship.target_collection.clone(),
+                    ))
+                }
                 Some(_) => {}
             };
 
@@ -339,22 +348,27 @@ fn translate_order_by_target_for_column(
                 .into_iter()
                 .map(|target_col| {
                     let new_table = target_collection_alias_name.clone();
-                    (
-                        target_col.clone(),
+                    let table_collection = CollectionInfo::Table {
+                        name: target_table_name.clone(),
+                        info: target_table_info.clone(),
+                    };
+                    let selected_column = table_collection.lookup_column(&target_col)?;
+                    let selected_column_alias =
+                        sql::helpers::make_column_alias(selected_column.name.clone());
+                    // we use the real name of the column as an alias as well.
+                    Ok((
+                        selected_column_alias.clone(),
                         sql::ast::Expression::ColumnName(sql::ast::ColumnName::AliasedColumn {
                             table: new_table,
-                            name: target_col,
+                            name: selected_column_alias,
                         }),
-                    )
+                    ))
                 })
-                .collect();
+                .collect::<Result<Vec<(sql::ast::ColumnAlias, sql::ast::Expression)>, Error>>()?;
 
             // We find the columns we need from the "previous" table so we can require them.
-            let source_relationship_table_key_columns: Vec<_> = relationship
-                .column_mapping
-                .keys()
-                .map(|source_col| sql::helpers::make_column_alias(source_col.to_string()))
-                .collect();
+            let source_relationship_table_key_columns: Vec<String> =
+                relationship.column_mapping.clone().into_keys().collect();
 
             let source_table = TableNameAndReference {
                 name: relationship.source_collection_or_type.clone(),
@@ -395,29 +409,43 @@ fn translate_order_by_target_for_column(
     )?;
 
     match last_table {
-        // if there were no relationship columns, we don't need to build a query, just return the table.
-        None => Ok((selected_column_alias, None)),
+        // if there were no relationship columns, we don't need to build a query, just return the column.
+        None => {
+            let table = env.lookup_collection(&root_and_current_tables.current_table.name)?;
+            let selected_column = table.lookup_column(&column_name)?;
+
+            let selected_column_name = sql::ast::ColumnName::AliasedColumn {
+                table: root_and_current_tables.current_table.reference.clone(),
+                name: sql::helpers::make_column_alias(selected_column.name.clone()),
+            };
+            Ok(ColumnOrSelect::Column(selected_column_name))
+        }
         // If there was a relationship column, build a wrapping select query selecting the wanted column
         // for the order by, and build a select of all the joins to select from.
-        Some(last_table) => {
+        Some((last_table_reference, last_table_name)) => {
             // order by columns
-            let selected_column_name =
-                sql::ast::Expression::ColumnName(sql::ast::ColumnName::AliasedColumn {
-                    table: sql::ast::TableName::AliasedTable(last_table),
-                    name: selected_column_alias.clone(),
-                });
+            let table = env.lookup_collection(&last_table_name)?;
+            let selected_column = table.lookup_column(&column_name)?;
+
+            let selected_column_name = sql::ast::ColumnName::AliasedColumn {
+                table: sql::ast::TableName::AliasedTable(last_table_reference),
+                name: sql::helpers::make_column_alias(selected_column.name.clone()),
+            };
 
             // if we got a function, we wrap the required column with
             // a function call.
             let selected_column_expr = match function {
-                None => selected_column_name,
+                None => sql::ast::Expression::ColumnName(selected_column_name.clone()),
                 Some(func) => sql::ast::Expression::FunctionCall {
                     function: sql::ast::Function::Unknown(func),
-                    args: vec![selected_column_name],
+                    args: vec![sql::ast::Expression::ColumnName(
+                        selected_column_name.clone(),
+                    )],
                 },
             };
 
             // wrapping select
+            let selected_column_alias = sql::helpers::make_column_alias(column_name.to_string());
             let mut select = sql::helpers::simple_select(vec![(
                 selected_column_alias.clone(),
                 selected_column_expr,
@@ -448,7 +476,10 @@ fn translate_order_by_target_for_column(
                 .collect::<Vec<sql::ast::Join>>();
 
             // and return the requested column alias and the inner select.
-            Ok((selected_column_alias, Some(select)))
+            Ok(ColumnOrSelect::Select {
+                column: selected_column_alias,
+                select,
+            })
         }
     }
 }

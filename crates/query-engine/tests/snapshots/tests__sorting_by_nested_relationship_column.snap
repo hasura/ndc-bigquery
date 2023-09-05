@@ -15,44 +15,42 @@ FROM
         FROM
           (
             SELECT
-              "Track"."Name" AS "Name"
+              "track"."Name" AS "Name"
             FROM
-              "public"."Track" AS "Track"
+              "public"."Track" AS "track"
               LEFT OUTER JOIN LATERAL (
                 SELECT
-                  "%ORDER_PATH_PART_1_Artist"."Name" AS "Name"
+                  "%ORDER_PATH_PART_1_artist"."Name" AS "name"
                 FROM
                   (
                     SELECT
-                      "%ORDER_PATH_PART_0_Album"."ArtistId" AS "ArtistId"
+                      "%ORDER_PATH_PART_0_album"."ArtistId" AS "ArtistId"
                     FROM
-                      "public"."Album" AS "%ORDER_PATH_PART_0_Album"
+                      "public"."Album" AS "%ORDER_PATH_PART_0_album"
                     WHERE
                       (
                         true
                         AND (
-                          "Track"."AlbumId" = "%ORDER_PATH_PART_0_Album"."AlbumId"
+                          "track"."AlbumId" = "%ORDER_PATH_PART_0_album"."AlbumId"
                         )
                       )
-                  ) AS "%ORDER_PATH_PART_0_Album"
+                  ) AS "%ORDER_PATH_PART_0_album"
                   LEFT OUTER JOIN LATERAL (
                     SELECT
-                      "%ORDER_PATH_PART_1_Artist"."Name" AS "Name"
+                      "%ORDER_PATH_PART_1_artist"."Name" AS "Name"
                     FROM
-                      "public"."Artist" AS "%ORDER_PATH_PART_1_Artist"
+                      "public"."Artist" AS "%ORDER_PATH_PART_1_artist"
                     WHERE
                       (
                         true
                         AND (
-                          "%ORDER_PATH_PART_0_Album"."ArtistId" = "%ORDER_PATH_PART_1_Artist"."ArtistId"
+                          "%ORDER_PATH_PART_0_album"."ArtistId" = "%ORDER_PATH_PART_1_artist"."ArtistId"
                         )
                       )
-                  ) AS "%ORDER_PATH_PART_1_Artist" ON ('true')
-              ) AS "%ORDER_0_FOR_Track" ON ('true')
+                  ) AS "%ORDER_PATH_PART_1_artist" ON ('true')
+              ) AS "%ORDER_0_FOR_track" ON ('true')
             ORDER BY
-              "%ORDER_0_FOR_Track"."Name" ASC
-            LIMIT
-              5 OFFSET 3
+              "%ORDER_0_FOR_track"."name" ASC
           ) AS "rows"
       ) AS "rows"
   ) AS "universe"
