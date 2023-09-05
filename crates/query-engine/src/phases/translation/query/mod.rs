@@ -59,7 +59,7 @@ pub fn translate(
     };
 
     // log and return
-    tracing::info!("SQL AST: {:?}", json_select);
+    tracing::info!(sql_ast = ?json_select);
 
     Ok(sql::execution_plan::simple_exec_plan(
         query_request.variables,

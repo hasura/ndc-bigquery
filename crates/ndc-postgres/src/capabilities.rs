@@ -7,7 +7,7 @@ use ndc_sdk::models;
 pub fn get_capabilities() -> models::CapabilitiesResponse {
     let empty = serde_json::to_value(()).unwrap();
     models::CapabilitiesResponse {
-        versions: "^0.0.0".into(),
+        versions: "^0.1.0".into(),
         capabilities: models::Capabilities {
             explain: Some(empty.clone()),
             query: Some(models::QueryCapabilities {

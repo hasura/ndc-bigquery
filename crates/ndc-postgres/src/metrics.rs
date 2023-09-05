@@ -1,5 +1,5 @@
 //! Metrics setup and update for our connector.
-//!
+
 use std::time::Duration;
 
 use prometheus::core::{AtomicF64, AtomicI64, AtomicU64, GenericCounter, GenericGauge};

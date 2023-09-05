@@ -19,10 +19,9 @@ pub async fn execute(
     let query = plan.query();
 
     tracing::info!(
-        "\nGenerated SQL: {}\nWith params: {:?}\nAnd variables: {:?}",
-        query.sql,
-        &query.params,
-        &plan.variables,
+        generated_sql = query.sql,
+        params = ?&query.params,
+        variables = ?&plan.variables,
     );
 
     // run the query on each set of variables. The result is a vector of rows each
@@ -43,15 +42,12 @@ pub async fn execute(
         }
     };
 
-    // tracing::info!("Database rows result: {:?}", rows);
+    // tracing::info!(rows_result = ?rows);
 
-    // Hack a response from the query results. See the 'response_hack' for more details.
+    // Make a response from rows.
     let response = rows_to_response(rows);
 
-    // tracing::info!(
-    //     "Query response: {}",
-    //     serde_json::to_string(&response).unwrap()
-    // );
+    // tracing::info!(query_response = serde_json::to_string(&response).unwrap());
 
     Ok(response)
 }
@@ -74,10 +70,9 @@ pub async fn explain(
     let query = plan.explain_query();
 
     tracing::info!(
-        "\nGenerated SQL: {}\nWith params: {:?}\nAnd variables: {:?}",
-        query.sql,
-        &query.params,
-        &plan.variables,
+        generated_sql = query.sql,
+        params = ?&query.params,
+        variables = ?&plan.variables,
     );
 
     let empty_map = BTreeMap::new();
