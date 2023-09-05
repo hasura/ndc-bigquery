@@ -12,12 +12,15 @@ use std::collections::BTreeMap;
 #[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize, JsonSchema)]
 pub struct NativeQueries(pub BTreeMap<String, NativeQueryInfo>);
 
-/// Information about a database table (or any other kind of relation).
+/// Information about a Native Query
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
 pub struct NativeQueryInfo {
+    /** SQL expression to use for the Native Query. We can interpolate values using `{{variable_name}}` syntax, such as `SELECT * FROM authors WHERE name = {{author_name}}` */
     pub sql: NativeQuerySql,
+    /** Columns returned by the Native Query */
     pub columns: BTreeMap<String, ColumnInfo>,
     #[serde(default)]
+    /** Names and types of arguments that can be passed to this Native Query */
     pub arguments: BTreeMap<String, ColumnInfo>,
 }
 

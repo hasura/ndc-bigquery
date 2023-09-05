@@ -16,7 +16,9 @@ const CONFIGURATION_QUERY: &str = include_str!("configuration.sql");
 /// User configuration.
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize, JsonSchema)]
 pub struct DeploymentConfiguration {
+    // Which version of the configuration format are we using
     pub version: u32,
+    // Connection string for a Postgres-compatible database
     pub postgres_database_url: String,
     pub metadata: query_engine::metadata::Metadata,
     pub aggregate_functions: query_engine::metadata::AggregateFunctions,
