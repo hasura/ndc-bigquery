@@ -16,31 +16,31 @@ jobs:
         connectors:
           [
             {
-              "build_command": "postgres.x86_64-linux",
+              "build_command": "ndc-postgres-x86_64-linux",
               "binary_artifact_name": "hasura-postgres-agent-rs",
               "artifact_path": "result/bin/ndc-postgres",
-              "docker_build_command": "postgres.docker-x86_64-linux",
+              "docker_build_command": "ndc-postgres-docker-x86_64-linux",
               "docker_image_name": "ghcr.io/hasura/ndc-postgres",
             },
             {
-              "build_command": "cockroach.x86-64-linux",
+              "build_command": "ndc-cockroach-x86_64-linux",
               "binary_artifact_name": "hasura-cockroach-agent-rs",
               "artifact_path": "result/bin/ndc-cockroach",
-              "docker_build_command": "cockroach.cockroach-x86_64-linux",
+              "docker_build_command": "ndc-cockroach-docker-x86_64-linux",
               "docker_image_name": "ghcr.io/hasura/ndc-cockroach",
             },
             {
-              "build_command": "citus.x86_64-linux",
+              "build_command": "ndc-citus-x86_64-linux",
               "binary_artifact_name": "hasura-citus-agent-rs",
               "artifact_path": "result/bin/ndc-citus",
-              "docker_build_command": "citus.docker-x86_64-linux",
+              "docker_build_command": "ndc-citus-docker-x86_64-linux",
               "docker_image_name": "ghcr.io/hasura/ndc-citus",
             },
             {
-              "build_command": "aurora.x86_64-linux",
+              "build_command": "ndc-aurora-x86_64-linux",
               "binary_artifact_name": "hasura-aurora-agent-rs",
               "artifact_path": "result/bin/ndc-aurora",
-              "docker_build_command": "aurora.docker-x86_64-linux",
+              "docker_build_command": "ndc-aurora-docker-x86_64-linux",
               "docker_image_name": "ghcr.io/hasura/ndc-aurora",
             },
           ]
