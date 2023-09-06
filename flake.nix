@@ -154,6 +154,7 @@
             pkgs.cargo-watch
             pkgs.just
             pkgs.k6
+            pkgs.nixpkgs-fmt
             pkgs.nodePackages.prettier
             pkgs.pkg-config
             pkgs.rnix-lsp

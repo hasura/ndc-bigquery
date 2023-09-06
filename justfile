@@ -234,11 +234,13 @@ lint-apply *FLAGS:
 # reformat everything
 format:
   cargo fmt --all
+  ! command -v nixpkgs-fmt > /dev/null || nixpkgs-fmt .
   prettier --write .
 
 # is everything formatted?
 format-check:
   cargo fmt --all -- --check
+  ! command -v nixpkgs-fmt > /dev/null || nixpkgs-fmt --check .
   prettier --check .
 
 # check the nix builds work
