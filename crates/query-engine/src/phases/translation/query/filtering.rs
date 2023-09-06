@@ -3,11 +3,12 @@
 use ndc_sdk::models;
 
 use super::error::Error;
-use super::helpers::{CollectionInfo, Env, RootAndCurrentTables, State, TableNameAndReference};
+use super::helpers::{
+    CollectionInfo, ColumnInfo, Env, RootAndCurrentTables, State, TableNameAndReference,
+};
 use super::operators;
 use super::relationships;
 use super::values;
-use crate::metadata;
 use crate::phases::translation::sql;
 use crate::phases::translation::sql::helpers::simple_select;
 
@@ -94,7 +95,7 @@ pub fn translate_expression(
             joins.extend(left_joins);
             joins.extend(right_joins);
             Ok((
-                sql::ast::Expression::BinaryOperator {
+                sql::ast::Expression::BinaryOperation {
                     left: Box::new(left),
                     operator: operators::translate_operator(operator.as_ref())?,
                     right: Box::new(right),
@@ -132,7 +133,7 @@ pub fn translate_expression(
                 .collect::<Result<Vec<sql::ast::Expression>, Error>>()?;
 
             Ok((
-                sql::ast::Expression::BinaryArrayOperator {
+                sql::ast::Expression::BinaryArrayOperation {
                     left: Box::new(left),
                     operator: match *operator {
                         models::BinaryArrayComparisonOperator::In => {
@@ -170,8 +171,8 @@ pub fn translate_expression(
                 )?;
 
                 Ok((
-                    sql::ast::Expression::UnaryOperator {
-                        column: Box::new(value),
+                    sql::ast::Expression::UnaryOperation {
+                        expression: Box::new(value),
                         operator: sql::ast::UnaryOperator::IsNull,
                     },
                     joins,
@@ -259,9 +260,9 @@ fn translate_comparison_pathelements(
             }?;
 
             // relationship target db table name
-            let db_table_name: sql::ast::TableName = sql::ast::TableName::DBTable {
-                schema: table_info.schema_name.clone(),
-                table: table_info.table_name.clone(),
+            let db_table_name: sql::ast::TableReference = sql::ast::TableReference::DBTable {
+                schema: sql::ast::SchemaName(table_info.schema_name.clone()),
+                table: sql::ast::TableName(table_info.table_name.clone()),
             };
 
             // new alias for the target table
@@ -271,12 +272,12 @@ fn translate_comparison_pathelements(
                     &relationship.target_collection.clone().to_string(),
                 );
             let target_table_alias_name =
-                sql::ast::TableName::AliasedTable(target_table_alias.clone());
+                sql::ast::TableReference::AliasedTable(target_table_alias.clone());
 
             // build a SELECT querying this table with the relevant predicate.
             let mut select = simple_select(vec![]);
             select.from = Some(sql::ast::From::Table {
-                name: db_table_name.clone(),
+                reference: db_table_name.clone(),
                 alias: target_table_alias.clone(),
             });
 
@@ -344,12 +345,12 @@ fn translate_comparison_target(
 
             // get the unrelated table information from the metadata.
             let collection_info = env.lookup_collection(&table_ref.name)?;
-            let metadata::ColumnInfo { name, .. } = collection_info.lookup_column(&name)?;
+            let ColumnInfo { name, .. } = collection_info.lookup_column(&name)?;
 
             Ok((
-                sql::ast::Expression::ColumnName(sql::ast::ColumnName::TableColumn {
+                sql::ast::Expression::ColumnReference(sql::ast::ColumnReference::TableColumn {
                     table: table_ref.reference.clone(),
-                    name: name.to_string(),
+                    name,
                 }),
                 joins,
             ))
@@ -362,12 +363,12 @@ fn translate_comparison_target(
             let collection_info = env.lookup_collection(&root_table.name)?;
 
             // find the requested column in the tables columns.
-            let metadata::ColumnInfo { name, .. } = collection_info.lookup_column(&name)?;
+            let ColumnInfo { name, .. } = collection_info.lookup_column(&name)?;
 
             Ok((
-                sql::ast::Expression::ColumnName(sql::ast::ColumnName::TableColumn {
+                sql::ast::Expression::ColumnReference(sql::ast::ColumnReference::TableColumn {
                     table: root_table.reference.clone(),
-                    name: name.to_string(),
+                    name,
                 }),
                 vec![],
             ))
@@ -428,21 +429,19 @@ pub fn translate_exists_in_collection(
             }?;
 
             // db table name
-            let db_table_name: sql::ast::TableName = sql::ast::TableName::DBTable {
-                schema: table_info.schema_name.clone(),
-                table: table_info.table_name.clone(),
+            let db_table_name = sql::ast::TableReference::DBTable {
+                schema: sql::ast::SchemaName(table_info.schema_name.clone()),
+                table: sql::ast::TableName(table_info.table_name.clone()),
             };
 
             // new alias for the table
-            let table_alias: sql::ast::TableAlias =
-                sql::helpers::make_table_alias(collection.clone());
-            let table_alias_name: sql::ast::TableName =
-                sql::ast::TableName::AliasedTable(table_alias.clone());
+            let table_alias = sql::helpers::make_table_alias(collection.clone());
+            let table_alias_name = sql::ast::TableReference::AliasedTable(table_alias.clone());
 
             // build a SELECT querying this table with the relevant predicate.
             let mut select = simple_select(vec![]);
             select.from = Some(sql::ast::From::Table {
-                name: db_table_name.clone(),
+                reference: db_table_name.clone(),
                 alias: table_alias.clone(),
             });
 
@@ -498,21 +497,20 @@ pub fn translate_exists_in_collection(
             }?;
 
             // relationship target db table name
-            let db_table_name: sql::ast::TableName = sql::ast::TableName::DBTable {
-                schema: table_info.schema_name.clone(),
-                table: table_info.table_name.clone(),
+            let db_table_name = sql::ast::TableReference::DBTable {
+                schema: sql::ast::SchemaName(table_info.schema_name.clone()),
+                table: sql::ast::TableName(table_info.table_name.clone()),
             };
 
             // new alias for the target table
-            let table_alias: sql::ast::TableAlias =
+            let table_alias =
                 sql::helpers::make_table_alias(relationship.target_collection.clone());
-            let table_alias_name: sql::ast::TableName =
-                sql::ast::TableName::AliasedTable(table_alias.clone());
+            let table_alias_name = sql::ast::TableReference::AliasedTable(table_alias.clone());
 
             // build a SELECT querying this table with the relevant predicate.
             let mut select = simple_select(vec![]);
             select.from = Some(sql::ast::From::Table {
-                name: db_table_name.clone(),
+                reference: db_table_name.clone(),
                 alias: table_alias.clone(),
             });
 

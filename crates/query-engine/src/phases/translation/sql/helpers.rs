@@ -55,13 +55,13 @@ pub fn false_expr() -> Expression {
 
 /// Generate a column expression refering to a specific table.
 pub fn make_column(
-    table: TableName,
-    name: String,
+    table: TableReference,
+    name: ColumnName,
     alias: ColumnAlias,
 ) -> (ColumnAlias, Expression) {
     (
         alias,
-        Expression::ColumnName(ColumnName::TableColumn { table, name }),
+        Expression::ColumnReference(ColumnReference::TableColumn { table, name }),
     )
 }
 
@@ -174,7 +174,7 @@ pub fn select_rowset(
 ) -> Select {
     let row = vec![(
         output_column_alias,
-        (Expression::RowToJson(TableName::AliasedTable(output_table_alias.clone()))),
+        (Expression::RowToJson(TableReference::AliasedTable(output_table_alias.clone()))),
     )];
 
     let mut final_select = simple_select(row);
@@ -251,7 +251,7 @@ pub fn select_rows_as_json(
         args: vec![
             Expression::FunctionCall {
                 function: Function::JsonAgg,
-                args: vec![Expression::RowToJson(TableName::AliasedTable(
+                args: vec![Expression::RowToJson(TableReference::AliasedTable(
                     table_alias.clone(),
                 ))],
             },
@@ -283,7 +283,7 @@ pub fn select_row_as_json_with_default(
     let expression = Expression::FunctionCall {
         function: Function::Coalesce,
         args: vec![
-            Expression::RowToJson(TableName::AliasedTable(table_alias.clone())),
+            Expression::RowToJson(TableReference::AliasedTable(table_alias.clone())),
             Expression::Value(Value::EmptyJsonArray),
         ],
     };

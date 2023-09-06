@@ -67,10 +67,10 @@ pub fn translate_order_by(
                             joins.push(sql::ast::Join::LeftOuterJoinLateral(new_join));
 
                             // Build an alias to query the column from this select.
-                            let column_name = sql::ast::Expression::ColumnName(
-                                sql::ast::ColumnName::AliasedColumn {
-                                    table: sql::ast::TableName::AliasedTable(table_alias),
-                                    name: column_alias,
+                            let column_name = sql::ast::Expression::ColumnReference(
+                                sql::ast::ColumnReference::AliasedColumn {
+                                    table: sql::ast::TableReference::AliasedTable(table_alias),
+                                    column: column_alias,
                                 },
                             );
 
@@ -122,11 +122,11 @@ fn translate_order_by_star_count_aggregate(
             // examine the path elements' relationship.
             let relationship = env.lookup_relationship(relationship_name)?;
 
-            let target_collection_alias: sql::ast::TableAlias =
+            let target_collection_alias =
                 sql::helpers::make_table_alias(relationship.target_collection.clone());
 
-            let target_collection_alias_name: sql::ast::TableName =
-                sql::ast::TableName::AliasedTable(target_collection_alias.clone());
+            let target_collection_alias_name =
+                sql::ast::TableReference::AliasedTable(target_collection_alias.clone());
 
             // make a very basic select COUNT(*) as "Count" FROM
             // <nested-table> WHERE <join-conditions>
@@ -152,7 +152,7 @@ fn translate_order_by_star_count_aggregate(
             select.where_ = sql::ast::Where(join_condition);
 
             select.from = Some(sql::ast::From::Table {
-                name: target_collection_alias_name,
+                reference: target_collection_alias_name,
                 alias: target_collection_alias,
             });
 
@@ -187,7 +187,9 @@ fn translate_order_by_target(
 
     match column_or_relationship_select {
         // The column is from the source table, we just need to query it directly.
-        ColumnOrSelect::Column(column_name) => Ok(sql::ast::Expression::ColumnName(column_name)),
+        ColumnOrSelect::Column(column_name) => {
+            Ok(sql::ast::Expression::ColumnReference(column_name))
+        }
 
         // The column is from a relationship table, we need to join with this select query.
         ColumnOrSelect::Select { column, select } => {
@@ -207,9 +209,9 @@ fn translate_order_by_target(
 
             // Build an alias to query the column from this select.
             let column_name =
-                sql::ast::Expression::ColumnName(sql::ast::ColumnName::AliasedColumn {
-                    table: sql::ast::TableName::AliasedTable(table_alias),
-                    name: column,
+                sql::ast::Expression::ColumnReference(sql::ast::ColumnReference::AliasedColumn {
+                    table: sql::ast::TableReference::AliasedTable(table_alias),
+                    column,
                 });
 
             Ok(column_name)
@@ -220,7 +222,7 @@ fn translate_order_by_target(
 /// Used as the return type of `translate_order_by_target_for_column`.
 enum ColumnOrSelect {
     /// Column represents a target column that is reference from the outer select.
-    Column(sql::ast::ColumnName),
+    Column(sql::ast::ColumnReference),
     /// Select represents a select query which contain the requested column.
     Select {
         column: sql::ast::ColumnAlias,
@@ -302,9 +304,9 @@ fn translate_order_by_target_for_column(
             }?;
 
             // relationship target db table name
-            let target_db_table_name: sql::ast::TableName = sql::ast::TableName::DBTable {
-                schema: target_table_info.schema_name.clone(),
-                table: target_table_info.table_name.clone(),
+            let target_db_table_name = sql::ast::TableReference::DBTable {
+                schema: sql::ast::SchemaName(target_table_info.schema_name.clone()),
+                table: sql::ast::TableName(target_table_info.table_name.clone()),
             };
 
             let target_collection_alias: sql::ast::TableAlias =
@@ -326,8 +328,8 @@ fn translate_order_by_target_for_column(
                 sql::helpers::make_table_alias(relationship.source_collection_or_type.clone())
             };
 
-            let target_collection_alias_name: sql::ast::TableName =
-                sql::ast::TableName::AliasedTable(target_collection_alias.clone());
+            let target_collection_alias_name =
+                sql::ast::TableReference::AliasedTable(target_collection_alias.clone());
 
             // If last_table is None, we are just starting the loop, let's
             // put a pin on what the last table is, so we can wrap the joins
@@ -353,15 +355,19 @@ fn translate_order_by_target_for_column(
                         info: target_table_info.clone(),
                     };
                     let selected_column = table_collection.lookup_column(&target_col)?;
+                    // we are going to deliberately use the table column name and not an alias we get from
+                    // the query request because this is internal to the sorting mechanism.
                     let selected_column_alias =
-                        sql::helpers::make_column_alias(selected_column.name.clone());
+                        sql::helpers::make_column_alias(selected_column.name.0.clone());
                     // we use the real name of the column as an alias as well.
                     Ok((
                         selected_column_alias.clone(),
-                        sql::ast::Expression::ColumnName(sql::ast::ColumnName::AliasedColumn {
-                            table: new_table,
-                            name: selected_column_alias,
-                        }),
+                        sql::ast::Expression::ColumnReference(
+                            sql::ast::ColumnReference::AliasedColumn {
+                                table: new_table,
+                                column: selected_column_alias,
+                            },
+                        ),
                     ))
                 })
                 .collect::<Result<Vec<(sql::ast::ColumnAlias, sql::ast::Expression)>, Error>>()?;
@@ -372,7 +378,7 @@ fn translate_order_by_target_for_column(
 
             let source_table = TableNameAndReference {
                 name: relationship.source_collection_or_type.clone(),
-                reference: sql::ast::TableName::AliasedTable(source_table_alias),
+                reference: sql::ast::TableReference::AliasedTable(source_table_alias),
             };
 
             // generate a condition for this join.
@@ -390,7 +396,7 @@ fn translate_order_by_target_for_column(
             select.where_ = sql::ast::Where(join_condition);
 
             select.from = Some(sql::ast::From::Table {
-                name: target_db_table_name,
+                reference: target_db_table_name,
                 alias: target_collection_alias.clone(),
             });
 
@@ -414,9 +420,11 @@ fn translate_order_by_target_for_column(
             let table = env.lookup_collection(&root_and_current_tables.current_table.name)?;
             let selected_column = table.lookup_column(&column_name)?;
 
-            let selected_column_name = sql::ast::ColumnName::AliasedColumn {
+            let selected_column_name = sql::ast::ColumnReference::AliasedColumn {
                 table: root_and_current_tables.current_table.reference.clone(),
-                name: sql::helpers::make_column_alias(selected_column.name.clone()),
+                // we are going to deliberately use the table column name and not an alias we get from
+                // the query request because this is internal to the sorting mechanism.
+                column: sql::helpers::make_column_alias(selected_column.name.0.clone()),
             };
             Ok(ColumnOrSelect::Column(selected_column_name))
         }
@@ -427,18 +435,20 @@ fn translate_order_by_target_for_column(
             let table = env.lookup_collection(&last_table_name)?;
             let selected_column = table.lookup_column(&column_name)?;
 
-            let selected_column_name = sql::ast::ColumnName::AliasedColumn {
-                table: sql::ast::TableName::AliasedTable(last_table_reference),
-                name: sql::helpers::make_column_alias(selected_column.name.clone()),
+            let selected_column_name = sql::ast::ColumnReference::AliasedColumn {
+                table: sql::ast::TableReference::AliasedTable(last_table_reference),
+                // we are going to deliberately use the table column name and not an alias we get from
+                // the query request because this is internal to the sorting mechanism.
+                column: sql::helpers::make_column_alias(selected_column.name.0.clone()),
             };
 
             // if we got a function, we wrap the required column with
             // a function call.
             let selected_column_expr = match function {
-                None => sql::ast::Expression::ColumnName(selected_column_name.clone()),
+                None => sql::ast::Expression::ColumnReference(selected_column_name.clone()),
                 Some(func) => sql::ast::Expression::FunctionCall {
                     function: sql::ast::Function::Unknown(func),
-                    args: vec![sql::ast::Expression::ColumnName(
+                    args: vec![sql::ast::Expression::ColumnReference(
                         selected_column_name.clone(),
                     )],
                 },

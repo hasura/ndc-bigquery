@@ -9,7 +9,7 @@ use crate::phases::translation::sql;
 
 /// Translate any aggregates we should include in the query into our SQL AST.
 pub fn translate(
-    table: &sql::ast::TableName,
+    table: &sql::ast::TableReference,
     aggregates: IndexMap<String, models::Aggregate>,
 ) -> Result<Vec<(sql::ast::ColumnAlias, sql::ast::Expression)>, Error> {
     aggregates
@@ -20,16 +20,16 @@ pub fn translate(
                     let count_column_alias = sql::helpers::make_column_alias(column);
                     if distinct {
                         sql::ast::Expression::Count(sql::ast::CountType::Distinct(
-                            sql::ast::ColumnName::AliasedColumn {
+                            sql::ast::ColumnReference::AliasedColumn {
                                 table: table.clone(),
-                                name: count_column_alias,
+                                column: count_column_alias,
                             },
                         ))
                     } else {
                         sql::ast::Expression::Count(sql::ast::CountType::Simple(
-                            sql::ast::ColumnName::AliasedColumn {
+                            sql::ast::ColumnReference::AliasedColumn {
                                 table: table.clone(),
-                                name: count_column_alias,
+                                column: count_column_alias,
                             },
                         ))
                     }
@@ -37,10 +37,10 @@ pub fn translate(
                 models::Aggregate::SingleColumn { column, function } => {
                     sql::ast::Expression::FunctionCall {
                         function: sql::ast::Function::Unknown(function),
-                        args: vec![sql::ast::Expression::ColumnName(
-                            sql::ast::ColumnName::AliasedColumn {
+                        args: vec![sql::ast::Expression::ColumnReference(
+                            sql::ast::ColumnReference::AliasedColumn {
                                 table: table.clone(),
-                                name: sql::helpers::make_column_alias(column),
+                                column: sql::helpers::make_column_alias(column),
                             },
                         )],
                     }

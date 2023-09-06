@@ -2,16 +2,19 @@
 
 use std::collections::BTreeMap;
 
+/// An EXPLAIN clause
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Explain<'a> {
     Select(&'a Select),
 }
 
+/// A WITH clause
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct With {
     pub common_table_expressions: Vec<CommonTableExpression>,
 }
 
+/// A single Common Table Expression
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CommonTableExpression {
     pub alias: TableAlias,
@@ -19,17 +22,22 @@ pub struct CommonTableExpression {
     pub select: CTExpr,
 }
 
+/// The 'body' side of a Common Table Expression
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum CTExpr {
     RawSql(Vec<RawSql>),
 }
 
+/// Raw SQL written by a user which is opaque to us
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum RawSql {
+    /// Raw SQL text
     RawText(String),
+    /// A value or variable
     Value(Value),
 }
 
+/// A SELECT clause
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Select {
     pub with: With,
@@ -42,126 +50,151 @@ pub struct Select {
     pub limit: Limit,
 }
 
+/// A select list
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum SelectList {
     SelectList(Vec<(ColumnAlias, Expression)>),
     SelectStar,
 }
 
+/// A FROM clause
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum From {
+    /// Select from a table reference
     Table {
-        name: TableName,
+        reference: TableReference,
         alias: TableAlias,
     },
+    /// Select from a subquery
     Select {
         select: Box<Select>,
         alias: TableAlias,
     },
 }
 
+/// A JOIN clause
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Join {
+    /// LEFT OUTER JOIN LATERAL
     LeftOuterJoinLateral(LeftOuterJoinLateral),
+    /// INNER JOIN LATERAL
     InnerJoinLateral(InnerJoinLateral),
+    /// CROSS JOIN
     CrossJoin(CrossJoin),
 }
 
+/// A CROSS JOIN clause
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CrossJoin {
     pub select: Box<Select>,
     pub alias: TableAlias,
 }
 
+/// A LEFT OUTER JOIN LATERAL clause
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct LeftOuterJoinLateral {
     pub select: Box<Select>,
     pub alias: TableAlias,
 }
 
+/// An INNER JOIN LATERAL clause
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct InnerJoinLateral {
     pub select: Box<Select>,
     pub alias: TableAlias,
 }
 
+/// A WHERE clause
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Where(pub Expression);
 
+/// A GROUP BY clause, currently not in use
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct GroupBy {}
 
+/// An ORDER BY clause
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct OrderBy {
     pub elements: Vec<OrderByElement>,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum OrderByDirection {
-    Asc,
-    Desc,
-}
-
 // todo: should we also include option for specifying NULLS FIRST | NULLS LAST
+/// A single element in an ORDER BY clause
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct OrderByElement {
     pub target: Expression,
     pub direction: OrderByDirection,
 }
 
+/// A direction for a single ORDER BY element
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum OrderByDirection {
+    Asc,
+    Desc,
+}
+
+/// LIMIT and OFFSET clauses
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Limit {
     pub limit: Option<u32>,
     pub offset: Option<u32>,
 }
 
+/// A scalar expression
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Expression {
+    /// AND clause
     And {
         left: Box<Expression>,
         right: Box<Expression>,
     },
+    /// OR clause
     Or {
         left: Box<Expression>,
         right: Box<Expression>,
     },
+    /// NOT clause
     Not(Box<Expression>),
-    BinaryOperator {
+    /// A binary operation on two scalar expression
+    BinaryOperation {
         left: Box<Expression>,
         operator: BinaryOperator,
         right: Box<Expression>,
     },
-    BinaryArrayOperator {
+    /// A binary operation on a scalar expression and an array of scalar expressions
+    BinaryArrayOperation {
         left: Box<Expression>,
         operator: BinaryArrayOperator,
         right: Vec<Expression>,
     },
-    UnaryOperator {
-        column: Box<Expression>,
+    /// An unary operation on a scalar expression
+    UnaryOperation {
+        expression: Box<Expression>,
         operator: UnaryOperator,
     },
+    /// A scalar function call
     FunctionCall {
         function: Function,
         args: Vec<Expression>,
     },
-    Exists {
-        select: Box<Select>,
-    },
+    /// An EXISTS clause
+    Exists { select: Box<Select> },
+    /// A json_build_object function call
     JsonBuildObject(BTreeMap<String, Box<Expression>>),
     // SELECT queries can appear in a select list if they return
     // one row. For now we can only do this with 'row_to_json'.
     // Consider changing this if we encounter more ways.
-    RowToJson(TableName),
-    ColumnName(ColumnName),
+    /// A row_to_json function call
+    RowToJson(TableReference),
+    /// A column reference
+    ColumnReference(ColumnReference),
+    /// An irreducible value
     Value(Value),
+    /// A COUNT clause
     Count(CountType),
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum Type {
-    Json,
-}
-
+/// An unary operator
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum UnaryOperator {
     IsNull,
@@ -171,6 +204,7 @@ pub enum UnaryOperator {
 //   * we should consider at least the list in `Hasura.Backends.Postgres.Translate.BoolExp`
 //   * we have skipped column checks for now, ie, CEQ, CNE, CGT etc
 //   * we have skipped casts for now
+/// A Binary operator
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BinaryOperator {
     Equals,
@@ -191,11 +225,13 @@ pub enum BinaryOperator {
     NotCaseInsensitiveRegex,
 }
 
+/// A binary operator when the rhs is an array
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum BinaryArrayOperator {
     In,
 }
 
+/// A scalar function
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Function {
     Coalesce,
@@ -203,13 +239,15 @@ pub enum Function {
     Unknown(String),
 }
 
+/// COUNT clause
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum CountType {
     Star,
-    Simple(ColumnName),
-    Distinct(ColumnName),
+    Simple(ColumnReference),
+    Distinct(ColumnReference),
 }
 
+/// Irreducable values
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Value {
     Int4(i32),
@@ -221,27 +259,55 @@ pub enum Value {
     Variable(String),
 }
 
+/// A database schema name
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct SchemaName(pub String);
+
+/// A database table name
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct TableName(pub String);
+
+/// A reference to a table. Used when we want to query it,
+/// for example in a FROM clause.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum TableReference {
+    /// refers to a db table object name
+    DBTable {
+        schema: SchemaName,
+        table: TableName,
+    },
+    /// refers to an alias we created
+    AliasedTable(TableAlias),
+}
+
+/// A database table's column name
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ColumnName(pub String);
+
+/// A reference to a column. Used when we want to query it,
+/// for example in a SELECT list.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ColumnReference {
+    /// refers to a db column object name
+    TableColumn {
+        table: TableReference,
+        name: ColumnName,
+    },
+    /// refers to an alias we created
+    AliasedColumn {
+        table: TableReference,
+        column: ColumnAlias,
+    },
+}
+
 /// aliases that we give to relations
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct TableAlias {
     pub name: String,
 }
+
 /// aliases that we give to columns
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ColumnAlias {
     pub name: String,
-}
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum TableName {
-    /// refers to a db table object name
-    DBTable { schema: String, table: String },
-    /// refers to an alias we created
-    AliasedTable(TableAlias),
-}
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ColumnName {
-    /// refers to a db column object name
-    TableColumn { table: TableName, name: String },
-    /// refers to an alias we created
-    AliasedColumn { table: TableName, name: ColumnAlias },
 }

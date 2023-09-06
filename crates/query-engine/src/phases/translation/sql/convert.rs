@@ -125,8 +125,8 @@ impl From {
     pub fn to_sql(&self, sql: &mut SQL) {
         sql.append_syntax("FROM ");
         match &self {
-            From::Table { name, alias } => {
-                name.to_sql(sql);
+            From::Table { reference, alias } => {
+                reference.to_sql(sql);
                 sql.append_syntax(" AS ");
                 alias.to_sql(sql);
             }
@@ -188,7 +188,7 @@ impl Where {
 impl Expression {
     pub fn to_sql(&self, sql: &mut SQL) {
         match &self {
-            Expression::ColumnName(column_name) => column_name.to_sql(sql),
+            Expression::ColumnReference(column_reference) => column_reference.to_sql(sql),
             Expression::Value(value) => value.to_sql(sql),
             Expression::And { left, right } => {
                 sql.append_syntax("(");
@@ -208,7 +208,7 @@ impl Expression {
                 sql.append_syntax("NOT ");
                 expr.to_sql(sql);
             }
-            Expression::BinaryOperator {
+            Expression::BinaryOperation {
                 left,
                 operator,
                 right,
@@ -219,7 +219,7 @@ impl Expression {
                 right.to_sql(sql);
                 sql.append_syntax(")");
             }
-            Expression::BinaryArrayOperator {
+            Expression::BinaryArrayOperation {
                 left,
                 operator,
                 right,
@@ -239,9 +239,12 @@ impl Expression {
                 }
                 sql.append_syntax(")");
             }
-            Expression::UnaryOperator { column, operator } => {
+            Expression::UnaryOperation {
+                expression,
+                operator,
+            } => {
                 sql.append_syntax("(");
-                column.to_sql(sql);
+                expression.to_sql(sql);
                 operator.to_sql(sql);
                 sql.append_syntax(")");
             }
@@ -292,14 +295,6 @@ impl Expression {
                 count_type.to_sql(sql);
                 sql.append_syntax(")")
             }
-        }
-    }
-}
-
-impl Type {
-    pub fn to_sql(&self, sql: &mut SQL) {
-        match self {
-            Type::Json => sql.append_syntax("json"),
         }
     }
 }
@@ -410,15 +405,15 @@ impl Limit {
 }
 
 // names
-impl TableName {
+impl TableReference {
     pub fn to_sql(&self, sql: &mut SQL) {
         match self {
-            TableName::DBTable { schema, table } => {
-                sql.append_identifier(schema);
+            TableReference::DBTable { schema, table } => {
+                sql.append_identifier(&schema.0);
                 sql.append_syntax(".");
-                sql.append_identifier(table);
+                sql.append_identifier(&table.0);
             }
-            TableName::AliasedTable(alias) => alias.to_sql(sql),
+            TableReference::AliasedTable(alias) => alias.to_sql(sql),
         };
     }
 }
@@ -430,18 +425,18 @@ impl TableAlias {
     }
 }
 
-impl ColumnName {
+impl ColumnReference {
     pub fn to_sql(&self, sql: &mut SQL) {
         match self {
-            ColumnName::TableColumn { table, name } => {
+            ColumnReference::TableColumn { table, name } => {
                 table.to_sql(sql);
                 sql.append_syntax(".");
-                sql.append_identifier(&name.to_string());
+                sql.append_identifier(&name.0.to_string());
             }
-            ColumnName::AliasedColumn { table, name } => {
+            ColumnReference::AliasedColumn { table, column } => {
                 table.to_sql(sql);
                 sql.append_syntax(".");
-                name.to_sql(sql);
+                column.to_sql(sql);
             }
         };
     }

@@ -86,9 +86,9 @@ pub fn translate_rows_query(
             } => {
                 let table_alias = sql::helpers::make_table_alias(alias.clone());
                 let column_alias = sql::helpers::make_column_alias(alias);
-                let column_name = sql::ast::ColumnName::AliasedColumn {
-                    table: sql::ast::TableName::AliasedTable(table_alias.clone()),
-                    name: column_alias.clone(),
+                let column_name = sql::ast::ColumnReference::AliasedColumn {
+                    table: sql::ast::TableReference::AliasedTable(table_alias.clone()),
+                    column: column_alias.clone(),
                 };
                 join_fields.push(relationships::JoinFieldInfo {
                     alias: table_alias,
@@ -96,7 +96,10 @@ pub fn translate_rows_query(
                     arguments,
                     query: *query,
                 });
-                Ok((column_alias, sql::ast::Expression::ColumnName(column_name)))
+                Ok((
+                    column_alias,
+                    sql::ast::Expression::ColumnReference(column_name),
+                ))
             }
         })
         .collect::<Result<Vec<_>, Error>>()?;
@@ -186,10 +189,8 @@ pub fn make_from_clause_and_reference(
     env: &Env,
     state: &mut State,
 ) -> Result<(TableNameAndReference, sql::ast::From), Error> {
-    let collection_alias: sql::ast::TableAlias =
-        sql::helpers::make_table_alias(collection_name.to_string());
-    let collection_alias_name: sql::ast::TableName =
-        sql::ast::TableName::AliasedTable(collection_alias.clone());
+    let collection_alias = sql::helpers::make_table_alias(collection_name.to_string());
+    let collection_alias_name = sql::ast::TableReference::AliasedTable(collection_alias.clone());
 
     // find the table according to the metadata.
     let collection_info = env.lookup_collection(collection_name)?;
@@ -212,13 +213,13 @@ fn make_from_clause(
 ) -> Result<sql::ast::From, Error> {
     match &collection_info {
         CollectionInfo::Table { info, .. } => {
-            let db_table = sql::ast::TableName::DBTable {
-                schema: info.schema_name.clone(),
-                table: info.table_name.clone(),
+            let db_table = sql::ast::TableReference::DBTable {
+                schema: sql::ast::SchemaName(info.schema_name.clone()),
+                table: sql::ast::TableName(info.table_name.clone()),
             };
 
             Ok(sql::ast::From::Table {
-                name: db_table,
+                reference: db_table,
                 alias: current_table_alias.clone(),
             })
         }
@@ -227,7 +228,7 @@ fn make_from_clause(
             let aliased_table =
                 state.insert_native_query(name.clone(), info.clone(), arguments.clone());
             Ok(sql::ast::From::Table {
-                name: aliased_table,
+                reference: aliased_table,
                 alias: current_table_alias.clone(),
             })
         }

@@ -56,7 +56,13 @@ pub struct TableNameAndReference {
     /// Table name for column lookup
     pub name: String,
     /// Table alias to query from
-    pub reference: sql::ast::TableName,
+    pub reference: sql::ast::TableReference,
+}
+
+/// Information about columns
+pub struct ColumnInfo {
+    pub name: sql::ast::ColumnName,
+    pub r#type: metadata::ScalarType,
 }
 
 /// Metadata information about a specific collection.
@@ -118,24 +124,30 @@ impl Env {
 
 impl CollectionInfo {
     /// Lookup a column in a collection.
-    pub fn lookup_column(&self, column_name: &str) -> Result<&metadata::ColumnInfo, Error> {
+    pub fn lookup_column(&self, column_name: &str) -> Result<ColumnInfo, Error> {
         match self {
-            CollectionInfo::Table { name, info } => {
-                info.columns
-                    .get(column_name)
-                    .ok_or(Error::ColumnNotFoundInCollection(
-                        column_name.to_string(),
-                        name.clone(),
-                    ))
-            }
-            CollectionInfo::NativeQuery { name, info } => {
-                info.columns
-                    .get(column_name)
-                    .ok_or(Error::ColumnNotFoundInCollection(
-                        column_name.to_string(),
-                        name.clone(),
-                    ))
-            }
+            CollectionInfo::Table { name, info } => info
+                .columns
+                .get(column_name)
+                .map(|column_info| ColumnInfo {
+                    name: sql::ast::ColumnName(column_info.name.clone()),
+                    r#type: column_info.r#type,
+                })
+                .ok_or(Error::ColumnNotFoundInCollection(
+                    column_name.to_string(),
+                    name.clone(),
+                )),
+            CollectionInfo::NativeQuery { name, info } => info
+                .columns
+                .get(column_name)
+                .map(|column_info| ColumnInfo {
+                    name: sql::ast::ColumnName(column_info.name.clone()),
+                    r#type: column_info.r#type,
+                })
+                .ok_or(Error::ColumnNotFoundInCollection(
+                    column_name.to_string(),
+                    name.clone(),
+                )),
         }
     }
 }
@@ -162,7 +174,7 @@ impl State {
         name: String,
         info: metadata::NativeQueryInfo,
         arguments: BTreeMap<String, models::Argument>,
-    ) -> sql::ast::TableName {
+    ) -> sql::ast::TableReference {
         self.native_queries
             .insert_native_query(name, info, arguments)
     }
@@ -187,7 +199,7 @@ impl NativeQueries {
         name: String,
         info: metadata::NativeQueryInfo,
         arguments: BTreeMap<String, models::Argument>,
-    ) -> sql::ast::TableName {
+    ) -> sql::ast::TableReference {
         let index = self.index;
         self.index += 1;
         let alias = sql::helpers::make_native_query_table_alias(index, &name);
@@ -196,6 +208,6 @@ impl NativeQueries {
             arguments,
             alias: alias.clone(),
         });
-        sql::ast::TableName::AliasedTable(alias)
+        sql::ast::TableReference::AliasedTable(alias)
     }
 }
