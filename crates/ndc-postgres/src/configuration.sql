@@ -13,29 +13,12 @@
 -- We therefore make a set of assumptions about these. We may wish to rewrite
 -- this using the `pg_catalog` tables instead.
 
--- This is a temporary function for mapping SQL data types to GraphQL scalar types.
--- When updating this, update the documentation accordingly.
-create function pg_temp.data_type_to_scalar_type(information_schema.character_data)
-  returns varchar
-  language sql
-  immutable
-  return
-    case $1
-      when 'boolean' then 'Boolean'
-      when 'smallint' then 'Int'
-      when 'integer' then 'Int'
-      when 'bigint' then 'Int'
-      when 'smallserial' then 'Int'
-      when 'serial' then 'Int'
-      when 'bigserial' then 'Int'
-      when 'decimal' then 'Float'
-      when 'numeric' then 'Float'
-      when 'real' then 'Float'
-      when 'double precision' then 'Float'
-      when 'text' then 'String'
-      when 'character varying' then 'String'
-      else 'any'
-    end;
+-- NOTE[Data Types]: We currently translate Postgres scalar types to GraphQL
+-- locally in this file. We used to do this by a user-defined function, but
+-- this precluded read-only connections. Therefore the function is now inlined
+-- where it was used, which we see as a temporary measure. We expect this to be
+-- replaced with metadata-dependent processing host-side rather than
+-- database-side.
 
 select
   coalesce(tables, '{}'), -- maps to `TableInfo`
@@ -67,7 +50,23 @@ from
                     'name',
                     c.column_name,
                     'type',
-                    pg_temp.data_type_to_scalar_type(c.data_type)
+                    -- See Note[Data Types] above.
+                    case c.data_type
+                      when 'boolean' then 'Boolean'
+                      when 'smallint' then 'Int'
+                      when 'integer' then 'Int'
+                      when 'bigint' then 'Int'
+                      when 'smallserial' then 'Int'
+                      when 'serial' then 'Int'
+                      when 'bigserial' then 'Int'
+                      when 'decimal' then 'Float'
+                      when 'numeric' then 'Float'
+                      when 'real' then 'Float'
+                      when 'double precision' then 'Float'
+                      when 'text' then 'String'
+                      when 'character varying' then 'String'
+                      else 'any'
+                    end
                   )
                 )
               from information_schema.columns c
@@ -173,7 +172,7 @@ from
     from
       (
         select
-          pg_temp.data_type_to_scalar_type(data_type) scalar_type,
+          r.scalar_type,
           json_object_agg(
             -- the function name
             routine_name,
@@ -182,10 +181,31 @@ from
               -- NOTE: this information is not actually available, so we assume
               -- the return type is always the same as the input type
               'return_type',
-              pg_temp.data_type_to_scalar_type(data_type)
+              r.scalar_type
             )
           ) routines
-        from information_schema.routines r
+        from
+          (
+            select r.*, 
+              -- See Note[Data Types] above.
+              case r.data_type
+                when 'boolean' then 'Boolean'
+                when 'smallint' then 'Int'
+                when 'integer' then 'Int'
+                when 'bigint' then 'Int'
+                when 'smallserial' then 'Int'
+                when 'serial' then 'Int'
+                when 'bigserial' then 'Int'
+                when 'decimal' then 'Float'
+                when 'numeric' then 'Float'
+                when 'real' then 'Float'
+                when 'double precision' then 'Float'
+                when 'text' then 'String'
+                when 'character varying' then 'String'
+                else 'any'
+              end scalar_type
+            from information_schema.routines r
+          ) r
         -- get the parameters count for a routine
         left outer join lateral (
           select count(*) as count
@@ -196,7 +216,7 @@ from
         -- include routines with only one parameter
         and parameters.count = 1
         and routine_type is null -- aggregate functions don't have a routine type
-        and pg_temp.data_type_to_scalar_type(data_type) <> 'any'
-        group by pg_temp.data_type_to_scalar_type(data_type)
+        and r.scalar_type <> 'any'
+        group by r.scalar_type
       ) routines_by_type
   ) _aggregate_functions
