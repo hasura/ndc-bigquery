@@ -475,7 +475,7 @@
   {
     "kind": "graphqlType",
     "typeName": "artist_below_id",
-    "graphqlTypeName": "Artist",
+    "graphqlTypeName": "ArtistBelowId",
     "graphqlTypeKind": "Object"
   },
   {
