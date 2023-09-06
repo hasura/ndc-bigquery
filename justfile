@@ -1,6 +1,6 @@
 set shell := ["bash", "-c"]
 
-CONNECTOR_IMAGE_NAME := "ghcr.io/hasura/postgres-agent-rs"
+CONNECTOR_IMAGE_NAME := "ghcr.io/hasura/ndc-postgres"
 CONNECTOR_IMAGE_TAG := "dev"
 CONNECTOR_IMAGE := CONNECTOR_IMAGE_NAME + ":" + CONNECTOR_IMAGE_TAG
 
@@ -243,30 +243,29 @@ format-check:
 
 # check the nix builds work
 build-with-nix:
-  nix build '.#postgres-agent' --print-build-logs
-  nix build '.#cockroach-agent' --print-build-logs
+  nix build --no-warn-dirty --print-build-logs '.#ndc-postgres' '.#ndc-cockroach' '.#ndc-citus' '.#ndc-aurora'
 
 # check the docker build works
 build-docker-with-nix:
   #!/usr/bin/env bash
   if [[ '{{CONNECTOR_IMAGE_TAG}}' == 'dev' ]]; then
-    echo 'nix build | docker load'
-    docker load < "$(nix build --no-link --print-out-paths '.#dockerDev')"
+    echo 'nix build .#ndc-postgres-docker | gunzip | docker load'
+    gunzip < "$(nix build --no-warn-dirty --no-link --print-out-paths '.#ndc-postgres-docker')" | docker load
   fi
 
 # check the Postgres arm64 docker build works
-build-arch64-docker-with-nix:
+build-aarch64-docker-with-nix:
   #!/usr/bin/env bash
   if [[ '{{CONNECTOR_IMAGE_TAG}}' == 'dev' ]]; then
-    echo 'nix build | docker load'
-    docker load < "$(nix build --system aarch64-linux --no-link --print-out-paths '.#docker-postgres-aarch64-linux')"
+    echo 'nix build .#ndc-postgres-docker-aarch64-linux | gunzip | docker load'
+    gunzip < "$(nix build --no-warn-dirty --no-link --print-out-paths --system aarch64-linux '.#ndc-postgres-docker-aarch64-linux')" | docker load
   fi
 
 # check the Cockroach arm64 docker build works
-build-cockroach-arch64-docker-with-nix:
+build-cockroach-aarch64-docker-with-nix:
   #!/usr/bin/env bash
   if [[ '{{CONNECTOR_IMAGE_TAG}}' == 'dev' ]]; then
-    echo 'nix build | docker load'
-    docker load < "$(nix build --system aarch64-linux --no-link --print-out-paths '.#docker-cockroach-aarch64-linux')"
+    echo 'nix build .#ndc-cockroach-docker-aarch64-linux | gunzip | docker load'
+    gunzip < "$(nix build --no-warn-dirty --no-link --print-out-paths --system aarch64-linux '.#ndc-cockroach-docker-aarch64-linux')" | docker load
   fi
 

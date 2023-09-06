@@ -22,7 +22,7 @@ jobs:
 
       - name: Build the Docker image 🔨
         run: |
-          docker load < $(nix build --no-link --print-out-paths '.#dockerDev')
+          docker load < $(nix build --no-link --print-out-paths '.#ndc-postgres-docker')
 
       - name: Start dependencies ▶️
         run: |

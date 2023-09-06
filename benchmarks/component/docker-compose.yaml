@@ -47,7 +47,7 @@ services:
         target: /home/k6/output
 
   agent:
-    image: ghcr.io/hasura/postgres-agent-rs:dev
+    image: ghcr.io/hasura/ndc-postgres:dev
     command:
       - serve
     init: true
@@ -65,7 +65,7 @@ services:
         condition: service_started
 
   agent-configuration:
-    image: ghcr.io/hasura/postgres-agent-rs:dev
+    image: ghcr.io/hasura/ndc-postgres:dev
     command:
       - configuration
       - serve

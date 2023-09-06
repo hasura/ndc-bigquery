@@ -41,94 +41,85 @@
         # cockroachExpression = import ./nix/cockroach-agent.nix;
         cargoBuild = import ./nix/cargo-build.nix;
 
-        ### POSTGRES ###
+        # create binaries for a given NDC
+        make-binaries = (binary-name: {
+          inherit binary-name;
+          # a binary for whichever is the local computer
+          local-system = cargoBuild {
+            inherit binary-name crateExpression nixpkgs crane rust-overlay localSystem;
+          };
+          # cross compiler an x86_64 linux binary
+          x86_64-linux = cargoBuild {
+            inherit binary-name crateExpression nixpkgs crane rust-overlay localSystem;
+            crossSystem = "x86_64-linux";
+          };
+          # cross compile a aarch64 linux binary
+          aarch64-linux = cargoBuild {
+            inherit binary-name crateExpression nixpkgs crane rust-overlay localSystem;
+            crossSystem = "aarch64-linux";
+          };
+        });
 
-        # Build for the architecture and OS that is running the build
-        postgres-agent = cargoBuild {
-          binary-name = "ndc-postgres";
-          inherit crateExpression nixpkgs crane rust-overlay localSystem;
-        };
+        # given the binaries, return the flake targets that build Docker etc
+        make-packages =
+          (ndc-binaries:
+            let name = ndc-binaries.binary-name; in {
+              # binary compiled on local system
+              "${name}" = ndc-binaries.local-system;
+              # binary compiled for x86_64-linux
+              "${name}-x86_64-linux" = ndc-binaries.x86_64-linux;
+              # binary compiled for aarch64-linux
+              "${name}-aarch64-linux" = ndc-binaries.aarch64-linux;
+              # docker for local system
+              "${name}-docker" = pkgs.callPackage ./nix/docker.nix {
+                ndc-agent = ndc-binaries.local-system;
+                binary-name = name;
+                image-name = "ghcr.io/hasura/${name}";
+                tag = "dev";
+              };
+              # docker for x86_64-linux
+              "${name}-docker-x86_64-linux" = pkgs.callPackage ./nix/docker.nix {
+                ndc-agent = ndc-binaries.x86_64-linux;
+                architecture = "amd64";
+                binary-name = name;
+                image-name = "ghcr.io/hasura/${name}";
+              };
+              # docker for aarch64-linux
+              "${name}-docker-aarch64-linux" = pkgs.callPackage ./nix/docker.nix {
+                ndc-agent = ndc-binaries.aarch64-linux;
+                architecture = "arm64";
+                binary-name = name;
+                image-name = "ghcr.io/hasura/${name}";
+              };
+            });
 
-        inherit (postgres-agent) cargoArtifacts rustToolchain craneLib buildArgs;
+        postgres-binaries = make-binaries "ndc-postgres";
+        cockroach-binaries = make-binaries "ndc-cockroach";
+        citus-binaries = make-binaries "ndc-citus";
+        aurora-binaries = make-binaries "ndc-aurora";
 
-        postgres-agent-x86_64-linux = cargoBuild {
-          inherit crateExpression nixpkgs crane rust-overlay localSystem;
-          binary-name = "ndc-postgres";
-          crossSystem = "x86_64-linux";
-        };
-
-        postgres-agent-aarch64-linux = cargoBuild {
-          inherit crateExpression nixpkgs crane rust-overlay localSystem;
-          binary-name = "ndc-postgres";
-          crossSystem = "aarch64-linux";
-        };
-
-        ### COCKROACH ###
-
-        # Build for the architecture and OS that is running the build
-        cockroach-agent = cargoBuild {
-          binary-name = "ndc-cockroach";
-          inherit crateExpression nixpkgs crane rust-overlay localSystem;
-        };
-
-        cockroach-agent-x86_64-linux = cargoBuild {
-          inherit crateExpression nixpkgs crane rust-overlay localSystem;
-          binary-name = "ndc-cockroach";
-          crossSystem = "x86_64-linux";
-        };
-
-        cockroach-agent-aarch64-linux = cargoBuild {
-          inherit crateExpression nixpkgs crane rust-overlay localSystem;
-          binary-name = "ndc-cockroach";
-          crossSystem = "aarch64-linux";
-        };
-
-        ### CITUS ###
-
-        # Build for the architecture and OS that is running the build
-        citus-agent = cargoBuild {
-          binary-name = "ndc-citus";
-          inherit crateExpression nixpkgs crane rust-overlay localSystem;
-        };
-
-        citus-agent-x86_64-linux = cargoBuild {
-          inherit crateExpression nixpkgs crane rust-overlay localSystem;
-          binary-name = "ndc-citus";
-          crossSystem = "x86_64-linux";
-        };
-
-        citus-agent-aarch64-linux = cargoBuild {
-          inherit crateExpression nixpkgs crane rust-overlay localSystem;
-          binary-name = "ndc-citus";
-          crossSystem = "aarch64-linux";
-        };
-
-        ### AURORA ###
-
-        # Build for the architecture and OS that is running the build
-        aurora-agent = cargoBuild {
-          binary-name = "ndc-aurora";
-          inherit crateExpression nixpkgs crane rust-overlay localSystem;
-        };
-
-        aurora-agent-x86_64-linux = cargoBuild {
-          inherit crateExpression nixpkgs crane rust-overlay localSystem;
-          binary-name = "ndc-aurora";
-          crossSystem = "x86_64-linux";
-        };
-
-        aurora-agent-aarch64-linux = cargoBuild {
-          inherit crateExpression nixpkgs crane rust-overlay localSystem;
-          binary-name = "ndc-aurora";
-          crossSystem = "aarch64-linux";
-        };
-
+        inherit (postgres-binaries.local-system) cargoArtifacts rustToolchain craneLib buildArgs;
 
       in
       {
+        packages = builtins.foldl' (x: y: x // y) { } [
+          (make-packages postgres-binaries)
+          (make-packages cockroach-binaries)
+          (make-packages citus-binaries)
+          (make-packages aurora-binaries)
+        ] // {
+          default = postgres-binaries.local-system;
+
+          publish-docker-image = pkgs.writeShellApplication {
+            name = "publish-docker-image";
+            runtimeInputs = with pkgs; [ coreutils skopeo ];
+            text = builtins.readFile ./ci/deploy.sh;
+          };
+        };
+
         checks = {
           # Build the crate as part of `nix flake check`
-          inherit postgres-agent;
+          ndc-postgres = postgres-binaries.local-system;
 
           crate-clippy = craneLib.cargoClippy (buildArgs // {
             inherit cargoArtifacts;
@@ -143,131 +134,7 @@
 
           crate-audit = craneLib.cargoAudit {
             inherit advisory-db;
-            inherit (postgres-agent) src;
-          };
-        };
-
-        packages = {
-          default = postgres-agent;
-
-          docker = pkgs.callPackage ./nix/docker.nix {
-            ndc-agent = postgres-agent;
-            binary-name = "ndc-postgres";
-            image-name = "ghcr.io/hasura/postgres-agent-rs";
-          };
-
-          dockerDev = pkgs.callPackage ./nix/docker.nix {
-            ndc-agent = postgres-agent;
-            binary-name = "ndc-postgres";
-            image-name = "ghcr.io/hasura/postgres-agent-rs";
-            tag = "dev";
-          };
-
-          /* postgres ndc targets */
-          postgres-agent = postgres-agent;
-          postgres-agent-x86_64-linux = postgres-agent-x86_64-linux;
-          postgres-agent-aarch64-linux = postgres-agent-aarch64-linux;
-
-          docker-postgres-x86_64-linux = pkgs.callPackage ./nix/docker.nix {
-            ndc-agent = postgres-agent-x86_64-linux;
-            architecture = "amd64";
-            binary-name = "ndc-postgres";
-            image-name = "ghcr.io/hasura/postgres-agent-rs";
-          };
-
-          docker-postgres-aarch64-linux = pkgs.callPackage ./nix/docker.nix {
-            ndc-agent = postgres-agent-aarch64-linux;
-            architecture = "arm64";
-            binary-name = "ndc-postgres";
-            image-name = "ghcr.io/hasura/postgres-agent-rs";
-          };
-
-          /* cockroach ndc targets */
-          cockroach-agent = cockroach-agent;
-          cockroach-agent-x86_64-linux = cockroach-agent-x86_64-linux;
-          cockroach-agent-aarch64-linux = cockroach-agent-aarch64-linux;
-
-          /* build Docker for Cockroach with whatever the local dev env is */
-          docker-cockroach-dev = pkgs.callPackage ./nix/docker.nix {
-            ndc-agent = cockroach-agent;
-            binary-name = "ndc-cockroach";
-            image-name = "ghcr.io/hasura/cockroach-agent-rs";
-            tag = "dev";
-          };
-
-          docker-cockroach-x86_64-linux = pkgs.callPackage ./nix/docker.nix {
-            ndc-agent = cockroach-agent-x86_64-linux;
-            architecture = "amd64";
-            binary-name = "ndc-cockroach";
-            image-name = "ghcr.io/hasura/cockroach-agent-rs";
-          };
-
-          docker-cockroach-aarch64-linux = pkgs.callPackage ./nix/docker.nix {
-            ndc-agent = cockroach-agent-aarch64-linux;
-            architecture = "arm64";
-            binary-name = "ndc-cockroach";
-            image-name = "ghcr.io/hasura/cockroach-agent-rs";
-          };
-
-          /* citus ndc targets */
-          citus-agent = citus-agent;
-          citus-agent-x86_64-linux = citus-agent-x86_64-linux;
-          citus-agent-aarch64-linux = citus-agent-aarch64-linux;
-
-          /* build Docker for Citus with whatever the local dev env is */
-          docker-citus-dev = pkgs.callPackage ./nix/docker.nix {
-            ndc-agent = citus-agent;
-            binary-name = "ndc-citus";
-            image-name = "ghcr.io/hasura/citus-agent-rs";
-            tag = "dev";
-          };
-
-          docker-citus-x86_64-linux = pkgs.callPackage ./nix/docker.nix {
-            ndc-agent = citus-agent-x86_64-linux;
-            architecture = "amd64";
-            binary-name = "ndc-citus";
-            image-name = "ghcr.io/hasura/citus-agent-rs";
-          };
-
-          docker-citus-aarch64-linux = pkgs.callPackage ./nix/docker.nix {
-            ndc-agent = citus-agent-aarch64-linux;
-            architecture = "arm64";
-            binary-name = "ndc-citus";
-            image-name = "ghcr.io/hasura/citus-agent-rs";
-          };
-
-          /* aurora ndc targets */
-          aurora-agent = aurora-agent;
-          aurora-agent-x86_64-linux = aurora-agent-x86_64-linux;
-          aurora-agent-aarch64-linux = aurora-agent-aarch64-linux;
-
-          /* build Docker for Citus with whatever the local dev env is */
-          docker-aurora-dev = pkgs.callPackage ./nix/docker.nix {
-            ndc-agent = aurora-agent;
-            binary-name = "ndc-aurora";
-            image-name = "ghcr.io/hasura/aurora-agent-rs";
-            tag = "dev";
-          };
-
-          docker-aurora-x86_64-linux = pkgs.callPackage ./nix/docker.nix {
-            ndc-agent = aurora-agent-x86_64-linux;
-            architecture = "amd64";
-            binary-name = "ndc-aurora";
-            image-name = "ghcr.io/hasura/aurora-agent-rs";
-          };
-
-          docker-aurora-aarch64-linux = pkgs.callPackage ./nix/docker.nix {
-            ndc-agent = aurora-agent-aarch64-linux;
-            architecture = "arm64";
-            binary-name = "ndc-aurora";
-            image-name = "ghcr.io/hasura/aurora-agent-rs";
-          };
-
-
-          publish-docker-image = pkgs.writeShellApplication {
-            name = "publish-docker-image";
-            runtimeInputs = with pkgs; [ coreutils skopeo ];
-            text = builtins.readFile ./ci/deploy.sh;
+            inherit (postgres-binaries.local-system) src;
           };
         };
 

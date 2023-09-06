@@ -21,4 +21,5 @@ generated/
 .envrc.local
 
 # nix outputs
-result
+/result
+/result-*
