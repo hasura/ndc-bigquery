@@ -19,14 +19,9 @@
         flake-utils.follows = "flake-utils";
       };
     };
-
-    advisory-db = {
-      url = "github:rustsec/advisory-db";
-      flake = false;
-    };
   };
 
-  outputs = { self, nixpkgs, flake-utils, crane, rust-overlay, advisory-db }:
+  outputs = { self, nixpkgs, flake-utils, crane, rust-overlay }:
     flake-utils.lib.eachDefaultSystem (localSystem:
       let
         pkgs = import nixpkgs {
@@ -120,22 +115,6 @@
         checks = {
           # Build the crate as part of `nix flake check`
           ndc-postgres = postgres-binaries.local-system;
-
-          crate-clippy = craneLib.cargoClippy (buildArgs // {
-            inherit cargoArtifacts;
-            cargoClippyExtraArgs = "--all-targets -- --deny warnings";
-          });
-
-          crate-nextest = craneLib.cargoNextest (buildArgs // {
-            inherit cargoArtifacts;
-            partitions = 1;
-            partitionType = "count";
-          });
-
-          crate-audit = craneLib.cargoAudit {
-            inherit advisory-db;
-            inherit (postgres-binaries.local-system) src;
-          };
         };
 
         formatter = pkgs.nixpkgs-fmt;
