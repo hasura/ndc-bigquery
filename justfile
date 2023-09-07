@@ -146,8 +146,14 @@ test: start-dependencies start-cockroach-dependencies start-citus-dependencies s
 # re-generate the deployment configuration file
 generate-chinook-configuration: build start-dependencies start-cockroach-dependencies start-citus-dependencies
   ./scripts/generate-chinook-configuration.sh "ndc-postgres" {{POSTGRESQL_CONNECTION_STRING}} {{POSTGRES_CHINOOK_DEPLOYMENT}}
+
   # re-enable once Cockroach introspection is fixed
   #./scripts/generate-chinook-configuration.sh "ndc-cockroach" {{COCKROACH_CONNECTION_STRING}} {{COCKROACH_CHINOOK_DEPLOYMENT}}
+  # for now do this instead to hack around it
+  ./scripts/generate-chinook-configuration.sh "ndc-cockroach" {{POSTGRESQL_CONNECTION_STRING}} {{COCKROACH_CHINOOK_DEPLOYMENT}}
+  # hack around cockroach returning 500
+  sed -i 's_{{POSTGRESQL_CONNECTION_STRING}}_{{COCKROACH_CONNECTION_STRING}}_' {{COCKROACH_CHINOOK_DEPLOYMENT}}
+
   ./scripts/generate-chinook-configuration.sh "ndc-citus" {{CITUS_CONNECTION_STRING}} {{CITUS_CHINOOK_DEPLOYMENT}}
   ./scripts/generate-chinook-configuration.sh "ndc-aurora" {{AURORA_CONNECTION_STRING}} {{AURORA_CHINOOK_DEPLOYMENT_TEMPLATE}}
 

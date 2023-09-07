@@ -16,20 +16,27 @@ if ! kill -0 "$CONFIGURATION_SERVER_PID"; then
 fi
 
 # name for temp file
-CHINOOK_DEPLOYMENT_NEW="${CHINOOK_DEPLOYMENT}.new"
+CHINOOK_DEPLOYMENT_OLD="${CHINOOK_DEPLOYMENT}.old"
 
-# pass connection string to config server to generate initial deployment from
-# introspection
+# make a copy of the old file
+cp "${CHINOOK_DEPLOYMENT}" "${CHINOOK_DEPLOYMENT_OLD}"
+
+# pass connection string to config server to generate initial deployment from introspection
 curl -fsS http://localhost:9100 \
   | jq --arg postgres_database_url "${CONNECTION_STRING}" '. + {"postgres_database_url": $postgres_database_url, "version": 1, "metadata": {}, "aggregate_functions": {}}' \
   | curl -fsS http://localhost:9100 -H 'Content-Type: application/json' -d @- \
   | jq . \
-  > "${CHINOOK_DEPLOYMENT_NEW}"
+  > "${CHINOOK_DEPLOYMENT}"
 
-# grab .metadata from new file, and put it into original file
+# grab .metadata.native_queries from the old file, and put it into original file
 cat "${CHINOOK_DEPLOYMENT}" \
-  | jq --arg new_metadata "$(cat "${CHINOOK_DEPLOYMENT_NEW}" | jq '.metadata')" '.metadata |= ($new_metadata | fromjson)'
+  | jq --arg old_native_queries "$(cat "${CHINOOK_DEPLOYMENT_OLD}" | jq '.metadata.native_queries')" '.metadata.native_queries |= ($old_native_queries | fromjson)' \
+  > "${CHINOOK_DEPLOYMENT}"
+
+# grab .postgres_database_url from the old file, and put it into original file
+cat "${CHINOOK_DEPLOYMENT}" \
+  | jq --arg old_url "$(cat "${CHINOOK_DEPLOYMENT_OLD}" | jq '.postgres_database_url')" '.postgres_database_url |= ($old_url | fromjson)' \
+  > "${CHINOOK_DEPLOYMENT}"
 
 # remote temp file
-rm -f "${CHINOOK_DEPLOYMENT_NEW}"
-
+rm "${CHINOOK_DEPLOYMENT_OLD}"

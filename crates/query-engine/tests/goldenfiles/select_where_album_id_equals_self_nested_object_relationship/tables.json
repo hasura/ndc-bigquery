@@ -6,15 +6,15 @@
       "columns": {
         "AlbumId": {
           "name": "AlbumId",
-          "type": "Int"
+          "type": "integer"
         },
         "ArtistId": {
           "name": "ArtistId",
-          "type": "Int"
+          "type": "integer"
         },
         "Title": {
           "name": "Title",
-          "type": "String"
+          "type": "character varying"
         }
       },
       "uniqueness_constraints": {
@@ -35,11 +35,11 @@
       "columns": {
         "ArtistId": {
           "name": "ArtistId",
-          "type": "Int"
+          "type": "integer"
         },
         "Name": {
           "name": "Name",
-          "type": "String"
+          "type": "character varying"
         }
       },
       "uniqueness_constraints": {
@@ -53,39 +53,39 @@
       "columns": {
         "AlbumId": {
           "name": "AlbumId",
-          "type": "String"
+          "type": "character varying"
         },
         "Bytes": {
           "name": "Bytes",
-          "type": "String"
+          "type": "character varying"
         },
         "Composer": {
           "name": "Composer",
-          "type": "String"
+          "type": "character varying"
         },
         "GenreId": {
           "name": "GenreId",
-          "type": "Int"
+          "type": "integer"
         },
         "MediaTypeId": {
           "name": "MediaTypeId",
-          "type": "Int"
+          "type": "integer"
         },
         "Milliseconds": {
           "name": "Milliseconds",
-          "type": "Int"
+          "type": "integer"
         },
         "Name": {
           "name": "Name",
-          "type": "String"
+          "type": "character varying"
         },
         "TrackId": {
           "name": "TrackId",
-          "type": "Int"
+          "type": "integer"
         },
         "UnitPrice": {
           "name": "UnitPrice",
-          "type": "Float"
+          "type": "real"
         }
       },
       "uniqueness_constraints": {

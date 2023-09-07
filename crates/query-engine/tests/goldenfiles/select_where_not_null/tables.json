@@ -6,11 +6,11 @@
       "columns": {
         "Id": {
           "name": "AlbumId",
-          "type": "Int"
+          "type": "integer"
         },
         "Title": {
           "name": "Title",
-          "type": "String"
+          "type": "character varying"
         }
       }
     }

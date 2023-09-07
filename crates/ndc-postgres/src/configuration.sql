@@ -13,13 +13,6 @@
 -- We therefore make a set of assumptions about these. We may wish to rewrite
 -- this using the `pg_catalog` tables instead.
 
--- NOTE[Data Types]: We currently translate Postgres scalar types to GraphQL
--- locally in this file. We used to do this by a user-defined function, but
--- this precluded read-only connections. Therefore the function is now inlined
--- where it was used, which we see as a temporary measure. We expect this to be
--- replaced with metadata-dependent processing host-side rather than
--- database-side.
-
 select
   coalesce(tables, '{}'), -- maps to `TableInfo`
   coalesce(aggregate_functions, '{}') -- maps to `AggregateFunctions`
@@ -50,21 +43,26 @@ from
                     'name',
                     c.column_name,
                     'type',
-                    -- See Note[Data Types] above.
+                    -- These are the types we support, mapped to "standard" aliases.
+                    -- We have a similar case expression below, the two needs to be in sync.
                     case c.data_type
-                      when 'boolean' then 'Boolean'
-                      when 'smallint' then 'Int'
-                      when 'integer' then 'Int'
-                      when 'bigint' then 'Int'
-                      when 'smallserial' then 'Int'
-                      when 'serial' then 'Int'
-                      when 'bigserial' then 'Int'
-                      when 'decimal' then 'Float'
-                      when 'numeric' then 'Float'
-                      when 'real' then 'Float'
-                      when 'double precision' then 'Float'
-                      when 'text' then 'String'
-                      when 'character varying' then 'String'
+                      when 'boolean' then 'boolean'
+                      when 'smallint' then 'smallint'
+                      when 'integer' then 'integer'
+                      when 'bigint' then 'bigint'
+                      when 'numeric' then 'numeric'
+                      when 'real' then 'real'
+                      when 'double precision' then 'double precision'
+                      when 'text' then 'text'
+                      when 'character varying' then 'character varying'
+                      when 'character' then 'character'
+                      when 'json' then 'json'
+                      when 'jsonb' then 'jsonb'
+                      when 'date' then 'date'
+                      when 'time with time zone' then 'time with time zone'
+                      when 'time without time zone' then 'time without time zone'
+                      when 'timestamp with time zone' then 'timestamp with time zone'
+                      when 'timestamp without time zone' then 'timestamp without time zone'
                       else 'any'
                     end
                   )
@@ -186,22 +184,27 @@ from
           ) routines
         from
           (
-            select r.*, 
-              -- See Note[Data Types] above.
+            select r.*,
+              -- These are the types we support, mapped to "standard" aliases.
+              -- We have a similar case expression above, the two needs to be in sync.
               case r.data_type
-                when 'boolean' then 'Boolean'
-                when 'smallint' then 'Int'
-                when 'integer' then 'Int'
-                when 'bigint' then 'Int'
-                when 'smallserial' then 'Int'
-                when 'serial' then 'Int'
-                when 'bigserial' then 'Int'
-                when 'decimal' then 'Float'
-                when 'numeric' then 'Float'
-                when 'real' then 'Float'
-                when 'double precision' then 'Float'
-                when 'text' then 'String'
-                when 'character varying' then 'String'
+                when 'boolean' then 'boolean'
+                when 'smallint' then 'smallint'
+                when 'integer' then 'integer'
+                when 'bigint' then 'bigint'
+                when 'numeric' then 'numeric'
+                when 'real' then 'real'
+                when 'double precision' then 'double precision'
+                when 'text' then 'text'
+                when 'character varying' then 'character varying'
+                when 'character' then 'character'
+                when 'json' then 'json'
+                when 'jsonb' then 'jsonb'
+                when 'date' then 'date'
+                when 'time with time zone' then 'time with time zone'
+                when 'time without time zone' then 'time without time zone'
+                when 'timestamp with time zone' then 'timestamp with time zone'
+                when 'timestamp without time zone' then 'timestamp without time zone'
                 else 'any'
               end scalar_type
             from information_schema.routines r

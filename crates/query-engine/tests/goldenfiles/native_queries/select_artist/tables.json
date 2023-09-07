@@ -5,11 +5,11 @@
       "columns": {
         "ArtistId": {
           "name": "ArtistId",
-          "type": "Int"
+          "type": "integer"
         },
         "Name": {
           "name": "Name",
-          "type": "String"
+          "type": "character varying"
         }
       }
     }

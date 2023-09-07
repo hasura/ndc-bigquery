@@ -49,7 +49,9 @@ mod tests {
     // This needs to live here because this module is private.
     #[test]
     fn test_metadata_binary_comparison_operators_are_in_sync_with_sql() {
-        for metadata_operator in enum_iterator::all::<crate::metadata::database::BinaryOperator>() {
+        for metadata_operator in
+            enum_iterator::all::<crate::metadata::database::ComparisonOperator>()
+        {
             let name = metadata_operator.name();
             let sql_operator = lookup_by_name(name)
                 .unwrap_or_else(|| panic!("{}", Error::OperatorNotFound(name.to_string())));

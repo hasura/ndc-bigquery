@@ -10,45 +10,64 @@ use serde::{Deserialize, Serialize};
 #[derive(
     Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Sequence, Serialize, Deserialize, JsonSchema,
 )]
+#[serde(rename_all = "lowercase")]
 pub enum ScalarType {
     Boolean,
-    Float,
-    Int,
-    String,
-    /// `Any` isn't supported by the engine.
-    #[serde(rename = "any")]
+    Smallint,
+    Integer,
+    Bigint,
+    Real,
+    #[serde(rename = "double precision")]
+    DoublePrecision,
+    Numeric,
+    Character,
+    #[serde(rename = "character varying")]
+    CharacterVarying,
+    Text,
+    Json,
+    Jsonb,
+    Date,
+    #[serde(rename = "time with time zone")]
+    TimeWithTimeZone,
+    #[serde(rename = "time without time zone")]
+    TimeWithoutTimeZone,
+    #[serde(rename = "timestamp with time zone")]
+    TimestampWithTimeZone,
+    #[serde(rename = "timestamp without time zone")]
+    TimestampWithoutTimeZone,
     Any,
 }
 
 impl ScalarType {
-    const OPERATORS_SUPPORTED_BY_ALL_TYPES: &[BinaryOperator] = &[
-        BinaryOperator::Equals,
-        BinaryOperator::NotEquals,
-        BinaryOperator::LessThan,
-        BinaryOperator::LessThanOrEqualTo,
-        BinaryOperator::GreaterThan,
-        BinaryOperator::GreaterThanOrEqualTo,
+    const OPERATORS_SUPPORTED_BY_ALL_TYPES: &[ComparisonOperator] = &[
+        ComparisonOperator::Equals,
+        ComparisonOperator::NotEquals,
+        ComparisonOperator::LessThan,
+        ComparisonOperator::LessThanOrEqualTo,
+        ComparisonOperator::GreaterThan,
+        ComparisonOperator::GreaterThanOrEqualTo,
     ];
 
-    const STRING_OPERATORS: &[BinaryOperator] = &[
-        BinaryOperator::Like,
-        BinaryOperator::NotLike,
-        BinaryOperator::CaseInsensitiveLike,
-        BinaryOperator::NotCaseInsensitiveLike,
-        BinaryOperator::Similar,
-        BinaryOperator::NotSimilar,
-        BinaryOperator::Regex,
-        BinaryOperator::NotRegex,
-        BinaryOperator::CaseInsensitiveRegex,
-        BinaryOperator::NotCaseInsensitiveRegex,
+    const STRING_OPERATORS: &[ComparisonOperator] = &[
+        ComparisonOperator::Like,
+        ComparisonOperator::NotLike,
+        ComparisonOperator::CaseInsensitiveLike,
+        ComparisonOperator::NotCaseInsensitiveLike,
+        ComparisonOperator::Similar,
+        ComparisonOperator::NotSimilar,
+        ComparisonOperator::Regex,
+        ComparisonOperator::NotRegex,
+        ComparisonOperator::CaseInsensitiveRegex,
+        ComparisonOperator::NotCaseInsensitiveRegex,
     ];
 
     /// Returns the complete set of comparison operators for the given type.
-    pub fn comparison_operators(&self) -> BTreeSet<BinaryOperator> {
+    pub fn comparison_operators(&self) -> BTreeSet<ComparisonOperator> {
         let mut operators =
             BTreeSet::from_iter(Self::OPERATORS_SUPPORTED_BY_ALL_TYPES.iter().copied());
         operators.extend(match self {
-            ScalarType::String => Self::STRING_OPERATORS.iter(),
+            ScalarType::CharacterVarying => Self::STRING_OPERATORS.iter(),
+            ScalarType::Text => Self::STRING_OPERATORS.iter(),
             _ => [].iter(),
         });
         operators
@@ -58,11 +77,13 @@ impl ScalarType {
 impl ToString for ScalarType {
     fn to_string(&self) -> String {
         match self {
-            Self::Boolean => "Boolean".to_string(),
-            Self::Float => "Float".to_string(),
-            Self::Int => "Int".to_string(),
-            Self::String => "String".to_string(),
-            Self::Any => "any".to_string(),
+            ScalarType::DoublePrecision => "double precision".to_string(),
+            ScalarType::CharacterVarying => "character varying".to_string(),
+            ScalarType::TimeWithTimeZone => "time with time zone".to_string(),
+            ScalarType::TimeWithoutTimeZone => "time without time zone".to_string(),
+            ScalarType::TimestampWithTimeZone => "timestamp with time zone".to_string(),
+            ScalarType::TimestampWithoutTimeZone => "timestamp without time zone".to_string(),
+            _ => format!("{:?}", self).to_lowercase(),
         }
     }
 }
@@ -85,7 +106,7 @@ impl ToString for ScalarType {
     Deserialize,
     JsonSchema,
 )]
-pub enum BinaryOperator {
+pub enum ComparisonOperator {
     Equals,
     NotEquals,
     LessThan,
@@ -104,7 +125,7 @@ pub enum BinaryOperator {
     NotCaseInsensitiveRegex,
 }
 
-impl BinaryOperator {
+impl ComparisonOperator {
     /// The name of the binary operator exposed via the schema.
     pub fn name(&self) -> &'static str {
         match self {
@@ -137,7 +158,7 @@ impl BinaryOperator {
     }
 }
 
-impl ToString for BinaryOperator {
+impl ToString for ComparisonOperator {
     fn to_string(&self) -> String {
         self.name().to_string()
     }
@@ -203,9 +224,9 @@ mod tests {
         // This is the set of all operators exposed through the schema.
         let exposed_operators = enum_iterator::all::<ScalarType>()
             .flat_map(|scalar_type| scalar_type.comparison_operators())
-            .collect::<BTreeSet<BinaryOperator>>();
+            .collect::<BTreeSet<ComparisonOperator>>();
 
-        for operator in enum_iterator::all::<BinaryOperator>() {
+        for operator in enum_iterator::all::<ComparisonOperator>() {
             assert!(
                 exposed_operators.contains(&operator),
                 "The operator {:?} is not exposed anywhere.",

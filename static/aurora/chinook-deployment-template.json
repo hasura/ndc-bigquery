@@ -9,15 +9,15 @@
         "columns": {
           "AlbumId": {
             "name": "AlbumId",
-            "type": "Int"
+            "type": "integer"
           },
           "ArtistId": {
             "name": "ArtistId",
-            "type": "Int"
+            "type": "integer"
           },
           "Title": {
             "name": "Title",
-            "type": "String"
+            "type": "character varying"
           }
         },
         "uniqueness_constraints": {
@@ -38,11 +38,11 @@
         "columns": {
           "ArtistId": {
             "name": "ArtistId",
-            "type": "Int"
+            "type": "integer"
           },
           "Name": {
             "name": "Name",
-            "type": "String"
+            "type": "character varying"
           }
         },
         "uniqueness_constraints": {
@@ -56,55 +56,55 @@
         "columns": {
           "Address": {
             "name": "Address",
-            "type": "String"
+            "type": "character varying"
           },
           "City": {
             "name": "City",
-            "type": "String"
+            "type": "character varying"
           },
           "Company": {
             "name": "Company",
-            "type": "String"
+            "type": "character varying"
           },
           "Country": {
             "name": "Country",
-            "type": "String"
+            "type": "character varying"
           },
           "CustomerId": {
             "name": "CustomerId",
-            "type": "Int"
+            "type": "integer"
           },
           "Email": {
             "name": "Email",
-            "type": "String"
+            "type": "character varying"
           },
           "Fax": {
             "name": "Fax",
-            "type": "String"
+            "type": "character varying"
           },
           "FirstName": {
             "name": "FirstName",
-            "type": "String"
+            "type": "character varying"
           },
           "LastName": {
             "name": "LastName",
-            "type": "String"
+            "type": "character varying"
           },
           "Phone": {
             "name": "Phone",
-            "type": "String"
+            "type": "character varying"
           },
           "PostalCode": {
             "name": "PostalCode",
-            "type": "String"
+            "type": "character varying"
           },
           "State": {
             "name": "State",
-            "type": "String"
+            "type": "character varying"
           },
           "SupportRepId": {
             "name": "SupportRepId",
-            "type": "Int"
+            "type": "integer"
           }
         },
         "uniqueness_constraints": {
@@ -125,63 +125,63 @@
         "columns": {
           "Address": {
             "name": "Address",
-            "type": "String"
+            "type": "character varying"
           },
           "BirthDate": {
             "name": "BirthDate",
-            "type": "any"
+            "type": "timestamp without time zone"
           },
           "City": {
             "name": "City",
-            "type": "String"
+            "type": "character varying"
           },
           "Country": {
             "name": "Country",
-            "type": "String"
+            "type": "character varying"
           },
           "Email": {
             "name": "Email",
-            "type": "String"
+            "type": "character varying"
           },
           "EmployeeId": {
             "name": "EmployeeId",
-            "type": "Int"
+            "type": "integer"
           },
           "Fax": {
             "name": "Fax",
-            "type": "String"
+            "type": "character varying"
           },
           "FirstName": {
             "name": "FirstName",
-            "type": "String"
+            "type": "character varying"
           },
           "HireDate": {
             "name": "HireDate",
-            "type": "any"
+            "type": "timestamp without time zone"
           },
           "LastName": {
             "name": "LastName",
-            "type": "String"
+            "type": "character varying"
           },
           "Phone": {
             "name": "Phone",
-            "type": "String"
+            "type": "character varying"
           },
           "PostalCode": {
             "name": "PostalCode",
-            "type": "String"
+            "type": "character varying"
           },
           "ReportsTo": {
             "name": "ReportsTo",
-            "type": "Int"
+            "type": "integer"
           },
           "State": {
             "name": "State",
-            "type": "String"
+            "type": "character varying"
           },
           "Title": {
             "name": "Title",
-            "type": "String"
+            "type": "character varying"
           }
         },
         "uniqueness_constraints": {
@@ -202,11 +202,11 @@
         "columns": {
           "GenreId": {
             "name": "GenreId",
-            "type": "Int"
+            "type": "integer"
           },
           "Name": {
             "name": "Name",
-            "type": "String"
+            "type": "character varying"
           }
         },
         "uniqueness_constraints": {
@@ -220,39 +220,39 @@
         "columns": {
           "BillingAddress": {
             "name": "BillingAddress",
-            "type": "String"
+            "type": "character varying"
           },
           "BillingCity": {
             "name": "BillingCity",
-            "type": "String"
+            "type": "character varying"
           },
           "BillingCountry": {
             "name": "BillingCountry",
-            "type": "String"
+            "type": "character varying"
           },
           "BillingPostalCode": {
             "name": "BillingPostalCode",
-            "type": "String"
+            "type": "character varying"
           },
           "BillingState": {
             "name": "BillingState",
-            "type": "String"
+            "type": "character varying"
           },
           "CustomerId": {
             "name": "CustomerId",
-            "type": "Int"
+            "type": "integer"
           },
           "InvoiceDate": {
             "name": "InvoiceDate",
-            "type": "any"
+            "type": "timestamp without time zone"
           },
           "InvoiceId": {
             "name": "InvoiceId",
-            "type": "Int"
+            "type": "integer"
           },
           "Total": {
             "name": "Total",
-            "type": "Float"
+            "type": "numeric"
           }
         },
         "uniqueness_constraints": {
@@ -273,23 +273,23 @@
         "columns": {
           "InvoiceId": {
             "name": "InvoiceId",
-            "type": "Int"
+            "type": "integer"
           },
           "InvoiceLineId": {
             "name": "InvoiceLineId",
-            "type": "Int"
+            "type": "integer"
           },
           "Quantity": {
             "name": "Quantity",
-            "type": "Int"
+            "type": "integer"
           },
           "TrackId": {
             "name": "TrackId",
-            "type": "Int"
+            "type": "integer"
           },
           "UnitPrice": {
             "name": "UnitPrice",
-            "type": "Float"
+            "type": "numeric"
           }
         },
         "uniqueness_constraints": {
@@ -316,11 +316,11 @@
         "columns": {
           "MediaTypeId": {
             "name": "MediaTypeId",
-            "type": "Int"
+            "type": "integer"
           },
           "Name": {
             "name": "Name",
-            "type": "String"
+            "type": "character varying"
           }
         },
         "uniqueness_constraints": {
@@ -334,11 +334,11 @@
         "columns": {
           "Name": {
             "name": "Name",
-            "type": "String"
+            "type": "character varying"
           },
           "PlaylistId": {
             "name": "PlaylistId",
-            "type": "Int"
+            "type": "integer"
           }
         },
         "uniqueness_constraints": {
@@ -352,11 +352,11 @@
         "columns": {
           "PlaylistId": {
             "name": "PlaylistId",
-            "type": "Int"
+            "type": "integer"
           },
           "TrackId": {
             "name": "TrackId",
-            "type": "Int"
+            "type": "integer"
           }
         },
         "uniqueness_constraints": {
@@ -383,39 +383,39 @@
         "columns": {
           "AlbumId": {
             "name": "AlbumId",
-            "type": "Int"
+            "type": "integer"
           },
           "Bytes": {
             "name": "Bytes",
-            "type": "Int"
+            "type": "integer"
           },
           "Composer": {
             "name": "Composer",
-            "type": "String"
+            "type": "character varying"
           },
           "GenreId": {
             "name": "GenreId",
-            "type": "Int"
+            "type": "integer"
           },
           "MediaTypeId": {
             "name": "MediaTypeId",
-            "type": "Int"
+            "type": "integer"
           },
           "Milliseconds": {
             "name": "Milliseconds",
-            "type": "Int"
+            "type": "integer"
           },
           "Name": {
             "name": "Name",
-            "type": "String"
+            "type": "character varying"
           },
           "TrackId": {
             "name": "TrackId",
-            "type": "Int"
+            "type": "integer"
           },
           "UnitPrice": {
             "name": "UnitPrice",
-            "type": "Float"
+            "type": "numeric"
           }
         },
         "uniqueness_constraints": {
@@ -449,11 +449,11 @@
         "columns": {
           "ArtistId": {
             "name": "ArtistId",
-            "type": "Int"
+            "type": "integer"
           },
           "Name": {
             "name": "Name",
-            "type": "String"
+            "type": "character varying"
           }
         }
       },
@@ -462,17 +462,17 @@
         "columns": {
           "ArtistId": {
             "name": "ArtistId",
-            "type": "Int"
+            "type": "integer"
           },
           "Name": {
             "name": "Name",
-            "type": "String"
+            "type": "character varying"
           }
         },
         "arguments": {
           "id": {
             "name": "id",
-            "type": "Int"
+            "type": "integer"
           }
         }
       },
@@ -481,150 +481,253 @@
         "columns": {
           "AlbumId": {
             "name": "AlbumId",
-            "type": "Int"
+            "type": "integer"
           },
           "Title": {
             "name": "Title",
-            "type": "String"
+            "type": "character varying"
           },
           "ArtistId": {
             "name": "ArtistId",
-            "type": "Int"
+            "type": "integer"
           }
         },
         "arguments": {
           "id": {
             "name": "id",
-            "type": "Int"
+            "type": "integer"
           },
           "title": {
             "name": "title",
-            "type": "String"
+            "type": "character varying"
           }
         }
       }
     }
   },
   "aggregate_functions": {
-    "Boolean": {
+    "boolean": {
       "bool_and": {
-        "return_type": "Boolean"
+        "return_type": "boolean"
       },
       "bool_or": {
-        "return_type": "Boolean"
+        "return_type": "boolean"
       },
       "every": {
-        "return_type": "Boolean"
+        "return_type": "boolean"
       }
     },
-    "Int": {
+    "smallint": {
       "bit_and": {
-        "return_type": "Int"
+        "return_type": "smallint"
       },
       "bit_or": {
-        "return_type": "Int"
+        "return_type": "smallint"
       },
       "bit_xor": {
-        "return_type": "Int"
-      },
-      "count": {
-        "return_type": "Int"
-      },
-      "dense_rank": {
-        "return_type": "Int"
+        "return_type": "smallint"
       },
       "max": {
-        "return_type": "Int"
+        "return_type": "smallint"
       },
       "min": {
-        "return_type": "Int"
-      },
-      "ntile": {
-        "return_type": "Int"
-      },
-      "rank": {
-        "return_type": "Int"
-      },
-      "sum": {
-        "return_type": "Int"
+        "return_type": "smallint"
       }
     },
-    "Float": {
+    "integer": {
+      "bit_and": {
+        "return_type": "integer"
+      },
+      "bit_or": {
+        "return_type": "integer"
+      },
+      "bit_xor": {
+        "return_type": "integer"
+      },
+      "max": {
+        "return_type": "integer"
+      },
+      "min": {
+        "return_type": "integer"
+      },
+      "ntile": {
+        "return_type": "integer"
+      }
+    },
+    "bigint": {
+      "bit_and": {
+        "return_type": "bigint"
+      },
+      "bit_or": {
+        "return_type": "bigint"
+      },
+      "bit_xor": {
+        "return_type": "bigint"
+      },
+      "count": {
+        "return_type": "bigint"
+      },
+      "dense_rank": {
+        "return_type": "bigint"
+      },
+      "max": {
+        "return_type": "bigint"
+      },
+      "min": {
+        "return_type": "bigint"
+      },
+      "rank": {
+        "return_type": "bigint"
+      },
+      "sum": {
+        "return_type": "bigint"
+      }
+    },
+    "real": {
+      "max": {
+        "return_type": "real"
+      },
+      "min": {
+        "return_type": "real"
+      },
+      "sum": {
+        "return_type": "real"
+      }
+    },
+    "double precision": {
       "avg": {
-        "return_type": "Float"
+        "return_type": "double precision"
       },
       "cume_dist": {
-        "return_type": "Float"
+        "return_type": "double precision"
       },
       "max": {
-        "return_type": "Float"
+        "return_type": "double precision"
       },
       "min": {
-        "return_type": "Float"
+        "return_type": "double precision"
       },
       "percent_rank": {
-        "return_type": "Float"
+        "return_type": "double precision"
       },
       "stddev": {
-        "return_type": "Float"
+        "return_type": "double precision"
       },
       "stddev_pop": {
-        "return_type": "Float"
+        "return_type": "double precision"
       },
       "stddev_samp": {
-        "return_type": "Float"
+        "return_type": "double precision"
       },
       "sum": {
-        "return_type": "Float"
+        "return_type": "double precision"
       },
       "var_pop": {
-        "return_type": "Float"
+        "return_type": "double precision"
       },
       "var_samp": {
-        "return_type": "Float"
+        "return_type": "double precision"
       },
       "variance": {
-        "return_type": "Float"
+        "return_type": "double precision"
       }
     },
-    "Int": {
-      "bit_and": {
-        "return_type": "Int"
-      },
-      "bit_or": {
-        "return_type": "Int"
-      },
-      "bit_xor": {
-        "return_type": "Int"
-      },
-      "count": {
-        "return_type": "Int"
-      },
-      "dense_rank": {
-        "return_type": "Int"
+    "numeric": {
+      "avg": {
+        "return_type": "numeric"
       },
       "max": {
-        "return_type": "Int"
+        "return_type": "numeric"
       },
       "min": {
-        "return_type": "Int"
+        "return_type": "numeric"
       },
-      "ntile": {
-        "return_type": "Int"
+      "stddev": {
+        "return_type": "numeric"
       },
-      "rank": {
-        "return_type": "Int"
+      "stddev_pop": {
+        "return_type": "numeric"
+      },
+      "stddev_samp": {
+        "return_type": "numeric"
       },
       "sum": {
-        "return_type": "Int"
+        "return_type": "numeric"
+      },
+      "var_pop": {
+        "return_type": "numeric"
+      },
+      "var_samp": {
+        "return_type": "numeric"
+      },
+      "variance": {
+        "return_type": "numeric"
       }
     },
-    "String": {
+    "character": {
       "max": {
-        "return_type": "String"
+        "return_type": "character"
       },
       "min": {
-        "return_type": "String"
+        "return_type": "character"
+      }
+    },
+    "text": {
+      "max": {
+        "return_type": "text"
+      },
+      "min": {
+        "return_type": "text"
+      }
+    },
+    "json": {
+      "json_agg": {
+        "return_type": "json"
+      }
+    },
+    "jsonb": {
+      "jsonb_agg": {
+        "return_type": "jsonb"
+      }
+    },
+    "date": {
+      "max": {
+        "return_type": "date"
+      },
+      "min": {
+        "return_type": "date"
+      }
+    },
+    "time with time zone": {
+      "max": {
+        "return_type": "time with time zone"
+      },
+      "min": {
+        "return_type": "time with time zone"
+      }
+    },
+    "time without time zone": {
+      "max": {
+        "return_type": "time without time zone"
+      },
+      "min": {
+        "return_type": "time without time zone"
+      }
+    },
+    "timestamp with time zone": {
+      "max": {
+        "return_type": "timestamp with time zone"
+      },
+      "min": {
+        "return_type": "timestamp with time zone"
+      }
+    },
+    "timestamp without time zone": {
+      "max": {
+        "return_type": "timestamp without time zone"
+      },
+      "min": {
+        "return_type": "timestamp without time zone"
       }
     }
   }
