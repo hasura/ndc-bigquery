@@ -13,7 +13,9 @@ if [ -z "${1+x}" ]; then
 fi
 
 github_ref="$1"
-image_path="$2"
+binary_image_name="$2" # ie, 'ndc-postgres'
+
+image_path="ghcr.io/hasura/${binary_image_name}"
 
 # Assumes that the given ref is a branch name. Sets a tag for a docker image of
 # the form:
@@ -67,28 +69,54 @@ function set_docker_tags {
     fi
 }
 
-# expects to find a tar file in ./result
-# as the result of `nix build .#docker-postgres` or similar
-function maybe_publish {
+function publish_multi_arch {
     local input="$1"
+    
     set_docker_tags "$input"
+  
+    architectures=("aarch64" "x86_64")
+
+    # do nothing if no tags found
     if [[ ${#docker_tags[@]} == 0 ]]; then
         echo "The given ref, $input, was not a release tag or a branch - will not publish a docker image"
         exit
     fi
 
-    echo "Will publish docker image with tags: ${docker_tags[*]}"
+    # build and push the individual images for each architecture
+    for arch in "${architectures[@]}"; do
+      # build the docker image
+      nix build .#"${binary_image_name}"-docker-"${arch}"-linux
+      echo "Will publish docker image with tags: ${docker_tags[*]}"
 
-    ls -lh result
-    local image_archive
-    image_archive=docker-archive://"$(readlink -f result)"
-    skopeo inspect "$image_archive"
+      # grab result from ./result
+      ls -lh result
+      local image_archive
+      image_archive=docker-archive://"$(readlink -f result)"
+      skopeo inspect "$image_archive"
 
+      local image_path_for_arch
+      image_path_for_arch="${image_path}-${arch}" 
+
+      for tag in "${docker_tags[@]}"; do
+          echo
+          echo "Pushing docker://$image_path_for_arch:$tag"
+          skopeo copy "$image_archive" docker://"$image_path_for_arch:$tag"
+      done
+    done
+
+    # now create and push the manifest
     for tag in "${docker_tags[@]}"; do
-        echo
-        echo "Pushing docker://$image_path:$tag"
-        skopeo copy "$image_archive" docker://"$image_path:$tag"
+      echo "Creating manifest for $image_path:$tag"
+      # create a manifest referencing both architectures
+      # i did not use a loop here, forgive me
+      docker manifest create \
+          "$image_path:$tag" \
+           --amend "${image_path}-aarch64:$tag" \
+           --amend "${image_path}-x86_64:$tag"
+      
+      # push manifest as the main image
+      docker manifest push "$image_path:$tag"
     done
 }
 
-maybe_publish "$github_ref"
+publish_multi_arch "$github_ref"

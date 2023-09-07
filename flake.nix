@@ -77,14 +77,14 @@
                 ndc-agent = ndc-binaries.x86_64-linux;
                 architecture = "amd64";
                 binary-name = name;
-                image-name = "ghcr.io/hasura/${name}";
+                image-name = "ghcr.io/hasura/${name}-x86_64";
               };
               # docker for aarch64-linux
               "${name}-docker-aarch64-linux" = pkgs.callPackage ./nix/docker.nix {
                 ndc-agent = ndc-binaries.aarch64-linux;
                 architecture = "arm64";
                 binary-name = name;
-                image-name = "ghcr.io/hasura/${name}";
+                image-name = "ghcr.io/hasura/${name}-aarch64";
               };
             });
 
@@ -137,6 +137,7 @@
             pkgs.nodePackages.prettier
             pkgs.pkg-config
             pkgs.rnix-lsp
+            pkgs.skopeo
             rustToolchain
           ];
         };

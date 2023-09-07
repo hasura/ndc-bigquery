@@ -1,4 +1,4 @@
-name: Postgres NDC build and deploy with Nix
+name: Postgres NDC build and push binaries with Nix
 
 on:
   push:
@@ -19,29 +19,21 @@ jobs:
               "build_command": "ndc-postgres-x86_64-linux",
               "binary_artifact_name": "hasura-postgres-agent-rs",
               "artifact_path": "result/bin/ndc-postgres",
-              "docker_build_command": "ndc-postgres-docker-x86_64-linux",
-              "docker_image_name": "ghcr.io/hasura/ndc-postgres",
             },
             {
               "build_command": "ndc-cockroach-x86_64-linux",
               "binary_artifact_name": "hasura-cockroach-agent-rs",
               "artifact_path": "result/bin/ndc-cockroach",
-              "docker_build_command": "ndc-cockroach-docker-x86_64-linux",
-              "docker_image_name": "ghcr.io/hasura/ndc-cockroach",
             },
             {
               "build_command": "ndc-citus-x86_64-linux",
               "binary_artifact_name": "hasura-citus-agent-rs",
               "artifact_path": "result/bin/ndc-citus",
-              "docker_build_command": "ndc-citus-docker-x86_64-linux",
-              "docker_image_name": "ghcr.io/hasura/ndc-citus",
             },
             {
               "build_command": "ndc-aurora-x86_64-linux",
               "binary_artifact_name": "hasura-aurora-agent-rs",
               "artifact_path": "result/bin/ndc-aurora",
-              "docker_build_command": "ndc-aurora-docker-x86_64-linux",
-              "docker_image_name": "ghcr.io/hasura/ndc-aurora",
             },
           ]
 
@@ -70,19 +62,6 @@ jobs:
         with:
           name: ${{ matrix.connectors.binary_artifact_name }}
           path: ${{ matrix.connectors.artifact_path }}
-
-      - name: Login to GitHub Container Registry 📦
-        uses: docker/login-action@v2
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build docker image 🔨
-        run: nix build .#${{ matrix.connectors.docker_build_command }}
-
-      - name: Deploy 🚀
-        run: nix run .#publish-docker-image ${{ github.ref }} ${{ matrix.connectors.docker_image_name }}
 
       # scream into Slack if something goes wrong
       - name: Report Status
