@@ -13,8 +13,9 @@ COCKROACH_CHINOOK_DEPLOYMENT := "static/cockroach/chinook-deployment.json"
 CITUS_CONNECTION_STRING := "postgresql://postgres:password@localhost:64004?sslmode=disable"
 CITUS_CHINOOK_DEPLOYMENT := "static/citus/chinook-deployment.json"
 
-# AURORA_CONNECTION_STRING := env_var("AURORA_CONNECTION_STRING")
+AURORA_CONNECTION_STRING := env_var('AURORA_CONNECTION_STRING')
 AURORA_CHINOOK_DEPLOYMENT := "static/aurora/chinook-deployment.json"
+AURORA_CHINOOK_DEPLOYMENT_TEMPLATE := "static/aurora/chinook-deployment-template.json"
 
 # Notes:
 # * Building Docker images will not work on macOS.
@@ -138,28 +139,27 @@ build:
   cargo build --all-targets
 
 # run all tests
-test: start-dependencies
+test: start-dependencies start-cockroach-dependencies start-citus-dependencies start-aurora-dependencies
   RUST_LOG=DEBUG \
-    cargo test -p query-engine -p ndc-postgres
+    cargo test -p query-engine -p ndc-postgres -p ndc-cockroach -p ndc-citus -p ndc-aurora
 
 # re-generate the deployment configuration file
-generate-chinook-configuration: build
-  #!/usr/bin/env bash
-  set -e -u
+generate-chinook-configuration: build start-dependencies start-cockroach-dependencies start-citus-dependencies
+  ./scripts/generate-chinook-configuration.sh "ndc-postgres" {{POSTGRESQL_CONNECTION_STRING}} {{POSTGRES_CHINOOK_DEPLOYMENT}}
+  # re-enable once Cockroach introspection is fixed
+  #./scripts/generate-chinook-configuration.sh "ndc-cockroach" {{COCKROACH_CONNECTION_STRING}} {{COCKROACH_CHINOOK_DEPLOYMENT}}
+  ./scripts/generate-chinook-configuration.sh "ndc-citus" {{CITUS_CONNECTION_STRING}} {{CITUS_CHINOOK_DEPLOYMENT}}
+  ./scripts/generate-chinook-configuration.sh "ndc-aurora" {{AURORA_CONNECTION_STRING}} {{AURORA_CHINOOK_DEPLOYMENT_TEMPLATE}}
 
-  cargo run --quiet -- configuration serve &
-  CONFIGURATION_SERVER_PID=$!
-  trap "kill $CONFIGURATION_SERVER_PID" EXIT
-  ./scripts/wait-until --timeout=30 --report -- nc -z localhost 9100
-  if ! kill -0 "$CONFIGURATION_SERVER_PID"; then
-    echo >&2 'The server stopped abruptly.'
-    exit 1
-  fi
-  curl -fsS http://localhost:9100 \
-    | jq --arg postgres_database_url '{{POSTGRESQL_CONNECTION_STRING}}' '. + {"postgres_database_url": $postgres_database_url}' \
-    | curl -fsS http://localhost:9100 -H 'Content-Type: application/json' -d @- \
-    | jq . \
-    > '{{POSTGRES_CHINOOK_DEPLOYMENT}}'
+  # regenerate aurora deployment from template we've just updated
+  just start-aurora-dependencies
+
+  # make everything delightful
+  prettier --write {{ POSTGRES_CHINOOK_DEPLOYMENT }} \
+    {{ COCKROACH_CHINOOK_DEPLOYMENT }} \
+    {{ CITUS_CHINOOK_DEPLOYMENT }} \
+    {{ AURORA_CHINOOK_DEPLOYMENT_TEMPLATE }} \
+    {{ AURORA_CHINOOK_DEPLOYMENT }}
 
 # run postgres + jaeger
 start-dependencies:
@@ -189,9 +189,9 @@ start-aurora-dependencies:
   # start jaeger, configured to listen to V3
   docker compose -f ../v3-engine/docker-compose.yaml up -d jaeger
   # splice `AURORA_CONNECTION_STRING` into
-  cat static/aurora/chinook-deployment-template.json \
+  cat {{ AURORA_CHINOOK_DEPLOYMENT_TEMPLATE }} \
     | jq '.postgres_database_url=(env | .AURORA_CONNECTION_STRING)' \
-    >> {{ AURORA_CHINOOK_DEPLOYMENT }}
+    > {{ AURORA_CHINOOK_DEPLOYMENT }}
 
 # run prometheus + grafana
 start-metrics:
@@ -270,4 +270,3 @@ build-cockroach-aarch64-docker-with-nix:
     echo 'nix build .#ndc-cockroach-docker-aarch64-linux | gunzip | docker load'
     gunzip < "$(nix build --no-warn-dirty --no-link --print-out-paths --system aarch64-linux '.#ndc-cockroach-docker-aarch64-linux')" | docker load
   fi
-

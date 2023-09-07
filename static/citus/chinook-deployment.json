@@ -443,6 +443,8 @@
         }
       },
       "citus_tables": {
+        "schema_name": "public",
+        "table_name": "citus_tables",
         "columns": {
           "access_method": {
             "name": "access_method",
@@ -477,10 +479,8 @@
             "type": "String"
           }
         },
-        "foreign_relations": {},
-        "schema_name": "public",
-        "table_name": "citus_tables",
-        "uniqueness_constraints": {}
+        "uniqueness_constraints": {},
+        "foreign_relations": {}
       }
     },
     "native_queries": {
@@ -546,6 +546,17 @@
     }
   },
   "aggregate_functions": {
+    "Boolean": {
+      "bool_and": {
+        "return_type": "Boolean"
+      },
+      "bool_or": {
+        "return_type": "Boolean"
+      },
+      "every": {
+        "return_type": "Boolean"
+      }
+    },
     "Int": {
       "bit_and": {
         "return_type": "Int"
@@ -616,23 +627,44 @@
         "return_type": "Float"
       }
     },
+    "Int": {
+      "bit_and": {
+        "return_type": "Int"
+      },
+      "bit_or": {
+        "return_type": "Int"
+      },
+      "bit_xor": {
+        "return_type": "Int"
+      },
+      "count": {
+        "return_type": "Int"
+      },
+      "dense_rank": {
+        "return_type": "Int"
+      },
+      "max": {
+        "return_type": "Int"
+      },
+      "min": {
+        "return_type": "Int"
+      },
+      "ntile": {
+        "return_type": "Int"
+      },
+      "rank": {
+        "return_type": "Int"
+      },
+      "sum": {
+        "return_type": "Int"
+      }
+    },
     "String": {
       "max": {
         "return_type": "String"
       },
       "min": {
         "return_type": "String"
-      }
-    },
-    "Boolean": {
-      "bool_and": {
-        "return_type": "Boolean"
-      },
-      "bool_or": {
-        "return_type": "Boolean"
-      },
-      "every": {
-        "return_type": "Boolean"
       }
     }
   }
