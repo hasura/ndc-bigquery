@@ -1707,6 +1707,7 @@ dependencies = [
  "async-trait",
  "axum",
  "env_logger",
+ "insta",
  "ndc-postgres",
  "ndc-sdk",
  "prometheus",

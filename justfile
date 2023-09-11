@@ -139,7 +139,7 @@ build:
   cargo build --all-targets
 
 # run all tests
-test: start-dependencies start-cockroach-dependencies start-citus-dependencies start-aurora-dependencies
+test: start-dependencies start-cockroach-dependencies start-citus-dependencies create-aurora-deployment 
   RUST_LOG=DEBUG \
     cargo test -p query-engine -p ndc-postgres -p ndc-cockroach -p ndc-citus -p ndc-aurora
 
