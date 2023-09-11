@@ -9,11 +9,11 @@
         "columns": {
           "AlbumId": {
             "name": "AlbumId",
-            "type": "integer"
+            "type": "bigint"
           },
           "ArtistId": {
             "name": "ArtistId",
-            "type": "integer"
+            "type": "bigint"
           },
           "Title": {
             "name": "Title",
@@ -25,7 +25,7 @@
         },
         "foreign_relations": {
           "FK_AlbumArtistId": {
-            "foreign_table": "Artist",
+            "foreign_table": "information_schema.constraint_table_usage is empty in cockroach",
             "column_mapping": {
               "ArtistId": "ArtistId"
             }
@@ -38,7 +38,7 @@
         "columns": {
           "ArtistId": {
             "name": "ArtistId",
-            "type": "integer"
+            "type": "bigint"
           },
           "Name": {
             "name": "Name",
@@ -72,7 +72,7 @@
           },
           "CustomerId": {
             "name": "CustomerId",
-            "type": "integer"
+            "type": "bigint"
           },
           "Email": {
             "name": "Email",
@@ -104,7 +104,7 @@
           },
           "SupportRepId": {
             "name": "SupportRepId",
-            "type": "integer"
+            "type": "bigint"
           }
         },
         "uniqueness_constraints": {
@@ -112,7 +112,7 @@
         },
         "foreign_relations": {
           "FK_CustomerSupportRepId": {
-            "foreign_table": "Employee",
+            "foreign_table": "information_schema.constraint_table_usage is empty in cockroach",
             "column_mapping": {
               "SupportRepId": "EmployeeId"
             }
@@ -145,7 +145,7 @@
           },
           "EmployeeId": {
             "name": "EmployeeId",
-            "type": "integer"
+            "type": "bigint"
           },
           "Fax": {
             "name": "Fax",
@@ -173,7 +173,7 @@
           },
           "ReportsTo": {
             "name": "ReportsTo",
-            "type": "integer"
+            "type": "bigint"
           },
           "State": {
             "name": "State",
@@ -189,7 +189,7 @@
         },
         "foreign_relations": {
           "FK_EmployeeReportsTo": {
-            "foreign_table": "Employee",
+            "foreign_table": "information_schema.constraint_table_usage is empty in cockroach",
             "column_mapping": {
               "ReportsTo": "EmployeeId"
             }
@@ -202,7 +202,7 @@
         "columns": {
           "GenreId": {
             "name": "GenreId",
-            "type": "integer"
+            "type": "bigint"
           },
           "Name": {
             "name": "Name",
@@ -240,7 +240,7 @@
           },
           "CustomerId": {
             "name": "CustomerId",
-            "type": "integer"
+            "type": "bigint"
           },
           "InvoiceDate": {
             "name": "InvoiceDate",
@@ -248,7 +248,7 @@
           },
           "InvoiceId": {
             "name": "InvoiceId",
-            "type": "integer"
+            "type": "bigint"
           },
           "Total": {
             "name": "Total",
@@ -260,7 +260,7 @@
         },
         "foreign_relations": {
           "FK_InvoiceCustomerId": {
-            "foreign_table": "Customer",
+            "foreign_table": "information_schema.constraint_table_usage is empty in cockroach",
             "column_mapping": {
               "CustomerId": "CustomerId"
             }
@@ -273,19 +273,19 @@
         "columns": {
           "InvoiceId": {
             "name": "InvoiceId",
-            "type": "integer"
+            "type": "bigint"
           },
           "InvoiceLineId": {
             "name": "InvoiceLineId",
-            "type": "integer"
+            "type": "bigint"
           },
           "Quantity": {
             "name": "Quantity",
-            "type": "integer"
+            "type": "bigint"
           },
           "TrackId": {
             "name": "TrackId",
-            "type": "integer"
+            "type": "bigint"
           },
           "UnitPrice": {
             "name": "UnitPrice",
@@ -297,13 +297,13 @@
         },
         "foreign_relations": {
           "FK_InvoiceLineInvoiceId": {
-            "foreign_table": "Invoice",
+            "foreign_table": "information_schema.constraint_table_usage is empty in cockroach",
             "column_mapping": {
               "InvoiceId": "InvoiceId"
             }
           },
           "FK_InvoiceLineTrackId": {
-            "foreign_table": "Track",
+            "foreign_table": "information_schema.constraint_table_usage is empty in cockroach",
             "column_mapping": {
               "TrackId": "TrackId"
             }
@@ -316,7 +316,7 @@
         "columns": {
           "MediaTypeId": {
             "name": "MediaTypeId",
-            "type": "integer"
+            "type": "bigint"
           },
           "Name": {
             "name": "Name",
@@ -338,7 +338,7 @@
           },
           "PlaylistId": {
             "name": "PlaylistId",
-            "type": "integer"
+            "type": "bigint"
           }
         },
         "uniqueness_constraints": {
@@ -352,11 +352,11 @@
         "columns": {
           "PlaylistId": {
             "name": "PlaylistId",
-            "type": "integer"
+            "type": "bigint"
           },
           "TrackId": {
             "name": "TrackId",
-            "type": "integer"
+            "type": "bigint"
           }
         },
         "uniqueness_constraints": {
@@ -364,13 +364,13 @@
         },
         "foreign_relations": {
           "FK_PlaylistTrackPlaylistId": {
-            "foreign_table": "Playlist",
+            "foreign_table": "information_schema.constraint_table_usage is empty in cockroach",
             "column_mapping": {
               "PlaylistId": "PlaylistId"
             }
           },
           "FK_PlaylistTrackTrackId": {
-            "foreign_table": "Track",
+            "foreign_table": "information_schema.constraint_table_usage is empty in cockroach",
             "column_mapping": {
               "TrackId": "TrackId"
             }
@@ -383,11 +383,11 @@
         "columns": {
           "AlbumId": {
             "name": "AlbumId",
-            "type": "integer"
+            "type": "bigint"
           },
           "Bytes": {
             "name": "Bytes",
-            "type": "integer"
+            "type": "bigint"
           },
           "Composer": {
             "name": "Composer",
@@ -395,15 +395,15 @@
           },
           "GenreId": {
             "name": "GenreId",
-            "type": "integer"
+            "type": "bigint"
           },
           "MediaTypeId": {
             "name": "MediaTypeId",
-            "type": "integer"
+            "type": "bigint"
           },
           "Milliseconds": {
             "name": "Milliseconds",
-            "type": "integer"
+            "type": "bigint"
           },
           "Name": {
             "name": "Name",
@@ -411,7 +411,7 @@
           },
           "TrackId": {
             "name": "TrackId",
-            "type": "integer"
+            "type": "bigint"
           },
           "UnitPrice": {
             "name": "UnitPrice",
@@ -423,19 +423,19 @@
         },
         "foreign_relations": {
           "FK_TrackAlbumId": {
-            "foreign_table": "Album",
+            "foreign_table": "information_schema.constraint_table_usage is empty in cockroach",
             "column_mapping": {
               "AlbumId": "AlbumId"
             }
           },
           "FK_TrackGenreId": {
-            "foreign_table": "Genre",
+            "foreign_table": "information_schema.constraint_table_usage is empty in cockroach",
             "column_mapping": {
               "GenreId": "GenreId"
             }
           },
           "FK_TrackMediaTypeId": {
-            "foreign_table": "MediaType",
+            "foreign_table": "information_schema.constraint_table_usage is empty in cockroach",
             "column_mapping": {
               "MediaTypeId": "MediaTypeId"
             }
@@ -505,230 +505,5 @@
       }
     }
   },
-  "aggregate_functions": {
-    "boolean": {
-      "bool_and": {
-        "return_type": "boolean"
-      },
-      "bool_or": {
-        "return_type": "boolean"
-      },
-      "every": {
-        "return_type": "boolean"
-      }
-    },
-    "smallint": {
-      "bit_and": {
-        "return_type": "smallint"
-      },
-      "bit_or": {
-        "return_type": "smallint"
-      },
-      "bit_xor": {
-        "return_type": "smallint"
-      },
-      "max": {
-        "return_type": "smallint"
-      },
-      "min": {
-        "return_type": "smallint"
-      }
-    },
-    "integer": {
-      "bit_and": {
-        "return_type": "integer"
-      },
-      "bit_or": {
-        "return_type": "integer"
-      },
-      "bit_xor": {
-        "return_type": "integer"
-      },
-      "max": {
-        "return_type": "integer"
-      },
-      "min": {
-        "return_type": "integer"
-      },
-      "ntile": {
-        "return_type": "integer"
-      }
-    },
-    "bigint": {
-      "bit_and": {
-        "return_type": "bigint"
-      },
-      "bit_or": {
-        "return_type": "bigint"
-      },
-      "bit_xor": {
-        "return_type": "bigint"
-      },
-      "count": {
-        "return_type": "bigint"
-      },
-      "dense_rank": {
-        "return_type": "bigint"
-      },
-      "max": {
-        "return_type": "bigint"
-      },
-      "min": {
-        "return_type": "bigint"
-      },
-      "rank": {
-        "return_type": "bigint"
-      },
-      "sum": {
-        "return_type": "bigint"
-      }
-    },
-    "real": {
-      "max": {
-        "return_type": "real"
-      },
-      "min": {
-        "return_type": "real"
-      },
-      "sum": {
-        "return_type": "real"
-      }
-    },
-    "double precision": {
-      "avg": {
-        "return_type": "double precision"
-      },
-      "cume_dist": {
-        "return_type": "double precision"
-      },
-      "max": {
-        "return_type": "double precision"
-      },
-      "min": {
-        "return_type": "double precision"
-      },
-      "percent_rank": {
-        "return_type": "double precision"
-      },
-      "stddev": {
-        "return_type": "double precision"
-      },
-      "stddev_pop": {
-        "return_type": "double precision"
-      },
-      "stddev_samp": {
-        "return_type": "double precision"
-      },
-      "sum": {
-        "return_type": "double precision"
-      },
-      "var_pop": {
-        "return_type": "double precision"
-      },
-      "var_samp": {
-        "return_type": "double precision"
-      },
-      "variance": {
-        "return_type": "double precision"
-      }
-    },
-    "numeric": {
-      "avg": {
-        "return_type": "numeric"
-      },
-      "max": {
-        "return_type": "numeric"
-      },
-      "min": {
-        "return_type": "numeric"
-      },
-      "stddev": {
-        "return_type": "numeric"
-      },
-      "stddev_pop": {
-        "return_type": "numeric"
-      },
-      "stddev_samp": {
-        "return_type": "numeric"
-      },
-      "sum": {
-        "return_type": "numeric"
-      },
-      "var_pop": {
-        "return_type": "numeric"
-      },
-      "var_samp": {
-        "return_type": "numeric"
-      },
-      "variance": {
-        "return_type": "numeric"
-      }
-    },
-    "character": {
-      "max": {
-        "return_type": "character"
-      },
-      "min": {
-        "return_type": "character"
-      }
-    },
-    "text": {
-      "max": {
-        "return_type": "text"
-      },
-      "min": {
-        "return_type": "text"
-      }
-    },
-    "json": {
-      "json_agg": {
-        "return_type": "json"
-      }
-    },
-    "jsonb": {
-      "jsonb_agg": {
-        "return_type": "jsonb"
-      }
-    },
-    "date": {
-      "max": {
-        "return_type": "date"
-      },
-      "min": {
-        "return_type": "date"
-      }
-    },
-    "time with time zone": {
-      "max": {
-        "return_type": "time with time zone"
-      },
-      "min": {
-        "return_type": "time with time zone"
-      }
-    },
-    "time without time zone": {
-      "max": {
-        "return_type": "time without time zone"
-      },
-      "min": {
-        "return_type": "time without time zone"
-      }
-    },
-    "timestamp with time zone": {
-      "max": {
-        "return_type": "timestamp with time zone"
-      },
-      "min": {
-        "return_type": "timestamp with time zone"
-      }
-    },
-    "timestamp without time zone": {
-      "max": {
-        "return_type": "timestamp without time zone"
-      },
-      "min": {
-        "return_type": "timestamp without time zone"
-      }
-    }
-  }
+  "aggregate_functions": {}
 }

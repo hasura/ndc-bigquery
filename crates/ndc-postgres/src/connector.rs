@@ -13,6 +13,8 @@ use ndc_sdk::models;
 
 use super::{capabilities, configuration, explain, health, metrics, query, schema};
 
+const CONFIGURATION_QUERY: &str = include_str!("configuration.sql");
+
 #[derive(Clone, Default)]
 pub struct Postgres {}
 
@@ -33,7 +35,7 @@ impl connector::Connector for Postgres {
     async fn update_configuration(
         args: &Self::RawConfiguration,
     ) -> Result<configuration::DeploymentConfiguration, connector::UpdateConfigurationError> {
-        configuration::configure(args)
+        configuration::configure(args, CONFIGURATION_QUERY)
             .instrument(info_span!("Update configuration"))
             .await
     }

@@ -16,6 +16,8 @@ use ndc_postgres::{capabilities, configuration, explain, health, metrics, query,
 
 use tracing::{info_span, Instrument};
 
+const CONFIGURATION_QUERY: &str = include_str!("../../ndc-postgres/src/configuration.sql");
+
 #[derive(Clone, Default)]
 pub struct Citus {}
 
@@ -36,7 +38,7 @@ impl connector::Connector for Citus {
     async fn update_configuration(
         args: &Self::RawConfiguration,
     ) -> Result<configuration::DeploymentConfiguration, connector::UpdateConfigurationError> {
-        configuration::configure(args)
+        configuration::configure(args, CONFIGURATION_QUERY)
             .instrument(info_span!("Update configuration"))
             .await
     }

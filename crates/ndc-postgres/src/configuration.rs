@@ -11,7 +11,6 @@ use ndc_sdk::connector;
 use super::metrics;
 
 const CURRENT_VERSION: u32 = 1;
-const CONFIGURATION_QUERY: &str = include_str!("configuration.sql");
 
 /// User configuration.
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize, JsonSchema)]
@@ -86,13 +85,14 @@ async fn create_pool(configuration: &DeploymentConfiguration) -> Result<PgPool, 
 /// Construct the deployment configuration by introspecting the database.
 pub async fn configure(
     args: &DeploymentConfiguration,
+    configuration_query: &str,
 ) -> Result<DeploymentConfiguration, connector::UpdateConfigurationError> {
     let mut connection = PgConnection::connect(&args.postgres_database_url)
         .await
         .map_err(|e| connector::UpdateConfigurationError::Other(e.into()))?;
 
     let row = connection
-        .fetch_one(CONFIGURATION_QUERY)
+        .fetch_one(configuration_query)
         .await
         .map_err(|e| connector::UpdateConfigurationError::Other(e.into()))?;
 

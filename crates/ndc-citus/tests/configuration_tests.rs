@@ -14,6 +14,8 @@ use ndc_postgres::configuration;
 
 use tests_common::deployment::get_deployment_file;
 
+const CONFIGURATION_QUERY: &str = include_str!("../../ndc-postgres/src/configuration.sql");
+
 #[tokio::test]
 async fn test_configure() {
     let args = configuration::DeploymentConfiguration {
@@ -37,7 +39,7 @@ async fn test_configure() {
         result
     };
 
-    let actual = configuration::configure(&args)
+    let actual = configuration::configure(&args, CONFIGURATION_QUERY)
         .await
         .expect("configuration::configure");
 

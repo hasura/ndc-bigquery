@@ -14,6 +14,7 @@ use tests_common::deployment::get_deployment_file;
 
 const POSTGRESQL_CONNECTION_STRING: &str = "postgresql://postgres:password@localhost:64002";
 const CHINOOK_DEPLOYMENT_PATH: &str = "static/chinook-deployment.json";
+const CONFIGURATION_QUERY: &str = include_str!("../src/configuration.sql");
 
 #[tokio::test]
 async fn test_configure() {
@@ -38,7 +39,7 @@ async fn test_configure() {
         result
     };
 
-    let actual = configuration::configure(&args)
+    let actual = configuration::configure(&args, CONFIGURATION_QUERY)
         .await
         .expect("configuration::configure");
 

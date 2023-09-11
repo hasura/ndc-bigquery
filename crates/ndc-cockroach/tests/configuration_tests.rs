@@ -8,18 +8,15 @@ use std::fs;
 
 use similar_asserts::assert_eq;
 
-// this only makes sense because we use the `ndc-postgres` config implementation for now
-// it should be switched the to the Cockroach one later
-use ndc_postgres::configuration;
-
 use tests_common::deployment::get_deployment_file;
 
+const CONFIGURATION_QUERY: &str = include_str!("../src/configuration.sql");
+
 #[tokio::test]
-#[ignore]
 async fn test_configure() {
-    let args = configuration::DeploymentConfiguration {
+    let args = ndc_postgres::configuration::DeploymentConfiguration {
         postgres_database_url: common::POSTGRESQL_CONNECTION_STRING.to_string(),
-        ..configuration::DeploymentConfiguration::empty()
+        ..ndc_postgres::configuration::DeploymentConfiguration::empty()
     };
 
     let expected_value: serde_json::Value = {
@@ -38,7 +35,7 @@ async fn test_configure() {
         result
     };
 
-    let actual = configuration::configure(&args)
+    let actual = ndc_postgres::configuration::configure(&args, CONFIGURATION_QUERY)
         .await
         .expect("configuration::configure");
 

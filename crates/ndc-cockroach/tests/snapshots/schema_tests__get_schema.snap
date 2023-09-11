@@ -10,62 +10,7 @@ expression: result
       "update_operators": {}
     },
     "bigint": {
-      "aggregate_functions": {
-        "bit_and": {
-          "result_type": {
-            "type": "named",
-            "name": "bigint"
-          }
-        },
-        "bit_or": {
-          "result_type": {
-            "type": "named",
-            "name": "bigint"
-          }
-        },
-        "bit_xor": {
-          "result_type": {
-            "type": "named",
-            "name": "bigint"
-          }
-        },
-        "count": {
-          "result_type": {
-            "type": "named",
-            "name": "bigint"
-          }
-        },
-        "dense_rank": {
-          "result_type": {
-            "type": "named",
-            "name": "bigint"
-          }
-        },
-        "max": {
-          "result_type": {
-            "type": "named",
-            "name": "bigint"
-          }
-        },
-        "min": {
-          "result_type": {
-            "type": "named",
-            "name": "bigint"
-          }
-        },
-        "rank": {
-          "result_type": {
-            "type": "named",
-            "name": "bigint"
-          }
-        },
-        "sum": {
-          "result_type": {
-            "type": "named",
-            "name": "bigint"
-          }
-        }
-      },
+      "aggregate_functions": {},
       "comparison_operators": {
         "_eq": {
           "argument_type": {
@@ -107,26 +52,7 @@ expression: result
       "update_operators": {}
     },
     "boolean": {
-      "aggregate_functions": {
-        "bool_and": {
-          "result_type": {
-            "type": "named",
-            "name": "boolean"
-          }
-        },
-        "bool_or": {
-          "result_type": {
-            "type": "named",
-            "name": "boolean"
-          }
-        },
-        "every": {
-          "result_type": {
-            "type": "named",
-            "name": "boolean"
-          }
-        }
-      },
+      "aggregate_functions": {},
       "comparison_operators": {
         "_eq": {
           "argument_type": {
@@ -168,20 +94,7 @@ expression: result
       "update_operators": {}
     },
     "character": {
-      "aggregate_functions": {
-        "max": {
-          "result_type": {
-            "type": "named",
-            "name": "character"
-          }
-        },
-        "min": {
-          "result_type": {
-            "type": "named",
-            "name": "character"
-          }
-        }
-      },
+      "aggregate_functions": {},
       "comparison_operators": {
         "_eq": {
           "argument_type": {
@@ -325,20 +238,7 @@ expression: result
       "update_operators": {}
     },
     "date": {
-      "aggregate_functions": {
-        "max": {
-          "result_type": {
-            "type": "named",
-            "name": "date"
-          }
-        },
-        "min": {
-          "result_type": {
-            "type": "named",
-            "name": "date"
-          }
-        }
-      },
+      "aggregate_functions": {},
       "comparison_operators": {
         "_eq": {
           "argument_type": {
@@ -380,80 +280,7 @@ expression: result
       "update_operators": {}
     },
     "double precision": {
-      "aggregate_functions": {
-        "avg": {
-          "result_type": {
-            "type": "named",
-            "name": "double precision"
-          }
-        },
-        "cume_dist": {
-          "result_type": {
-            "type": "named",
-            "name": "double precision"
-          }
-        },
-        "max": {
-          "result_type": {
-            "type": "named",
-            "name": "double precision"
-          }
-        },
-        "min": {
-          "result_type": {
-            "type": "named",
-            "name": "double precision"
-          }
-        },
-        "percent_rank": {
-          "result_type": {
-            "type": "named",
-            "name": "double precision"
-          }
-        },
-        "stddev": {
-          "result_type": {
-            "type": "named",
-            "name": "double precision"
-          }
-        },
-        "stddev_pop": {
-          "result_type": {
-            "type": "named",
-            "name": "double precision"
-          }
-        },
-        "stddev_samp": {
-          "result_type": {
-            "type": "named",
-            "name": "double precision"
-          }
-        },
-        "sum": {
-          "result_type": {
-            "type": "named",
-            "name": "double precision"
-          }
-        },
-        "var_pop": {
-          "result_type": {
-            "type": "named",
-            "name": "double precision"
-          }
-        },
-        "var_samp": {
-          "result_type": {
-            "type": "named",
-            "name": "double precision"
-          }
-        },
-        "variance": {
-          "result_type": {
-            "type": "named",
-            "name": "double precision"
-          }
-        }
-      },
+      "aggregate_functions": {},
       "comparison_operators": {
         "_eq": {
           "argument_type": {
@@ -495,44 +322,7 @@ expression: result
       "update_operators": {}
     },
     "integer": {
-      "aggregate_functions": {
-        "bit_and": {
-          "result_type": {
-            "type": "named",
-            "name": "integer"
-          }
-        },
-        "bit_or": {
-          "result_type": {
-            "type": "named",
-            "name": "integer"
-          }
-        },
-        "bit_xor": {
-          "result_type": {
-            "type": "named",
-            "name": "integer"
-          }
-        },
-        "max": {
-          "result_type": {
-            "type": "named",
-            "name": "integer"
-          }
-        },
-        "min": {
-          "result_type": {
-            "type": "named",
-            "name": "integer"
-          }
-        },
-        "ntile": {
-          "result_type": {
-            "type": "named",
-            "name": "integer"
-          }
-        }
-      },
+      "aggregate_functions": {},
       "comparison_operators": {
         "_eq": {
           "argument_type": {
@@ -574,14 +364,7 @@ expression: result
       "update_operators": {}
     },
     "json": {
-      "aggregate_functions": {
-        "json_agg": {
-          "result_type": {
-            "type": "named",
-            "name": "json"
-          }
-        }
-      },
+      "aggregate_functions": {},
       "comparison_operators": {
         "_eq": {
           "argument_type": {
@@ -623,14 +406,7 @@ expression: result
       "update_operators": {}
     },
     "jsonb": {
-      "aggregate_functions": {
-        "jsonb_agg": {
-          "result_type": {
-            "type": "named",
-            "name": "jsonb"
-          }
-        }
-      },
+      "aggregate_functions": {},
       "comparison_operators": {
         "_eq": {
           "argument_type": {
@@ -672,68 +448,7 @@ expression: result
       "update_operators": {}
     },
     "numeric": {
-      "aggregate_functions": {
-        "avg": {
-          "result_type": {
-            "type": "named",
-            "name": "numeric"
-          }
-        },
-        "max": {
-          "result_type": {
-            "type": "named",
-            "name": "numeric"
-          }
-        },
-        "min": {
-          "result_type": {
-            "type": "named",
-            "name": "numeric"
-          }
-        },
-        "stddev": {
-          "result_type": {
-            "type": "named",
-            "name": "numeric"
-          }
-        },
-        "stddev_pop": {
-          "result_type": {
-            "type": "named",
-            "name": "numeric"
-          }
-        },
-        "stddev_samp": {
-          "result_type": {
-            "type": "named",
-            "name": "numeric"
-          }
-        },
-        "sum": {
-          "result_type": {
-            "type": "named",
-            "name": "numeric"
-          }
-        },
-        "var_pop": {
-          "result_type": {
-            "type": "named",
-            "name": "numeric"
-          }
-        },
-        "var_samp": {
-          "result_type": {
-            "type": "named",
-            "name": "numeric"
-          }
-        },
-        "variance": {
-          "result_type": {
-            "type": "named",
-            "name": "numeric"
-          }
-        }
-      },
+      "aggregate_functions": {},
       "comparison_operators": {
         "_eq": {
           "argument_type": {
@@ -775,26 +490,7 @@ expression: result
       "update_operators": {}
     },
     "real": {
-      "aggregate_functions": {
-        "max": {
-          "result_type": {
-            "type": "named",
-            "name": "real"
-          }
-        },
-        "min": {
-          "result_type": {
-            "type": "named",
-            "name": "real"
-          }
-        },
-        "sum": {
-          "result_type": {
-            "type": "named",
-            "name": "real"
-          }
-        }
-      },
+      "aggregate_functions": {},
       "comparison_operators": {
         "_eq": {
           "argument_type": {
@@ -836,38 +532,7 @@ expression: result
       "update_operators": {}
     },
     "smallint": {
-      "aggregate_functions": {
-        "bit_and": {
-          "result_type": {
-            "type": "named",
-            "name": "smallint"
-          }
-        },
-        "bit_or": {
-          "result_type": {
-            "type": "named",
-            "name": "smallint"
-          }
-        },
-        "bit_xor": {
-          "result_type": {
-            "type": "named",
-            "name": "smallint"
-          }
-        },
-        "max": {
-          "result_type": {
-            "type": "named",
-            "name": "smallint"
-          }
-        },
-        "min": {
-          "result_type": {
-            "type": "named",
-            "name": "smallint"
-          }
-        }
-      },
+      "aggregate_functions": {},
       "comparison_operators": {
         "_eq": {
           "argument_type": {
@@ -909,20 +574,7 @@ expression: result
       "update_operators": {}
     },
     "text": {
-      "aggregate_functions": {
-        "max": {
-          "result_type": {
-            "type": "named",
-            "name": "text"
-          }
-        },
-        "min": {
-          "result_type": {
-            "type": "named",
-            "name": "text"
-          }
-        }
-      },
+      "aggregate_functions": {},
       "comparison_operators": {
         "_eq": {
           "argument_type": {
@@ -1024,20 +676,7 @@ expression: result
       "update_operators": {}
     },
     "time with time zone": {
-      "aggregate_functions": {
-        "max": {
-          "result_type": {
-            "type": "named",
-            "name": "time with time zone"
-          }
-        },
-        "min": {
-          "result_type": {
-            "type": "named",
-            "name": "time with time zone"
-          }
-        }
-      },
+      "aggregate_functions": {},
       "comparison_operators": {
         "_eq": {
           "argument_type": {
@@ -1079,20 +718,7 @@ expression: result
       "update_operators": {}
     },
     "time without time zone": {
-      "aggregate_functions": {
-        "max": {
-          "result_type": {
-            "type": "named",
-            "name": "time without time zone"
-          }
-        },
-        "min": {
-          "result_type": {
-            "type": "named",
-            "name": "time without time zone"
-          }
-        }
-      },
+      "aggregate_functions": {},
       "comparison_operators": {
         "_eq": {
           "argument_type": {
@@ -1134,20 +760,7 @@ expression: result
       "update_operators": {}
     },
     "timestamp with time zone": {
-      "aggregate_functions": {
-        "max": {
-          "result_type": {
-            "type": "named",
-            "name": "timestamp with time zone"
-          }
-        },
-        "min": {
-          "result_type": {
-            "type": "named",
-            "name": "timestamp with time zone"
-          }
-        }
-      },
+      "aggregate_functions": {},
       "comparison_operators": {
         "_eq": {
           "argument_type": {
@@ -1189,20 +802,7 @@ expression: result
       "update_operators": {}
     },
     "timestamp without time zone": {
-      "aggregate_functions": {
-        "max": {
-          "result_type": {
-            "type": "named",
-            "name": "timestamp without time zone"
-          }
-        },
-        "min": {
-          "result_type": {
-            "type": "named",
-            "name": "timestamp without time zone"
-          }
-        }
-      },
+      "aggregate_functions": {},
       "comparison_operators": {
         "_eq": {
           "argument_type": {
@@ -1250,13 +850,13 @@ expression: result
         "AlbumId": {
           "type": {
             "type": "named",
-            "name": "integer"
+            "name": "bigint"
           }
         },
         "ArtistId": {
           "type": {
             "type": "named",
-            "name": "integer"
+            "name": "bigint"
           }
         },
         "Title": {
@@ -1272,7 +872,7 @@ expression: result
         "ArtistId": {
           "type": {
             "type": "named",
-            "name": "integer"
+            "name": "bigint"
           }
         },
         "Name": {
@@ -1312,7 +912,7 @@ expression: result
         "CustomerId": {
           "type": {
             "type": "named",
-            "name": "integer"
+            "name": "bigint"
           }
         },
         "Email": {
@@ -1360,7 +960,7 @@ expression: result
         "SupportRepId": {
           "type": {
             "type": "named",
-            "name": "integer"
+            "name": "bigint"
           }
         }
       }
@@ -1400,7 +1000,7 @@ expression: result
         "EmployeeId": {
           "type": {
             "type": "named",
-            "name": "integer"
+            "name": "bigint"
           }
         },
         "Fax": {
@@ -1442,7 +1042,7 @@ expression: result
         "ReportsTo": {
           "type": {
             "type": "named",
-            "name": "integer"
+            "name": "bigint"
           }
         },
         "State": {
@@ -1464,7 +1064,7 @@ expression: result
         "GenreId": {
           "type": {
             "type": "named",
-            "name": "integer"
+            "name": "bigint"
           }
         },
         "Name": {
@@ -1510,7 +1110,7 @@ expression: result
         "CustomerId": {
           "type": {
             "type": "named",
-            "name": "integer"
+            "name": "bigint"
           }
         },
         "InvoiceDate": {
@@ -1522,7 +1122,7 @@ expression: result
         "InvoiceId": {
           "type": {
             "type": "named",
-            "name": "integer"
+            "name": "bigint"
           }
         },
         "Total": {
@@ -1538,25 +1138,25 @@ expression: result
         "InvoiceId": {
           "type": {
             "type": "named",
-            "name": "integer"
+            "name": "bigint"
           }
         },
         "InvoiceLineId": {
           "type": {
             "type": "named",
-            "name": "integer"
+            "name": "bigint"
           }
         },
         "Quantity": {
           "type": {
             "type": "named",
-            "name": "integer"
+            "name": "bigint"
           }
         },
         "TrackId": {
           "type": {
             "type": "named",
-            "name": "integer"
+            "name": "bigint"
           }
         },
         "UnitPrice": {
@@ -1572,7 +1172,7 @@ expression: result
         "MediaTypeId": {
           "type": {
             "type": "named",
-            "name": "integer"
+            "name": "bigint"
           }
         },
         "Name": {
@@ -1594,7 +1194,7 @@ expression: result
         "PlaylistId": {
           "type": {
             "type": "named",
-            "name": "integer"
+            "name": "bigint"
           }
         }
       }
@@ -1604,13 +1204,13 @@ expression: result
         "PlaylistId": {
           "type": {
             "type": "named",
-            "name": "integer"
+            "name": "bigint"
           }
         },
         "TrackId": {
           "type": {
             "type": "named",
-            "name": "integer"
+            "name": "bigint"
           }
         }
       }
@@ -1620,13 +1220,13 @@ expression: result
         "AlbumId": {
           "type": {
             "type": "named",
-            "name": "integer"
+            "name": "bigint"
           }
         },
         "Bytes": {
           "type": {
             "type": "named",
-            "name": "integer"
+            "name": "bigint"
           }
         },
         "Composer": {
@@ -1638,19 +1238,19 @@ expression: result
         "GenreId": {
           "type": {
             "type": "named",
-            "name": "integer"
+            "name": "bigint"
           }
         },
         "MediaTypeId": {
           "type": {
             "type": "named",
-            "name": "integer"
+            "name": "bigint"
           }
         },
         "Milliseconds": {
           "type": {
             "type": "named",
-            "name": "integer"
+            "name": "bigint"
           }
         },
         "Name": {
@@ -1662,7 +1262,7 @@ expression: result
         "TrackId": {
           "type": {
             "type": "named",
-            "name": "integer"
+            "name": "bigint"
           }
         },
         "UnitPrice": {
@@ -1692,7 +1292,7 @@ expression: result
           "column_mapping": {
             "ArtistId": "ArtistId"
           },
-          "foreign_collection": "Artist"
+          "foreign_collection": "information_schema.constraint_table_usage is empty in cockroach"
         }
       }
     },
@@ -1727,7 +1327,7 @@ expression: result
           "column_mapping": {
             "SupportRepId": "EmployeeId"
           },
-          "foreign_collection": "Employee"
+          "foreign_collection": "information_schema.constraint_table_usage is empty in cockroach"
         }
       }
     },
@@ -1748,7 +1348,7 @@ expression: result
           "column_mapping": {
             "ReportsTo": "EmployeeId"
           },
-          "foreign_collection": "Employee"
+          "foreign_collection": "information_schema.constraint_table_usage is empty in cockroach"
         }
       }
     },
@@ -1783,7 +1383,7 @@ expression: result
           "column_mapping": {
             "CustomerId": "CustomerId"
           },
-          "foreign_collection": "Customer"
+          "foreign_collection": "information_schema.constraint_table_usage is empty in cockroach"
         }
       }
     },
@@ -1804,13 +1404,13 @@ expression: result
           "column_mapping": {
             "InvoiceId": "InvoiceId"
           },
-          "foreign_collection": "Invoice"
+          "foreign_collection": "information_schema.constraint_table_usage is empty in cockroach"
         },
         "FK_InvoiceLineTrackId": {
           "column_mapping": {
             "TrackId": "TrackId"
           },
-          "foreign_collection": "Track"
+          "foreign_collection": "information_schema.constraint_table_usage is empty in cockroach"
         }
       }
     },
@@ -1860,13 +1460,13 @@ expression: result
           "column_mapping": {
             "PlaylistId": "PlaylistId"
           },
-          "foreign_collection": "Playlist"
+          "foreign_collection": "information_schema.constraint_table_usage is empty in cockroach"
         },
         "FK_PlaylistTrackTrackId": {
           "column_mapping": {
             "TrackId": "TrackId"
           },
-          "foreign_collection": "Track"
+          "foreign_collection": "information_schema.constraint_table_usage is empty in cockroach"
         }
       }
     },
@@ -1887,19 +1487,19 @@ expression: result
           "column_mapping": {
             "AlbumId": "AlbumId"
           },
-          "foreign_collection": "Album"
+          "foreign_collection": "information_schema.constraint_table_usage is empty in cockroach"
         },
         "FK_TrackGenreId": {
           "column_mapping": {
             "GenreId": "GenreId"
           },
-          "foreign_collection": "Genre"
+          "foreign_collection": "information_schema.constraint_table_usage is empty in cockroach"
         },
         "FK_TrackMediaTypeId": {
           "column_mapping": {
             "MediaTypeId": "MediaTypeId"
           },
-          "foreign_collection": "MediaType"
+          "foreign_collection": "information_schema.constraint_table_usage is empty in cockroach"
         }
       }
     }
