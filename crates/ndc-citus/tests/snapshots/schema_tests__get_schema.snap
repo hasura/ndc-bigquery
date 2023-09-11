@@ -1260,21 +1260,18 @@ expression: result
     "Album": {
       "fields": {
         "AlbumId": {
-          "arguments": {},
           "type": {
             "type": "named",
             "name": "integer"
           }
         },
         "ArtistId": {
-          "arguments": {},
           "type": {
             "type": "named",
             "name": "integer"
           }
         },
         "Title": {
-          "arguments": {},
           "type": {
             "type": "named",
             "name": "character varying"
@@ -1285,14 +1282,12 @@ expression: result
     "Artist": {
       "fields": {
         "ArtistId": {
-          "arguments": {},
           "type": {
             "type": "named",
             "name": "integer"
           }
         },
         "Name": {
-          "arguments": {},
           "type": {
             "type": "named",
             "name": "character varying"
@@ -1303,91 +1298,78 @@ expression: result
     "Customer": {
       "fields": {
         "Address": {
-          "arguments": {},
           "type": {
             "type": "named",
             "name": "character varying"
           }
         },
         "City": {
-          "arguments": {},
           "type": {
             "type": "named",
             "name": "character varying"
           }
         },
         "Company": {
-          "arguments": {},
           "type": {
             "type": "named",
             "name": "character varying"
           }
         },
         "Country": {
-          "arguments": {},
           "type": {
             "type": "named",
             "name": "character varying"
           }
         },
         "CustomerId": {
-          "arguments": {},
           "type": {
             "type": "named",
             "name": "integer"
           }
         },
         "Email": {
-          "arguments": {},
           "type": {
             "type": "named",
             "name": "character varying"
           }
         },
         "Fax": {
-          "arguments": {},
           "type": {
             "type": "named",
             "name": "character varying"
           }
         },
         "FirstName": {
-          "arguments": {},
           "type": {
             "type": "named",
             "name": "character varying"
           }
         },
         "LastName": {
-          "arguments": {},
           "type": {
             "type": "named",
             "name": "character varying"
           }
         },
         "Phone": {
-          "arguments": {},
           "type": {
             "type": "named",
             "name": "character varying"
           }
         },
         "PostalCode": {
-          "arguments": {},
           "type": {
             "type": "named",
             "name": "character varying"
           }
         },
         "State": {
-          "arguments": {},
           "type": {
             "type": "named",
             "name": "character varying"
           }
         },
         "SupportRepId": {
-          "arguments": {},
           "type": {
             "type": "named",
             "name": "integer"
@@ -1398,105 +1380,90 @@ expression: result
     "Employee": {
       "fields": {
         "Address": {
-          "arguments": {},
           "type": {
             "type": "named",
             "name": "character varying"
           }
         },
         "BirthDate": {
-          "arguments": {},
           "type": {
             "type": "named",
             "name": "timestamp without time zone"
           }
         },
         "City": {
-          "arguments": {},
           "type": {
             "type": "named",
             "name": "character varying"
           }
         },
         "Country": {
-          "arguments": {},
           "type": {
             "type": "named",
             "name": "character varying"
           }
         },
         "Email": {
-          "arguments": {},
           "type": {
             "type": "named",
             "name": "character varying"
           }
         },
         "EmployeeId": {
-          "arguments": {},
           "type": {
             "type": "named",
             "name": "integer"
           }
         },
         "Fax": {
-          "arguments": {},
           "type": {
             "type": "named",
             "name": "character varying"
           }
         },
         "FirstName": {
-          "arguments": {},
           "type": {
             "type": "named",
             "name": "character varying"
           }
         },
         "HireDate": {
-          "arguments": {},
           "type": {
             "type": "named",
             "name": "timestamp without time zone"
           }
         },
         "LastName": {
-          "arguments": {},
           "type": {
             "type": "named",
             "name": "character varying"
           }
         },
         "Phone": {
-          "arguments": {},
           "type": {
             "type": "named",
             "name": "character varying"
           }
         },
         "PostalCode": {
-          "arguments": {},
           "type": {
             "type": "named",
             "name": "character varying"
           }
         },
         "ReportsTo": {
-          "arguments": {},
           "type": {
             "type": "named",
             "name": "integer"
           }
         },
         "State": {
-          "arguments": {},
           "type": {
             "type": "named",
             "name": "character varying"
           }
         },
         "Title": {
-          "arguments": {},
           "type": {
             "type": "named",
             "name": "character varying"
@@ -1507,14 +1474,12 @@ expression: result
     "Genre": {
       "fields": {
         "GenreId": {
-          "arguments": {},
           "type": {
             "type": "named",
             "name": "integer"
           }
         },
         "Name": {
-          "arguments": {},
           "type": {
             "type": "named",
             "name": "character varying"
@@ -1525,63 +1490,54 @@ expression: result
     "Invoice": {
       "fields": {
         "BillingAddress": {
-          "arguments": {},
           "type": {
             "type": "named",
             "name": "character varying"
           }
         },
         "BillingCity": {
-          "arguments": {},
           "type": {
             "type": "named",
             "name": "character varying"
           }
         },
         "BillingCountry": {
-          "arguments": {},
           "type": {
             "type": "named",
             "name": "character varying"
           }
         },
         "BillingPostalCode": {
-          "arguments": {},
           "type": {
             "type": "named",
             "name": "character varying"
           }
         },
         "BillingState": {
-          "arguments": {},
           "type": {
             "type": "named",
             "name": "character varying"
           }
         },
         "CustomerId": {
-          "arguments": {},
           "type": {
             "type": "named",
             "name": "integer"
           }
         },
         "InvoiceDate": {
-          "arguments": {},
           "type": {
             "type": "named",
             "name": "timestamp without time zone"
           }
         },
         "InvoiceId": {
-          "arguments": {},
           "type": {
             "type": "named",
             "name": "integer"
           }
         },
         "Total": {
-          "arguments": {},
           "type": {
             "type": "named",
             "name": "numeric"
@@ -1592,35 +1548,30 @@ expression: result
     "InvoiceLine": {
       "fields": {
         "InvoiceId": {
-          "arguments": {},
           "type": {
             "type": "named",
             "name": "integer"
           }
         },
         "InvoiceLineId": {
-          "arguments": {},
           "type": {
             "type": "named",
             "name": "integer"
           }
         },
         "Quantity": {
-          "arguments": {},
           "type": {
             "type": "named",
             "name": "integer"
           }
         },
         "TrackId": {
-          "arguments": {},
           "type": {
             "type": "named",
             "name": "integer"
           }
         },
         "UnitPrice": {
-          "arguments": {},
           "type": {
             "type": "named",
             "name": "numeric"
@@ -1631,14 +1582,12 @@ expression: result
     "MediaType": {
       "fields": {
         "MediaTypeId": {
-          "arguments": {},
           "type": {
             "type": "named",
             "name": "integer"
           }
         },
         "Name": {
-          "arguments": {},
           "type": {
             "type": "named",
             "name": "character varying"
@@ -1649,14 +1598,12 @@ expression: result
     "Playlist": {
       "fields": {
         "Name": {
-          "arguments": {},
           "type": {
             "type": "named",
             "name": "character varying"
           }
         },
         "PlaylistId": {
-          "arguments": {},
           "type": {
             "type": "named",
             "name": "integer"
@@ -1667,14 +1614,12 @@ expression: result
     "PlaylistTrack": {
       "fields": {
         "PlaylistId": {
-          "arguments": {},
           "type": {
             "type": "named",
             "name": "integer"
           }
         },
         "TrackId": {
-          "arguments": {},
           "type": {
             "type": "named",
             "name": "integer"
@@ -1685,63 +1630,54 @@ expression: result
     "Track": {
       "fields": {
         "AlbumId": {
-          "arguments": {},
           "type": {
             "type": "named",
             "name": "integer"
           }
         },
         "Bytes": {
-          "arguments": {},
           "type": {
             "type": "named",
             "name": "integer"
           }
         },
         "Composer": {
-          "arguments": {},
           "type": {
             "type": "named",
             "name": "character varying"
           }
         },
         "GenreId": {
-          "arguments": {},
           "type": {
             "type": "named",
             "name": "integer"
           }
         },
         "MediaTypeId": {
-          "arguments": {},
           "type": {
             "type": "named",
             "name": "integer"
           }
         },
         "Milliseconds": {
-          "arguments": {},
           "type": {
             "type": "named",
             "name": "integer"
           }
         },
         "Name": {
-          "arguments": {},
           "type": {
             "type": "named",
             "name": "character varying"
           }
         },
         "TrackId": {
-          "arguments": {},
           "type": {
             "type": "named",
             "name": "integer"
           }
         },
         "UnitPrice": {
-          "arguments": {},
           "type": {
             "type": "named",
             "name": "numeric"
@@ -1752,56 +1688,48 @@ expression: result
     "citus_tables": {
       "fields": {
         "access_method": {
-          "arguments": {},
           "type": {
             "type": "named",
             "name": "any"
           }
         },
         "citus_table_type": {
-          "arguments": {},
           "type": {
             "type": "named",
             "name": "text"
           }
         },
         "colocation_id": {
-          "arguments": {},
           "type": {
             "type": "named",
             "name": "integer"
           }
         },
         "distribution_column": {
-          "arguments": {},
           "type": {
             "type": "named",
             "name": "text"
           }
         },
         "shard_count": {
-          "arguments": {},
           "type": {
             "type": "named",
             "name": "bigint"
           }
         },
         "table_name": {
-          "arguments": {},
           "type": {
             "type": "named",
             "name": "any"
           }
         },
         "table_owner": {
-          "arguments": {},
           "type": {
             "type": "named",
             "name": "any"
           }
         },
         "table_size": {
-          "arguments": {},
           "type": {
             "type": "named",
             "name": "text"

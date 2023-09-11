@@ -82,14 +82,14 @@ pub fn translate_expression(
                 state,
                 next_free_name,
                 root_and_current_tables,
-                *column,
+                column,
             )?;
             let (right, right_joins) = translate_comparison_value(
                 env,
                 state,
                 next_free_name,
                 root_and_current_tables,
-                *value,
+                value,
             )?;
 
             joins.extend(left_joins);
@@ -97,7 +97,7 @@ pub fn translate_expression(
             Ok((
                 sql::ast::Expression::BinaryOperation {
                     left: Box::new(left),
-                    operator: operators::translate_operator(operator.as_ref())?,
+                    operator: operators::translate_operator(&operator)?,
                     right: Box::new(right),
                 },
                 joins,
@@ -114,7 +114,7 @@ pub fn translate_expression(
                 state,
                 next_free_name,
                 root_and_current_tables,
-                *column.clone(),
+                column.clone(),
             )?;
             joins.extend(left_joins);
             let right = values
@@ -135,7 +135,7 @@ pub fn translate_expression(
             Ok((
                 sql::ast::Expression::BinaryArrayOperation {
                     left: Box::new(left),
-                    operator: match *operator {
+                    operator: match operator {
                         models::BinaryArrayComparisonOperator::In => {
                             sql::ast::BinaryArrayOperator::In
                         }
@@ -155,19 +155,19 @@ pub fn translate_expression(
                 state,
                 next_free_name,
                 root_and_current_tables,
-                *in_collection,
+                in_collection,
                 *predicate,
             )?,
             vec![],
         )),
-        models::Expression::UnaryComparisonOperator { column, operator } => match *operator {
+        models::Expression::UnaryComparisonOperator { column, operator } => match operator {
             models::UnaryComparisonOperator::IsNull => {
                 let (value, joins) = translate_comparison_target(
                     env,
                     state,
                     next_free_name,
                     root_and_current_tables,
-                    *column,
+                    column,
                 )?;
 
                 Ok((
@@ -385,13 +385,9 @@ fn translate_comparison_value(
     value: models::ComparisonValue,
 ) -> Result<(sql::ast::Expression, Vec<sql::ast::Join>), Error> {
     match value {
-        models::ComparisonValue::Column { column } => translate_comparison_target(
-            env,
-            state,
-            next_free_name,
-            root_and_current_tables,
-            *column,
-        ),
+        models::ComparisonValue::Column { column } => {
+            translate_comparison_target(env, state, next_free_name, root_and_current_tables, column)
+        }
         models::ComparisonValue::Scalar { value: json_value } => Ok((
             sql::ast::Expression::Value(values::translate_json_value(&json_value)?),
             vec![],

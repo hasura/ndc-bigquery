@@ -136,7 +136,6 @@ pub async fn get_schema(
                 (
                     column.name.clone(),
                     models::ObjectField {
-                        arguments: BTreeMap::new(),
                         description: None,
                         r#type: models::Type::Named {
                             name: column.r#type.to_string(),
