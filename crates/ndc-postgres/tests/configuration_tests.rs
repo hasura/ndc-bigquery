@@ -46,3 +46,9 @@ async fn test_configure() {
 
     assert_eq!(expected_value, actual_value);
 }
+
+#[tokio::test]
+async fn get_configuration_schema() {
+    let schema = schemars::schema_for!(configuration::DeploymentConfiguration);
+    insta::assert_json_snapshot!(schema);
+}

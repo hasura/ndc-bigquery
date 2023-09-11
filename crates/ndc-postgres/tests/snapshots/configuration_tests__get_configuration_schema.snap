@@ -1,0 +1,259 @@
+---
+source: crates/ndc-postgres/tests/configuration_tests.rs
+assertion_line: 53
+expression: schema
+---
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "DeploymentConfiguration",
+  "description": "User configuration.",
+  "type": "object",
+  "required": [
+    "postgres_database_url",
+    "version"
+  ],
+  "properties": {
+    "version": {
+      "type": "integer",
+      "format": "uint32",
+      "minimum": 0.0
+    },
+    "postgres_database_url": {
+      "type": "string"
+    },
+    "metadata": {
+      "default": {
+        "native_queries": {},
+        "tables": {}
+      },
+      "allOf": [
+        {
+          "$ref": "#/definitions/Metadata"
+        }
+      ]
+    },
+    "aggregate_functions": {
+      "default": {},
+      "allOf": [
+        {
+          "$ref": "#/definitions/AggregateFunctions"
+        }
+      ]
+    }
+  },
+  "definitions": {
+    "Metadata": {
+      "description": "Metadata information.",
+      "type": "object",
+      "properties": {
+        "tables": {
+          "default": {},
+          "allOf": [
+            {
+              "$ref": "#/definitions/TablesInfo"
+            }
+          ]
+        },
+        "native_queries": {
+          "default": {},
+          "allOf": [
+            {
+              "$ref": "#/definitions/NativeQueries"
+            }
+          ]
+        }
+      }
+    },
+    "TablesInfo": {
+      "description": "Mapping from a \"table\" name to its information.",
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/TableInfo"
+      }
+    },
+    "TableInfo": {
+      "description": "Information about a database table (or any other kind of relation).",
+      "type": "object",
+      "required": [
+        "columns",
+        "schema_name",
+        "table_name"
+      ],
+      "properties": {
+        "schema_name": {
+          "type": "string"
+        },
+        "table_name": {
+          "type": "string"
+        },
+        "columns": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/ColumnInfo"
+          }
+        },
+        "uniqueness_constraints": {
+          "default": {},
+          "allOf": [
+            {
+              "$ref": "#/definitions/UniquenessConstraints"
+            }
+          ]
+        },
+        "foreign_relations": {
+          "default": {},
+          "allOf": [
+            {
+              "$ref": "#/definitions/ForeignRelations"
+            }
+          ]
+        }
+      }
+    },
+    "ColumnInfo": {
+      "description": "Information about a database column.",
+      "type": "object",
+      "required": [
+        "name",
+        "type"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/ScalarType"
+        }
+      }
+    },
+    "ScalarType": {
+      "description": "The scalar types supported by the Engine.",
+      "type": "string",
+      "enum": [
+        "boolean",
+        "smallint",
+        "integer",
+        "bigint",
+        "real",
+        "double precision",
+        "numeric",
+        "character",
+        "character varying",
+        "text",
+        "json",
+        "jsonb",
+        "date",
+        "time with time zone",
+        "time without time zone",
+        "timestamp with time zone",
+        "timestamp without time zone",
+        "any"
+      ]
+    },
+    "UniquenessConstraints": {
+      "description": "A mapping from the name of a unique constraint to its value.",
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/UniquenessConstraint"
+      }
+    },
+    "UniquenessConstraint": {
+      "description": "The set of columns that make up a uniqueness constraint.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "ForeignRelations": {
+      "description": "A mapping from the name of a foreign key constraint to its value.",
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/ForeignRelation"
+      }
+    },
+    "ForeignRelation": {
+      "description": "A foreign key constraint.",
+      "type": "object",
+      "required": [
+        "column_mapping",
+        "foreign_table"
+      ],
+      "properties": {
+        "foreign_table": {
+          "type": "string"
+        },
+        "column_mapping": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "NativeQueries": {
+      "description": "Metadata information of native queries.",
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/NativeQueryInfo"
+      }
+    },
+    "NativeQueryInfo": {
+      "description": "Information about a Native Query",
+      "type": "object",
+      "required": [
+        "columns",
+        "sql"
+      ],
+      "properties": {
+        "sql": {
+          "description": "SQL expression to use for the Native Query. We can interpolate values using `{{variable_name}}` syntax, such as `SELECT * FROM authors WHERE name = {{author_name}}`",
+          "allOf": [
+            {
+              "$ref": "#/definitions/Native_query_sql"
+            }
+          ]
+        },
+        "columns": {
+          "description": "Columns returned by the Native Query",
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/ColumnInfo"
+          }
+        },
+        "arguments": {
+          "description": "Names and types of arguments that can be passed to this Native Query",
+          "default": {},
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/ColumnInfo"
+          }
+        }
+      }
+    },
+    "Native_query_sql": {
+      "type": "string"
+    },
+    "AggregateFunctions": {
+      "description": "All supported aggregate functions, grouped by type.",
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": {
+          "$ref": "#/definitions/AggregateFunction"
+        }
+      }
+    },
+    "AggregateFunction": {
+      "type": "object",
+      "required": [
+        "return_type"
+      ],
+      "properties": {
+        "return_type": {
+          "$ref": "#/definitions/ScalarType"
+        }
+      }
+    }
+  }
+}

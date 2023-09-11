@@ -20,7 +20,9 @@ pub struct DeploymentConfiguration {
     pub version: u32,
     // Connection string for a Postgres-compatible database
     pub postgres_database_url: String,
+    #[serde(default)]
     pub metadata: query_engine::metadata::Metadata,
+    #[serde(default)]
     pub aggregate_functions: query_engine::metadata::AggregateFunctions,
 }
 
