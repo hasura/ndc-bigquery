@@ -177,8 +177,8 @@ jobs:
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.BROKEN_BUILD_SLACK_WEBHOOK_URL }}
 
-  test-aurora-ndc:
-    name: Test ndc-aurora
+  test-postgres-ndc-with-aurora:
+    name: Test ndc-postgres on AWS aurora
     runs-on: ubuntu-latest
     env:
       CARGO_NET_GIT_FETCH_WITH_CLI: "true"
@@ -208,7 +208,7 @@ jobs:
 
       - name: run tests
         run: |
-          cargo test --release -p ndc-aurora
+          cargo test --release -p other-db-tests
         env:
           RUST_LOG: INFO
           AURORA_CONNECTION_STRING: ${{ secrets.AURORA_CONNECTION_STRING }}

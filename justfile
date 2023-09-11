@@ -104,16 +104,16 @@ dev-citus: start-citus-dependencies
     -x clippy \
     -x 'run --bin ndc-citus -- serve --configuration {{CITUS_CHINOOK_DEPLOYMENT}}'
 
-# watch the code, then test and re-run on changes
-dev-aurora: start-aurora-dependencies
+# Run postgres, testing against external DBs like Aurora
+test-other-dbs: create-aurora-deployment start-dependencies
   RUST_LOG=INFO \
     OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://localhost:4317 \
-    OTEL_SERVICE_NAME=citus-ndc \
+    OTEL_SERVICE_NAME=postgres-ndc \
     cargo watch -i "**/snapshots/*" \
     -c \
-    -x 'test -p query-engine -p ndc-aurora' \
+    -x 'test -p other-db-tests' \
     -x clippy \
-    -x 'run --bin ndc-aurora -- serve --configuration {{AURORA_CHINOOK_DEPLOYMENT}}'
+    -x 'run --bin ndc-postgres -- serve --configuration {{AURORA_CHINOOK_DEPLOYMENT}}'
 
 # watch the code, and re-run on changes
 watch-run: start-dependencies
@@ -191,7 +191,7 @@ start-citus-dependencies:
 # setup aurora + jaeger
 # aurora is a big different, the 'setup' step is taking the
 # `AURORA_CONNECTION_STRING` and inserting it into a new copy of the deployment
-start-aurora-dependencies:
+create-aurora-deployment:
   # start jaeger, configured to listen to V3
   docker compose -f ../v3-engine/docker-compose.yaml up -d jaeger
   # splice `AURORA_CONNECTION_STRING` into
@@ -251,7 +251,7 @@ format-check:
 
 # check the nix builds work
 build-with-nix:
-  nix build --no-warn-dirty --print-build-logs '.#ndc-postgres' '.#ndc-cockroach' '.#ndc-citus' '.#ndc-aurora'
+  nix build --no-warn-dirty --print-build-logs '.#ndc-postgres' '.#ndc-cockroach' '.#ndc-citus'
 
 # check the docker build works
 build-docker-with-nix:

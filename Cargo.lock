@@ -1302,35 +1302,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "ndc-aurora"
-version = "0.1.0"
-dependencies = [
- "async-trait",
- "axum",
- "axum-test-helper",
- "env_logger",
- "hyper",
- "insta",
- "ndc-client",
- "ndc-postgres",
- "ndc-sdk",
- "ndc-test",
- "prometheus",
- "query-engine",
- "reqwest",
- "schemars",
- "serde",
- "serde_derive",
- "serde_json",
- "similar-asserts",
- "sqlx",
- "tests-common",
- "thiserror",
- "tokio",
- "tracing",
-]
-
-[[package]]
 name = "ndc-citus"
 version = "0.1.0"
 dependencies = [
@@ -1727,6 +1698,28 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2a54938017eacd63036332b4ae5c8a49fc8c0c1d6d629893057e4f13609edd06"
 dependencies = [
  "num-traits",
+]
+
+[[package]]
+name = "other-db-tests"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "axum",
+ "env_logger",
+ "ndc-postgres",
+ "ndc-sdk",
+ "prometheus",
+ "query-engine",
+ "schemars",
+ "serde",
+ "serde_derive",
+ "serde_json",
+ "sqlx",
+ "tests-common",
+ "thiserror",
+ "tokio",
+ "tracing",
 ]
 
 [[package]]

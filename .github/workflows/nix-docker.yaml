@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - djh/multi-arch
     tags:
       - "v*"
 
@@ -15,7 +14,6 @@ jobs:
     strategy:
       matrix:
         connector:
-          - ndc-aurora
           - ndc-citus
           - ndc-cockroach
           - ndc-postgres

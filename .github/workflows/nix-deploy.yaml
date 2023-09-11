@@ -30,11 +30,6 @@ jobs:
               "binary_artifact_name": "hasura-citus-agent-rs",
               "artifact_path": "result/bin/ndc-citus",
             },
-            {
-              "build_command": "ndc-aurora-x86_64-linux",
-              "binary_artifact_name": "hasura-aurora-agent-rs",
-              "artifact_path": "result/bin/ndc-aurora",
-            },
           ]
 
     steps:

@@ -16,7 +16,7 @@ jobs:
 
       - name: nix build
         run: |
-          nix build --print-build-logs '.#ndc-postgres' '.#ndc-cockroach' '.#ndc-citus' '.#ndc-aurora'
+          nix build --print-build-logs '.#ndc-postgres' '.#ndc-cockroach' '.#ndc-citus'
 
       # scream into Slack if something goes wrong
       - name: Report Status
