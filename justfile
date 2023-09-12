@@ -141,7 +141,8 @@ build:
 # run all tests
 test: start-dependencies start-cockroach-dependencies start-citus-dependencies create-aurora-deployment
   RUST_LOG=DEBUG \
-    cargo test -p query-engine -p ndc-postgres -p ndc-cockroach -p ndc-citus
+    cargo test -p query-engine -p ndc-postgres -p ndc-cockroach -p ndc-citus -p other-db-tests
+
 
 # re-generate the deployment configuration file
 generate-chinook-configuration: build start-dependencies start-cockroach-dependencies start-citus-dependencies

@@ -31,6 +31,7 @@ pub fn translate(
         &query_request.arguments,
         &env,
         &mut state,
+        None,
     )?;
 
     let select_set = translate_query(

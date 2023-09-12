@@ -29,26 +29,10 @@ pub fn translate_joins(
         .into_iter()
         .map(|join_field| {
             let relationship = env.lookup_relationship(&join_field.relationship_name)?;
-            // these are arguments defined in the relationship definition.
-            let relationship_arguments: BTreeMap<String, models::Argument> = relationship
-                .arguments
-                .clone()
-                .into_iter()
-                .map(|(key, argument)| {
-                    Ok((key, relationship_argument_to_argument(argument.clone())?))
-                })
-                .collect::<Result<BTreeMap<String, models::Argument>, Error>>()?;
-
-            // these are arguments defined when calling the relationship.
-            let caller_arguments: BTreeMap<String, models::Argument> = join_field
-                .arguments
-                .into_iter()
-                .map(|(key, argument)| Ok((key, relationship_argument_to_argument(argument)?)))
-                .collect::<Result<BTreeMap<String, models::Argument>, Error>>()?;
-
-            let mut arguments = relationship_arguments;
-            // we assume that the caller arguments can override the relationship definition arguments.
-            arguments.extend(caller_arguments);
+            let arguments = make_relationship_arguments(MakeRelationshipArguments {
+                caller_arguments: join_field.arguments,
+                relationship_arguments: relationship.arguments.clone(),
+            })?;
 
             // create a from clause and get a reference of inner query.
             let (target_collection, from_clause) = root::make_from_clause_and_reference(
@@ -56,6 +40,7 @@ pub fn translate_joins(
                 &arguments,
                 env,
                 state,
+                None,
             )?;
 
             // process inner query and get the SELECTs for the 'rows' and 'aggregates' fields.
@@ -193,6 +178,39 @@ pub fn translate_column_mapping(
                 right: Box::new(op),
             })
         })
+}
+
+/// Used in `make_relationship_arguments()` below.
+pub struct MakeRelationshipArguments {
+    pub relationship_arguments: BTreeMap<String, models::RelationshipArgument>,
+    pub caller_arguments: BTreeMap<String, models::RelationshipArgument>,
+}
+
+/// Combine the caller arguments and the relationship arguments into a single map.
+///
+/// We don't support relationships column arguments yet, so for now we convert to a regular argument
+/// and throw an error on the column case. Will be fixed in the future.
+pub fn make_relationship_arguments(
+    arguments: MakeRelationshipArguments,
+) -> Result<BTreeMap<String, models::Argument>, Error> {
+    // these are arguments defined in the relationship definition.
+    let relationship_arguments: BTreeMap<String, models::Argument> = arguments
+        .relationship_arguments
+        .into_iter()
+        .map(|(key, argument)| Ok((key, relationship_argument_to_argument(argument)?)))
+        .collect::<Result<BTreeMap<String, models::Argument>, Error>>()?;
+
+    // these are arguments defined when calling the relationship.
+    let caller_arguments: BTreeMap<String, models::Argument> = arguments
+        .caller_arguments
+        .into_iter()
+        .map(|(key, argument)| Ok((key, relationship_argument_to_argument(argument)?)))
+        .collect::<Result<BTreeMap<String, models::Argument>, Error>>()?;
+
+    let mut arguments = relationship_arguments;
+    // we assume that the caller arguments can override the relationship definition arguments.
+    arguments.extend(caller_arguments);
+    Ok(arguments)
 }
 
 /// We don't support relationships column arguments yet, so for now we convert to a regular argument

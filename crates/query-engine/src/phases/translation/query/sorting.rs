@@ -1,14 +1,18 @@
 use ndc_sdk::models;
 
+use std::collections::BTreeMap;
+
 use super::error::Error;
-use super::helpers::{CollectionInfo, Env, RootAndCurrentTables, TableNameAndReference};
+use super::helpers::{Env, RootAndCurrentTables, State, TableNameAndReference};
 use super::relationships;
+use super::root;
 use crate::phases::translation::sql;
 
 /// Convert the order by fields from a QueryRequest to a SQL ORDER BY clause and potentially
 /// JOINs when we order by relationship fields.
 pub fn translate_order_by(
     env: &Env,
+    state: &mut State,
     root_and_current_tables: &RootAndCurrentTables,
     order_by: &Option<models::OrderBy>,
 ) -> Result<(sql::ast::OrderBy, Vec<sql::ast::Join>), Error> {
@@ -25,6 +29,7 @@ pub fn translate_order_by(
                     let target = match &order_by.target {
                         models::OrderByTarget::Column { name, path } => translate_order_by_target(
                             env,
+                            state,
                             root_and_current_tables,
                             index,
                             (name, path),
@@ -38,6 +43,7 @@ pub fn translate_order_by(
                             path,
                         } => translate_order_by_target(
                             env,
+                            state,
                             root_and_current_tables,
                             index,
                             (column, path),
@@ -169,6 +175,7 @@ fn translate_order_by_star_count_aggregate(
 /// and return the expression used for the sort by the wrapping SELECT.
 fn translate_order_by_target(
     env: &Env,
+    state: &mut State,
     root_and_current_tables: &RootAndCurrentTables,
     index: usize,
     (column, path): (&str, &Vec<models::PathElement>),
@@ -179,6 +186,7 @@ fn translate_order_by_target(
 ) -> Result<sql::ast::Expression, Error> {
     let column_or_relationship_select = translate_order_by_target_for_column(
         env,
+        state,
         root_and_current_tables,
         column.to_string(),
         path,
@@ -235,6 +243,7 @@ enum ColumnOrSelect {
 /// or a select query describing how to reach the column.
 fn translate_order_by_target_for_column(
     env: &Env,
+    state: &mut State,
     root_and_current_tables: &RootAndCurrentTables,
     column_name: String,
     path: &[models::PathElement],
@@ -279,7 +288,8 @@ fn translate_order_by_target_for_column(
             // destruct path_element into parts.
             let models::PathElement {
                 relationship: relationship_name,
-                ..
+                arguments,
+                predicate: _, // TODO: use this
             } = path_element;
 
             // examine the path elements' relationship.
@@ -293,27 +303,26 @@ fn translate_order_by_target_for_column(
                 models::RelationshipType::Object => Ok(()),
             }?;
 
-            let target_collection_info = env.lookup_collection(&relationship.target_collection)?;
-
-            // unpack table info for now.
-            let (target_table_info, target_table_name) = match target_collection_info {
-                CollectionInfo::Table { info, name } => Ok((info, name)),
-                CollectionInfo::NativeQuery { .. } => {
-                    Err(Error::NotSupported("Native Queries".to_string()))
-                }
-            }?;
-
-            // relationship target db table name
-            let target_db_table_name = sql::ast::TableReference::DBTable {
-                schema: sql::ast::SchemaName(target_table_info.schema_name.clone()),
-                table: sql::ast::TableName(target_table_info.table_name.clone()),
-            };
-
             let target_collection_alias: sql::ast::TableAlias =
                 sql::helpers::make_order_path_part_table_alias(
                     index,
                     &relationship.target_collection,
                 );
+            let arguments = relationships::make_relationship_arguments(
+                relationships::MakeRelationshipArguments {
+                    caller_arguments: BTreeMap::new(),
+                    relationship_arguments: arguments.clone(),
+                },
+            )?;
+
+            // create a from clause and get a reference of inner query.
+            let (table, from_clause) = root::make_from_clause_and_reference(
+                &relationship.target_collection,
+                &arguments,
+                env,
+                state,
+                Some(target_collection_alias.clone()),
+            )?;
 
             // The source table is going to be defined using this index - 1 in the next iteration,
             // unless it is the root source table.
@@ -349,12 +358,9 @@ fn translate_order_by_target_for_column(
             let select_cols: Vec<(sql::ast::ColumnAlias, sql::ast::Expression)> = required_cols
                 .into_iter()
                 .map(|target_col| {
-                    let new_table = target_collection_alias_name.clone();
-                    let table_collection = CollectionInfo::Table {
-                        name: target_table_name.clone(),
-                        info: target_table_info.clone(),
-                    };
-                    let selected_column = table_collection.lookup_column(&target_col)?;
+                    let target_collection =
+                        env.lookup_collection(&relationship.target_collection)?;
+                    let selected_column = target_collection.lookup_column(&target_col)?;
                     // we are going to deliberately use the table column name and not an alias we get from
                     // the query request because this is internal to the sorting mechanism.
                     let selected_column_alias =
@@ -364,7 +370,7 @@ fn translate_order_by_target_for_column(
                         selected_column_alias.clone(),
                         sql::ast::Expression::ColumnReference(
                             sql::ast::ColumnReference::AliasedColumn {
-                                table: new_table,
+                                table: table.reference.clone(),
                                 column: selected_column_alias,
                             },
                         ),
@@ -395,10 +401,7 @@ fn translate_order_by_target_for_column(
 
             select.where_ = sql::ast::Where(join_condition);
 
-            select.from = Some(sql::ast::From::Table {
-                reference: target_db_table_name,
-                alias: target_collection_alias.clone(),
-            });
+            select.from = Some(from_clause);
 
             // build a join from it, and
             let join = sql::ast::LeftOuterJoinLateral {

@@ -151,7 +151,7 @@ fn translate_query_part(
 
     // translate order_by
     let (order_by, order_by_joins) =
-        sorting::translate_order_by(env, &root_and_current_tables, &query.order_by)?;
+        sorting::translate_order_by(env, state, &root_and_current_tables, &query.order_by)?;
 
     relationship_joins.extend(order_by_joins);
 
@@ -188,8 +188,12 @@ pub fn make_from_clause_and_reference(
     arguments: &BTreeMap<String, models::Argument>,
     env: &Env,
     state: &mut State,
+    collection_alias: Option<sql::ast::TableAlias>,
 ) -> Result<(TableNameAndReference, sql::ast::From), Error> {
-    let collection_alias = sql::helpers::make_table_alias(collection_name.to_string());
+    let collection_alias = match collection_alias {
+        None => sql::helpers::make_table_alias(collection_name.to_string()),
+        Some(alias) => alias,
+    };
     let collection_alias_name = sql::ast::TableReference::AliasedTable(collection_alias.clone());
 
     // find the table according to the metadata.

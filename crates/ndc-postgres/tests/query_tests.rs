@@ -345,4 +345,24 @@ mod native_queries {
         .await;
         insta::assert_json_snapshot!(result);
     }
+
+    #[tokio::test]
+    async fn select_where_relationship() {
+        let result = run_query(
+            create_router().await,
+            "native_queries/select_where_relationship",
+        )
+        .await;
+        insta::assert_json_snapshot!(result);
+    }
+
+    #[tokio::test]
+    async fn select_sort_relationship() {
+        let result = run_query(
+            create_router().await,
+            "native_queries/select_sort_relationship",
+        )
+        .await;
+        insta::assert_json_snapshot!(result);
+    }
 }

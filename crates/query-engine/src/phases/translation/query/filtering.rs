@@ -1,13 +1,14 @@
 //! Handle filtering/where clauses translation.
 
+use std::collections::BTreeMap;
+
 use ndc_sdk::models;
 
 use super::error::Error;
-use super::helpers::{
-    CollectionInfo, ColumnInfo, Env, RootAndCurrentTables, State, TableNameAndReference,
-};
+use super::helpers::{ColumnInfo, Env, RootAndCurrentTables, State, TableNameAndReference};
 use super::operators;
 use super::relationships;
+use super::root;
 use super::values;
 use crate::phases::translation::sql;
 use crate::phases::translation::sql::helpers::simple_select;
@@ -235,7 +236,7 @@ fn translate_comparison_pathelements(
          models::PathElement {
              relationship,
              predicate,
-             ..
+             arguments,
          }| {
             // get the relationship table
             let relationship_name = &relationship;
@@ -258,45 +259,40 @@ fn translate_comparison_pathelements(
                 Ok(())
             }?;
 
-            let collection_info = env.lookup_collection(&relationship.target_collection)?;
-
-            // unpack table info for now.
-            let table_info = match collection_info {
-                CollectionInfo::Table { info, .. } => Ok(info),
-                CollectionInfo::NativeQuery { .. } => {
-                    Err(Error::NotSupported("Native Queries".to_string()))
-                }
-            }?;
-
-            // relationship target db table name
-            let db_table_name: sql::ast::TableReference = sql::ast::TableReference::DBTable {
-                schema: sql::ast::SchemaName(table_info.schema_name.clone()),
-                table: sql::ast::TableName(table_info.table_name.clone()),
-            };
-
             // new alias for the target table
             let target_table_alias: sql::ast::TableAlias =
                 sql::helpers::make_boolean_expression_table_alias(
                     next_free_name,
                     &relationship.target_collection.clone().to_string(),
                 );
-            let target_table_alias_name =
-                sql::ast::TableReference::AliasedTable(target_table_alias.clone());
+
+            let arguments = relationships::make_relationship_arguments(
+                relationships::MakeRelationshipArguments {
+                    caller_arguments: arguments,
+                    relationship_arguments: relationship.arguments.clone(),
+                },
+            )?;
+
+            // create a from clause and get a reference of inner query.
+            let (table, from_clause) = root::make_from_clause_and_reference(
+                &relationship.target_collection,
+                &arguments,
+                env,
+                state,
+                Some(target_table_alias.clone()),
+            )?;
 
             // build a SELECT querying this table with the relevant predicate.
             let mut select = simple_select(vec![]);
-            select.from = Some(sql::ast::From::Table {
-                reference: db_table_name.clone(),
-                alias: target_table_alias.clone(),
-            });
+            select.from = Some(from_clause);
 
             select.select_list = sql::ast::SelectList::SelectStar;
 
             let new_root_and_current_tables = RootAndCurrentTables {
                 root_table: root_and_current_tables.root_table.clone(),
                 current_table: TableNameAndReference {
-                    reference: target_table_alias_name.clone(),
-                    name: relationship.target_collection.clone(),
+                    reference: table.reference.clone(),
+                    name: table.name.clone(),
                 },
             };
             // relationship-specfic filter
@@ -312,7 +308,7 @@ fn translate_comparison_pathelements(
             let cond = relationships::translate_column_mapping(
                 env,
                 &current_table_ref,
-                &target_table_alias_name,
+                &table.reference,
                 rel_cond,
                 relationship,
             )?;
@@ -324,7 +320,7 @@ fn translate_comparison_pathelements(
             joins.push(sql::ast::Join::InnerJoinLateral(
                 sql::ast::InnerJoinLateral {
                     select: Box::new(select),
-                    alias: target_table_alias.clone(),
+                    alias: target_table_alias,
                 },
             ));
             Ok(new_root_and_current_tables.current_table)
@@ -420,41 +416,30 @@ pub fn translate_exists_in_collection(
     predicate: models::Expression,
 ) -> Result<sql::ast::Expression, Error> {
     match in_collection {
-        // ignore arguments for now
-        models::ExistsInCollection::Unrelated { collection, .. } => {
-            // get the unrelated table information from the metadata.
-            let collection_info = env.lookup_collection(&collection)?;
+        models::ExistsInCollection::Unrelated {
+            collection,
+            arguments,
+        } => {
+            let arguments = relationships::make_relationship_arguments(
+                relationships::MakeRelationshipArguments {
+                    caller_arguments: arguments,
+                    relationship_arguments: BTreeMap::new(),
+                },
+            )?;
 
-            // unpack table info for now.
-            let table_info = match collection_info {
-                CollectionInfo::Table { info, .. } => Ok(info),
-                CollectionInfo::NativeQuery { .. } => {
-                    Err(Error::NotSupported("Native Queries".to_string()))
-                }
-            }?;
-
-            // db table name
-            let db_table_name = sql::ast::TableReference::DBTable {
-                schema: sql::ast::SchemaName(table_info.schema_name.clone()),
-                table: sql::ast::TableName(table_info.table_name.clone()),
-            };
-
-            // new alias for the table
-            let table_alias = sql::helpers::make_table_alias(collection.clone());
-            let table_alias_name = sql::ast::TableReference::AliasedTable(table_alias.clone());
+            // create a from clause and get a reference of inner query.
+            let (table, from_clause) =
+                root::make_from_clause_and_reference(&collection, &arguments, env, state, None)?;
 
             // build a SELECT querying this table with the relevant predicate.
             let mut select = simple_select(vec![]);
-            select.from = Some(sql::ast::From::Table {
-                reference: db_table_name.clone(),
-                alias: table_alias.clone(),
-            });
+            select.from = Some(from_clause);
 
             let new_root_and_current_tables = RootAndCurrentTables {
                 root_table: root_and_current_tables.root_table.clone(),
                 current_table: TableNameAndReference {
-                    reference: table_alias_name,
-                    name: collection.clone(),
+                    reference: table.reference.clone(),
+                    name: table.name.clone(),
                 },
             };
 
@@ -477,7 +462,10 @@ pub fn translate_exists_in_collection(
         // We get a relationship name in exists, query the target table directly,
         // and build a WHERE clause that contains the join conditions and the specified
         // EXISTS condition.
-        models::ExistsInCollection::Related { relationship, .. } => {
+        models::ExistsInCollection::Related {
+            relationship,
+            arguments,
+        } => {
             // get the relationship table
             let relationship = env.lookup_relationship(&relationship)?;
 
@@ -491,39 +479,31 @@ pub fn translate_exists_in_collection(
                 Ok(())
             }?;
 
-            // get the unrelated table information from the metadata.
-            let collection_info = env.lookup_collection(&relationship.target_collection)?;
-            // unpack table info for now.
-            let table_info = match collection_info {
-                CollectionInfo::Table { info, .. } => Ok(info),
-                CollectionInfo::NativeQuery { .. } => {
-                    Err(Error::NotSupported("Native Queries".to_string()))
-                }
-            }?;
+            let arguments = relationships::make_relationship_arguments(
+                relationships::MakeRelationshipArguments {
+                    caller_arguments: arguments,
+                    relationship_arguments: relationship.arguments.clone(),
+                },
+            )?;
 
-            // relationship target db table name
-            let db_table_name = sql::ast::TableReference::DBTable {
-                schema: sql::ast::SchemaName(table_info.schema_name.clone()),
-                table: sql::ast::TableName(table_info.table_name.clone()),
-            };
-
-            // new alias for the target table
-            let table_alias =
-                sql::helpers::make_table_alias(relationship.target_collection.clone());
-            let table_alias_name = sql::ast::TableReference::AliasedTable(table_alias.clone());
+            // create a from clause and get a reference of inner query.
+            let (table, from_clause) = root::make_from_clause_and_reference(
+                &relationship.target_collection,
+                &arguments,
+                env,
+                state,
+                None,
+            )?;
 
             // build a SELECT querying this table with the relevant predicate.
             let mut select = simple_select(vec![]);
-            select.from = Some(sql::ast::From::Table {
-                reference: db_table_name.clone(),
-                alias: table_alias.clone(),
-            });
+            select.from = Some(from_clause);
 
             let new_root_and_current_tables = RootAndCurrentTables {
                 root_table: root_and_current_tables.root_table.clone(),
                 current_table: TableNameAndReference {
-                    reference: table_alias_name.clone(),
-                    name: relationship.target_collection.clone(),
+                    reference: table.reference.clone(),
+                    name: table.name.clone(),
                 },
             };
 
@@ -540,7 +520,7 @@ pub fn translate_exists_in_collection(
             let cond = relationships::translate_column_mapping(
                 env,
                 &root_and_current_tables.current_table,
-                &table_alias_name,
+                &table.reference,
                 exists_cond,
                 relationship,
             )?;
