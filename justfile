@@ -13,7 +13,7 @@ COCKROACH_CHINOOK_DEPLOYMENT := "static/cockroach/chinook-deployment.json"
 CITUS_CONNECTION_STRING := "postgresql://postgres:password@localhost:64004?sslmode=disable"
 CITUS_CHINOOK_DEPLOYMENT := "static/citus/chinook-deployment.json"
 
-AURORA_CONNECTION_STRING := env_var('AURORA_CONNECTION_STRING')
+AURORA_CONNECTION_STRING := env_var_or_default('AURORA_CONNECTION_STRING', '')
 AURORA_CHINOOK_DEPLOYMENT := "static/aurora/chinook-deployment.json"
 AURORA_CHINOOK_DEPLOYMENT_TEMPLATE := "static/aurora/chinook-deployment-template.json"
 
@@ -146,20 +146,13 @@ test: start-dependencies start-cockroach-dependencies start-citus-dependencies c
 
 # re-generate the deployment configuration file
 generate-chinook-configuration: build start-dependencies start-cockroach-dependencies start-citus-dependencies
-  ./scripts/generate-chinook-configuration.sh "ndc-postgres" {{POSTGRESQL_CONNECTION_STRING}} {{POSTGRES_CHINOOK_DEPLOYMENT}}
-  ./scripts/generate-chinook-configuration.sh "ndc-cockroach" {{COCKROACH_CONNECTION_STRING}} {{COCKROACH_CHINOOK_DEPLOYMENT}}
-  ./scripts/generate-chinook-configuration.sh "ndc-citus" {{CITUS_CONNECTION_STRING}} {{CITUS_CHINOOK_DEPLOYMENT}}
-  ./scripts/generate-chinook-configuration.sh "ndc-aurora" {{AURORA_CONNECTION_STRING}} {{AURORA_CHINOOK_DEPLOYMENT_TEMPLATE}}
+  ./scripts/generate-chinook-configuration.sh "ndc-postgres" '{{POSTGRESQL_CONNECTION_STRING}}' '{{POSTGRES_CHINOOK_DEPLOYMENT}}'
+  if [[ -n '{{AURORA_CONNECTION_STRING}}' ]]; then \
+    ./scripts/generate-chinook-configuration.sh "ndc-aurora" '{{AURORA_CONNECTION_STRING}}' '{{AURORA_CHINOOK_DEPLOYMENT_TEMPLATE}}'; \
+  fi
 
   # regenerate aurora deployment from template we've just updated
-  just start-aurora-dependencies
-
-  # make everything delightful
-  prettier --write {{ POSTGRES_CHINOOK_DEPLOYMENT }} \
-    {{ COCKROACH_CHINOOK_DEPLOYMENT }} \
-    {{ CITUS_CHINOOK_DEPLOYMENT }} \
-    {{ AURORA_CHINOOK_DEPLOYMENT_TEMPLATE }} \
-    {{ AURORA_CHINOOK_DEPLOYMENT }}
+  just create-aurora-deployment
 
 # run postgres + jaeger
 start-dependencies:
@@ -191,6 +184,7 @@ create-aurora-deployment:
   # splice `AURORA_CONNECTION_STRING` into
   cat {{ AURORA_CHINOOK_DEPLOYMENT_TEMPLATE }} \
     | jq '.postgres_database_url=(env | .AURORA_CONNECTION_STRING)' \
+    | prettier --parser=json \
     > {{ AURORA_CHINOOK_DEPLOYMENT }}
 
 # run prometheus + grafana
@@ -239,7 +233,7 @@ format:
 
 # is everything formatted?
 format-check:
-  cargo fmt --all -- --check
+  cargo fmt --all --check
   ! command -v nixpkgs-fmt > /dev/null || nixpkgs-fmt --check .
   prettier --check .
 

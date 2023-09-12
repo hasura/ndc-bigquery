@@ -242,11 +242,12 @@ fn translate_comparison_pathelements(
             let relationship_name = &relationship;
             let relationship = env.lookup_relationship(relationship_name)?;
 
-            if relationship.relationship_type == models::RelationshipType::Array
-            {
-                Err(Error::NotSupported(format!("array relationships in boolean expressions, such as '{}',", relationship_name)))
-            }
-            else {
+            if relationship.relationship_type == models::RelationshipType::Array {
+                Err(Error::NotSupported(format!(
+                    "array relationships in boolean expressions, such as '{}',",
+                    relationship_name
+                )))
+            } else {
                 Ok(())
             }?;
 

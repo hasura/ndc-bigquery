@@ -38,5 +38,8 @@ cat "${CHINOOK_DEPLOYMENT}" \
   | jq --arg old_url "$(cat "${CHINOOK_DEPLOYMENT_OLD}" | jq '.postgres_database_url')" '.postgres_database_url |= ($old_url | fromjson)' \
   > "${CHINOOK_DEPLOYMENT}"
 
-# remote temp file
+# remove the temporary file
 rm "${CHINOOK_DEPLOYMENT_OLD}"
+
+# ensure the file is formatted correctly
+prettier --write "${CHINOOK_DEPLOYMENT}"
