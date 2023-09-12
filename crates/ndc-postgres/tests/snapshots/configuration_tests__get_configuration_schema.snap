@@ -1,6 +1,5 @@
 ---
 source: crates/ndc-postgres/tests/configuration_tests.rs
-assertion_line: 53
 expression: schema
 ---
 {
@@ -19,7 +18,7 @@ expression: schema
       "minimum": 0.0
     },
     "postgres_database_url": {
-      "type": "string"
+      "$ref": "#/definitions/PostgresDatabaseUrls"
     },
     "metadata": {
       "default": {
@@ -42,6 +41,43 @@ expression: schema
     }
   },
   "definitions": {
+    "PostgresDatabaseUrls": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "$ref": "#/definitions/MultipleRegionsConnectionUrls"
+        }
+      ]
+    },
+    "MultipleRegionsConnectionUrls": {
+      "type": "object",
+      "required": [
+        "reads",
+        "writes"
+      ],
+      "properties": {
+        "writes": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "reads": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
     "Metadata": {
       "description": "Metadata information.",
       "type": "object",

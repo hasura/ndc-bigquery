@@ -4,6 +4,7 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use sqlx::postgres::{PgConnection, PgPool, PgPoolOptions};
 use sqlx::{Connection, Executor, Row};
+use std::collections::BTreeMap;
 use thiserror::Error;
 
 use ndc_sdk::connector;
@@ -18,18 +19,34 @@ pub struct DeploymentConfiguration {
     // Which version of the configuration format are we using
     pub version: u32,
     // Connection string for a Postgres-compatible database
-    pub postgres_database_url: String,
+    pub postgres_database_url: PostgresDatabaseUrls,
     #[serde(default)]
     pub metadata: query_engine::metadata::Metadata,
     #[serde(default)]
     pub aggregate_functions: query_engine::metadata::AggregateFunctions,
 }
 
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize, JsonSchema)]
+#[serde(untagged)]
+pub enum PostgresDatabaseUrls {
+    SingleRegion(String),
+    MultiRegion(MultipleRegionsConnectionUrls),
+}
+
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize, JsonSchema)]
+pub struct MultipleRegionsConnectionUrls {
+    pub writes: BTreeMap<RegionName, Vec<String>>,
+    pub reads: BTreeMap<RegionName, Vec<String>>,
+}
+
+#[derive(Debug, Clone, PartialOrd, PartialEq, Eq, Ord, Deserialize, Serialize, JsonSchema)]
+pub struct RegionName(String);
+
 impl DeploymentConfiguration {
     pub fn empty() -> Self {
         Self {
             version: CURRENT_VERSION,
-            postgres_database_url: "".into(),
+            postgres_database_url: PostgresDatabaseUrls::SingleRegion("".into()),
             metadata: query_engine::metadata::Metadata::default(),
             aggregate_functions: query_engine::metadata::AggregateFunctions::default(),
         }
@@ -76,10 +93,12 @@ pub async fn create_state(
 
 /// Create a connection pool with default settings.
 async fn create_pool(configuration: &DeploymentConfiguration) -> Result<PgPool, sqlx::Error> {
-    PgPoolOptions::new()
-        .max_connections(50)
-        .connect(&configuration.postgres_database_url)
-        .await
+    let url = match &configuration.postgres_database_url {
+        PostgresDatabaseUrls::SingleRegion(url) => url,
+        PostgresDatabaseUrls::MultiRegion(_) => todo!(),
+    };
+
+    PgPoolOptions::new().max_connections(50).connect(url).await
 }
 
 /// Construct the deployment configuration by introspecting the database.
@@ -87,7 +106,12 @@ pub async fn configure(
     args: &DeploymentConfiguration,
     configuration_query: &str,
 ) -> Result<DeploymentConfiguration, connector::UpdateConfigurationError> {
-    let mut connection = PgConnection::connect(&args.postgres_database_url)
+    let url = match &args.postgres_database_url {
+        PostgresDatabaseUrls::SingleRegion(url) => url,
+        PostgresDatabaseUrls::MultiRegion(_) => todo!(),
+    };
+
+    let mut connection = PgConnection::connect(url)
         .await
         .map_err(|e| connector::UpdateConfigurationError::Other(e.into()))?;
 

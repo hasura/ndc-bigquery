@@ -19,7 +19,9 @@ const CONFIGURATION_QUERY: &str = include_str!("../src/configuration.sql");
 #[tokio::test]
 async fn test_configure() {
     let args = configuration::DeploymentConfiguration {
-        postgres_database_url: POSTGRESQL_CONNECTION_STRING.to_string(),
+        postgres_database_url: configuration::PostgresDatabaseUrls::SingleRegion(
+            POSTGRESQL_CONNECTION_STRING.to_string(),
+        ),
         ..configuration::DeploymentConfiguration::empty()
     };
 
