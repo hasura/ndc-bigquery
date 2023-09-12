@@ -1,30 +1,30 @@
 [
   {
-    "kind": "dataSource",
+    "kind": "DataSource",
     "name": "db",
     "dataConnectorUrl": "http://localhost:8100",
     "schema": {
       "scalar_types": {
-        "character varying": {
+        "String": {
           "aggregate_functions": {},
           "comparison_operators": {
             "like": {
               "argument_type": {
                 "type": "named",
-                "name": "character varying"
+                "name": "String"
               }
             }
           },
           "update_operators": {}
         },
-        "integer": {
+        "Int": {
           "aggregate_functions": {
             "min": {
               "result_type": {
                 "type": "nullable",
                 "underlying_type": {
                   "type": "named",
-                  "name": "integer"
+                  "name": "Int"
                 }
               }
             },
@@ -33,7 +33,7 @@
                 "type": "nullable",
                 "underlying_type": {
                   "type": "named",
-                  "name": "integer"
+                  "name": "Int"
                 }
               }
             }
@@ -51,7 +51,7 @@
               "arguments": {},
               "type": {
                 "type": "named",
-                "name": "integer"
+                "name": "Int"
               }
             },
             "Name": {
@@ -59,7 +59,7 @@
               "arguments": {},
               "type": {
                 "type": "named",
-                "name": "character varying"
+                "name": "String"
               }
             }
           }
@@ -72,7 +72,7 @@
               "arguments": {},
               "type": {
                 "type": "named",
-                "name": "integer"
+                "name": "Int"
               }
             },
             "Title": {
@@ -80,7 +80,7 @@
               "arguments": {},
               "type": {
                 "type": "named",
-                "name": "character varying"
+                "name": "String"
               }
             },
             "ArtistId": {
@@ -88,7 +88,7 @@
               "arguments": {},
               "type": {
                 "type": "named",
-                "name": "integer"
+                "name": "Int"
               }
             }
           }
@@ -101,7 +101,7 @@
               "arguments": {},
               "type": {
                 "type": "named",
-                "name": "integer"
+                "name": "Int"
               }
             },
             "Name": {
@@ -109,7 +109,7 @@
               "arguments": {},
               "type": {
                 "type": "named",
-                "name": "character varying"
+                "name": "String"
               }
             },
             "AlbumId": {
@@ -117,7 +117,7 @@
               "arguments": {},
               "type": {
                 "type": "named",
-                "name": "integer"
+                "name": "Int"
               }
             }
           }
@@ -132,13 +132,13 @@
                   "description": "The cyling id",
                   "type": {
                     "type": "named",
-                    "name": "integer"
+                    "name": "Int"
                   }
                 }
               },
               "type": {
                 "type": "named",
-                "name": "integer"
+                "name": "Int"
               }
             },
             "Name": {
@@ -146,7 +146,7 @@
               "arguments": {},
               "type": {
                 "type": "named",
-                "name": "character varying"
+                "name": "String"
               }
             }
           }
@@ -200,7 +200,7 @@
               "description": "The ceiling id",
               "type": {
                 "type": "named",
-                "name": "integer"
+                "name": "Int"
               }
             }
           },
@@ -215,7 +215,7 @@
     }
   },
   {
-    "kind": "objectType",
+    "kind": "ObjectType",
     "name": "Artist",
     "fields": [
       {
@@ -226,10 +226,13 @@
         "name": "Name",
         "type": "String"
       }
-    ]
+    ],
+    "graphql": {
+      "typeName": "Artist"
+    }
   },
   {
-    "kind": "objectType",
+    "kind": "ObjectType",
     "name": "Album",
     "fields": [
       {
@@ -244,10 +247,13 @@
         "name": "ArtistId",
         "type": "Int"
       }
-    ]
+    ],
+    "graphql": {
+      "typeName": "Album"
+    }
   },
   {
-    "kind": "objectType",
+    "kind": "ObjectType",
     "name": "Track",
     "fields": [
       {
@@ -262,10 +268,13 @@
         "name": "AlbumId",
         "type": "Int"
       }
-    ]
+    ],
+    "graphql": {
+      "typeName": "Track"
+    }
   },
   {
-    "kind": "objectType",
+    "kind": "ObjectType",
     "name": "artist_below_id",
     "fields": [
       {
@@ -276,114 +285,136 @@
         "name": "Name",
         "type": "String"
       }
-    ]
+    ],
+    "graphql": {
+      "typeName": "ArtistBelowId"
+    }
   },
   {
-    "kind": "model",
+    "kind": "Model",
     "name": "Artists",
-    "dataType": "Artist"
-  },
-  {
-    "kind": "modelSource",
-    "modelName": "Artists",
-    "dataSource": "db",
-    "collection": "Artist",
-    "typeMappings": {
-      "Artist": {
-        "fieldMappings": {
-          "ArtistId": {
-            "column": "ArtistId"
-          },
-          "Name": {
-            "column": "Name"
-          }
-        }
-      }
-    }
-  },
-  {
-    "kind": "model",
-    "name": "Albums",
-    "dataType": "Album"
-  },
-  {
-    "kind": "modelSource",
-    "modelName": "Albums",
-    "dataSource": "db",
-    "collection": "Album",
-    "typeMappings": {
-      "Album": {
-        "fieldMappings": {
-          "AlbumId": {
-            "column": "AlbumId"
-          },
-          "Title": {
-            "column": "Title"
-          },
-          "ArtistId": {
-            "column": "ArtistId"
-          }
-        }
-      }
-    }
-  },
-  {
-    "kind": "model",
-    "name": "Tracks",
-    "dataType": "Track"
-  },
-  {
-    "kind": "modelSource",
-    "modelName": "Tracks",
-    "dataSource": "db",
-    "collection": "Track",
-    "typeMappings": {
-      "Track": {
-        "fieldMappings": {
-          "TrackId": {
-            "column": "TrackId"
-          },
-          "Name": {
-            "column": "Name"
-          },
-          "AlbumId": {
-            "column": "AlbumId"
-          }
-        }
-      }
-    }
-  },
-  {
-    "kind": "model",
-    "name": "artist_below_id",
     "dataType": "Artist",
-    "arguments": [
-      {
-        "name": "id",
-        "type": "Int"
+    "source": {
+      "dataSource": "db",
+      "collection": "Artist",
+      "typeMappings": {
+        "Artist": {
+          "fieldMappings": {
+            "ArtistId": {
+              "column": "ArtistId"
+            },
+            "Name": {
+              "column": "Name"
+            }
+          }
+        }
       }
-    ]
+    },
+    "graphql": {
+      "selectUniques": [
+        {
+          "queryRootField": "ArtistByID",
+          "uniqueIdentifier": ["ArtistId"]
+        }
+      ],
+      "selectMany": {
+        "queryRootField": "Artist"
+      }
+    }
   },
   {
-    "kind": "modelSource",
-    "modelName": "artist_below_id",
-    "dataSource": "db",
-    "collection": "artist_below_id",
-    "typeMappings": {
-      "Artist": {
-        "fieldMappings": {
-          "ArtistId": {
-            "column": "ArtistId"
-          },
-          "Name": {
-            "column": "Name"
+    "kind": "Model",
+    "name": "Albums",
+    "dataType": "Album",
+    "source": {
+      "dataSource": "db",
+      "collection": "Album",
+      "typeMappings": {
+        "Album": {
+          "fieldMappings": {
+            "AlbumId": {
+              "column": "AlbumId"
+            },
+            "Title": {
+              "column": "Title"
+            },
+            "ArtistId": {
+              "column": "ArtistId"
+            }
+          }
+        }
+      }
+    },
+    "graphql": {
+      "selectUniques": [
+        {
+          "queryRootField": "AlbumByID",
+          "uniqueIdentifier": ["AlbumId"]
+        }
+      ],
+      "selectMany": {
+        "queryRootField": "Album"
+      }
+    }
+  },
+  {
+    "kind": "Model",
+    "name": "Tracks",
+    "dataType": "Track",
+    "source": {
+      "dataSource": "db",
+      "collection": "Track",
+      "typeMappings": {
+        "Track": {
+          "fieldMappings": {
+            "TrackId": {
+              "column": "TrackId"
+            },
+            "Name": {
+              "column": "Name"
+            },
+            "AlbumId": {
+              "column": "AlbumId"
+            }
+          }
+        }
+      },
+      "graphql": {
+        "selectUniques": [
+          {
+            "queryRootField": "TrackByID",
+            "uniqueIdentifier": ["TrackId"]
+          }
+        ],
+        "selectMany": {
+          "queryRootField": "Track"
+        }
+      }
+    }
+  },
+  {
+    "kind": "Model",
+    "name": "artist_below_id",
+    "dataType": "artist_below_id",
+    "source": {
+      "dataSource": "db",
+      "collection": "artist_below_id",
+      "typeMappings": {
+        "Artist": {
+          "fieldMappings": {
+            "ArtistId": {
+              "column": "ArtistId"
+            },
+            "Name": {
+              "column": "Name"
+            }
           }
         }
       }
     }
   },
   {
-    "kind": "typeOutputPermissions",
+    "kind": "TypeOutputPermissions",
     "typeName": "Artist",
     "permissions": {
       "admin": {
@@ -392,7 +423,7 @@
     }
   },
   {
-    "kind": "typeOutputPermissions",
+    "kind": "TypeOutputPermissions",
     "typeName": "Album",
     "permissions": {
       "admin": {
@@ -401,7 +432,7 @@
     }
   },
   {
-    "kind": "typeOutputPermissions",
+    "kind": "TypeOutputPermissions",
     "typeName": "Track",
     "permissions": {
       "admin": {
@@ -410,7 +441,7 @@
     }
   },
   {
-    "kind": "typeOutputPermissions",
+    "kind": "TypeOutputPermissions",
     "typeName": "artist_below_id",
     "permissions": {
       "admin": {
@@ -419,7 +450,7 @@
     }
   },
   {
-    "kind": "modelSelectPermissions",
+    "kind": "ModelSelectPermissions",
     "modelName": "Artists",
     "permissions": {
       "admin": {
@@ -428,7 +459,7 @@
     }
   },
   {
-    "kind": "modelSelectPermissions",
+    "kind": "ModelSelectPermissions",
     "modelName": "Albums",
     "permissions": {
       "admin": {
@@ -437,7 +468,7 @@
     }
   },
   {
-    "kind": "modelSelectPermissions",
+    "kind": "ModelSelectPermissions",
     "modelName": "Tracks",
     "permissions": {
       "admin": {
@@ -446,7 +477,7 @@
     }
   },
   {
-    "kind": "modelSelectPermissions",
+    "kind": "ModelSelectPermissions",
     "modelName": "artist_below_id",
     "permissions": {
       "admin": {
@@ -455,78 +486,7 @@
     }
   },
   {
-    "kind": "graphqlType",
-    "typeName": "Artist",
-    "graphqlTypeName": "Artist",
-    "graphqlTypeKind": "Object"
-  },
-  {
-    "kind": "graphqlType",
-    "typeName": "Album",
-    "graphqlTypeName": "Album",
-    "graphqlTypeKind": "Object"
-  },
-  {
-    "kind": "graphqlType",
-    "typeName": "Track",
-    "graphqlTypeName": "Track",
-    "graphqlTypeKind": "Object"
-  },
-  {
-    "kind": "graphqlType",
-    "typeName": "artist_below_id",
-    "graphqlTypeName": "ArtistBelowId",
-    "graphqlTypeKind": "Object"
-  },
-  {
-    "kind": "modelGraphqlApi",
-    "modelName": "Artists",
-    "selectUniques": [
-      {
-        "queryRootField": "ArtistByID",
-        "uniqueIdentifier": ["ArtistId"]
-      }
-    ],
-    "selectMany": {
-      "queryRootField": "Artist"
-    }
-  },
-  {
-    "kind": "modelGraphqlApi",
-    "modelName": "Albums",
-    "selectUniques": [
-      {
-        "queryRootField": "AlbumByID",
-        "uniqueIdentifier": ["AlbumId"]
-      }
-    ],
-    "selectMany": {
-      "queryRootField": "Album"
-    }
-  },
-  {
-    "kind": "modelGraphqlApi",
-    "modelName": "Tracks",
-    "selectUniques": [
-      {
-        "queryRootField": "TrackByID",
-        "uniqueIdentifier": ["TrackId"]
-      }
-    ],
-    "selectMany": {
-      "queryRootField": "Track"
-    }
-  },
-  {
-    "kind": "modelGraphqlApi",
-    "modelName": "artist_below_id",
-    "selectUniques": [],
-    "selectMany": {
-      "queryRootField": "artist_below_id"
-    }
-  },
-  {
-    "kind": "relationship",
+    "kind": "Relationship",
     "source": "Artist",
     "name": "Albums",
     "target": {
@@ -553,7 +513,7 @@
     ]
   },
   {
-    "kind": "relationship",
+    "kind": "Relationship",
     "source": "Album",
     "name": "Tracks",
     "target": {
@@ -580,7 +540,7 @@
     ]
   },
   {
-    "kind": "relationship",
+    "kind": "Relationship",
     "source": "Album",
     "name": "Artist",
     "target": {
@@ -607,7 +567,7 @@
     ]
   },
   {
-    "kind": "relationship",
+    "kind": "Relationship",
     "source": "Track",
     "name": "Album",
     "target": {
@@ -634,21 +594,18 @@
     ]
   },
   {
-    "kind": "scalarTypeRepresentation",
+    "kind": "DataConnectorScalarRepresentation",
     "dataSource": "db",
-    "scalarType": "integer",
+    "scalarType": "Int",
     "representation": "Int"
   },
   {
-    "kind": "scalarTypeRepresentation",
+    "kind": "DataConnectorScalarRepresentation",
     "dataSource": "db",
-    "scalarType": "character varying",
-    "representation": "String"
-  },
-  {
-    "kind": "scalarTypeGraphqlExpression",
-    "dataSource": "db",
-    "scalarTypeName": "character varying",
-    "graphqlComparisonExpressionTypeName": "String_Comparison_Exp"
+    "scalarType": "String",
+    "representation": "String",
+    "graphql": {
+      "ComparisonExpressionTypeName": "String_Comparison_Exp"
+    }
   }
 ]
