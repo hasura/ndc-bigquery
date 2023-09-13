@@ -153,3 +153,19 @@ mod native_queries {
         insta::assert_snapshot!(result);
     }
 }
+
+mod types {
+    use crate::common;
+
+    #[test]
+    fn select_types_on_comparisons() {
+        let result = common::test_translation("values/select_types_on_comparisons").unwrap();
+        insta::assert_snapshot!(result);
+    }
+
+    #[test]
+    fn select_types_on_native_queries() {
+        let result = common::test_translation("values/select_types_on_native_queries").unwrap();
+        insta::assert_snapshot!(result);
+    }
+}

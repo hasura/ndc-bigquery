@@ -1,5 +1,7 @@
 //! Errors for query translation.
 
+use crate::metadata::database;
+
 /// A type for translation errors.
 #[derive(Debug)]
 pub enum Error {
@@ -10,6 +12,7 @@ pub enum Error {
     OperatorNotFound(String),
     EmptyPathForStarCountAggregate,
     NoFields,
+    TypeMismatch(serde_json::Value, database::ScalarType),
     NotSupported(String),
 }
 
@@ -34,14 +37,17 @@ impl std::fmt::Display for Error {
             Error::OperatorNotFound(operator) => {
                 write!(f, "Operator '{}' not found.", operator)
             }
-            Error::NotSupported(thing) => {
-                write!(f, "Queries containing {} are not supported.", thing)
-            }
             Error::EmptyPathForStarCountAggregate => {
                 write!(f, "No path elements supplied for Star Count Aggregate")
             }
             Error::NoFields => {
                 write!(f, "No fields in request.")
+            }
+            Error::TypeMismatch(value, typ) => {
+                write!(f, "Value '{:?}' is not of type '{:?}'.", value, typ)
+            }
+            Error::NotSupported(thing) => {
+                write!(f, "Queries containing {} are not supported.", thing)
             }
         }
     }

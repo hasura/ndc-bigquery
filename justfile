@@ -28,7 +28,7 @@ check: build lint format-check test
 # run the connector
 run: start-dependencies
   RUST_LOG=INFO \
-    cargo run --release -- serve --configuration {{POSTGRES_CHINOOK_DEPLOYMENT}}
+    cargo run --bin ndc-postgres --release -- serve --configuration {{POSTGRES_CHINOOK_DEPLOYMENT}}
 
 # run the connector inside a Docker image
 run-in-docker: build-docker-with-nix start-dependencies
@@ -148,7 +148,7 @@ test: start-dependencies start-cockroach-dependencies start-citus-dependencies c
 generate-chinook-configuration: build start-dependencies start-cockroach-dependencies start-citus-dependencies
   ./scripts/generate-chinook-configuration.sh "ndc-postgres" '{{POSTGRESQL_CONNECTION_STRING}}' '{{POSTGRES_CHINOOK_DEPLOYMENT}}'
   if [[ -n '{{AURORA_CONNECTION_STRING}}' ]]; then \
-    ./scripts/generate-chinook-configuration.sh "ndc-aurora" '{{AURORA_CONNECTION_STRING}}' '{{AURORA_CHINOOK_DEPLOYMENT_TEMPLATE}}'; \
+    ./scripts/generate-chinook-configuration.sh "ndc-postgres" '{{AURORA_CONNECTION_STRING}}' '{{AURORA_CHINOOK_DEPLOYMENT_TEMPLATE}}'; \
   fi
 
   # regenerate aurora deployment from template we've just updated

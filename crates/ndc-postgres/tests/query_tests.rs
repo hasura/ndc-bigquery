@@ -1,6 +1,7 @@
 pub mod common;
 use tests_common::request::run_query;
 
+#[cfg(test)]
 mod basic {
     use super::common::create_router;
     use super::run_query;
@@ -24,6 +25,7 @@ mod basic {
     }
 }
 
+#[cfg(test)]
 mod predicates {
     use super::common::create_router;
     use super::run_query;
@@ -181,6 +183,7 @@ mod predicates {
     }
 }
 
+#[cfg(test)]
 mod sorting {
     use super::common::create_router;
     use super::run_query;
@@ -240,6 +243,7 @@ mod sorting {
     }
 }
 
+#[cfg(test)]
 mod aggregation {
     use super::common::create_router;
     use super::run_query;
@@ -273,6 +277,7 @@ mod aggregation {
     }
 }
 
+#[cfg(test)]
 mod relationships {
     use super::common::create_router;
     use super::run_query;
@@ -316,6 +321,7 @@ mod relationships {
     }
 }
 
+#[cfg(test)]
 mod native_queries {
     use super::common::create_router;
     use super::run_query;
@@ -363,6 +369,18 @@ mod native_queries {
             "native_queries/select_sort_relationship",
         )
         .await;
+        insta::assert_json_snapshot!(result);
+    }
+}
+
+#[cfg(test)]
+mod types {
+    use super::common::create_router;
+    use super::run_query;
+
+    #[tokio::test]
+    async fn select_value_types() {
+        let result = run_query(create_router().await, "value_types").await;
         insta::assert_json_snapshot!(result);
     }
 }

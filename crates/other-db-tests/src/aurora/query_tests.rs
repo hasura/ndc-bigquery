@@ -357,3 +357,15 @@ mod native_queries {
         insta::assert_json_snapshot!(result);
     }
 }
+
+#[cfg(test)]
+mod types {
+    use crate::aurora::common::create_router;
+    use tests_common::request::run_query;
+
+    #[tokio::test]
+    async fn select_value_types() {
+        let result = run_query(create_router().await, "value_types").await;
+        insta::assert_json_snapshot!(result);
+    }
+}

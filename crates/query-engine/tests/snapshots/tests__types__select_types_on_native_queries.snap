@@ -1,0 +1,37 @@
+---
+source: crates/query-engine/tests/tests.rs
+expression: result
+---
+WITH "%NATIVE_QUERY_0_FOR_types" AS (
+  SELECT
+    cast($1 as date) as date,
+    cast($2 as time without time zone) as time,
+    cast($3 as time with time zone) as timetz,
+    cast($4 as timestamp without time zone) as timestamp,
+    cast($5 as timestamp with time zone) as timestamptz
+)
+SELECT
+  row_to_json("universe") AS "universe"
+FROM
+  (
+    SELECT
+      *
+    FROM
+      (
+        SELECT
+          coalesce(json_agg(row_to_json("rows")), '[]') AS "rows"
+        FROM
+          (
+            SELECT
+              "types"."date" AS "date",
+              "types"."time" AS "time",
+              "types"."timetz" AS "timetz",
+              "types"."timestamp" AS "timestamp",
+              "types"."timestamptz" AS "timestamptz"
+            FROM
+              "%NATIVE_QUERY_0_FOR_types" AS "types"
+          ) AS "rows"
+      ) AS "rows"
+  ) AS "universe"
+
+[(1, String("2021-12-21")), (2, String("02:35:59")), (3, String("02:35:59-07")), (4, String("2013-11-03 02:35:59")), (5, String("2013-11-03 02:35:59-07"))]

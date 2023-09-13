@@ -604,6 +604,133 @@
             "type": "character varying"
           }
         }
+      },
+      "value_types": {
+        "sql": "SELECT {{boolean}} as boolean, {{integer}} as integer, {{smallint}} as smallint, {{bigint}} as bigint, {{real}} as real, {{double precision}} as \"double precision\", {{numeric}} as numeric, {{character}} as character, {{character varying}} as \"character varying\", {{text}} as text, {{date}} as date, {{time}} as time, {{timetz}} as timetz, {{timestamp}} as timestamp, {{timestamptz}} as timestamptz",
+        "columns": {
+          "boolean": {
+            "name": "boolean",
+            "type": "boolean"
+          },
+          "smallint": {
+            "name": "smallint",
+            "type": "smallint"
+          },
+          "integer": {
+            "name": "integer",
+            "type": "integer"
+          },
+          "bigint": {
+            "name": "bigint",
+            "type": "bigint"
+          },
+          "real": {
+            "name": "real",
+            "type": "real"
+          },
+          "double precision": {
+            "name": "double precision",
+            "type": "double precision"
+          },
+          "numeric": {
+            "name": "numeric",
+            "type": "numeric"
+          },
+          "character": {
+            "name": "character",
+            "type": "character"
+          },
+          "character varying": {
+            "name": "character varying",
+            "type": "character varying"
+          },
+          "text": {
+            "name": "text",
+            "type": "text"
+          },
+          "date": {
+            "name": "date",
+            "type": "date"
+          },
+          "time": {
+            "name": "time",
+            "type": "time without time zone"
+          },
+          "timetz": {
+            "name": "timetz",
+            "type": "time with time zone"
+          },
+          "timestamp": {
+            "name": "timestamp",
+            "type": "timestamp without time zone"
+          },
+          "timestamptz": {
+            "name": "timestamptz",
+            "type": "timestamp with time zone"
+          }
+        },
+        "arguments": {
+          "boolean": {
+            "name": "boolean",
+            "type": "boolean"
+          },
+          "smallint": {
+            "name": "smallint",
+            "type": "smallint"
+          },
+          "integer": {
+            "name": "integer",
+            "type": "integer"
+          },
+          "bigint": {
+            "name": "bigint",
+            "type": "bigint"
+          },
+          "real": {
+            "name": "real",
+            "type": "real"
+          },
+          "double precision": {
+            "name": "double precision",
+            "type": "double precision"
+          },
+          "numeric": {
+            "name": "numeric",
+            "type": "numeric"
+          },
+          "character": {
+            "name": "character",
+            "type": "character"
+          },
+          "character varying": {
+            "name": "character varying",
+            "type": "character varying"
+          },
+          "text": {
+            "name": "text",
+            "type": "text"
+          },
+          "date": {
+            "name": "date",
+            "type": "date"
+          },
+          "time": {
+            "name": "time",
+            "type": "time without time zone"
+          },
+          "timetz": {
+            "name": "timetz",
+            "type": "time with time zone"
+          },
+          "timestamp": {
+            "name": "timestamp",
+            "type": "timestamp without time zone"
+          },
+          "timestamptz": {
+            "name": "timestamptz",
+            "type": "timestamp with time zone"
+          }
+        }
       }
     }
   },

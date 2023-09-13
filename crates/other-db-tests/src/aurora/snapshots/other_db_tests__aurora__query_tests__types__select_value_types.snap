@@ -1,0 +1,27 @@
+---
+source: crates/other-db-tests/src/aurora/query_tests.rs
+expression: result
+---
+[
+  {
+    "rows": [
+      {
+        "bigint": 245555555,
+        "boolean": true,
+        "character": "s",
+        "character varying": "character varying string",
+        "date": "2021-12-21",
+        "double precision": 2455.555,
+        "integer": 24555,
+        "numeric": 24.555,
+        "real": 24.555,
+        "smallint": 245,
+        "text": "textual text",
+        "time": "02:35:59",
+        "timestamp": "2013-11-03T02:35:59",
+        "timestamptz": "2013-11-03T09:35:59+00:00",
+        "timetz": "02:35:59-07"
+      }
+    ]
+  }
+]

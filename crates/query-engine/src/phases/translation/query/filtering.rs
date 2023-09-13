@@ -10,6 +10,7 @@ use super::operators;
 use super::relationships;
 use super::root;
 use super::values;
+use crate::metadata::database;
 use crate::phases::translation::sql;
 use crate::phases::translation::sql::helpers::simple_select;
 
@@ -78,6 +79,7 @@ pub fn translate_expression(
             value,
         } => {
             let mut joins = vec![];
+            let typ = infer_value_type(env, root_and_current_tables, &column, &operator)?;
             let (left, left_joins) = translate_comparison_target(
                 env,
                 state,
@@ -91,6 +93,7 @@ pub fn translate_expression(
                 next_free_name,
                 root_and_current_tables,
                 value,
+                typ,
             )?;
 
             joins.extend(left_joins);
@@ -109,6 +112,7 @@ pub fn translate_expression(
             operator,
             values,
         } => {
+            let typ = infer_value_type_array(env, root_and_current_tables, &column, &operator)?;
             let mut joins = vec![];
             let (left, left_joins) = translate_comparison_target(
                 env,
@@ -127,6 +131,7 @@ pub fn translate_expression(
                         next_free_name,
                         root_and_current_tables,
                         value.clone(),
+                        typ,
                     )?;
                     joins.extend(right_joins);
                     Ok(right)
@@ -389,13 +394,14 @@ fn translate_comparison_value(
     next_free_name: &mut u32,
     root_and_current_tables: &RootAndCurrentTables,
     value: models::ComparisonValue,
+    typ: database::ScalarType,
 ) -> Result<(sql::ast::Expression, Vec<sql::ast::Join>), Error> {
     match value {
         models::ComparisonValue::Column { column } => {
             translate_comparison_target(env, state, next_free_name, root_and_current_tables, column)
         }
         models::ComparisonValue::Scalar { value: json_value } => Ok((
-            sql::ast::Expression::Value(values::translate_json_value(&json_value)?),
+            sql::ast::Expression::Value(values::translate_json_value(&json_value, typ)?),
             vec![],
         )),
         models::ComparisonValue::Variable { name: var } => Ok((
@@ -535,5 +541,114 @@ pub fn translate_exists_in_collection(
                 select: Box::new(select),
             })
         }
+    }
+}
+
+/// Infer the type of the ComparisonValue column from the operator and the ComparisonTarget.
+fn infer_value_type(
+    env: &Env,
+    root_and_current_tables: &RootAndCurrentTables,
+    column: &models::ComparisonTarget,
+    operator: &models::BinaryComparisonOperator,
+) -> Result<database::ScalarType, Error> {
+    // For the operators we support at the moment, the type of the value should be
+    // the same as the type of the target.
+    match operators::translate_operator(operator)? {
+        sql::ast::BinaryOperator::Equals => {
+            get_comparison_target_type(env, root_and_current_tables, column)
+        }
+        sql::ast::BinaryOperator::NotEquals => {
+            get_comparison_target_type(env, root_and_current_tables, column)
+        }
+        sql::ast::BinaryOperator::LessThan => {
+            get_comparison_target_type(env, root_and_current_tables, column)
+        }
+        sql::ast::BinaryOperator::LessThanOrEqualTo => {
+            get_comparison_target_type(env, root_and_current_tables, column)
+        }
+        sql::ast::BinaryOperator::GreaterThan => {
+            get_comparison_target_type(env, root_and_current_tables, column)
+        }
+        sql::ast::BinaryOperator::GreaterThanOrEqualTo => {
+            get_comparison_target_type(env, root_and_current_tables, column)
+        }
+        sql::ast::BinaryOperator::Like => {
+            get_comparison_target_type(env, root_and_current_tables, column)
+        }
+        sql::ast::BinaryOperator::NotLike => {
+            get_comparison_target_type(env, root_and_current_tables, column)
+        }
+        sql::ast::BinaryOperator::CaseInsensitiveLike => {
+            get_comparison_target_type(env, root_and_current_tables, column)
+        }
+        sql::ast::BinaryOperator::NotCaseInsensitiveLike => {
+            get_comparison_target_type(env, root_and_current_tables, column)
+        }
+        sql::ast::BinaryOperator::Similar => {
+            get_comparison_target_type(env, root_and_current_tables, column)
+        }
+        sql::ast::BinaryOperator::NotSimilar => {
+            get_comparison_target_type(env, root_and_current_tables, column)
+        }
+        sql::ast::BinaryOperator::Regex => {
+            get_comparison_target_type(env, root_and_current_tables, column)
+        }
+        sql::ast::BinaryOperator::NotRegex => {
+            get_comparison_target_type(env, root_and_current_tables, column)
+        }
+        sql::ast::BinaryOperator::CaseInsensitiveRegex => {
+            get_comparison_target_type(env, root_and_current_tables, column)
+        }
+        sql::ast::BinaryOperator::NotCaseInsensitiveRegex => {
+            get_comparison_target_type(env, root_and_current_tables, column)
+        }
+    }
+}
+
+/// Infer the type of the ComparisonValue column from the operator and the ComparisonTarget.
+/// For array operators.
+fn infer_value_type_array(
+    env: &Env,
+    root_and_current_tables: &RootAndCurrentTables,
+    column: &models::ComparisonTarget,
+    operator: &models::BinaryArrayComparisonOperator,
+) -> Result<database::ScalarType, Error> {
+    match operator {
+        models::BinaryArrayComparisonOperator::In => {
+            get_comparison_target_type(env, root_and_current_tables, column)
+        }
+    }
+}
+
+/// Extract the scalar type of a comparison target
+fn get_comparison_target_type(
+    env: &Env,
+    root_and_current_tables: &RootAndCurrentTables,
+    column: &models::ComparisonTarget,
+) -> Result<database::ScalarType, Error> {
+    match column {
+        models::ComparisonTarget::RootCollectionColumn { name } => {
+            let column = env
+                .lookup_collection(&root_and_current_tables.root_table.name)?
+                .lookup_column(name)?;
+            Ok(column.r#type)
+        }
+        models::ComparisonTarget::Column { name, path } => match path.last() {
+            None => {
+                let column = env
+                    .lookup_collection(&root_and_current_tables.current_table.name)?
+                    .lookup_column(name)?;
+                Ok(column.r#type)
+            }
+            Some(last) => {
+                let column = env
+                    .lookup_collection(
+                        &env.lookup_relationship(&last.relationship)?
+                            .target_collection,
+                    )?
+                    .lookup_column(name)?;
+                Ok(column.r#type)
+            }
+        },
     }
 }

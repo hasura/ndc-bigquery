@@ -3,19 +3,19 @@
 use std::collections::BTreeMap;
 
 /// An EXPLAIN clause
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum Explain<'a> {
     Select(&'a Select),
 }
 
 /// A WITH clause
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct With {
     pub common_table_expressions: Vec<CommonTableExpression>,
 }
 
 /// A single Common Table Expression
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct CommonTableExpression {
     pub alias: TableAlias,
     pub column_names: Option<Vec<ColumnAlias>>,
@@ -23,13 +23,13 @@ pub struct CommonTableExpression {
 }
 
 /// The 'body' side of a Common Table Expression
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum CTExpr {
     RawSql(Vec<RawSql>),
 }
 
 /// Raw SQL written by a user which is opaque to us
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum RawSql {
     /// Raw SQL text
     RawText(String),
@@ -38,7 +38,7 @@ pub enum RawSql {
 }
 
 /// A SELECT clause
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct Select {
     pub with: With,
     pub select_list: SelectList,
@@ -51,14 +51,14 @@ pub struct Select {
 }
 
 /// A select list
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum SelectList {
     SelectList(Vec<(ColumnAlias, Expression)>),
     SelectStar,
 }
 
 /// A FROM clause
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum From {
     /// Select from a table reference
     Table {
@@ -73,7 +73,7 @@ pub enum From {
 }
 
 /// A JOIN clause
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum Join {
     /// LEFT OUTER JOIN LATERAL
     LeftOuterJoinLateral(LeftOuterJoinLateral),
@@ -84,43 +84,43 @@ pub enum Join {
 }
 
 /// A CROSS JOIN clause
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct CrossJoin {
     pub select: Box<Select>,
     pub alias: TableAlias,
 }
 
 /// A LEFT OUTER JOIN LATERAL clause
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct LeftOuterJoinLateral {
     pub select: Box<Select>,
     pub alias: TableAlias,
 }
 
 /// An INNER JOIN LATERAL clause
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct InnerJoinLateral {
     pub select: Box<Select>,
     pub alias: TableAlias,
 }
 
 /// A WHERE clause
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct Where(pub Expression);
 
 /// A GROUP BY clause, currently not in use
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct GroupBy {}
 
 /// An ORDER BY clause
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct OrderBy {
     pub elements: Vec<OrderByElement>,
 }
 
 // todo: should we also include option for specifying NULLS FIRST | NULLS LAST
 /// A single element in an ORDER BY clause
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct OrderByElement {
     pub target: Expression,
     pub direction: OrderByDirection,
@@ -141,7 +141,7 @@ pub struct Limit {
 }
 
 /// A scalar expression
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum Expression {
     /// AND clause
     And {
@@ -247,16 +247,39 @@ pub enum CountType {
     Distinct(ColumnReference),
 }
 
-/// Irreducable values
-#[derive(Debug, Clone, PartialEq, Eq)]
+/// Value
+#[derive(Debug, Clone, PartialEq)]
 pub enum Value {
-    Int4(i32),
+    Int8(i32),
+    Float8(f64),
     Bool(bool),
+    Character(String),
     String(String),
+    /// values that need to be cast
+    Cast {
+        value: String,
+        r#type: ScalarType,
+    },
     Null,
     Array(Vec<Value>),
     EmptyJsonArray,
     Variable(String),
+}
+
+/// Scalar type
+#[derive(Debug, Clone, PartialEq)]
+pub enum ScalarType {
+    Smallint,
+    Integer,
+    Bigint,
+    Real,
+    DoublePrecision,
+    Numeric,
+    Date,
+    TimeWithTimeZone,
+    TimeWithoutTimeZone,
+    TimestampWithTimeZone,
+    TimestampWithoutTimeZone,
 }
 
 /// A database schema name
