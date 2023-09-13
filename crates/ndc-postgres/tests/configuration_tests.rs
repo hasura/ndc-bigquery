@@ -18,11 +18,11 @@ const CONFIGURATION_QUERY: &str = include_str!("../src/configuration.sql");
 
 #[tokio::test]
 async fn test_configure() {
-    let args = configuration::DeploymentConfiguration {
+    let args = configuration::RawConfiguration {
         postgres_database_url: configuration::PostgresDatabaseUrls::SingleRegion(
             POSTGRESQL_CONNECTION_STRING.to_string(),
         ),
-        ..configuration::DeploymentConfiguration::empty()
+        ..configuration::RawConfiguration::empty()
     };
 
     let expected_value: serde_json::Value = {
@@ -51,7 +51,13 @@ async fn test_configure() {
 }
 
 #[tokio::test]
+async fn get_rawconfiguration_schema() {
+    let schema = schemars::schema_for!(configuration::RawConfiguration);
+    insta::assert_json_snapshot!(schema);
+}
+
+#[tokio::test]
 async fn get_configuration_schema() {
-    let schema = schemars::schema_for!(configuration::DeploymentConfiguration);
+    let schema = schemars::schema_for!(configuration::Configuration);
     insta::assert_json_snapshot!(schema);
 }

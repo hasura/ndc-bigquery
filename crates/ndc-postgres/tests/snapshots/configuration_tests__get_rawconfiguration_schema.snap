@@ -4,67 +4,43 @@ expression: schema
 ---
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Configuration",
-  "description": "User configuration, elaborated from a 'RawConfiguration'.",
+  "title": "RawConfiguration",
+  "description": "Initial configuration, just enough to connect to a database and elaborate a full 'Configuration'.",
   "type": "object",
   "required": [
-    "config"
+    "postgres_database_url",
+    "version"
   ],
   "properties": {
-    "config": {
-      "$ref": "#/definitions/RawConfiguration"
+    "version": {
+      "type": "integer",
+      "format": "uint32",
+      "minimum": 0.0
     },
-    "write_regions": {
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/RegionName"
-      }
+    "postgres_database_url": {
+      "$ref": "#/definitions/PostgresDatabaseUrls"
     },
-    "read_regions": {
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/RegionName"
-      }
+    "metadata": {
+      "default": {
+        "native_queries": {},
+        "tables": {}
+      },
+      "allOf": [
+        {
+          "$ref": "#/definitions/Metadata"
+        }
+      ]
+    },
+    "aggregate_functions": {
+      "default": {},
+      "allOf": [
+        {
+          "$ref": "#/definitions/AggregateFunctions"
+        }
+      ]
     }
   },
   "definitions": {
-    "RawConfiguration": {
-      "description": "Initial configuration, just enough to connect to a database and elaborate a full 'Configuration'.",
-      "type": "object",
-      "required": [
-        "postgres_database_url",
-        "version"
-      ],
-      "properties": {
-        "version": {
-          "type": "integer",
-          "format": "uint32",
-          "minimum": 0.0
-        },
-        "postgres_database_url": {
-          "$ref": "#/definitions/PostgresDatabaseUrls"
-        },
-        "metadata": {
-          "default": {
-            "native_queries": {},
-            "tables": {}
-          },
-          "allOf": [
-            {
-              "$ref": "#/definitions/Metadata"
-            }
-          ]
-        },
-        "aggregate_functions": {
-          "default": {},
-          "allOf": [
-            {
-              "$ref": "#/definitions/AggregateFunctions"
-            }
-          ]
-        }
-      }
-    },
     "PostgresDatabaseUrls": {
       "anyOf": [
         {
@@ -314,9 +290,6 @@ expression: schema
           "$ref": "#/definitions/ScalarType"
         }
       }
-    },
-    "RegionName": {
-      "type": "string"
     }
   }
 }

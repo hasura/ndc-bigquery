@@ -24,20 +24,20 @@ pub struct Citus {}
 #[async_trait]
 impl connector::Connector for Citus {
     /// RawConfiguration is what the user specifies as JSON
-    type RawConfiguration = configuration::DeploymentConfiguration;
+    type RawConfiguration = configuration::RawConfiguration;
     /// The type of validated configuration
-    type Configuration = configuration::DeploymentConfiguration;
+    type Configuration = configuration::Configuration;
     /// The type of unserializable state
     type State = configuration::State;
 
     fn make_empty_configuration() -> Self::RawConfiguration {
-        configuration::DeploymentConfiguration::empty()
+        configuration::RawConfiguration::empty()
     }
 
     /// Configure a configuration maybe?
     async fn update_configuration(
         args: &Self::RawConfiguration,
-    ) -> Result<configuration::DeploymentConfiguration, connector::UpdateConfigurationError> {
+    ) -> Result<configuration::RawConfiguration, connector::UpdateConfigurationError> {
         configuration::configure(args, CONFIGURATION_QUERY)
             .instrument(info_span!("Update configuration"))
             .await
@@ -77,7 +77,7 @@ impl connector::Connector for Citus {
     /// the number of idle connections in a connection pool
     /// can be polled but not updated directly.
     fn fetch_metrics(
-        _configuration: &configuration::DeploymentConfiguration,
+        _configuration: &configuration::Configuration,
         state: &configuration::State,
     ) -> Result<(), connector::FetchMetricsError> {
         metrics::update_pool_metrics(&state.pool, &state.metrics);

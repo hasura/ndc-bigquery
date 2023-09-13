@@ -24,23 +24,21 @@ pub struct Cockroach {}
 #[async_trait]
 impl connector::Connector for Cockroach {
     /// RawConfiguration is what the user specifies as JSON
-    type RawConfiguration = ndc_postgres::configuration::DeploymentConfiguration;
+    type RawConfiguration = ndc_postgres::configuration::RawConfiguration;
     /// The type of validated configuration
-    type Configuration = ndc_postgres::configuration::DeploymentConfiguration;
+    type Configuration = ndc_postgres::configuration::Configuration;
     /// The type of unserializable state
     type State = ndc_postgres::configuration::State;
 
     fn make_empty_configuration() -> Self::RawConfiguration {
-        ndc_postgres::configuration::DeploymentConfiguration::empty()
+        ndc_postgres::configuration::RawConfiguration::empty()
     }
 
     /// Configure a configuration maybe?
     async fn update_configuration(
         args: &Self::RawConfiguration,
-    ) -> Result<
-        ndc_postgres::configuration::DeploymentConfiguration,
-        connector::UpdateConfigurationError,
-    > {
+    ) -> Result<ndc_postgres::configuration::RawConfiguration, connector::UpdateConfigurationError>
+    {
         ndc_postgres::configuration::configure(args, CONFIGURATION_QUERY)
             .instrument(info_span!("Update configuration"))
             .await
@@ -80,7 +78,7 @@ impl connector::Connector for Cockroach {
     /// the number of idle connections in a connection pool
     /// can be polled but not updated directly.
     fn fetch_metrics(
-        _configuration: &ndc_postgres::configuration::DeploymentConfiguration,
+        _configuration: &ndc_postgres::configuration::Configuration,
         state: &ndc_postgres::configuration::State,
     ) -> Result<(), connector::FetchMetricsError> {
         ndc_postgres::metrics::update_pool_metrics(&state.pool, &state.metrics);

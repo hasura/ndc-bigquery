@@ -15,11 +15,15 @@ use super::configuration;
 /// This function implements the [schema endpoint](https://hasura.github.io/ndc-spec/specification/schema/index.html)
 /// from the NDC specification.
 pub async fn get_schema(
-    configuration::DeploymentConfiguration {
-        metadata,
-        aggregate_functions,
+    configuration::Configuration {
+        config:
+            configuration::RawConfiguration {
+                metadata,
+                aggregate_functions,
+                ..
+            },
         ..
-    }: &configuration::DeploymentConfiguration,
+    }: &configuration::Configuration,
 ) -> Result<models::SchemaResponse, connector::SchemaError> {
     let mut scalar_types: BTreeMap<String, models::ScalarType> = enum_iterator::all::<
         metadata::ScalarType,

@@ -14,11 +14,11 @@ const CONFIGURATION_QUERY: &str = include_str!("../src/configuration.sql");
 
 #[tokio::test]
 async fn test_configure() {
-    let args = ndc_postgres::configuration::DeploymentConfiguration {
+    let args = ndc_postgres::configuration::RawConfiguration {
         postgres_database_url: ndc_postgres::configuration::PostgresDatabaseUrls::SingleRegion(
             common::POSTGRESQL_CONNECTION_STRING.to_string(),
         ),
-        ..ndc_postgres::configuration::DeploymentConfiguration::empty()
+        ..ndc_postgres::configuration::RawConfiguration::empty()
     };
 
     let expected_value: serde_json::Value = {

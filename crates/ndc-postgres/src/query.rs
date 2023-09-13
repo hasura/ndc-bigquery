@@ -15,7 +15,7 @@ use super::configuration;
 /// This function implements the [query endpoint](https://hasura.github.io/ndc-spec/specification/queries/index.html)
 /// from the NDC specification.
 pub async fn query(
-    configuration: &configuration::DeploymentConfiguration,
+    configuration: &configuration::Configuration,
     state: &configuration::State,
     query_request: models::QueryRequest,
 ) -> Result<models::QueryResponse, connector::QueryError> {
@@ -27,19 +27,21 @@ pub async fn query(
         );
 
         // Compile the query.
-        let plan =
-            match phases::translation::query::translate(&configuration.metadata, query_request) {
-                Ok(plan) => Ok(plan),
-                Err(err) => {
-                    tracing::error!("{}", err);
-                    match err {
-                        phases::translation::query::error::Error::NotSupported(_) => {
-                            Err(connector::QueryError::UnsupportedOperation(err.to_string()))
-                        }
-                        _ => Err(connector::QueryError::InvalidRequest(err.to_string())),
+        let plan = match phases::translation::query::translate(
+            &configuration.config.metadata,
+            query_request,
+        ) {
+            Ok(plan) => Ok(plan),
+            Err(err) => {
+                tracing::error!("{}", err);
+                match err {
+                    phases::translation::query::error::Error::NotSupported(_) => {
+                        Err(connector::QueryError::UnsupportedOperation(err.to_string()))
                     }
+                    _ => Err(connector::QueryError::InvalidRequest(err.to_string())),
                 }
-            }?;
+            }
+        }?;
 
         // Execute the query.
         let result = phases::execution::execute(&state.pool, plan)
