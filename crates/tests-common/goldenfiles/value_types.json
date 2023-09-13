@@ -76,6 +76,11 @@
         "type": "column",
         "column": "timestamptz",
         "arguments": {}
+      },
+      "uuid": {
+        "type": "column",
+        "column": "uuid",
+        "arguments": {}
       }
     },
     "where": {
@@ -305,6 +310,21 @@
             "type": "scalar",
             "value": "2013-11-03 02:35:59-07"
           }
+        },
+        {
+          "type": "binary_comparison_operator",
+          "column": {
+            "type": "column",
+            "name": "uuid",
+            "path": []
+          },
+          "operator": {
+            "type": "equal"
+          },
+          "value": {
+            "type": "scalar",
+            "value": "7992fdfa-65b5-11ed-8612-6a8b11ef7372"
+          }
         }
       ]
     }
@@ -369,6 +389,10 @@
     "timestamptz": {
       "type": "literal",
       "value": "2013-11-03 02:35:59-07"
+    },
+    "uuid": {
+      "type": "literal",
+      "value": "7992fdfa-65b5-11ed-8612-6a8b11ef7372"
     }
   },
   "collection_relationships": {}

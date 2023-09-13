@@ -207,6 +207,7 @@ expression: schema
         "time without time zone",
         "timestamp with time zone",
         "timestamp without time zone",
+        "uuid",
         "any"
       ]
     },

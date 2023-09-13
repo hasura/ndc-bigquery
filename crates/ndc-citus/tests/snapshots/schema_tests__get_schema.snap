@@ -1254,6 +1254,48 @@ expression: result
         }
       },
       "update_operators": {}
+    },
+    "uuid": {
+      "aggregate_functions": {},
+      "comparison_operators": {
+        "_eq": {
+          "argument_type": {
+            "type": "named",
+            "name": "uuid"
+          }
+        },
+        "_gt": {
+          "argument_type": {
+            "type": "named",
+            "name": "uuid"
+          }
+        },
+        "_gte": {
+          "argument_type": {
+            "type": "named",
+            "name": "uuid"
+          }
+        },
+        "_lt": {
+          "argument_type": {
+            "type": "named",
+            "name": "uuid"
+          }
+        },
+        "_lte": {
+          "argument_type": {
+            "type": "named",
+            "name": "uuid"
+          }
+        },
+        "_neq": {
+          "argument_type": {
+            "type": "named",
+            "name": "uuid"
+          }
+        }
+      },
+      "update_operators": {}
     }
   },
   "object_types": {

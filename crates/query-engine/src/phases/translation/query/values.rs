@@ -104,6 +104,12 @@ pub fn translate_json_value(
                 r#type: sql::ast::ScalarType::TimestampWithoutTimeZone,
             }),
 
+            // uuid
+            database::ScalarType::Uuid => Ok(sql::ast::Value::Cast {
+                value: s.to_string(),
+                r#type: sql::ast::ScalarType::Uuid,
+            }),
+
             // Any will be passed as string for now
             database::ScalarType::Any => Ok(sql::ast::Value::String(s.to_string())),
 

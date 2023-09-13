@@ -606,7 +606,7 @@
         }
       },
       "value_types": {
-        "sql": "SELECT {{boolean}} as boolean, {{integer}} as integer, {{smallint}} as smallint, {{bigint}} as bigint, {{real}} as real, {{double precision}} as \"double precision\", {{numeric}} as numeric, {{character}} as character, {{character varying}} as \"character varying\", {{text}} as text, {{date}} as date, {{time}} as time, {{timetz}} as timetz, {{timestamp}} as timestamp, {{timestamptz}} as timestamptz",
+        "sql": "SELECT {{boolean}} as boolean, {{integer}} as integer, {{smallint}} as smallint, {{bigint}} as bigint, {{real}} as real, {{double precision}} as \"double precision\", {{numeric}} as numeric, {{character}} as character, {{character varying}} as \"character varying\", {{text}} as text, {{date}} as date, {{time}} as time, {{timetz}} as timetz, {{timestamp}} as timestamp, {{timestamptz}} as timestamptz, {{uuid}} as uuid",
         "columns": {
           "boolean": {
             "name": "boolean",
@@ -667,6 +667,10 @@
           "timestamptz": {
             "name": "timestamptz",
             "type": "timestamp with time zone"
+          },
+          "uuid": {
+            "name": "uuid",
+            "type": "uuid"
           }
         },
         "arguments": {
@@ -729,6 +733,10 @@
           "timestamptz": {
             "name": "timestamptz",
             "type": "timestamp with time zone"
+          },
+          "uuid": {
+            "name": "uuid",
+            "type": "uuid"
           }
         }
       }

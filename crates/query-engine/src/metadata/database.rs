@@ -35,6 +35,7 @@ pub enum ScalarType {
     TimestampWithTimeZone,
     #[serde(rename = "timestamp without time zone")]
     TimestampWithoutTimeZone,
+    Uuid,
     Any,
 }
 

@@ -280,6 +280,7 @@ pub enum ScalarType {
     TimeWithoutTimeZone,
     TimestampWithTimeZone,
     TimestampWithoutTimeZone,
+    Uuid,
 }
 
 /// A database schema name

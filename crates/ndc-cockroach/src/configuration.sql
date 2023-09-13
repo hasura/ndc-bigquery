@@ -61,6 +61,7 @@ from
                       when 'time without time zone' then 'time without time zone'
                       when 'timestamp with time zone' then 'timestamp with time zone'
                       when 'timestamp without time zone' then 'timestamp without time zone'
+                      when 'uuid' then 'uuid'
                       else 'any'
                     end
                   )
@@ -206,6 +207,7 @@ from
             when 'time without time zone' then 'time without time zone'
             when 'timestamp with time zone' then 'timestamp with time zone'
             when 'timestamp without time zone' then 'timestamp without time zone'
+            when 'uuid' then 'uuid'
             else 'any'
           end as scalar_type
           from information_schema.routines r) r

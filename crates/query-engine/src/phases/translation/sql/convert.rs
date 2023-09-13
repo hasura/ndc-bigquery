@@ -411,6 +411,7 @@ impl ScalarType {
             ScalarType::Real => sql.append_syntax("real"),
             ScalarType::DoublePrecision => sql.append_syntax("double precision"),
             ScalarType::Numeric => sql.append_syntax("numeric"),
+            ScalarType::Uuid => sql.append_syntax("uuid"),
         }
     }
 }
