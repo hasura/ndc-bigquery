@@ -10,6 +10,7 @@ pub enum Error {
     RelationshipNotFound(String),
     ArgumentNotFound(String),
     OperatorNotFound(String),
+    RelationshipArgumentWasOverriden(String),
     EmptyPathForStarCountAggregate,
     NoFields,
     TypeMismatch(serde_json::Value, database::ScalarType),
@@ -36,6 +37,9 @@ impl std::fmt::Display for Error {
             }
             Error::OperatorNotFound(operator) => {
                 write!(f, "Operator '{}' not found.", operator)
+            }
+            Error::RelationshipArgumentWasOverriden(key) => {
+                write!(f, "The relationship argument '{}' was defined as part of the relationship, but was overriden.", key)
             }
             Error::EmptyPathForStarCountAggregate => {
                 write!(f, "No path elements supplied for Star Count Aggregate")

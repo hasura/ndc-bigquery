@@ -41,10 +41,6 @@
         "id": {
           "type": "literal",
           "value": 300
-        },
-        "title": {
-          "type": "literal",
-          "value": "%Roll%"
         }
       }
     }

@@ -208,8 +208,17 @@ pub fn make_relationship_arguments(
         .collect::<Result<BTreeMap<String, models::Argument>, Error>>()?;
 
     let mut arguments = relationship_arguments;
-    // we assume that the caller arguments can override the relationship definition arguments.
-    arguments.extend(caller_arguments);
+
+    // We do not allow caller arguments to override relationship defined arguments,
+    // because those might be specified as permissions.
+    // We don't expect the engine to return such queries, but add this as a precaution.
+    for (key, value) in caller_arguments {
+        match arguments.insert(key.clone(), value) {
+            None => Ok(()),
+            Some(_) => Err(Error::RelationshipArgumentWasOverriden(key)),
+        }?;
+    }
+
     Ok(arguments)
 }
 
