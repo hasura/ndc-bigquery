@@ -1,45 +1,52 @@
 #!/usr/bin/env bash
-set -e -u
+set -e -u -o pipefail
 
 EXECUTABLE="$1"
 CONNECTION_STRING="$2"
 CHINOOK_DEPLOYMENT="$3"
 
-# start config server
-cargo run --bin "${EXECUTABLE}" --quiet -- configuration serve &
+# ensure we clean up
+function stop {
+  if [[ "${CONFIGURATION_SERVER_PID+x}" ]]; then
+    kill "$CONFIGURATION_SERVER_PID"
+  fi
+  if [[ "${NEW_FILE+x}" ]]; then
+    rm -f "$NEW_FILE"
+  fi
+}
+
+trap stop EXIT
+
+# start the configuration server
+cargo run --bin "$EXECUTABLE" --quiet -- configuration serve &
 CONFIGURATION_SERVER_PID=$!
-trap "kill $CONFIGURATION_SERVER_PID" EXIT
 ./scripts/wait-until --timeout=30 --report -- nc -z localhost 9100
 if ! kill -0 "$CONFIGURATION_SERVER_PID"; then
   echo >&2 'The server stopped abruptly.'
   exit 1
 fi
 
-# name for temp file
-CHINOOK_DEPLOYMENT_OLD="${CHINOOK_DEPLOYMENT}.old"
+# grab .postgres_database_url and .metadata.native_queries from the current file
+PRESERVED_DATA="$(jq '{"postgres_database_url": .postgres_database_url, "metadata": {"native_queries": .metadata.native_queries}}' "$CHINOOK_DEPLOYMENT")"
 
-# make a copy of the old file
-cp "${CHINOOK_DEPLOYMENT}" "${CHINOOK_DEPLOYMENT_OLD}"
+# create a temporary file for the output so we don't overwrite data by accident
+NEW_FILE="$(mktemp)"
 
-# pass connection string to config server to generate initial deployment from introspection
+# 1. Pass the connection string to the configuration server to generate the
+#    initial deployment from introspection
+# 2. Splice in the preserved data from above
+# 3. Format the file
+#
+# Because we `set -o pipefail` above, this will fail if any of the steps fail,
+# and we will abort without overwriting the original file.
 curl -fsS http://localhost:9100 \
-  | jq --arg postgres_database_url "${CONNECTION_STRING}" '. + {"postgres_database_url": $postgres_database_url, "version": 1, "metadata": {}, "aggregate_functions": {}}' \
+  | jq \
+    --arg postgres_database_url "$CONNECTION_STRING" \
+    '. + {"postgres_database_url": $postgres_database_url, "version": 1, "metadata": {}, "aggregate_functions": {}}' \
   | curl -fsS http://localhost:9100 -H 'Content-Type: application/json' -d @- \
-  | jq . \
-  > "${CHINOOK_DEPLOYMENT}"
+  | jq --argjson preserved_data "$PRESERVED_DATA" '. * $preserved_data' \
+  | prettier --parser=json \
+  > "$NEW_FILE"
 
-# grab .metadata.native_queries from the old file, and put it into original file
-cat "${CHINOOK_DEPLOYMENT}" \
-  | jq --arg old_native_queries "$(cat "${CHINOOK_DEPLOYMENT_OLD}" | jq '.metadata.native_queries')" '.metadata.native_queries |= ($old_native_queries | fromjson)' \
-  > "${CHINOOK_DEPLOYMENT}"
-
-# grab .postgres_database_url from the old file, and put it into original file
-cat "${CHINOOK_DEPLOYMENT}" \
-  | jq --arg old_url "$(cat "${CHINOOK_DEPLOYMENT_OLD}" | jq '.postgres_database_url')" '.postgres_database_url |= ($old_url | fromjson)' \
-  > "${CHINOOK_DEPLOYMENT}"
-
-# remove the temporary file
-rm "${CHINOOK_DEPLOYMENT_OLD}"
-
-# ensure the file is formatted correctly
-prettier --write "${CHINOOK_DEPLOYMENT}"
+# If the above command succeeded, overwrite the original file.
+mv -f "$NEW_FILE" "$CHINOOK_DEPLOYMENT"

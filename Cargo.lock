@@ -571,16 +571,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bbfc4744c1b8f2a09adc0e55242f60b1af195d88596bd8700be74418c056c555"
 
 [[package]]
-name = "e2e-tests"
-version = "0.1.0"
-dependencies = [
- "insta",
- "reqwest",
- "serde_json",
- "tokio",
-]
-
-[[package]]
 name = "either"
 version = "1.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"

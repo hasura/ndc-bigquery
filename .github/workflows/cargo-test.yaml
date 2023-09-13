@@ -208,7 +208,7 @@ jobs:
 
       - name: run tests
         run: |
-          cargo test --release -p other-db-tests
+          cargo test --release -p other-db-tests --all-features
         env:
           RUST_LOG: INFO
           AURORA_CONNECTION_STRING: ${{ secrets.AURORA_CONNECTION_STRING }}

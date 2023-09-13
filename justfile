@@ -111,7 +111,7 @@ test-other-dbs: create-aurora-deployment start-dependencies
     OTEL_SERVICE_NAME=postgres-ndc \
     cargo watch -i "**/snapshots/*" \
     -c \
-    -x 'test -p other-db-tests' \
+    -x 'test -p other-db-tests --all-features' \
     -x clippy \
     -x 'run --bin ndc-postgres -- serve --configuration {{AURORA_CHINOOK_DEPLOYMENT}}'
 
@@ -140,19 +140,29 @@ build:
 
 # run all tests
 test: start-dependencies start-cockroach-dependencies start-citus-dependencies create-aurora-deployment
-  RUST_LOG=DEBUG \
-    cargo test -p query-engine -p ndc-postgres -p ndc-cockroach -p ndc-citus -p other-db-tests
-
+  #!/usr/bin/env bash
+  # enable the "aurora" feature if the connection string is set
+  features=()
+  if [[ -n '{{AURORA_CONNECTION_STRING}}' ]]; then
+    features+=(--features aurora)
+  else
+    echo "$(tput bold)$(tput setaf 3)WARNING:$(tput sgr0) Skipping the Aurora tests because the connection string is unset."; \
+  fi
+  echo "$(tput bold)cargo test ${features[@]}$(tput sgr0)"
+  RUST_LOG=DEBUG cargo test "${features[@]}"
 
 # re-generate the deployment configuration file
 generate-chinook-configuration: build start-dependencies start-cockroach-dependencies start-citus-dependencies
-  ./scripts/generate-chinook-configuration.sh "ndc-postgres" '{{POSTGRESQL_CONNECTION_STRING}}' '{{POSTGRES_CHINOOK_DEPLOYMENT}}'
-  if [[ -n '{{AURORA_CONNECTION_STRING}}' ]]; then \
+  ./scripts/generate-chinook-configuration.sh 'ndc-postgres' '{{POSTGRESQL_CONNECTION_STRING}}' '{{POSTGRES_CHINOOK_DEPLOYMENT}}'
+  ./scripts/generate-chinook-configuration.sh 'ndc-citus' '{{CITUS_CONNECTION_STRING}}' '{{CITUS_CHINOOK_DEPLOYMENT}}'
+  ./scripts/generate-chinook-configuration.sh 'ndc-cockroach' '{{COCKROACH_CONNECTION_STRING}}' '{{COCKROACH_CHINOOK_DEPLOYMENT}}'
+  @ if [[ -n '{{AURORA_CONNECTION_STRING}}' ]]; then \
+    echo "$(tput bold)./scripts/generate-chinook-configuration.sh 'ndc-postgres' '{{AURORA_CONNECTION_STRING}}' '{{AURORA_CHINOOK_DEPLOYMENT_TEMPLATE}}'$(tput sgr0)"; \
     ./scripts/generate-chinook-configuration.sh "ndc-postgres" '{{AURORA_CONNECTION_STRING}}' '{{AURORA_CHINOOK_DEPLOYMENT_TEMPLATE}}'; \
+    just create-aurora-deployment; \
+  else \
+    echo "$(tput bold)$(tput setaf 3)WARNING:$(tput sgr0) Not updating the Aurora configuration because the connection string is unset."; \
   fi
-
-  # regenerate aurora deployment from template we've just updated
-  just create-aurora-deployment
 
 # run postgres + jaeger
 start-dependencies:
@@ -245,7 +255,7 @@ build-with-nix:
 build-docker-with-nix:
   #!/usr/bin/env bash
   if [[ '{{CONNECTOR_IMAGE_TAG}}' == 'dev' ]]; then
-    echo 'nix build .#ndc-postgres-docker | gunzip | docker load'
+    echo "$(tput bold)nix build .#ndc-postgres-docker | gunzip | docker load$(tput sgr0)"
     gunzip < "$(nix build --no-warn-dirty --no-link --print-out-paths '.#ndc-postgres-docker')" | docker load
   fi
 
@@ -253,7 +263,7 @@ build-docker-with-nix:
 build-aarch64-docker-with-nix:
   #!/usr/bin/env bash
   if [[ '{{CONNECTOR_IMAGE_TAG}}' == 'dev' ]]; then
-    echo 'nix build .#ndc-postgres-docker-aarch64-linux | gunzip | docker load'
+    echo "$(tput bold)nix build .#ndc-postgres-docker-aarch64-linux | gunzip | docker load$(tput sgr0)"
     gunzip < "$(nix build --no-warn-dirty --no-link --print-out-paths --system aarch64-linux '.#ndc-postgres-docker-aarch64-linux')" | docker load
   fi
 
@@ -261,6 +271,6 @@ build-aarch64-docker-with-nix:
 build-cockroach-aarch64-docker-with-nix:
   #!/usr/bin/env bash
   if [[ '{{CONNECTOR_IMAGE_TAG}}' == 'dev' ]]; then
-    echo 'nix build .#ndc-cockroach-docker-aarch64-linux | gunzip | docker load'
+    echo "$(tput bold)nix build .#ndc-cockroach-docker-aarch64-linux | gunzip | docker load$(tput sgr0)"
     gunzip < "$(nix build --no-warn-dirty --no-link --print-out-paths --system aarch64-linux '.#ndc-cockroach-docker-aarch64-linux')" | docker load
   fi
