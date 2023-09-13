@@ -13,10 +13,10 @@ let
   args = {
     name = image-name;
     created = "now";
-
+    contents = [ ndc-agent ];
     config = {
       Entrypoint = [
-        "${ndc-agent}/bin/${binary-name}"
+        "/bin/${binary-name}"
       ];
       ExposedPorts = { "8100/tcp" = { }; };
     } // extraConfig;
