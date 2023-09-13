@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-ndc-sdk = { git = "https://github.com/hasura/ndc-hub.git", rev = "dc82a99", package = "ndc-sdk" }
+ndc-sdk = { git = "https://github.com/hasura/ndc-hub.git", rev = "ee22391", package = "ndc-sdk" }
 query-engine = { path = "../query-engine" }
 ndc-postgres = { path = "../ndc-postgres" }
 

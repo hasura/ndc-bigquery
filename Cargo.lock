@@ -1333,7 +1333,7 @@ dependencies = [
 [[package]]
 name = "ndc-client"
 version = "0.1.0"
-source = "git+https://github.com/hasura/ndc-spec.git?tag=v0.1.0-rc.3#2ec596686e4ba76c055944eecffcd3f650387d98"
+source = "git+https://github.com/hasura/ndc-spec.git?tag=v0.1.0-rc.4#38e19b0cfe0518c08bfcf486507de2a67e08b30e"
 dependencies = [
  "async-trait",
  "indexmap 1.9.3",
@@ -1408,7 +1408,7 @@ dependencies = [
 [[package]]
 name = "ndc-sdk"
 version = "0.1.0"
-source = "git+https://github.com/hasura/ndc-hub.git?rev=dc82a99#dc82a99fa75ad8bef4b505fa649afe9ffaed8473"
+source = "git+https://github.com/hasura/ndc-hub.git?rev=ee22391#ee22391f488372d0ffaa24bf7ec8faf41ae45370"
 dependencies = [
  "async-trait",
  "axum",
@@ -1421,6 +1421,7 @@ dependencies = [
  "opentelemetry_api",
  "opentelemetry_sdk",
  "prometheus",
+ "reqwest",
  "schemars",
  "serde",
  "serde_json",
@@ -1430,13 +1431,14 @@ dependencies = [
  "tracing",
  "tracing-opentelemetry",
  "tracing-subscriber",
+ "url",
  "uuid",
 ]
 
 [[package]]
 name = "ndc-test"
 version = "0.1.0"
-source = "git+https://github.com/hasura/ndc-spec.git?tag=v0.1.0-rc.3#2ec596686e4ba76c055944eecffcd3f650387d98"
+source = "git+https://github.com/hasura/ndc-spec.git?tag=v0.1.0-rc.4#38e19b0cfe0518c08bfcf486507de2a67e08b30e"
 dependencies = [
  "async-trait",
  "clap",
