@@ -1,5 +1,0 @@
-query {
-  AlbumByID(AlbumId: 1) {
-    Title
-  }
-}

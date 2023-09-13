@@ -3,7 +3,6 @@ version = "0.1.0"
 
 [workspace]
 members = [
-  "crates/e2e-tests",
   "crates/ndc-citus",
   "crates/ndc-cockroach",
   "crates/ndc-postgres",
