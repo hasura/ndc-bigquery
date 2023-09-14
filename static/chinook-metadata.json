@@ -5,26 +5,26 @@
     "dataConnectorUrl": "http://localhost:8100",
     "schema": {
       "scalar_types": {
-        "String": {
+        "character varying": {
           "aggregate_functions": {},
           "comparison_operators": {
             "like": {
               "argument_type": {
                 "type": "named",
-                "name": "String"
+                "name": "character varying"
               }
             }
           },
           "update_operators": {}
         },
-        "Int": {
+        "integer": {
           "aggregate_functions": {
             "min": {
               "result_type": {
                 "type": "nullable",
                 "underlying_type": {
                   "type": "named",
-                  "name": "Int"
+                  "name": "integer"
                 }
               }
             },
@@ -33,7 +33,7 @@
                 "type": "nullable",
                 "underlying_type": {
                   "type": "named",
-                  "name": "Int"
+                  "name": "integer"
                 }
               }
             }
@@ -51,7 +51,7 @@
               "arguments": {},
               "type": {
                 "type": "named",
-                "name": "Int"
+                "name": "integer"
               }
             },
             "Name": {
@@ -59,7 +59,7 @@
               "arguments": {},
               "type": {
                 "type": "named",
-                "name": "String"
+                "name": "character varying"
               }
             }
           }
@@ -72,7 +72,7 @@
               "arguments": {},
               "type": {
                 "type": "named",
-                "name": "Int"
+                "name": "integer"
               }
             },
             "Title": {
@@ -80,7 +80,7 @@
               "arguments": {},
               "type": {
                 "type": "named",
-                "name": "String"
+                "name": "character varying"
               }
             },
             "ArtistId": {
@@ -88,7 +88,7 @@
               "arguments": {},
               "type": {
                 "type": "named",
-                "name": "Int"
+                "name": "integer"
               }
             }
           }
@@ -101,7 +101,7 @@
               "arguments": {},
               "type": {
                 "type": "named",
-                "name": "Int"
+                "name": "integer"
               }
             },
             "Name": {
@@ -109,7 +109,7 @@
               "arguments": {},
               "type": {
                 "type": "named",
-                "name": "String"
+                "name": "character varying"
               }
             },
             "AlbumId": {
@@ -117,7 +117,7 @@
               "arguments": {},
               "type": {
                 "type": "named",
-                "name": "Int"
+                "name": "integer"
               }
             }
           }
@@ -132,13 +132,13 @@
                   "description": "The cyling id",
                   "type": {
                     "type": "named",
-                    "name": "Int"
+                    "name": "integer"
                   }
                 }
               },
               "type": {
                 "type": "named",
-                "name": "Int"
+                "name": "integer"
               }
             },
             "Name": {
@@ -146,7 +146,7 @@
               "arguments": {},
               "type": {
                 "type": "named",
-                "name": "String"
+                "name": "character varying"
               }
             }
           }
@@ -200,7 +200,7 @@
               "description": "The ceiling id",
               "type": {
                 "type": "named",
-                "name": "Int"
+                "name": "integer"
               }
             }
           },
@@ -594,18 +594,35 @@
     ]
   },
   {
-    "kind": "DataConnectorScalarRepresentation",
-    "dataSource": "db",
-    "scalarType": "Int",
-    "representation": "Int"
+    "graphql": {
+      "typeName": "Int"
+    },
+    "kind": "ScalarType",
+    "name": "Int"
   },
   {
-    "kind": "DataConnectorScalarRepresentation",
     "dataSource": "db",
-    "scalarType": "String",
-    "representation": "String",
     "graphql": {
-      "ComparisonExpressionTypeName": "String_Comparison_Exp"
-    }
+      "comparisonExpressionTypeName": "integer_comparison"
+    },
+    "kind": "DataConnectorScalarRepresentation",
+    "representation": "Int",
+    "scalarType": "integer"
+  },
+  {
+    "graphql": {
+      "typeName": "String"
+    },
+    "kind": "ScalarType",
+    "name": "String"
+  },
+  {
+    "dataSource": "db",
+    "graphql": {
+      "comparisonExpressionTypeName": "character_varying_comparison"
+    },
+    "kind": "DataConnectorScalarRepresentation",
+    "representation": "String",
+    "scalarType": "character varying"
   }
 ]
