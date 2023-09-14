@@ -52,7 +52,7 @@ run-in-docker: build-docker-with-nix start-dependencies
   CONFIGURATION_SERVER_URL='http://localhost:9100/'
   ./scripts/wait-until --timeout=30 --report -- nc -z localhost 9100
   curl -fsS "$CONFIGURATION_SERVER_URL" \
-    | jq --arg postgres_database_url 'postgresql://postgres:password@postgres' '. + {"postgres_database_url": $postgres_database_url}' \
+    | jq --arg connection_uris 'postgresql://postgres:password@postgres' '. + {"connection_uris": $connection_uris}' \
     | curl -fsS "$CONFIGURATION_SERVER_URL" -H 'Content-Type: application/json' -d @- \
     > "$configuration_file"
 
@@ -193,7 +193,7 @@ create-aurora-deployment:
   docker compose -f ../v3-engine/docker-compose.yaml up -d jaeger
   # splice `AURORA_CONNECTION_STRING` into
   cat {{ AURORA_CHINOOK_DEPLOYMENT_TEMPLATE }} \
-    | jq '.postgres_database_url=(env | .AURORA_CONNECTION_STRING)' \
+    | jq '.connection_uris[0] =(env | .AURORA_CONNECTION_STRING)' \
     | prettier --parser=json \
     > {{ AURORA_CHINOOK_DEPLOYMENT }}
 

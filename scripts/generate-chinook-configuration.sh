@@ -26,8 +26,8 @@ if ! kill -0 "$CONFIGURATION_SERVER_PID"; then
   exit 1
 fi
 
-# grab .postgres_database_url and .metadata.native_queries from the current file
-PRESERVED_DATA="$(jq '{"postgres_database_url": .postgres_database_url, "metadata": {"native_queries": .metadata.native_queries}}' "$CHINOOK_DEPLOYMENT")"
+# grab .connection_uris and .metadata.native_queries from the current file
+PRESERVED_DATA="$(jq '{"connection_uris": .connection_uris, "metadata": {"native_queries": .metadata.native_queries}}' "$CHINOOK_DEPLOYMENT")"
 
 # create a temporary file for the output so we don't overwrite data by accident
 NEW_FILE="$(mktemp)"
@@ -41,8 +41,8 @@ NEW_FILE="$(mktemp)"
 # and we will abort without overwriting the original file.
 curl -fsS http://localhost:9100 \
   | jq \
-    --arg postgres_database_url "$CONNECTION_STRING" \
-    '. + {"postgres_database_url": $postgres_database_url, "version": 1, "metadata": {}, "aggregate_functions": {}}' \
+    --arg connection_uris "$CONNECTION_STRING" \
+    '. + {"connection_uris": [$connection_uris], "version": 1, "metadata": {}, "aggregate_functions": {}}' \
   | curl -fsS http://localhost:9100 -H 'Content-Type: application/json' -d @- \
   | jq --argjson preserved_data "$PRESERVED_DATA" '. * $preserved_data' \
   | prettier --parser=json \

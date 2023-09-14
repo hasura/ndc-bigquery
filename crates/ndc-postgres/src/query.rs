@@ -14,8 +14,8 @@ use super::configuration;
 ///
 /// This function implements the [query endpoint](https://hasura.github.io/ndc-spec/specification/queries/index.html)
 /// from the NDC specification.
-pub async fn query(
-    configuration: &configuration::Configuration,
+pub async fn query<'a>(
+    configuration: &configuration::InternalConfiguration<'a>,
     state: &configuration::State,
     query_request: models::QueryRequest,
 ) -> Result<models::QueryResponse, connector::QueryError> {
@@ -36,22 +36,21 @@ pub async fn query(
 }
 
 fn plan_query(
-    configuration: &configuration::Configuration,
+    configuration: &configuration::InternalConfiguration,
     state: &configuration::State,
     query_request: models::QueryRequest,
 ) -> Result<phases::translation::sql::execution_plan::ExecutionPlan, connector::QueryError> {
     let timer = state.metrics.time_query_plan();
-    let result =
-        phases::translation::query::translate(&configuration.config.metadata, query_request)
-            .map_err(|err| {
-                tracing::error!("{}", err);
-                match err {
-                    phases::translation::query::error::Error::NotSupported(_) => {
-                        connector::QueryError::UnsupportedOperation(err.to_string())
-                    }
-                    _ => connector::QueryError::InvalidRequest(err.to_string()),
+    let result = phases::translation::query::translate(configuration.metadata, query_request)
+        .map_err(|err| {
+            tracing::error!("{}", err);
+            match err {
+                phases::translation::query::error::Error::NotSupported(_) => {
+                    connector::QueryError::UnsupportedOperation(err.to_string())
                 }
-            });
+                _ => connector::QueryError::InvalidRequest(err.to_string()),
+            }
+        });
     timer.complete_with(result)
 }
 

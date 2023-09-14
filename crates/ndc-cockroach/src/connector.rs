@@ -68,6 +68,7 @@ impl connector::Connector for Cockroach {
         ndc_postgres::configuration::create_state(configuration, metrics)
             .instrument(info_span!("Initialise state"))
             .await
+            .map_err(|err| connector::InitializationError::Other(err.into()))
     }
 
     /// Update any metrics from the state
@@ -111,7 +112,10 @@ impl connector::Connector for Cockroach {
     async fn get_schema(
         configuration: &Self::Configuration,
     ) -> Result<models::SchemaResponse, connector::SchemaError> {
-        ndc_postgres::schema::get_schema(configuration).await
+        let conf = &configuration
+            .as_internal()
+            .map_err(|err| connector::SchemaError::Other(err.into()))?;
+        ndc_postgres::schema::get_schema(conf).await
     }
 
     /// Explain a query by creating an execution plan
@@ -123,7 +127,10 @@ impl connector::Connector for Cockroach {
         state: &Self::State,
         query_request: models::QueryRequest,
     ) -> Result<models::ExplainResponse, connector::ExplainError> {
-        ndc_postgres::explain::explain(configuration, state, query_request).await
+        let conf = &configuration
+            .as_internal()
+            .map_err(|err| connector::ExplainError::Other(err.into()))?;
+        ndc_postgres::explain::explain(conf, state, query_request).await
     }
 
     /// Execute a mutation
@@ -147,6 +154,9 @@ impl connector::Connector for Cockroach {
         state: &Self::State,
         query_request: models::QueryRequest,
     ) -> Result<models::QueryResponse, connector::QueryError> {
-        ndc_postgres::query::query(configuration, state, query_request).await
+        let conf = &configuration
+            .as_internal()
+            .map_err(|err| connector::QueryError::Other(err.into()))?;
+        ndc_postgres::query::query(conf, state, query_request).await
     }
 }

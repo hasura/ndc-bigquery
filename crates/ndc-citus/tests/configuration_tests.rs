@@ -19,9 +19,9 @@ const CONFIGURATION_QUERY: &str = include_str!("../../ndc-postgres/src/configura
 #[tokio::test]
 async fn test_configure() {
     let args = configuration::RawConfiguration {
-        postgres_database_url: configuration::PostgresDatabaseUrls::SingleRegion(
+        connection_uris: configuration::ConnectionUris::SingleRegion(vec![
             common::POSTGRESQL_CONNECTION_STRING.to_string(),
-        ),
+        ]),
         ..configuration::RawConfiguration::empty()
     };
 

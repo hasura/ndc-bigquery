@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "postgres_database_url": "postgresql://postgres:password@localhost:64002",
+  "connection_uris": ["this should be templated in by justfile"],
   "metadata": {
     "tables": {
       "Album": {

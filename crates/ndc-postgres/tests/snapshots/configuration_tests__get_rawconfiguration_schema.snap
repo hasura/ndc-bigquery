@@ -8,7 +8,7 @@ expression: schema
   "description": "Initial configuration, just enough to connect to a database and elaborate a full 'Configuration'.",
   "type": "object",
   "required": [
-    "postgres_database_url",
+    "connection_uris",
     "version"
   ],
   "properties": {
@@ -17,8 +17,8 @@ expression: schema
       "format": "uint32",
       "minimum": 0.0
     },
-    "postgres_database_url": {
-      "$ref": "#/definitions/PostgresDatabaseUrls"
+    "connection_uris": {
+      "$ref": "#/definitions/ConnectionUris"
     },
     "metadata": {
       "default": {
@@ -41,10 +41,13 @@ expression: schema
     }
   },
   "definitions": {
-    "PostgresDatabaseUrls": {
+    "ConnectionUris": {
       "anyOf": [
         {
-          "type": "string"
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         },
         {
           "$ref": "#/definitions/MultipleRegionsConnectionUrls"

@@ -16,8 +16,8 @@ use super::configuration;
 ///
 /// This function implements the [explain endpoint](https://hasura.github.io/ndc-spec/specification/explain.html)
 /// from the NDC specification.
-pub async fn explain(
-    configuration: &configuration::Configuration,
+pub async fn explain<'a>(
+    configuration: &configuration::InternalConfiguration<'a>,
     state: &configuration::State,
     query_request: models::QueryRequest,
 ) -> Result<models::ExplainResponse, connector::ExplainError> {
@@ -28,16 +28,14 @@ pub async fn explain(
         );
 
         // Compile the query.
-        let plan = match phases::translation::query::translate(
-            &configuration.config.metadata,
-            query_request,
-        ) {
-            Ok(plan) => Ok(plan),
-            Err(err) => {
-                tracing::error!("{}", err);
-                Err(connector::ExplainError::Other(err.to_string().into()))
-            }
-        }?;
+        let plan =
+            match phases::translation::query::translate(configuration.metadata, query_request) {
+                Ok(plan) => Ok(plan),
+                Err(err) => {
+                    tracing::error!("{}", err);
+                    Err(connector::ExplainError::Other(err.to_string().into()))
+                }
+            }?;
 
         // Execute an explain query.
         let (query, plan) = phases::execution::explain(&state.pool, plan)
