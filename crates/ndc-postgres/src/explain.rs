@@ -53,8 +53,7 @@ pub async fn explain(
                 }
             })?;
 
-        // assuming explain succeeded, increment counter
-        state.metrics.explain_total.inc();
+        state.metrics.record_successful_explain();
 
         let details =
             BTreeMap::from_iter([("SQL Query".into(), query), ("Execution Plan".into(), plan)]);

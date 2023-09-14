@@ -57,8 +57,7 @@ pub async fn query(
                 }
             })?;
 
-        // assuming query succeeded, increment counter
-        state.metrics.query_total.inc();
+        state.metrics.record_successful_query();
 
         Ok(result)
     }

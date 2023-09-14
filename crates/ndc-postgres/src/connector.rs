@@ -11,7 +11,7 @@ use tracing::{info_span, Instrument};
 use ndc_sdk::connector;
 use ndc_sdk::models;
 
-use super::{capabilities, configuration, explain, health, metrics, query, schema};
+use super::{capabilities, configuration, explain, health, query, schema};
 
 const CONFIGURATION_QUERY: &str = include_str!("configuration.sql");
 
@@ -77,7 +77,7 @@ impl connector::Connector for Postgres {
         _configuration: &configuration::Configuration,
         state: &configuration::State,
     ) -> Result<(), connector::FetchMetricsError> {
-        metrics::update_pool_metrics(&state.pool, &state.metrics);
+        state.metrics.update_pool_metrics(&state.pool);
         Ok(())
     }
 

@@ -12,7 +12,7 @@ use async_trait::async_trait;
 use ndc_sdk::connector;
 use ndc_sdk::models;
 
-use ndc_postgres::{capabilities, configuration, explain, health, metrics, query, schema};
+use ndc_postgres::{capabilities, configuration, explain, health, query, schema};
 
 use tracing::{info_span, Instrument};
 
@@ -80,7 +80,7 @@ impl connector::Connector for Citus {
         _configuration: &configuration::Configuration,
         state: &configuration::State,
     ) -> Result<(), connector::FetchMetricsError> {
-        metrics::update_pool_metrics(&state.pool, &state.metrics);
+        state.metrics.update_pool_metrics(&state.pool);
         Ok(())
     }
 

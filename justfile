@@ -120,7 +120,7 @@ watch-run: start-dependencies
   RUST_LOG=DEBUG \
     cargo watch -i "tests/snapshots/*" \
     -c \
-    -x 'run -- serve --configuration {{POSTGRES_CHINOOK_DEPLOYMENT}}'
+    -x 'run --bin ndc-postgres -- serve --configuration {{POSTGRES_CHINOOK_DEPLOYMENT}}'
 
 # Run ndc-postgres with rust-gdb.
 debug: start-dependencies

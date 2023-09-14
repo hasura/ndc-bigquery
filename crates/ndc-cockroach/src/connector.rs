@@ -81,7 +81,7 @@ impl connector::Connector for Cockroach {
         _configuration: &ndc_postgres::configuration::Configuration,
         state: &ndc_postgres::configuration::State,
     ) -> Result<(), connector::FetchMetricsError> {
-        ndc_postgres::metrics::update_pool_metrics(&state.pool, &state.metrics);
+        state.metrics.update_pool_metrics(&state.pool);
         Ok(())
     }
 

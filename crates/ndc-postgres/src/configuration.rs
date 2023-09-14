@@ -113,7 +113,9 @@ pub async fn create_state(
         connector::InitializationError::Other(InitializationError::UnableToCreatePool(e).into())
     })?;
 
-    let metrics = metrics::initialise_metrics(metrics_registry).await?;
+    let metrics = metrics::Metrics::initialize(metrics_registry)?;
+    metrics.set_pool_options_metrics(pool.options());
+
     Ok(State { pool, metrics })
 }
 
