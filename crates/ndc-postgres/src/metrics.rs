@@ -2,7 +2,7 @@
 
 use std::time::Duration;
 
-use prometheus::{Gauge, IntCounter, IntGauge, Registry};
+use prometheus::{Gauge, Histogram, HistogramTimer, IntCounter, IntGauge, Registry};
 
 use ndc_sdk::connector;
 
@@ -13,6 +13,8 @@ use super::configuration::InitializationError;
 pub struct Metrics {
     query_total: IntCounter,
     explain_total: IntCounter,
+    query_plan_time: Histogram,
+    query_execution_time: Histogram,
     pool_size: IntGauge,
     pool_idle_count: IntGauge,
     pool_active_count: IntGauge,
@@ -38,6 +40,18 @@ impl Metrics {
             metrics_registry,
             "postgres_ndc_explain_total",
             "Total successful explains.",
+        )?;
+
+        let query_plan_time = add_histogram_metric(
+            metrics_registry,
+            "postgres_ndc_query_plan_time",
+            "Time taken to plan a query for execution, in seconds.",
+        )?;
+
+        let query_execution_time = add_histogram_metric(
+            metrics_registry,
+            "postgres_ndc_query_execution_time",
+            "Time taken to execute an already-planned query, in seconds.",
         )?;
 
         let pool_size = add_int_gauge_metric(
@@ -91,6 +105,8 @@ impl Metrics {
         Ok(Self {
             query_total,
             explain_total,
+            query_plan_time,
+            query_execution_time,
             pool_size,
             pool_idle_count,
             pool_active_count,
@@ -108,6 +124,14 @@ impl Metrics {
 
     pub fn record_successful_explain(&self) {
         self.explain_total.inc()
+    }
+
+    pub fn time_query_plan(&self) -> Timer {
+        Timer(self.query_plan_time.start_timer())
+    }
+
+    pub fn time_query_execution(&self) -> Timer {
+        Timer(self.query_execution_time.start_timer())
     }
 
     // Set the metrics populated from the pool options.
@@ -184,6 +208,21 @@ fn add_gauge_metric(
     register_collector(metrics_registry, gauge)
 }
 
+/// Create a new histogram metric using the default buckets, and register it with the provided
+/// Prometheus Registry.
+fn add_histogram_metric(
+    metrics_registry: &mut prometheus::Registry,
+    metric_name: &str,
+    metric_description: &str,
+) -> Result<Histogram, connector::InitializationError> {
+    let histogram = Histogram::with_opts(prometheus::HistogramOpts::new(
+        metric_name,
+        metric_description,
+    ))
+    .map_err(wrap_prometheus_error)?;
+    register_collector(metrics_registry, histogram)
+}
+
 /// Register a new collector with the registry, and returns it for later use.
 fn register_collector<Collector: prometheus::core::Collector + std::clone::Clone + 'static>(
     metrics_registry: &mut Registry,
@@ -197,4 +236,24 @@ fn register_collector<Collector: prometheus::core::Collector + std::clone::Clone
 
 fn wrap_prometheus_error(err: prometheus::Error) -> connector::InitializationError {
     connector::InitializationError::Other(InitializationError::PrometheusError(err).into())
+}
+
+/// A wrapper around the Prometheus [HistogramTimer] that can make a decision
+/// on whether to record or not based on a result.
+pub struct Timer(HistogramTimer);
+
+impl Timer {
+    /// Stops the timer, recording if the result is `Ok`, and discarding it if
+    /// the result is an `Err`. It returns its input for convenience.
+    pub fn complete_with<T, E>(self, result: Result<T, E>) -> Result<T, E> {
+        match result {
+            Ok(_) => {
+                self.0.stop_and_record();
+            }
+            Err(_) => {
+                self.0.stop_and_discard();
+            }
+        };
+        result
+    }
 }

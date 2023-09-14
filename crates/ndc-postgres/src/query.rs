@@ -26,41 +26,51 @@ pub async fn query(
             query_request = ?query_request
         );
 
-        // Compile the query.
-        let plan = match phases::translation::query::translate(
-            &configuration.config.metadata,
-            query_request,
-        ) {
-            Ok(plan) => Ok(plan),
-            Err(err) => {
-                tracing::error!("{}", err);
-                match err {
-                    phases::translation::query::error::Error::NotSupported(_) => {
-                        Err(connector::QueryError::UnsupportedOperation(err.to_string()))
-                    }
-                    _ => Err(connector::QueryError::InvalidRequest(err.to_string())),
-                }
-            }
-        }?;
-
-        // Execute the query.
-        let result = phases::execution::execute(&state.pool, plan)
-            .await
-            .map_err(|err| match err {
-                phases::execution::Error::Query(err) => {
-                    tracing::error!("{}", err);
-                    connector::QueryError::Other(err.into())
-                }
-                phases::execution::Error::DB(err) => {
-                    tracing::error!("{}", err);
-                    connector::QueryError::Other(err.to_string().into())
-                }
-            })?;
-
+        let plan = plan_query(configuration, state, query_request)?;
+        let result = execute_query(state, plan).await?;
         state.metrics.record_successful_query();
-
         Ok(result)
     }
     .instrument(info_span!("/query"))
     .await
+}
+
+fn plan_query(
+    configuration: &configuration::Configuration,
+    state: &configuration::State,
+    query_request: models::QueryRequest,
+) -> Result<phases::translation::sql::execution_plan::ExecutionPlan, connector::QueryError> {
+    let timer = state.metrics.time_query_plan();
+    let result =
+        phases::translation::query::translate(&configuration.config.metadata, query_request)
+            .map_err(|err| {
+                tracing::error!("{}", err);
+                match err {
+                    phases::translation::query::error::Error::NotSupported(_) => {
+                        connector::QueryError::UnsupportedOperation(err.to_string())
+                    }
+                    _ => connector::QueryError::InvalidRequest(err.to_string()),
+                }
+            });
+    timer.complete_with(result)
+}
+
+async fn execute_query(
+    state: &configuration::State,
+    plan: phases::translation::sql::execution_plan::ExecutionPlan,
+) -> Result<models::QueryResponse, connector::QueryError> {
+    let timer = state.metrics.time_query_execution();
+    let result = phases::execution::execute(&state.pool, plan)
+        .await
+        .map_err(|err| match err {
+            phases::execution::Error::Query(err) => {
+                tracing::error!("{}", err);
+                connector::QueryError::Other(err.into())
+            }
+            phases::execution::Error::DB(err) => {
+                tracing::error!("{}", err);
+                connector::QueryError::Other(err.to_string().into())
+            }
+        });
+    timer.complete_with(result)
 }
