@@ -395,6 +395,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "acbf1af155f9b9ef647e42cdc158db4b64a1b61f743629225fde6f3e0be2a7c7"
 
 [[package]]
+name = "colored"
+version = "2.0.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2674ec482fbc38012cf31e6c42ba0177b431a0cb6f15fe40efa5aab1bda516f6"
+dependencies = [
+ "is-terminal",
+ "lazy_static",
+ "windows-sys 0.48.0",
+]
+
+[[package]]
 name = "console"
 version = "0.15.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1329,7 +1340,7 @@ dependencies = [
 [[package]]
 name = "ndc-client"
 version = "0.1.0"
-source = "git+https://github.com/hasura/ndc-spec.git?tag=v0.1.0-rc.4#38e19b0cfe0518c08bfcf486507de2a67e08b30e"
+source = "git+https://github.com/hasura/ndc-spec.git?tag=v0.1.0-rc.5#0842f61fc5e29d19994ff3439abb8d7eabc28449"
 dependencies = [
  "async-trait",
  "indexmap 1.9.3",
@@ -1404,13 +1415,14 @@ dependencies = [
 [[package]]
 name = "ndc-sdk"
 version = "0.1.0"
-source = "git+https://github.com/hasura/ndc-hub.git?rev=ee22391#ee22391f488372d0ffaa24bf7ec8faf41ae45370"
+source = "git+https://github.com/hasura/ndc-hub.git?rev=4364624#4364624f7b7beb00517ca40c3913b455677ee11e"
 dependencies = [
  "async-trait",
  "axum",
  "axum-macros",
  "clap",
  "ndc-client",
+ "ndc-test",
  "opentelemetry",
  "opentelemetry-otlp",
  "opentelemetry-semantic-conventions",
@@ -1434,10 +1446,11 @@ dependencies = [
 [[package]]
 name = "ndc-test"
 version = "0.1.0"
-source = "git+https://github.com/hasura/ndc-spec.git?tag=v0.1.0-rc.4#38e19b0cfe0518c08bfcf486507de2a67e08b30e"
+source = "git+https://github.com/hasura/ndc-spec.git?tag=v0.1.0-rc.5#0842f61fc5e29d19994ff3439abb8d7eabc28449"
 dependencies = [
  "async-trait",
  "clap",
+ "colored",
  "indexmap 1.9.3",
  "ndc-client",
  "proptest",
@@ -3084,6 +3097,7 @@ dependencies = [
  "http",
  "http-body",
  "http-range-header",
+ "mime",
  "pin-project-lite",
  "tower-layer",
  "tower-service",
