@@ -23,3 +23,6 @@ generated/
 # nix outputs
 /result
 /result-*
+
+# deployments created for testing
+static/temp-deploys/*.json

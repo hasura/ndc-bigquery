@@ -16,7 +16,7 @@ pub async fn create_router() -> axum::Router {
 
     // work out where the deployment configs live
     let test_deployment_file =
-        tests_common::deployment::get_deployment_file(CHINOOK_DEPLOYMENT_PATH);
+        tests_common::deployment::helpers::get_path_from_project_root(CHINOOK_DEPLOYMENT_PATH);
 
     // initialise server state with the static configuration.
     let state = ndc_sdk::default_main::init_server_state::<connector::Postgres>(

@@ -10,7 +10,7 @@ use similar_asserts::assert_eq;
 
 use ndc_postgres::configuration;
 
-use tests_common::deployment::get_deployment_file;
+use tests_common::deployment::helpers::get_path_from_project_root;
 
 const POSTGRESQL_CONNECTION_STRING: &str = "postgresql://postgres:password@localhost:64002";
 const CHINOOK_DEPLOYMENT_PATH: &str = "static/chinook-deployment.json";
@@ -26,8 +26,8 @@ async fn test_configure() {
     };
 
     let expected_value: serde_json::Value = {
-        let file =
-            fs::File::open(get_deployment_file(CHINOOK_DEPLOYMENT_PATH)).expect("fs::File::open");
+        let file = fs::File::open(get_path_from_project_root(CHINOOK_DEPLOYMENT_PATH))
+            .expect("fs::File::open");
         let mut result: serde_json::Value =
             serde_json::from_reader(file).expect("serde_json::from_reader");
 
