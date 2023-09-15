@@ -1911,6 +1911,7 @@ dependencies = [
  "indexmap 1.9.3",
  "insta",
  "ndc-sdk",
+ "prometheus",
  "schemars",
  "serde",
  "serde_json",

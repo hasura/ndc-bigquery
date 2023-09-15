@@ -59,7 +59,7 @@ async fn execute_query(
     plan: phases::translation::sql::execution_plan::ExecutionPlan,
 ) -> Result<models::QueryResponse, connector::QueryError> {
     let timer = state.metrics.time_query_execution();
-    let result = phases::execution::execute(&state.pool, plan)
+    let result = phases::execution::execute(&state.pool, &state.metrics, plan)
         .await
         .map_err(|err| match err {
             phases::execution::Error::Query(err) => {

@@ -9,7 +9,7 @@ use thiserror::Error;
 
 use ndc_sdk::connector;
 
-use super::metrics;
+use query_engine::metrics;
 
 const CURRENT_VERSION: u32 = 1;
 
@@ -324,7 +324,8 @@ pub async fn create_state(
 ) -> Result<State, InitializationError> {
     let pool = create_pool(configuration).await?;
 
-    let metrics = metrics::Metrics::initialize(metrics_registry)?;
+    let metrics = metrics::Metrics::initialize(metrics_registry)
+        .map_err(InitializationError::MetricsError)?;
     metrics.set_pool_options_metrics(pool.options());
 
     Ok(State { pool, metrics })
@@ -350,8 +351,8 @@ async fn create_pool(configuration: &Configuration) -> Result<PgPool, Initializa
 pub enum InitializationError {
     #[error("unable to initialize connection pool: {0}")]
     UnableToCreatePool(sqlx::Error),
-    #[error("error initializing Prometheus metrics: {0}")]
-    PrometheusError(prometheus::Error),
+    #[error("error initializing metrics: {0}")]
+    MetricsError(metrics::Error),
     #[error("{0}")]
     ConfigurationError(ConfigurationError),
 }

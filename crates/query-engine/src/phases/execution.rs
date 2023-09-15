@@ -10,10 +10,12 @@ use sqlx::Row;
 use ndc_sdk::models;
 
 use super::translation::sql;
+use crate::metrics;
 
 /// Execute a query against postgres.
 pub async fn execute(
     pool: &sqlx::PgPool,
+    metrics: &metrics::Metrics,
     plan: sql::execution_plan::ExecutionPlan,
 ) -> Result<models::QueryResponse, Error> {
     let query = plan.query();
@@ -29,13 +31,13 @@ pub async fn execute(
     let rows: Vec<serde_json::Value> = match plan.variables {
         None => {
             let empty_map = BTreeMap::new();
-            let rows = execute_query(pool, &query, &empty_map).await?;
+            let rows = execute_query(pool, metrics, &query, &empty_map).await?;
             vec![rows]
         }
         Some(variable_sets) => {
             let mut sets_of_rows = vec![];
             for vars in &variable_sets {
-                let rows = execute_query(pool, &query, vars).await?;
+                let rows = execute_query(pool, metrics, &query, vars).await?;
                 sets_of_rows.push(rows);
             }
             sets_of_rows
@@ -112,16 +114,21 @@ pub async fn explain(
 /// Execute the query on one set of variables.
 async fn execute_query(
     pool: &sqlx::PgPool,
+    metrics: &metrics::Metrics,
     query: &sql::string::SQL,
     variables: &BTreeMap<String, serde_json::Value>,
 ) -> Result<serde_json::Value, Error> {
     // build query
     let sqlx_query = build_query_with_params(query, variables).await?;
 
+    let acquisition_timer = metrics.time_connection_acquisition_wait();
+    let connection_result = pool.acquire().await;
+    let mut connection = acquisition_timer.complete_with(connection_result)?;
+
     // run and fetch from the database
     let rows = sqlx_query
         .map(|row: sqlx::postgres::PgRow| row.get(0))
-        .fetch_one(pool)
+        .fetch_one(connection.as_mut())
         .await?;
 
     Ok(rows)
