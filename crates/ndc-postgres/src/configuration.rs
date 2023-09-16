@@ -144,6 +144,7 @@ impl RawConfiguration {
 /// Validate the user configuration.
 pub async fn validate_raw_configuration(
     rawconfiguration: &RawConfiguration,
+    raw_region_routing: &BTreeMap<String, Vec<String>>,
 ) -> Result<Configuration, connector::ValidateError> {
     if rawconfiguration.version != 1 {
         return Err(connector::ValidateError::ValidateError(vec![
@@ -236,12 +237,32 @@ pub async fn validate_raw_configuration(
         ),
         ConnectionUris::SingleRegion(_) => (vec![], vec![]),
     };
+    // Region-routing table
+    let region_routing = mk_region_routing_table(raw_region_routing);
+
     Ok(Configuration {
         config: rawconfiguration.clone(),
         write_regions,
         read_regions,
-        region_routing: BTreeMap::default(),
+        region_routing,
     })
+}
+
+fn mk_region_routing_table(
+    raw_region_routing: &BTreeMap<String, Vec<String>>,
+) -> BTreeMap<HasuraRegionName, Vec<RegionName>> {
+    raw_region_routing
+        .iter()
+        .map(|(hasura_region, application_regions)| {
+            (
+                HasuraRegionName(hasura_region.to_string()),
+                application_regions
+                    .iter()
+                    .map(|region| RegionName(region.to_string()))
+                    .collect::<Vec<_>>(),
+            )
+        })
+        .collect::<BTreeMap<HasuraRegionName, Vec<RegionName>>>()
 }
 
 /// Construct the deployment configuration by introspecting the database.

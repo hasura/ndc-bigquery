@@ -5,6 +5,8 @@
 //! The relevant types for configuration and state are defined in
 //! `super::configuration`.
 
+use std::collections::BTreeMap;
+
 use async_trait::async_trait;
 use tracing::{info_span, Instrument};
 
@@ -31,6 +33,14 @@ impl connector::Connector for Postgres {
         configuration::RawConfiguration::empty()
     }
 
+    fn get_read_regions(config: &Self::Configuration) -> Vec<String> {
+        config.read_regions.iter().map(|r| r.to_string()).collect()
+    }
+
+    fn get_write_regions(config: &Self::Configuration) -> Vec<String> {
+        config.write_regions.iter().map(|r| r.to_string()).collect()
+    }
+
     /// Configure a configuration maybe?
     async fn update_configuration(
         args: &Self::RawConfiguration,
@@ -44,8 +54,9 @@ impl connector::Connector for Postgres {
     /// returning a configuration error or a validated [`Connector::Configuration`].
     async fn validate_raw_configuration(
         configuration: &Self::RawConfiguration,
+        region_routing: &BTreeMap<String, Vec<String>>,
     ) -> Result<Self::Configuration, connector::ValidateError> {
-        configuration::validate_raw_configuration(configuration)
+        configuration::validate_raw_configuration(configuration, region_routing)
             .instrument(info_span!("Validate raw configuration"))
             .await
     }

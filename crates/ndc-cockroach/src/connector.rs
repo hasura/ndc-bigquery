@@ -8,6 +8,8 @@
 //! We use the entire implementation from Postgres for the time being, will swap things out as we
 //! need to
 
+use std::collections::BTreeMap;
+
 use async_trait::async_trait;
 use ndc_sdk::connector;
 use ndc_sdk::models;
@@ -34,6 +36,14 @@ impl connector::Connector for Cockroach {
         ndc_postgres::configuration::RawConfiguration::empty()
     }
 
+    fn get_read_regions(config: &Self::Configuration) -> Vec<String> {
+        config.read_regions.iter().map(|r| r.to_string()).collect()
+    }
+
+    fn get_write_regions(config: &Self::Configuration) -> Vec<String> {
+        config.write_regions.iter().map(|r| r.to_string()).collect()
+    }
+
     /// Configure a configuration maybe?
     async fn update_configuration(
         args: &Self::RawConfiguration,
@@ -48,8 +58,9 @@ impl connector::Connector for Cockroach {
     /// returning a configuration error or a validated [`Connector::Configuration`].
     async fn validate_raw_configuration(
         configuration: &Self::RawConfiguration,
+        region_routing: &BTreeMap<String, Vec<String>>,
     ) -> Result<Self::Configuration, connector::ValidateError> {
-        ndc_postgres::configuration::validate_raw_configuration(configuration)
+        ndc_postgres::configuration::validate_raw_configuration(configuration, region_routing)
             .instrument(info_span!("Validate raw configuration"))
             .await
     }
