@@ -3,7 +3,7 @@
     "kind": "DataSource",
     "name": "db",
     "dataConnectorUrl": {
-      "url": "http://postgres-ndc:8100"
+      "url": "http://localhost:8100"
     },
     "schema": {
       "scalar_types": {
