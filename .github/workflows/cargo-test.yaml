@@ -20,7 +20,7 @@ jobs:
 
       - name: run tests
         run: |
-          cargo test --release -p query-engine
+          cargo test --release -p query-engine-translation
         env:
           RUST_LOG: INFO
 

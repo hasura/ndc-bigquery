@@ -33,9 +33,9 @@ pub async fn execute(
 The translation step is essentially side-effect free - we use information from the request, as well as the information
 about the metadata to translate the query request into steps to run against the database.
 
-This process is currently found in the [phases/translation/query/](/crates/query-engine/src/phases/translation/query/) directory
+This process is currently found in the [translation/query/](/crates/query-engine/translation/src/translation/query/) directory
 and are split to several modules roughly mimicing the query parts as they are specified in the spec. The API
-is the following function in the [mod.rs](/crates/query-engine/src/phases/translation/query/mod.rs) file:
+is the following function in the [mod.rs](/crates/query-engine/translation/src/translation/query/mod.rs) file:
 
 ```rs
 pub fn translate(
@@ -62,7 +62,7 @@ Right now we don't expect `pre` and `post` to be populated, but it could be used
 
 ### SQL AST
 
-We maintain a SQL AST represented as Rust data types in [phases/translation/sql/ast.rs](/crates/query-engine/src/phases/translation/sql/ast.rs).
+We maintain a SQL AST represented as Rust data types in [sql/ast.rs](/crates/query-engine/sql/src/sql/ast.rs).
 We implement our own representation because we want more control over this core component of our application,
 and we want to implement exactly what we want and not more or less. Other external libraries such as `sqlparser`
 do not have the same goals as us, and we'll have to make compromises that will affect our codebase's complexity
@@ -88,18 +88,18 @@ that use them from GraphQL.
 
 Sometimes we'd like a shorthand to build specific repeating patterns,
 such as `SELECT coalesce(json_agg(row_to_json(<table_alias>)), '[]') AS <column_alias> FROM <query> as <table_alias>`.
-The [phases/translation/sql/helpers.rs](/crates/query-engine/src/phases/translation/sql/helpers.rs) module can come in handy to help
+The [sql/helpers.rs](/crates/query-engine/sql/src/sql/helpers.rs) module can come in handy to help
 codify certain SQL AST generation patterns. If you end up meeting a repeating long pattern that is used in multiple places,
 it might be a good candidate to codify it as a `helpers` function.
 
 ### SQL string
 
-The SQL string is a stringify representation of the SQL AST. It can be found in [phases/translation/sql/string.rs](/crates/query-engine/src/phases/translation/sql/string.rs).
+The SQL string is a stringify representation of the SQL AST. It can be found in [sql/string.rs](/crates/query-engine/sql/src/sql/string.rs).
 
 We separate the SQL to AST and string representation so we can write transformations and optimizations on the SQL AST.
 
 The SQL string representation should be generated from the SQL AST by pretty printing the result.
-The result of converting ([phases/translation/sql/convert.rs](/crates/query-engine/src/phases/translation/sql/convert.rs)) a sql ast to string should produce
+The result of converting ([sql/convert.rs](/crates/query-engine/sql/src/sql/convert.rs)) a sql ast to string should produce
 a query string that can be run against postgres as a parameterized query, as well as the parameters that are supplied by the user.
 
 Please use the API provided by the `SQL` type. It provides functions for constructing SQL strings in an easy way, such as appending syntax (like keywords and punctuation),
@@ -109,7 +109,7 @@ identifiers, and params. Don't use `append_syntax` for things that are not synta
 
 The query execution receives a pool and a plan and executes it against postgres. It then returns the results from the query part
 back to the caller of the function.
-The code can be found in [phases/execution.rs](/crates/query-engine/src/phases/execution.rs)
+The code can be found in [execution.rs](/crates/query-engine/execution/src/execution.rs)
 
 ```rs
 pub async fn execute(

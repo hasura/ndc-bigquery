@@ -1323,14 +1323,9 @@ dependencies = [
  "ndc-sdk",
  "ndc-test",
  "prometheus",
- "query-engine",
  "reqwest",
- "schemars",
- "serde",
- "serde_derive",
  "serde_json",
  "similar-asserts",
- "sqlx",
  "tests-common",
  "thiserror",
  "tokio",
@@ -1369,14 +1364,9 @@ dependencies = [
  "ndc-sdk",
  "ndc-test",
  "prometheus",
- "query-engine",
  "reqwest",
- "schemars",
- "serde",
- "serde_derive",
  "serde_json",
  "similar-asserts",
- "sqlx",
  "tests-common",
  "thiserror",
  "tokio",
@@ -1398,7 +1388,10 @@ dependencies = [
  "ndc-sdk",
  "ndc-test",
  "prometheus",
- "query-engine",
+ "query-engine-execution",
+ "query-engine-metadata",
+ "query-engine-sql",
+ "query-engine-translation",
  "reqwest",
  "schemars",
  "serde",
@@ -1722,7 +1715,6 @@ dependencies = [
  "ndc-postgres",
  "ndc-sdk",
  "prometheus",
- "query-engine",
  "schemars",
  "serde",
  "serde_derive",
@@ -1970,19 +1962,46 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "106dd99e98437432fed6519dedecfade6a06a73bb7b2a1e019fdd2bee5778d94"
 
 [[package]]
-name = "query-engine"
+name = "query-engine-execution"
+version = "0.1.0"
+dependencies = [
+ "ndc-sdk",
+ "prometheus",
+ "query-engine-sql",
+ "serde_json",
+ "sqlformat",
+ "sqlx",
+ "tracing",
+]
+
+[[package]]
+name = "query-engine-metadata"
+version = "0.1.0"
+dependencies = [
+ "enum-iterator",
+ "schemars",
+ "serde",
+]
+
+[[package]]
+name = "query-engine-sql"
+version = "0.1.0"
+dependencies = [
+ "serde_json",
+]
+
+[[package]]
+name = "query-engine-translation"
 version = "0.1.0"
 dependencies = [
  "enum-iterator",
  "indexmap 1.9.3",
  "insta",
  "ndc-sdk",
- "prometheus",
- "schemars",
- "serde",
+ "query-engine-metadata",
+ "query-engine-sql",
  "serde_json",
  "sqlformat",
- "sqlx",
  "tracing",
 ]
 

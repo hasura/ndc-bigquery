@@ -39,7 +39,7 @@ just run
 2. Query the connector via curl:
    ```
    curl -H "Content-Type: application/json" \
-     --data "@crates/ndc-postgres/tests/goldenfiles/select_where_variable.json" \
+     --data "@crates/tests/tests-common/goldenfiles/select_where_variable.json" \
      http://localhost:8100/query \
      | jq
    ```
@@ -170,8 +170,8 @@ Note that the `healthcheck` section refers to the binary `ndc-postgres`. This wi
 
 ## Write a database execution test
 
-1. Create a new file under `crates/tests-common/goldenfiles/<your-test-name>.json`
-2. Create a new test in `crates/ndc-postgres/tests/query_tests.rs` that looks like this:
+1. Create a new file under `crates/tests/tests-common/goldenfiles/<your-test-name>.json`
+2. Create a new test in `crates/connectors/ndc-postgres/tests/query_tests.rs` that looks like this:
    ```rs
    #[tokio::test]
    async fn select_5() {
@@ -184,10 +184,10 @@ Note that the `healthcheck` section refers to the binary `ndc-postgres`. This wi
 
 ## Write a SQL translation snapshot test
 
-1. Create a new folder under `crates/query-engine/tests/goldenfiles/<your-test-name>/`
+1. Create a new folder under `crates/query-engine/translation/tests/goldenfiles/<your-test-name>/`
 2. Create `request.json` and `tables.json` files in that folder to specify your
    request
-3. Create a new test in `crates/query-engine/tests/tests.rs` that looks like this:
+3. Create a new test in `crates/query-engine/translation/tests/tests.rs` that looks like this:
    ```rs
    #[tokio::test]
    async fn select_5() {

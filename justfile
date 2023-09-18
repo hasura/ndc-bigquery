@@ -78,7 +78,7 @@ dev: start-dependencies
     OTEL_SERVICE_NAME=postgres-ndc \
     cargo watch -i "**/snapshots/*" \
     -c \
-    -x 'test -p query-engine -p ndc-postgres' \
+    -x 'test -p query-engine-translation -p ndc-postgres' \
     -x clippy \
     -x 'run --bin ndc-postgres -- serve --configuration {{POSTGRES_CHINOOK_DEPLOYMENT}}'
 
@@ -89,7 +89,7 @@ dev-cockroach: start-cockroach-dependencies
     OTEL_SERVICE_NAME=cockroach-ndc \
     cargo watch -i "**/snapshots/*" \
     -c \
-    -x 'test -p query-engine -p ndc-cockroach' \
+    -x 'test -p query-engine-translation -p ndc-cockroach' \
     -x clippy \
     -x 'run --bin ndc-cockroach -- serve --configuration {{COCKROACH_CHINOOK_DEPLOYMENT}}'
 
@@ -100,7 +100,7 @@ dev-citus: start-citus-dependencies
     OTEL_SERVICE_NAME=citus-ndc \
     cargo watch -i "**/snapshots/*" \
     -c \
-    -x 'test -p query-engine -p ndc-citus' \
+    -x 'test -p query-engine-translation -p ndc-citus' \
     -x clippy \
     -x 'run --bin ndc-citus -- serve --configuration {{CITUS_CHINOOK_DEPLOYMENT}}'
 
