@@ -293,7 +293,7 @@ pub async fn configure(
         connection_uris: args.connection_uris.clone(),
         metadata: metadata::Metadata {
             tables,
-            native_queries: metadata::NativeQueries::default(),
+            native_queries: args.metadata.native_queries.clone(),
         },
         aggregate_functions,
     })
