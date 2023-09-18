@@ -8,8 +8,6 @@
 //! We use the entire implementation from Postgres for the time being, will swap things out as we
 //! need to
 
-use std::collections::BTreeMap;
-
 use async_trait::async_trait;
 use ndc_sdk::connector;
 use ndc_sdk::models;
@@ -57,9 +55,8 @@ impl connector::Connector for Citus {
     /// returning a configuration error or a validated [`Connector::Configuration`].
     async fn validate_raw_configuration(
         configuration: &Self::RawConfiguration,
-        region_routing: &BTreeMap<String, Vec<String>>,
     ) -> Result<Self::Configuration, connector::ValidateError> {
-        configuration::validate_raw_configuration(configuration, region_routing)
+        configuration::validate_raw_configuration(configuration)
             .instrument(info_span!("Validate raw configuration"))
             .await
     }

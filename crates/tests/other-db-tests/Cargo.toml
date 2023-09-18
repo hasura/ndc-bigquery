@@ -10,7 +10,7 @@ edition = "2021"
 aurora = []
 
 [dependencies]
-ndc-sdk = { git = "https://github.com/hasura/ndc-hub.git", rev = "abfc255", package = "ndc-sdk" }
+ndc-sdk = { git = "https://github.com/hasura/ndc-hub.git", rev = "e16b85a", package = "ndc-sdk" }
 ndc-postgres = { path = "../../connectors/ndc-postgres" }
 
 async-trait = "0.1.73"
