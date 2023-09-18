@@ -60,7 +60,7 @@ pub struct MultipleRegionsConnectionUrls {
 
 /// Name of a region that the ndc may be deployed into.
 #[derive(Debug, Clone, PartialOrd, PartialEq, Eq, Ord, Deserialize, Serialize, JsonSchema)]
-pub struct HasuraRegionName(String);
+pub struct HasuraRegionName(pub String);
 
 impl std::fmt::Display for HasuraRegionName {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
@@ -72,7 +72,7 @@ impl std::fmt::Display for HasuraRegionName {
 /// Name of a region that database servers may live in. These regions are distinct from the regions
 /// the ndc can live in, and they need not be related a priori.
 #[derive(Debug, Clone, PartialOrd, PartialEq, Eq, Ord, Deserialize, Serialize, JsonSchema)]
-pub struct RegionName(String);
+pub struct RegionName(pub String);
 
 impl std::fmt::Display for RegionName {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
