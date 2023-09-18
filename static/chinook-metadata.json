@@ -10,7 +10,7 @@
         "character varying": {
           "aggregate_functions": {},
           "comparison_operators": {
-            "like": {
+            "_like": {
               "argument_type": {
                 "type": "named",
                 "name": "character varying"
