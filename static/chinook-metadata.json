@@ -2,7 +2,9 @@
   {
     "kind": "DataSource",
     "name": "db",
-    "dataConnectorUrl": "http://localhost:8100",
+    "dataConnectorUrl": {
+      "url": "http://postgres-ndc:8100"
+    },
     "schema": {
       "scalar_types": {
         "character varying": {
@@ -418,7 +420,8 @@
     "typeName": "Artist",
     "permissions": {
       "admin": {
-        "fields": ["ArtistId", "Name"]
+        "fields": ["ArtistId", "Name"],
+        "filter": null
       }
     }
   },
@@ -427,7 +430,8 @@
     "typeName": "Album",
     "permissions": {
       "admin": {
-        "fields": ["AlbumId", "Title", "ArtistId"]
+        "fields": ["AlbumId", "Title", "ArtistId"],
+        "filter": null
       }
     }
   },
@@ -436,7 +440,8 @@
     "typeName": "Track",
     "permissions": {
       "admin": {
-        "fields": ["TrackId", "Name", "AlbumId"]
+        "fields": ["TrackId", "Name", "AlbumId"],
+        "filter": null
       }
     }
   },
@@ -445,7 +450,8 @@
     "typeName": "artist_below_id",
     "permissions": {
       "admin": {
-        "fields": ["ArtistId", "Name"]
+        "fields": ["ArtistId", "Name"],
+        "filter": null
       }
     }
   },
@@ -454,7 +460,8 @@
     "modelName": "Artists",
     "permissions": {
       "admin": {
-        "fields": ["ArtistId", "Name"]
+        "fields": ["ArtistId", "Name"],
+        "filter": null
       }
     }
   },
@@ -463,7 +470,8 @@
     "modelName": "Albums",
     "permissions": {
       "admin": {
-        "fields": ["AlbumId", "Title", "ArtistId"]
+        "fields": ["AlbumId", "Title", "ArtistId"],
+        "filter": null
       }
     }
   },
@@ -472,7 +480,8 @@
     "modelName": "Tracks",
     "permissions": {
       "admin": {
-        "fields": ["TrackId", "Name", "AlbumId"]
+        "fields": ["TrackId", "Name", "AlbumId"],
+        "filter": null
       }
     }
   },
@@ -481,7 +490,8 @@
     "modelName": "artist_below_id",
     "permissions": {
       "admin": {
-        "fields": ["ArtistId", "Name"]
+        "fields": ["ArtistId", "Name"],
+        "filter": null
       }
     }
   },
