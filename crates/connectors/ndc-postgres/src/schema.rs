@@ -1,6 +1,7 @@
 //! Implement the `/schema` endpoint to return the connector's schema.
-//! See the spec for further details:
-//! https://hasura.github.io/ndc-spec/specification/schema/index.html
+//! See the Hasura
+//! [Native Data Connector Specification](https://hasura.github.io/ndc-spec/specification/schema/index.html)
+//! for further details.
 
 use std::collections::BTreeMap;
 

@@ -1,3 +1,5 @@
+//! `/capabilities` endpoint for the connector.
+
 use ndc_sdk::models;
 
 /// Get the connector's capabilities.

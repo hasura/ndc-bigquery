@@ -53,7 +53,7 @@ impl connector::Connector for Cockroach {
     }
 
     /// Validate the raw configuration provided by the user,
-    /// returning a configuration error or a validated [`Connector::Configuration`].
+    /// returning a configuration error or a validated `connector::Configuration`.
     async fn validate_raw_configuration(
         configuration: &Self::RawConfiguration,
     ) -> Result<Self::Configuration, connector::ValidateError> {

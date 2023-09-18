@@ -1,3 +1,5 @@
+//! Health check endpoint for the connector.
+
 use ndc_sdk::connector;
 
 /// Check the health of the connector.

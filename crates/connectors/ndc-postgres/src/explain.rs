@@ -1,6 +1,7 @@
 //! Implement the `/explain` endpoint to return a query execution plan.
-//! See the spec for further details:
-//! https://hasura.github.io/ndc-spec/specification/explain.html
+//! See the Hasura
+//! [Native Data Connector Specification](https://hasura.github.io/ndc-spec/specification/explain.html)
+//! for further details.
 
 use std::collections::BTreeMap;
 

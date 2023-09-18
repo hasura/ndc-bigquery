@@ -24,12 +24,16 @@ pub struct NativeQueryInfo {
     pub arguments: BTreeMap<String, ColumnInfo>,
 }
 
+/// A part of a Native Query text, either raw text or a parameter.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum NativeQueryPart {
+    /// A raw text part
     Text(String),
+    /// A parameter
     Parameter(String),
 }
 
+/// A Native Query SQL after parsing.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct NativeQuerySql(pub Vec<NativeQueryPart>);
 

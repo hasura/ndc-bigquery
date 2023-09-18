@@ -138,6 +138,10 @@ flamegraph: start-dependencies
 build:
   cargo build --all-targets
 
+# build and open docs
+doc:
+  cargo doc --lib --no-deps --open
+
 # run all tests
 test: start-dependencies start-cockroach-dependencies start-citus-dependencies create-aurora-deployment
   #!/usr/bin/env bash

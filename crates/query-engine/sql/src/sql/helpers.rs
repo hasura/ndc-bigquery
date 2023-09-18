@@ -149,18 +149,21 @@ pub fn star_select(from: From) -> Select {
 
 /// given a set of rows and aggregate queries, combine them into
 /// one Select
-/// > SELECT row_to_json(<output_table_alias>) AS <output_column_alias>
-/// > FROM (
-/// >   SELECT *
-/// >     FROM (
-/// >       SELECT coalesce(json_agg(row_to_json(<row_column_alias>)), '[]') AS "rows"
-/// >         FROM (<row_select>) AS <row_table_alias>
-/// >       ) AS <row_column_alias>
-/// >         CROSS JOIN (
-/// >           SELECT coalesce(row_to_json(<aggregate_column_alias>), '[]') AS "aggregates"
-/// >             FROM (<aggregate_select>) AS <aggregate_table_alias>
-/// >           ) AS <aggregate_column_alias>
-/// >        ) AS <output_column_alias>
+///
+/// ```sql
+/// SELECT row_to_json(<output_table_alias>) AS <output_column_alias>
+/// FROM (
+///   SELECT *
+///     FROM (
+///       SELECT coalesce(json_agg(row_to_json(<row_column_alias>)), '[]') AS "rows"
+///         FROM (<row_select>) AS <row_table_alias>
+///       ) AS <row_column_alias>
+///         CROSS JOIN (
+///           SELECT coalesce(row_to_json(<aggregate_column_alias>), '[]') AS "aggregates"
+///             FROM (<aggregate_select>) AS <aggregate_table_alias>
+///           ) AS <aggregate_column_alias>
+///        ) AS <output_column_alias>
+/// ```
 ///
 /// The `row_select` and `aggregate_set` will not be included if they are not relevant
 pub fn select_rowset(
@@ -233,13 +236,15 @@ pub fn select_rowset(
 
 /// Wrap an query that returns multiple rows in
 ///
-/// > SELECT
-/// >   coalesce(json_agg(row_to_json(<table_alias>)), '[]')) AS <column_alias>
-/// > FROM <query> as <table_alias>
+/// ```sql
+/// SELECT
+///   coalesce(json_agg(row_to_json(<table_alias>)), '[]')) AS <column_alias>
+/// FROM <query> as <table_alias>
+/// ```
 ///
 /// - `row_to_json` takes a row and converts it to a json object.
 /// - `json_agg` aggregates the json objects to a json array.
-/// - `coalesce(<thing>, <otherwise>)` returns <thing> if it is not null, and <otherwise> if it is null.
+/// - `coalesce(<thing>, <otherwise>)` returns `<thing>` if it is not null, and `<otherwise>` if it is null.
 ///
 pub fn select_rows_as_json(
     row_select: Select,
@@ -268,12 +273,14 @@ pub fn select_rows_as_json(
 
 /// Wrap an query that returns a single row in
 ///
-/// > SELECT
-/// >   coalesce(row_to_json(<table_alias>), '{}'::json)) AS <column_alias>
-/// > FROM <query> as <table_alias>
+/// ```sql
+/// SELECT
+///   coalesce(row_to_json(<table_alias>), '{}'::json)) AS <column_alias>
+/// FROM <query> as <table_alias>
+/// ```
 ///
 /// - `row_to_json` takes a row and converts it to a json object.
-/// - `coalesce(<thing>, <otherwise>)` returns <thing> if it is not null, and <otherwise> if it is null.
+/// - `coalesce(<thing>, <otherwise>)` returns `<thing>` if it is not null, and `<otherwise>` if it is null.
 ///
 pub fn select_row_as_json_with_default(
     select: Select,

@@ -1,6 +1,7 @@
 //! Implement the `/query` endpoint to run a query against postgres.
-//! See the spec for further details:
-//! https://hasura.github.io/ndc-spec/specification/queries/index.html
+//! See the Hasura
+//! [Native Data Connector Specification](https://hasura.github.io/ndc-spec/specification/queries/index.html)
+//! for further details.
 
 use tracing::{info_span, Instrument};
 
