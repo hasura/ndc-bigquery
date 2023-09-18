@@ -116,10 +116,7 @@ impl connector::Connector for Postgres {
     async fn get_schema(
         configuration: &Self::Configuration,
     ) -> Result<models::SchemaResponse, connector::SchemaError> {
-        let conf = &configuration
-            .as_internal()
-            .map_err(|err| connector::SchemaError::Other(err.into()))?;
-        schema::get_schema(conf).await
+        schema::get_schema(configuration).await
     }
 
     /// Explain a query by creating an execution plan
