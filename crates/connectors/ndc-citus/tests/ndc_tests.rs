@@ -4,8 +4,6 @@ pub mod common;
 
 use std::net;
 
-// currently broken because we need to fix https://hasurahq.atlassian.net/browse/NDAT-888
-#[ignore]
 #[tokio::test]
 async fn test_connector() -> Result<(), Vec<ndc_test::FailedTest>> {
     let router = common::create_router().await;
