@@ -159,6 +159,18 @@ mod predicates {
     }
 
     #[tokio::test]
+    async fn select_where_or() {
+        let result = run_query(create_router().await, "select_where_or").await;
+        insta::assert_json_snapshot!(result);
+    }
+
+    #[tokio::test]
+    async fn select_where_and() {
+        let result = run_query(create_router().await, "select_where_and").await;
+        insta::assert_json_snapshot!(result);
+    }
+
+    #[tokio::test]
     async fn select_where_variable() {
         let result = run_query(create_router().await, "select_where_variable").await;
         insta::assert_json_snapshot!(result);

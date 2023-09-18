@@ -50,7 +50,7 @@ pub fn translate_expression(
                     translate_expression(env, state, next_free_name, root_and_current_tables, expr)
                 })
                 .try_fold(
-                    sql::ast::Expression::Value(sql::ast::Value::Bool(true)),
+                    sql::ast::Expression::Value(sql::ast::Value::Bool(false)),
                     |acc, expr| {
                         let (right, right_joins) = expr?;
                         acc_joins.extend(right_joins);
