@@ -17,7 +17,7 @@ use super::configuration;
 /// This function implements the [query endpoint](https://hasura.github.io/ndc-spec/specification/queries/index.html)
 /// from the NDC specification.
 pub async fn query<'a>(
-    configuration: &configuration::InternalConfiguration<'a>,
+    configuration: &configuration::RuntimeConfiguration<'a>,
     state: &configuration::State,
     query_request: models::QueryRequest,
 ) -> Result<models::QueryResponse, connector::QueryError> {
@@ -38,7 +38,7 @@ pub async fn query<'a>(
 }
 
 fn plan_query(
-    configuration: &configuration::InternalConfiguration,
+    configuration: &configuration::RuntimeConfiguration,
     state: &configuration::State,
     query_request: models::QueryRequest,
 ) -> Result<sql::execution_plan::ExecutionPlan, connector::QueryError> {

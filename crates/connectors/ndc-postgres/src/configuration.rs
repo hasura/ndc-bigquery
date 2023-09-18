@@ -289,25 +289,27 @@ pub async fn configure(
 /// This separation also decouples the implementation from things like API versioning concerns
 /// somewhat.
 ///
-/// Since the InternalConfiguration is reconstructed from a Configuration at every method call, and
+/// Since the RuntimeConfiguration is reconstructed from a Configuration at every method call, and
 /// since it consists of a sub-selection of components from the full Configuration, the fields are
 /// borrowed rather than owned.
 #[derive(Debug, PartialEq)]
-pub struct InternalConfiguration<'a> {
+pub struct RuntimeConfiguration<'a> {
     pub connection_uris: &'a str,
     pub metadata: &'a metadata::Metadata,
     pub aggregate_functions: &'a metadata::AggregateFunctions,
 }
 
 impl Configuration {
-    /// Apply the common interpretations on the Configuration API type into an InternalConfiguration.
+    /// Apply the common interpretations on the Configuration API type into an RuntimeConfiguration.
     /// This means things like specializing the configuration to the particular region the NDC runs in,
-    pub fn as_internal(self: &Configuration) -> Result<InternalConfiguration, ConfigurationError> {
+    pub fn as_runtime_configuration(
+        self: &Configuration,
+    ) -> Result<RuntimeConfiguration, ConfigurationError> {
         // Look-up region-specific connection strings.
         let connection_uris =
             select_connection_url(&self.config.connection_uris, &self.region_routing)?;
 
-        Ok(InternalConfiguration {
+        Ok(RuntimeConfiguration {
             connection_uris,
             aggregate_functions: &self.config.aggregate_functions,
             metadata: &self.config.metadata,

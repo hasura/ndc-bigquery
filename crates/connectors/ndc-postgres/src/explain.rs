@@ -18,7 +18,7 @@ use super::configuration;
 /// This function implements the [explain endpoint](https://hasura.github.io/ndc-spec/specification/explain.html)
 /// from the NDC specification.
 pub async fn explain<'a>(
-    configuration: &configuration::InternalConfiguration<'a>,
+    configuration: &configuration::RuntimeConfiguration<'a>,
     state: &configuration::State,
     query_request: models::QueryRequest,
 ) -> Result<models::ExplainResponse, connector::ExplainError> {

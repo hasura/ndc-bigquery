@@ -132,7 +132,7 @@ impl connector::Connector for Citus {
         query_request: models::QueryRequest,
     ) -> Result<models::ExplainResponse, connector::ExplainError> {
         let conf = &configuration
-            .as_internal()
+            .as_runtime_configuration()
             .map_err(|err| connector::ExplainError::Other(err.into()))?;
         explain::explain(conf, state, query_request).await
     }
@@ -159,7 +159,7 @@ impl connector::Connector for Citus {
         query_request: models::QueryRequest,
     ) -> Result<models::QueryResponse, connector::QueryError> {
         let conf = &configuration
-            .as_internal()
+            .as_runtime_configuration()
             .map_err(|err| connector::QueryError::Other(err.into()))?;
         query::query(conf, state, query_request).await
     }
