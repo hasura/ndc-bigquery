@@ -68,7 +68,7 @@ from
                     end
                   )
                 )
-              from information_schema.columns c
+              from information_schema.columns as c
               where
                 c.table_catalog = t.table_catalog
                 and c.table_schema = t.table_schema
@@ -118,7 +118,7 @@ from
                     'foreign_table',
                     (
                       select tu.table_name
-                      from information_schema.constraint_table_usage tu
+                      from information_schema.constraint_table_usage as tu
                       where
                         tu.constraint_catalog = c.constraint_catalog
                         and tu.constraint_schema = c.constraint_schema
@@ -129,8 +129,8 @@ from
                     (
                       select
                         json_object_agg(fc.column_name, uc.column_name)
-                      from information_schema.key_column_usage fc
-                      join information_schema.key_column_usage uc
+                      from information_schema.key_column_usage as fc
+                      join information_schema.key_column_usage as uc
                         on fc.position_in_unique_constraint = uc.ordinal_position
                       where
                         fc.constraint_catalog = rc.constraint_catalog
@@ -142,8 +142,8 @@ from
                     )
                   )
                 )
-              from information_schema.table_constraints c
-              join information_schema.referential_constraints rc on
+              from information_schema.table_constraints as c
+              join information_schema.referential_constraints as rc on
                 c.constraint_catalog = rc.constraint_catalog
                 and c.constraint_schema = rc.constraint_schema
                 and c.constraint_name = rc.constraint_name
@@ -156,10 +156,10 @@ from
             json_build_object()
           )
         )
-      ) tables
-    from information_schema.tables t
+      ) as tables
+    from information_schema.tables as t
     where t.table_schema = 'public'
-  ) _tables,
+  ) as _tables,
   (
     select
       json_object_agg(
@@ -167,7 +167,7 @@ from
         scalar_type,
         -- the set of functions
         routines
-      ) aggregate_functions
+      ) as aggregate_functions
     from
       (
         select
@@ -182,7 +182,7 @@ from
               'return_type',
               r.scalar_type
             )
-          ) routines
+          ) as routines
         from
           (
             select r.*,
@@ -209,8 +209,8 @@ from
                 when 'uuid' then 'uuid'
                 else 'any'
               end scalar_type
-            from information_schema.routines r
-          ) r
+            from information_schema.routines as r
+          ) as r
         -- get the parameters count for a routine
         left outer join lateral (
           select count(*) as count
@@ -223,5 +223,5 @@ from
         and routine_type is null -- aggregate functions don't have a routine type
         and r.scalar_type <> 'any'
         group by r.scalar_type
-      ) routines_by_type
-  ) _aggregate_functions
+      ) as routines_by_type
+  ) as _aggregate_functions
