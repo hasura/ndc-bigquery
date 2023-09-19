@@ -5,5 +5,5 @@ edition = "2021"
 
 [dependencies]
 enum-iterator = "1.4.1"
-schemars = { version = "0.8.12", features = ["smol_str"] }
+schemars = { version = "0.8.15", features = ["smol_str"] }
 serde = { version = "1.0.188", features = ["derive"] }
