@@ -1,5 +1,5 @@
 ---
-source: crates/ndc-postgres/tests/configuration_tests.rs
+source: crates/connectors/ndc-postgres/tests/configuration_tests.rs
 expression: schema
 ---
 {
@@ -53,6 +53,9 @@ expression: schema
         },
         "connection_uris": {
           "$ref": "#/definitions/ConnectionUris"
+        },
+        "pool_settings": {
+          "$ref": "#/definitions/PoolSettings"
         },
         "metadata": {
           "default": {
@@ -112,6 +115,46 @@ expression: schema
               "type": "string"
             }
           }
+        }
+      }
+    },
+    "PoolSettings": {
+      "description": "Settings for the PostgreSQL connection pool",
+      "type": "object",
+      "properties": {
+        "max_connections": {
+          "description": "maximum number of pool connections",
+          "default": 50,
+          "type": "integer",
+          "format": "uint32",
+          "minimum": 0.0
+        },
+        "pool_timeout": {
+          "description": "timeout for acquiring a connection from the pool (seconds)",
+          "default": 600,
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0.0
+        },
+        "idle_timeout": {
+          "description": "idle timeout for releasing a connection from the pool (seconds)",
+          "default": 180,
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "uint64",
+          "minimum": 0.0
+        },
+        "connection_lifetime": {
+          "description": "maximum lifetime for an individual connection (seconds)",
+          "default": 600,
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "uint64",
+          "minimum": 0.0
         }
       }
     },

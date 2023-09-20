@@ -22,6 +22,9 @@ pub struct RawConfiguration {
     pub version: u32,
     // Connection string for a Postgres-compatible database
     pub connection_uris: ConnectionUris,
+    #[serde(skip_serializing_if = "PoolSettings::is_default")]
+    #[serde(default)]
+    pub pool_settings: PoolSettings,
     #[serde(default)]
     pub metadata: metadata::Metadata,
     #[serde(default)]
@@ -131,11 +134,62 @@ pub fn select_first_connection_url(urls: &ConnectionUris) -> &str {
     }
 }
 
+/// Settings for the PostgreSQL connection pool
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
+pub struct PoolSettings {
+    /// maximum number of pool connections
+    #[serde(default = "max_connection_default")]
+    max_connections: u32,
+    /// timeout for acquiring a connection from the pool (seconds)
+    #[serde(default = "pool_timeout_default")]
+    pool_timeout: u64,
+    /// idle timeout for releasing a connection from the pool (seconds)
+    #[serde(default = "idle_timeout_default")]
+    idle_timeout: Option<u64>,
+    /// maximum lifetime for an individual connection (seconds)
+    #[serde(default = "connection_lifetime_default")]
+    connection_lifetime: Option<u64>,
+}
+
+impl PoolSettings {
+    fn is_default(&self) -> bool {
+        *self == PoolSettings::default()
+    }
+}
+
+/// <https://hasura.io/docs/latest/api-reference/syntax-defs/#pgpoolsettings>
+impl Default for PoolSettings {
+    fn default() -> PoolSettings {
+        PoolSettings {
+            max_connections: 50,
+            pool_timeout: 600,
+            idle_timeout: Some(180),
+            connection_lifetime: Some(600),
+        }
+    }
+}
+
+// for serde default //
+fn max_connection_default() -> u32 {
+    PoolSettings::default().max_connections
+}
+fn pool_timeout_default() -> u64 {
+    PoolSettings::default().pool_timeout
+}
+fn idle_timeout_default() -> Option<u64> {
+    PoolSettings::default().idle_timeout
+}
+fn connection_lifetime_default() -> Option<u64> {
+    PoolSettings::default().connection_lifetime
+}
+///////////////////////
+
 impl RawConfiguration {
     pub fn empty() -> Self {
         Self {
             version: CURRENT_VERSION,
             connection_uris: ConnectionUris::SingleRegion(vec![]),
+            pool_settings: PoolSettings::default(),
             metadata: metadata::Metadata::default(),
             aggregate_functions: metadata::AggregateFunctions::default(),
         }
@@ -275,6 +329,7 @@ pub async fn configure(
     Ok(RawConfiguration {
         version: 1,
         connection_uris: args.connection_uris.clone(),
+        pool_settings: args.pool_settings.clone(),
         metadata: metadata::Metadata {
             tables,
             native_queries: args.metadata.native_queries.clone(),
@@ -339,6 +394,7 @@ pub async fn create_state(
 }
 
 /// Create a connection pool with default settings.
+/// - <https://docs.rs/sqlx/latest/sqlx/pool/struct.PoolOptions.html>
 async fn create_pool(configuration: &Configuration) -> Result<PgPool, InitializationError> {
     let url = select_connection_url(
         &configuration.config.connection_uris,
@@ -346,8 +402,21 @@ async fn create_pool(configuration: &Configuration) -> Result<PgPool, Initializa
     )
     .map_err(InitializationError::ConfigurationError)?;
 
+    let pool_settings = &configuration.config.pool_settings;
+
     PgPoolOptions::new()
-        .max_connections(50)
+        .max_connections(pool_settings.max_connections)
+        .acquire_timeout(std::time::Duration::from_secs(pool_settings.pool_timeout))
+        .idle_timeout(
+            pool_settings
+                .idle_timeout
+                .map(std::time::Duration::from_secs),
+        )
+        .max_lifetime(
+            pool_settings
+                .connection_lifetime
+                .map(std::time::Duration::from_secs),
+        )
         .connect(url)
         .await
         .map_err(InitializationError::UnableToCreatePool)

@@ -133,8 +133,8 @@ debug: start-dependencies
 # Run the server and produce a flamegraph profile
 flamegraph: start-dependencies
   RUST_LOG=DEBUG \
-    cargo flamegraph --dev -- \
-    serve --configuration {{POSTGRES_CHINOOK_DEPLOYMENT}}
+    cargo flamegraph --bin ndc-postgres --dev -- \
+    serve --configuration {{POSTGRES_CHINOOK_DEPLOYMENT}} > /tmp/ndc-postgres.log
 
 # build everything
 build:
