@@ -19,9 +19,9 @@ const CONFIGURATION_QUERY: &str = include_str!("../src/configuration.sql");
 #[tokio::test]
 async fn test_configure() {
     let args = configuration::RawConfiguration {
-        connection_uris: configuration::ConnectionUris::SingleRegion(vec![
+        connection_uris: configuration::single_connection_uri(
             POSTGRESQL_CONNECTION_STRING.to_string(),
-        ]),
+        ),
         ..configuration::RawConfiguration::empty()
     };
 

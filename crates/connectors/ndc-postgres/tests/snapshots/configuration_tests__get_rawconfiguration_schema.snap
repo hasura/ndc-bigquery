@@ -47,17 +47,28 @@ expression: schema
     "ConnectionUris": {
       "anyOf": [
         {
+          "$ref": "#/definitions/SingleOrList_for_String"
+        },
+        {
+          "$ref": "#/definitions/MultipleRegionsConnectionUris"
+        }
+      ]
+    },
+    "SingleOrList_for_String": {
+      "description": "Type that accept both a single value and a list of values. Allows for a simpler format when a single value is the common case.",
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
           "type": "array",
           "items": {
             "type": "string"
           }
-        },
-        {
-          "$ref": "#/definitions/MultipleRegionsConnectionUrls"
         }
       ]
     },
-    "MultipleRegionsConnectionUrls": {
+    "MultipleRegionsConnectionUris": {
       "type": "object",
       "required": [
         "reads",
@@ -67,19 +78,13 @@ expression: schema
         "writes": {
           "type": "object",
           "additionalProperties": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
+            "$ref": "#/definitions/SingleOrList_for_String"
           }
         },
         "reads": {
           "type": "object",
           "additionalProperties": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
+            "$ref": "#/definitions/SingleOrList_for_String"
           }
         }
       }
