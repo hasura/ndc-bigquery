@@ -9,15 +9,18 @@
         "columns": {
           "AlbumId": {
             "name": "AlbumId",
-            "type": "bigint"
+            "type": "bigint",
+            "nullable": "NonNullable"
           },
           "ArtistId": {
             "name": "ArtistId",
-            "type": "bigint"
+            "type": "bigint",
+            "nullable": "NonNullable"
           },
           "Title": {
             "name": "Title",
-            "type": "character varying"
+            "type": "character varying",
+            "nullable": "NonNullable"
           }
         },
         "uniqueness_constraints": {
@@ -38,11 +41,13 @@
         "columns": {
           "ArtistId": {
             "name": "ArtistId",
-            "type": "bigint"
+            "type": "bigint",
+            "nullable": "NonNullable"
           },
           "Name": {
             "name": "Name",
-            "type": "character varying"
+            "type": "character varying",
+            "nullable": "Nullable"
           }
         },
         "uniqueness_constraints": {
@@ -56,55 +61,68 @@
         "columns": {
           "Address": {
             "name": "Address",
-            "type": "character varying"
+            "type": "character varying",
+            "nullable": "Nullable"
           },
           "City": {
             "name": "City",
-            "type": "character varying"
+            "type": "character varying",
+            "nullable": "Nullable"
           },
           "Company": {
             "name": "Company",
-            "type": "character varying"
+            "type": "character varying",
+            "nullable": "Nullable"
           },
           "Country": {
             "name": "Country",
-            "type": "character varying"
+            "type": "character varying",
+            "nullable": "Nullable"
           },
           "CustomerId": {
             "name": "CustomerId",
-            "type": "bigint"
+            "type": "bigint",
+            "nullable": "NonNullable"
           },
           "Email": {
             "name": "Email",
-            "type": "character varying"
+            "type": "character varying",
+            "nullable": "NonNullable"
           },
           "Fax": {
             "name": "Fax",
-            "type": "character varying"
+            "type": "character varying",
+            "nullable": "Nullable"
           },
           "FirstName": {
             "name": "FirstName",
-            "type": "character varying"
+            "type": "character varying",
+            "nullable": "NonNullable"
           },
           "LastName": {
             "name": "LastName",
-            "type": "character varying"
+            "type": "character varying",
+            "nullable": "NonNullable"
           },
           "Phone": {
             "name": "Phone",
-            "type": "character varying"
+            "type": "character varying",
+            "nullable": "Nullable"
           },
           "PostalCode": {
             "name": "PostalCode",
-            "type": "character varying"
+            "type": "character varying",
+            "nullable": "Nullable"
           },
           "State": {
             "name": "State",
-            "type": "character varying"
+            "type": "character varying",
+            "nullable": "Nullable"
           },
           "SupportRepId": {
             "name": "SupportRepId",
-            "type": "bigint"
+            "type": "bigint",
+            "nullable": "Nullable"
           }
         },
         "uniqueness_constraints": {
@@ -125,63 +143,78 @@
         "columns": {
           "Address": {
             "name": "Address",
-            "type": "character varying"
+            "type": "character varying",
+            "nullable": "Nullable"
           },
           "BirthDate": {
             "name": "BirthDate",
-            "type": "timestamp without time zone"
+            "type": "timestamp without time zone",
+            "nullable": "Nullable"
           },
           "City": {
             "name": "City",
-            "type": "character varying"
+            "type": "character varying",
+            "nullable": "Nullable"
           },
           "Country": {
             "name": "Country",
-            "type": "character varying"
+            "type": "character varying",
+            "nullable": "Nullable"
           },
           "Email": {
             "name": "Email",
-            "type": "character varying"
+            "type": "character varying",
+            "nullable": "Nullable"
           },
           "EmployeeId": {
             "name": "EmployeeId",
-            "type": "bigint"
+            "type": "bigint",
+            "nullable": "NonNullable"
           },
           "Fax": {
             "name": "Fax",
-            "type": "character varying"
+            "type": "character varying",
+            "nullable": "Nullable"
           },
           "FirstName": {
             "name": "FirstName",
-            "type": "character varying"
+            "type": "character varying",
+            "nullable": "NonNullable"
           },
           "HireDate": {
             "name": "HireDate",
-            "type": "timestamp without time zone"
+            "type": "timestamp without time zone",
+            "nullable": "Nullable"
           },
           "LastName": {
             "name": "LastName",
-            "type": "character varying"
+            "type": "character varying",
+            "nullable": "NonNullable"
           },
           "Phone": {
             "name": "Phone",
-            "type": "character varying"
+            "type": "character varying",
+            "nullable": "Nullable"
           },
           "PostalCode": {
             "name": "PostalCode",
-            "type": "character varying"
+            "type": "character varying",
+            "nullable": "Nullable"
           },
           "ReportsTo": {
             "name": "ReportsTo",
-            "type": "bigint"
+            "type": "bigint",
+            "nullable": "Nullable"
           },
           "State": {
             "name": "State",
-            "type": "character varying"
+            "type": "character varying",
+            "nullable": "Nullable"
           },
           "Title": {
             "name": "Title",
-            "type": "character varying"
+            "type": "character varying",
+            "nullable": "Nullable"
           }
         },
         "uniqueness_constraints": {
@@ -202,11 +235,13 @@
         "columns": {
           "GenreId": {
             "name": "GenreId",
-            "type": "bigint"
+            "type": "bigint",
+            "nullable": "NonNullable"
           },
           "Name": {
             "name": "Name",
-            "type": "character varying"
+            "type": "character varying",
+            "nullable": "Nullable"
           }
         },
         "uniqueness_constraints": {
@@ -220,39 +255,48 @@
         "columns": {
           "BillingAddress": {
             "name": "BillingAddress",
-            "type": "character varying"
+            "type": "character varying",
+            "nullable": "Nullable"
           },
           "BillingCity": {
             "name": "BillingCity",
-            "type": "character varying"
+            "type": "character varying",
+            "nullable": "Nullable"
           },
           "BillingCountry": {
             "name": "BillingCountry",
-            "type": "character varying"
+            "type": "character varying",
+            "nullable": "Nullable"
           },
           "BillingPostalCode": {
             "name": "BillingPostalCode",
-            "type": "character varying"
+            "type": "character varying",
+            "nullable": "Nullable"
           },
           "BillingState": {
             "name": "BillingState",
-            "type": "character varying"
+            "type": "character varying",
+            "nullable": "Nullable"
           },
           "CustomerId": {
             "name": "CustomerId",
-            "type": "bigint"
+            "type": "bigint",
+            "nullable": "NonNullable"
           },
           "InvoiceDate": {
             "name": "InvoiceDate",
-            "type": "timestamp without time zone"
+            "type": "timestamp without time zone",
+            "nullable": "NonNullable"
           },
           "InvoiceId": {
             "name": "InvoiceId",
-            "type": "bigint"
+            "type": "bigint",
+            "nullable": "NonNullable"
           },
           "Total": {
             "name": "Total",
-            "type": "numeric"
+            "type": "numeric",
+            "nullable": "NonNullable"
           }
         },
         "uniqueness_constraints": {
@@ -273,23 +317,28 @@
         "columns": {
           "InvoiceId": {
             "name": "InvoiceId",
-            "type": "bigint"
+            "type": "bigint",
+            "nullable": "NonNullable"
           },
           "InvoiceLineId": {
             "name": "InvoiceLineId",
-            "type": "bigint"
+            "type": "bigint",
+            "nullable": "NonNullable"
           },
           "Quantity": {
             "name": "Quantity",
-            "type": "bigint"
+            "type": "bigint",
+            "nullable": "NonNullable"
           },
           "TrackId": {
             "name": "TrackId",
-            "type": "bigint"
+            "type": "bigint",
+            "nullable": "NonNullable"
           },
           "UnitPrice": {
             "name": "UnitPrice",
-            "type": "numeric"
+            "type": "numeric",
+            "nullable": "NonNullable"
           }
         },
         "uniqueness_constraints": {
@@ -316,11 +365,13 @@
         "columns": {
           "MediaTypeId": {
             "name": "MediaTypeId",
-            "type": "bigint"
+            "type": "bigint",
+            "nullable": "NonNullable"
           },
           "Name": {
             "name": "Name",
-            "type": "character varying"
+            "type": "character varying",
+            "nullable": "Nullable"
           }
         },
         "uniqueness_constraints": {
@@ -334,11 +385,13 @@
         "columns": {
           "Name": {
             "name": "Name",
-            "type": "character varying"
+            "type": "character varying",
+            "nullable": "Nullable"
           },
           "PlaylistId": {
             "name": "PlaylistId",
-            "type": "bigint"
+            "type": "bigint",
+            "nullable": "NonNullable"
           }
         },
         "uniqueness_constraints": {
@@ -352,11 +405,13 @@
         "columns": {
           "PlaylistId": {
             "name": "PlaylistId",
-            "type": "bigint"
+            "type": "bigint",
+            "nullable": "NonNullable"
           },
           "TrackId": {
             "name": "TrackId",
-            "type": "bigint"
+            "type": "bigint",
+            "nullable": "NonNullable"
           }
         },
         "uniqueness_constraints": {
@@ -383,39 +438,48 @@
         "columns": {
           "AlbumId": {
             "name": "AlbumId",
-            "type": "bigint"
+            "type": "bigint",
+            "nullable": "Nullable"
           },
           "Bytes": {
             "name": "Bytes",
-            "type": "bigint"
+            "type": "bigint",
+            "nullable": "Nullable"
           },
           "Composer": {
             "name": "Composer",
-            "type": "character varying"
+            "type": "character varying",
+            "nullable": "Nullable"
           },
           "GenreId": {
             "name": "GenreId",
-            "type": "bigint"
+            "type": "bigint",
+            "nullable": "Nullable"
           },
           "MediaTypeId": {
             "name": "MediaTypeId",
-            "type": "bigint"
+            "type": "bigint",
+            "nullable": "NonNullable"
           },
           "Milliseconds": {
             "name": "Milliseconds",
-            "type": "bigint"
+            "type": "bigint",
+            "nullable": "NonNullable"
           },
           "Name": {
             "name": "Name",
-            "type": "character varying"
+            "type": "character varying",
+            "nullable": "NonNullable"
           },
           "TrackId": {
             "name": "TrackId",
-            "type": "bigint"
+            "type": "bigint",
+            "nullable": "NonNullable"
           },
           "UnitPrice": {
             "name": "UnitPrice",
-            "type": "numeric"
+            "type": "numeric",
+            "nullable": "NonNullable"
           }
         },
         "uniqueness_constraints": {

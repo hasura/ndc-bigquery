@@ -239,6 +239,14 @@ expression: schema
         },
         "type": {
           "$ref": "#/definitions/ScalarType"
+        },
+        "nullable": {
+          "default": "Nullable",
+          "allOf": [
+            {
+              "$ref": "#/definitions/Nullable"
+            }
+          ]
         }
       }
     },
@@ -265,6 +273,14 @@ expression: schema
         "timestamp without time zone",
         "uuid",
         "any"
+      ]
+    },
+    "Nullable": {
+      "description": "Can this column contain null values",
+      "type": "string",
+      "enum": [
+        "Nullable",
+        "NonNullable"
       ]
     },
     "UniquenessConstraints": {

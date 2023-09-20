@@ -181,11 +181,21 @@ pub struct TableInfo {
     pub foreign_relations: ForeignRelations,
 }
 
+/// Can this column contain null values
+#[derive(Debug, Clone, PartialEq, Eq, Default, Serialize, Deserialize, JsonSchema)]
+pub enum Nullable {
+    #[default]
+    Nullable,
+    NonNullable,
+}
+
 /// Information about a database column.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
 pub struct ColumnInfo {
     pub name: String,
     pub r#type: ScalarType,
+    #[serde(default)]
+    pub nullable: Nullable,
 }
 
 /// A mapping from the name of a unique constraint to its value.

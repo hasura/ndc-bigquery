@@ -63,7 +63,9 @@ from
                       when 'timestamp without time zone' then 'timestamp without time zone'
                       when 'uuid' then 'uuid'
                       else 'any'
-                    end
+                    end,
+                    'nullable',
+                    case c.is_nullable when 'YES' then 'Nullable' else 'NonNullable' end
                   )
                 )
               from information_schema.columns c

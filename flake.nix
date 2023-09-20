@@ -136,6 +136,7 @@
             pkgs.pkg-config
             pkgs.rnix-lsp
             pkgs.skopeo
+            pkgs.nodePackages.prettier
             rustToolchain
           ];
         };
