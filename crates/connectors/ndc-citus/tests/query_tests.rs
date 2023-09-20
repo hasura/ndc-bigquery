@@ -314,6 +314,12 @@ mod relationships {
         let result = run_query(create_router().await, "dup_array_relationship").await;
         insta::assert_json_snapshot!(result);
     }
+
+    #[tokio::test]
+    async fn very_nested_recursive_relationship() {
+        let result = run_query(create_router().await, "very_nested_recursive_relationship").await;
+        insta::assert_json_snapshot!(result);
+    }
 }
 
 mod native_queries {

@@ -87,6 +87,18 @@ fn dup_array_relationship() {
 }
 
 #[test]
+fn nested_recursive_relationship() {
+    let result = common::test_translation("nested_recursive_relationship").unwrap();
+    insta::assert_snapshot!(result);
+}
+
+#[test]
+fn very_nested_recursive_relationship() {
+    let result = common::test_translation("very_nested_recursive_relationship").unwrap();
+    insta::assert_snapshot!(result);
+}
+
+#[test]
 fn sorting_by_relationship_column() {
     let result = common::test_translation("sorting_by_relationship_column").unwrap();
     insta::assert_snapshot!(result);

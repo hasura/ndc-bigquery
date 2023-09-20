@@ -1,5 +1,5 @@
 ---
-source: crates/query-engine/tests/tests.rs
+source: crates/query-engine/translation/tests/tests.rs
 expression: result
 ---
 SELECT
@@ -16,12 +16,12 @@ FROM
           (
             SELECT
               "artist"."Name" AS "title",
-              "albums"."albums" AS "albums"
+              "%RELATIONSHIP_1_FOR_albums"."albums" AS "albums"
             FROM
               "public"."Artist" AS "artist"
               LEFT OUTER JOIN LATERAL (
                 SELECT
-                  row_to_json("albums") AS "albums"
+                  row_to_json("%RELATIONSHIP_1_FOR_albums") AS "albums"
                 FROM
                   (
                     SELECT
@@ -43,8 +43,8 @@ FROM
                               )
                           ) AS "rows"
                       ) AS "rows"
-                  ) AS "albums"
-              ) AS "albums" ON ('true')
+                  ) AS "%RELATIONSHIP_1_FOR_albums"
+              ) AS "%RELATIONSHIP_1_FOR_albums" ON ('true')
             WHERE
               EXISTS (
                 SELECT

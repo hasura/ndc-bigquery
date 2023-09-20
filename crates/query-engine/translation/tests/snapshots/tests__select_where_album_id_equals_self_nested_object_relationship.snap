@@ -1,5 +1,5 @@
 ---
-source: crates/query-engine/tests/tests.rs
+source: crates/query-engine/translation/tests/tests.rs
 expression: result
 ---
 SELECT
@@ -17,12 +17,12 @@ FROM
             SELECT
               "Track"."Name" AS "track",
               "Track"."AlbumId" AS "AlbumId",
-              "Album"."Album" AS "Album"
+              "%RELATIONSHIP_2_FOR_Album"."Album" AS "Album"
             FROM
               "public"."Track" AS "Track"
               LEFT OUTER JOIN LATERAL (
                 SELECT
-                  row_to_json("Album") AS "Album"
+                  row_to_json("%RELATIONSHIP_2_FOR_Album") AS "Album"
                 FROM
                   (
                     SELECT
@@ -35,12 +35,12 @@ FROM
                           (
                             SELECT
                               "Album"."Title" AS "album",
-                              "Artist"."Artist" AS "Artist"
+                              "%RELATIONSHIP_1_FOR_Artist"."Artist" AS "Artist"
                             FROM
                               "public"."Album" AS "Album"
                               LEFT OUTER JOIN LATERAL (
                                 SELECT
-                                  row_to_json("Artist") AS "Artist"
+                                  row_to_json("%RELATIONSHIP_1_FOR_Artist") AS "Artist"
                                 FROM
                                   (
                                     SELECT
@@ -63,8 +63,8 @@ FROM
                                               )
                                           ) AS "rows"
                                       ) AS "rows"
-                                  ) AS "Artist"
-                              ) AS "Artist" ON ('true')
+                                  ) AS "%RELATIONSHIP_1_FOR_Artist"
+                              ) AS "%RELATIONSHIP_1_FOR_Artist" ON ('true')
                             WHERE
                               (
                                 true
@@ -72,8 +72,8 @@ FROM
                               )
                           ) AS "rows"
                       ) AS "rows"
-                  ) AS "Album"
-              ) AS "Album" ON ('true')
+                  ) AS "%RELATIONSHIP_2_FOR_Album"
+              ) AS "%RELATIONSHIP_2_FOR_Album" ON ('true')
               INNER JOIN LATERAL (
                 SELECT
                   *

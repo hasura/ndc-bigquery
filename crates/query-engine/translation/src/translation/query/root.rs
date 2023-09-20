@@ -70,7 +70,8 @@ pub fn translate_rows_query(
     // translate fields to columns or relationships.
     let columns: Vec<(sql::ast::ColumnAlias, sql::ast::Expression)> = fields
         .into_iter()
-        .map(|(alias, field)| match field {
+        .enumerate()
+        .map(|(index, (alias, field))| match field {
             models::Field::Column { column, .. } => {
                 let column_info = collection_info.lookup_column(&column)?;
                 Ok(sql::helpers::make_column(
@@ -84,14 +85,15 @@ pub fn translate_rows_query(
                 relationship,
                 arguments,
             } => {
-                let table_alias = sql::helpers::make_table_alias(alias.clone());
+                let table_alias = sql::helpers::make_relationship_table_alias(index, &alias);
                 let column_alias = sql::helpers::make_column_alias(alias);
                 let column_name = sql::ast::ColumnReference::AliasedColumn {
                     table: sql::ast::TableReference::AliasedTable(table_alias.clone()),
                     column: column_alias.clone(),
                 };
                 join_fields.push(relationships::JoinFieldInfo {
-                    alias: table_alias,
+                    table_alias,
+                    column_alias: column_alias.clone(),
                     relationship_name: relationship,
                     arguments,
                     query: *query,

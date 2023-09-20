@@ -80,16 +80,19 @@ pub fn make_boolean_expression_table_alias(
 }
 
 /// Create column aliases using this function so we build everything in one place.
-/// We originally wanted indices, but we didn't end up using them.
-/// Leaving them here for now, but will probably remove them in the future.
 pub fn make_column_alias(name: String) -> ColumnAlias {
     ColumnAlias { name }
 }
 /// Create table aliases using this function so they get a unique index.
-/// We originally wanted indices, but we didn't end up using them.
-/// Leaving them here for now, but will probably remove them in the future.
 pub fn make_table_alias(name: String) -> TableAlias {
     TableAlias { name }
+}
+
+/// Create a table alias for left outer join lateral part.
+/// Provide an index and a source table name so we avoid name clashes,
+/// and get an alias.
+pub fn make_relationship_table_alias(index: usize, name: &String) -> TableAlias {
+    make_table_alias(format!("%RELATIONSHIP_{}_FOR_{}", index, name))
 }
 
 /// Create a table alias for order by target part.

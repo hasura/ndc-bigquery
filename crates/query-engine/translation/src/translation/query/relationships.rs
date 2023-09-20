@@ -10,7 +10,8 @@ use super::root;
 use query_engine_sql::sql;
 
 pub struct JoinFieldInfo {
-    pub alias: sql::ast::TableAlias,
+    pub table_alias: sql::ast::TableAlias,
+    pub column_alias: sql::ast::ColumnAlias,
     pub relationship_name: String,
     pub arguments: BTreeMap<String, models::RelationshipArgument>,
     pub query: models::Query,
@@ -118,8 +119,8 @@ pub fn translate_joins(
             // form a single JSON item shaped `{ rows: [], aggregates: {} }`
             // that matches the models::RowSet type
             let json_select = sql::helpers::select_rowset(
-                sql::helpers::make_column_alias(join_field.alias.name.clone()),
-                sql::helpers::make_table_alias(join_field.alias.name.clone()),
+                join_field.column_alias.clone(),
+                join_field.table_alias.clone(),
                 sql::helpers::make_table_alias("rows".to_string()),
                 sql::helpers::make_column_alias("rows".to_string()),
                 sql::helpers::make_table_alias("aggregates".to_string()),
@@ -130,7 +131,7 @@ pub fn translate_joins(
             Ok(sql::ast::Join::LeftOuterJoinLateral(
                 sql::ast::LeftOuterJoinLateral {
                     select: Box::new(json_select),
-                    alias: join_field.alias,
+                    alias: join_field.table_alias,
                 },
             ))
         })

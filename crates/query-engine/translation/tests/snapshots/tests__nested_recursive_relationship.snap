@@ -32,12 +32,12 @@ FROM
                         FROM
                           (
                             SELECT
-                              "%RELATIONSHIP_0_FOR_Tracks"."Tracks" AS "Tracks"
+                              "%RELATIONSHIP_0_FOR_Artist"."Artist" AS "Artist"
                             FROM
                               "public"."Album" AS "Album"
                               LEFT OUTER JOIN LATERAL (
                                 SELECT
-                                  row_to_json("%RELATIONSHIP_0_FOR_Tracks") AS "Tracks"
+                                  row_to_json("%RELATIONSHIP_0_FOR_Artist") AS "Artist"
                                 FROM
                                   (
                                     SELECT
@@ -49,18 +49,18 @@ FROM
                                         FROM
                                           (
                                             SELECT
-                                              "Track"."Name" AS "name"
+                                              "Artist"."Name" AS "name"
                                             FROM
-                                              "public"."Track" AS "Track"
+                                              "public"."Artist" AS "Artist"
                                             WHERE
                                               (
                                                 true
-                                                AND ("Album"."AlbumId" = "Track"."AlbumId")
+                                                AND ("Album"."ArtistId" = "Artist"."ArtistId")
                                               )
                                           ) AS "rows"
                                       ) AS "rows"
-                                  ) AS "%RELATIONSHIP_0_FOR_Tracks"
-                              ) AS "%RELATIONSHIP_0_FOR_Tracks" ON ('true')
+                                  ) AS "%RELATIONSHIP_0_FOR_Artist"
+                              ) AS "%RELATIONSHIP_0_FOR_Artist" ON ('true')
                             WHERE
                               (
                                 true
