@@ -29,8 +29,14 @@ pub async fn query<'a>(
             query_request = ?query_request
         );
 
-        let plan = plan_query(configuration, state, query_request)?;
-        let result = execute_query(state, plan).await?;
+        let plan = async { plan_query(configuration, state, query_request) }
+            .instrument(info_span!("Plan query"))
+            .await?;
+
+        let result = execute_query(state, plan)
+            .instrument(info_span!("Execute query"))
+            .await?;
+
         state.metrics.record_successful_query();
         Ok(result)
     }

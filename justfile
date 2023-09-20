@@ -28,7 +28,9 @@ check: build lint format-check test
 # run the connector
 run: start-dependencies
   RUST_LOG=INFO \
-    cargo run --bin ndc-postgres --release -- serve --configuration {{POSTGRES_CHINOOK_DEPLOYMENT}}
+  OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://localhost:4317 \
+  OTEL_SERVICE_NAME=postgres-ndc \
+    cargo run --bin ndc-postgres --release -- serve --configuration {{POSTGRES_CHINOOK_DEPLOYMENT}} > /tmp/ndc-postgres.log
 
 # run the connector inside a Docker image
 run-in-docker: build-docker-with-nix start-dependencies

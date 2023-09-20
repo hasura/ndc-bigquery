@@ -6,6 +6,7 @@ use serde_json;
 use sqlformat;
 use sqlx;
 use sqlx::Row;
+use tracing::{info_span, Instrument};
 
 use ndc_sdk::models;
 
@@ -47,7 +48,9 @@ pub async fn execute(
     // tracing::info!(rows_result = ?rows);
 
     // Make a response from rows.
-    let response = rows_to_response(rows);
+    let response = async { rows_to_response(rows) }
+        .instrument(info_span!("Create response"))
+        .await;
 
     // tracing::info!(query_response = serde_json::to_string(&response).unwrap());
 
@@ -119,16 +122,24 @@ async fn execute_query(
     variables: &BTreeMap<String, serde_json::Value>,
 ) -> Result<serde_json::Value, Error> {
     // build query
-    let sqlx_query = build_query_with_params(query, variables).await?;
+    let sqlx_query = build_query_with_params(query, variables)
+        .instrument(info_span!("Build query with params"))
+        .await?;
 
     let acquisition_timer = metrics.time_connection_acquisition_wait();
-    let connection_result = pool.acquire().await;
+
+    let connection_result = pool
+        .acquire()
+        .instrument(info_span!("Acquire connection"))
+        .await;
+
     let mut connection = acquisition_timer.complete_with(connection_result)?;
 
     // run and fetch from the database
     let rows = sqlx_query
         .map(|row: sqlx::postgres::PgRow| row.get(0))
         .fetch_one(connection.as_mut())
+        .instrument(info_span!("Execute query"))
         .await?;
 
     Ok(rows)
