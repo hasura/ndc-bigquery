@@ -9,6 +9,8 @@ use query_engine_metadata::metadata;
 
 mod version1;
 
+use tracing::{info_span, Instrument};
+
 pub use version1::{
     configure,
     single_connection_uri, // for tests only
@@ -61,11 +63,18 @@ pub async fn create_state(
     configuration: &Configuration,
     metrics_registry: &mut prometheus::Registry,
 ) -> Result<State, InitializationError> {
-    let pool = create_pool(configuration).await?;
+    let pool = create_pool(configuration)
+        .instrument(info_span!("Create connection pool"))
+        .await?;
 
-    let metrics = metrics::Metrics::initialize(metrics_registry)
-        .map_err(InitializationError::MetricsError)?;
-    metrics.set_pool_options_metrics(pool.options());
+    let metrics = async {
+        let metrics_inner = metrics::Metrics::initialize(metrics_registry)
+            .map_err(InitializationError::MetricsError)?;
+        metrics_inner.set_pool_options_metrics(pool.options());
+        Ok(metrics_inner)
+    }
+    .instrument(info_span!("Setup metrics"))
+    .await?;
 
     Ok(State { pool, metrics })
 }
