@@ -113,8 +113,15 @@ services:
         target: /etc/grafana/provisioning/datasources
         read_only: true
       - type: bind
-        source: ./metrics/grafana-data
+        source: ./metrics/grafana/dashboard.yaml
+        target: /etc/grafana/provisioning/dashboards/main.yaml
+      - type: bind
+        source: ./metrics/grafana/dashboards
+        target: /var/lib/grafana/dashboards
+      - type: volume
+        source: grafana_data
         target: /var/lib/grafana
 
 volumes:
   prom_data:
+  grafana_data:

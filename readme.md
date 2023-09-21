@@ -204,6 +204,12 @@ We have a Prometheus / Grafana set up in Docker. Run `just start-metrics` to
 start them, you can then navigation to `localhost:3001` for Grafana, or
 `localhost:9090` for Prometheus.
 
+### Editing Grafana dashboard
+
+The Grafana dashboard is exported and saved in
+`metrics/grafana/dashboards/*.json`. To make changes, update the graphs in the
+UI, export the JSON file and save it in this folder.
+
 ## Linting
 
 Run `just lint` to run clippy linter
