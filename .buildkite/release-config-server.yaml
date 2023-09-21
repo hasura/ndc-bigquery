@@ -56,6 +56,11 @@ steps:
               key: github-deploy-keys/ddn-cloud-read-write
               type: ssh
               region: us-east-2
+            - strategy: aws-secrets-manager
+              key: opslevel/ci-token
+              type: env
+              region: us-east-2
+              name: OPSLEVEL_TOKEN
       - hasura/smooth-checkout#v4.3.2:
           repos:
             - config:
