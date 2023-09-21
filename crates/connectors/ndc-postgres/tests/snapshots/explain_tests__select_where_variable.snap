@@ -1,10 +1,10 @@
 ---
-source: crates/ndc-postgres/tests/explain_tests.rs
+source: crates/connectors/ndc-postgres/tests/explain_tests.rs
 expression: result.details.query
 ---
 EXPLAIN
 SELECT
-  row_to_json("universe") AS "universe"
+  row_to_json("%1_universe") AS "universe"
 FROM
   (
     SELECT
@@ -12,15 +12,15 @@ FROM
     FROM
       (
         SELECT
-          coalesce(json_agg(row_to_json("rows")), '[]') AS "rows"
+          coalesce(json_agg(row_to_json("%2_rows")), '[]') AS "rows"
         FROM
           (
             SELECT
-              "Album"."Title" AS "Title"
+              "%0_Album"."Title" AS "Title"
             FROM
-              "public"."Album" AS "Album"
+              "public"."Album" AS "%0_Album"
             WHERE
-              ("Album"."Title" LIKE $1)
-          ) AS "rows"
-      ) AS "rows"
-  ) AS "universe"
+              ("%0_Album"."Title" LIKE $1)
+          ) AS "%2_rows"
+      ) AS "%2_rows"
+  ) AS "%1_universe"

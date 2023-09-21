@@ -3,7 +3,7 @@ source: crates/query-engine/translation/tests/tests.rs
 expression: result
 ---
 SELECT
-  row_to_json("universe") AS "universe"
+  row_to_json("%6_universe") AS "universe"
 FROM
   (
     SELECT
@@ -11,17 +11,17 @@ FROM
     FROM
       (
         SELECT
-          coalesce(json_agg(row_to_json("rows")), '[]') AS "rows"
+          coalesce(json_agg(row_to_json("%7_rows")), '[]') AS "rows"
         FROM
           (
             SELECT
-              "artist"."Name" AS "title",
-              "%RELATIONSHIP_1_FOR_albums"."albums" AS "albums"
+              "%0_artist"."Name" AS "title",
+              "%1_RELATIONSHIP_albums"."albums" AS "albums"
             FROM
-              "public"."Artist" AS "artist"
+              "public"."Artist" AS "%0_artist"
               LEFT OUTER JOIN LATERAL (
                 SELECT
-                  row_to_json("%RELATIONSHIP_1_FOR_albums") AS "albums"
+                  row_to_json("%1_RELATIONSHIP_albums") AS "albums"
                 FROM
                   (
                     SELECT
@@ -29,35 +29,35 @@ FROM
                     FROM
                       (
                         SELECT
-                          coalesce(json_agg(row_to_json("rows")), '[]') AS "rows"
+                          coalesce(json_agg(row_to_json("%3_rows")), '[]') AS "rows"
                         FROM
                           (
                             SELECT
-                              "album"."Title" AS "title"
+                              "%2_album"."Title" AS "title"
                             FROM
-                              "public"."Album" AS "album"
+                              "public"."Album" AS "%2_album"
                             WHERE
                               (
                                 true
-                                AND ("artist"."ArtistId" = "album"."ArtistId")
+                                AND ("%0_artist"."ArtistId" = "%2_album"."ArtistId")
                               )
-                          ) AS "rows"
-                      ) AS "rows"
-                  ) AS "%RELATIONSHIP_1_FOR_albums"
-              ) AS "%RELATIONSHIP_1_FOR_albums" ON ('true')
+                          ) AS "%3_rows"
+                      ) AS "%3_rows"
+                  ) AS "%1_RELATIONSHIP_albums"
+              ) AS "%1_RELATIONSHIP_albums" ON ('true')
             WHERE
               EXISTS (
                 SELECT
                 FROM
-                  "public"."Album" AS "album"
+                  "public"."Album" AS "%5_album"
                 WHERE
                   (
-                    ("album"."Title" LIKE $1)
-                    AND ("artist"."ArtistId" = "album"."ArtistId")
+                    ("%5_album"."Title" LIKE $1)
+                    AND ("%0_artist"."ArtistId" = "%5_album"."ArtistId")
                   )
               )
-          ) AS "rows"
-      ) AS "rows"
-  ) AS "universe"
+          ) AS "%7_rows"
+      ) AS "%7_rows"
+  ) AS "%6_universe"
 
 [(1, String("Supernatural"))]

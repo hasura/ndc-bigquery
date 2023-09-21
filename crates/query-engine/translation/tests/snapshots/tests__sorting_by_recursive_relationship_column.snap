@@ -1,9 +1,9 @@
 ---
-source: crates/query-engine/tests/tests.rs
+source: crates/query-engine/translation/tests/tests.rs
 expression: result
 ---
 SELECT
-  row_to_json("universe") AS "universe"
+  row_to_json("%4_universe") AS "universe"
 FROM
   (
     SELECT
@@ -11,48 +11,48 @@ FROM
     FROM
       (
         SELECT
-          coalesce(json_agg(row_to_json("rows")), '[]') AS "rows"
+          coalesce(json_agg(row_to_json("%5_rows")), '[]') AS "rows"
         FROM
           (
             SELECT
-              "Company"."Name" AS "Name"
+              "%0_Company"."Name" AS "Name"
             FROM
-              "public"."Company" AS "Company"
+              "public"."Company" AS "%0_Company"
               LEFT OUTER JOIN LATERAL (
                 SELECT
-                  "%ORDER_PATH_PART_1_Person"."Name" AS "Name"
+                  "%2_ORDER_PART_Person"."Name" AS "Name"
                 FROM
                   (
                     SELECT
-                      "%ORDER_PATH_PART_0_Person"."ParentId" AS "ParentId"
+                      "%1_ORDER_PART_Person"."ParentId" AS "ParentId"
                     FROM
-                      "public"."Person" AS "%ORDER_PATH_PART_0_Person"
+                      "public"."Person" AS "%1_ORDER_PART_Person"
                     WHERE
                       (
                         true
                         AND (
-                          "Company"."CEOId" = "%ORDER_PATH_PART_0_Person"."PersonId"
+                          "%0_Company"."CEOId" = "%1_ORDER_PART_Person"."PersonId"
                         )
                       )
-                  ) AS "%ORDER_PATH_PART_0_Person"
+                  ) AS "%1_ORDER_PART_Person"
                   LEFT OUTER JOIN LATERAL (
                     SELECT
-                      "%ORDER_PATH_PART_1_Person"."Name" AS "Name"
+                      "%2_ORDER_PART_Person"."Name" AS "Name"
                     FROM
-                      "public"."Person" AS "%ORDER_PATH_PART_1_Person"
+                      "public"."Person" AS "%2_ORDER_PART_Person"
                     WHERE
                       (
                         true
                         AND (
-                          "%ORDER_PATH_PART_0_Person"."ParentId" = "%ORDER_PATH_PART_1_Person"."PersonId"
+                          "%1_ORDER_PART_Person"."ParentId" = "%2_ORDER_PART_Person"."PersonId"
                         )
                       )
-                  ) AS "%ORDER_PATH_PART_1_Person" ON ('true')
-              ) AS "%ORDER_0_FOR_Company" ON ('true')
+                  ) AS "%2_ORDER_PART_Person" ON ('true')
+              ) AS "%3_ORDER_FOR_Company" ON ('true')
             ORDER BY
-              "%ORDER_0_FOR_Company"."Name" ASC
-          ) AS "rows"
-      ) AS "rows"
-  ) AS "universe"
+              "%3_ORDER_FOR_Company"."Name" ASC
+          ) AS "%5_rows"
+      ) AS "%5_rows"
+  ) AS "%4_universe"
 
 []

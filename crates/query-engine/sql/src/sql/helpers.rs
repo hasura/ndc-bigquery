@@ -64,60 +64,9 @@ pub fn make_column(
         Expression::ColumnReference(ColumnReference::TableColumn { table, name }),
     )
 }
-
-/// Create a table alias for boolean expressions.
-/// Provide state for fresh names and a source table name (to point at the table
-/// being filtered), and get an alias.
-pub fn make_boolean_expression_table_alias(
-    next_fresh_name: &mut u32,
-    source_table_name: &String,
-) -> TableAlias {
-    *next_fresh_name += 1;
-    make_table_alias(format!(
-        "%BOOLEXP_{}_FOR_{}",
-        next_fresh_name, source_table_name
-    ))
-}
-
 /// Create column aliases using this function so we build everything in one place.
 pub fn make_column_alias(name: String) -> ColumnAlias {
     ColumnAlias { name }
-}
-/// Create table aliases using this function so they get a unique index.
-pub fn make_table_alias(name: String) -> TableAlias {
-    TableAlias { name }
-}
-
-/// Create a table alias for left outer join lateral part.
-/// Provide an index and a source table name so we avoid name clashes,
-/// and get an alias.
-pub fn make_relationship_table_alias(index: usize, name: &String) -> TableAlias {
-    make_table_alias(format!("%RELATIONSHIP_{}_FOR_{}", index, name))
-}
-
-/// Create a table alias for order by target part.
-/// Provide an index and a source table name (to disambiguate the table being queried),
-/// and get an alias.
-pub fn make_order_path_part_table_alias(index: usize, table_name: &String) -> TableAlias {
-    make_table_alias(format!("%ORDER_PATH_PART_{}_{}", index, table_name))
-}
-
-/// Create a table alias for order by column.
-/// Provide an index and a source table name (to point at the table being ordered),
-/// and get an alias.
-pub fn make_order_by_table_alias(index: usize, source_table_name: &String) -> TableAlias {
-    make_table_alias(format!("%ORDER_{}_FOR_{}", index, source_table_name))
-}
-
-/// Create a table alias for count aggregate order by column.
-/// Provide an index and a source table name /// (to point at the table being ordered),
-/// and get an alias.
-pub fn make_order_by_count_table_alias(index: usize, source_table_name: &String) -> TableAlias {
-    make_table_alias(format!("%ORDER_{}_COUNT_FOR_{}", index, source_table_name))
-}
-
-pub fn make_native_query_table_alias(index: usize, name: &String) -> TableAlias {
-    make_table_alias(format!("%NATIVE_QUERY_{}_FOR_{}", index, name))
 }
 
 // SELECTs //

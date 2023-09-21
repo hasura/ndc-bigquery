@@ -1,8 +1,8 @@
 ---
-source: crates/query-engine/tests/tests.rs
+source: crates/query-engine/translation/tests/tests.rs
 expression: result
 ---
-WITH "%NATIVE_QUERY_0_FOR_artist_by_id" AS (
+WITH "%1_NATIVE_QUERY_artist_by_id" AS (
   SELECT
     *
   FROM
@@ -11,7 +11,7 @@ WITH "%NATIVE_QUERY_0_FOR_artist_by_id" AS (
     "ArtistId" = 1
 )
 SELECT
-  row_to_json("universe") AS "universe"
+  row_to_json("%2_universe") AS "universe"
 FROM
   (
     SELECT
@@ -19,15 +19,15 @@ FROM
     FROM
       (
         SELECT
-          coalesce(json_agg(row_to_json("rows")), '[]') AS "rows"
+          coalesce(json_agg(row_to_json("%3_rows")), '[]') AS "rows"
         FROM
           (
             SELECT
-              "artist_by_id"."Name" AS "Name"
+              "%0_artist_by_id"."Name" AS "Name"
             FROM
-              "%NATIVE_QUERY_0_FOR_artist_by_id" AS "artist_by_id"
-          ) AS "rows"
-      ) AS "rows"
-  ) AS "universe"
+              "%1_NATIVE_QUERY_artist_by_id" AS "%0_artist_by_id"
+          ) AS "%3_rows"
+      ) AS "%3_rows"
+  ) AS "%2_universe"
 
 []

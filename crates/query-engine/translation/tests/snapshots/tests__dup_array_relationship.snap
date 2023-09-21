@@ -3,7 +3,7 @@ source: crates/query-engine/translation/tests/tests.rs
 expression: result
 ---
 SELECT
-  row_to_json("universe") AS "universe"
+  row_to_json("%9_universe") AS "universe"
 FROM
   (
     SELECT
@@ -11,17 +11,17 @@ FROM
     FROM
       (
         SELECT
-          coalesce(json_agg(row_to_json("rows")), '[]') AS "rows"
+          coalesce(json_agg(row_to_json("%10_rows")), '[]') AS "rows"
         FROM
           (
             SELECT
-              "%RELATIONSHIP_0_FOR_albums"."albums" AS "albums",
-              "%RELATIONSHIP_1_FOR_Albums"."Albums" AS "Albums"
+              "%1_RELATIONSHIP_albums"."albums" AS "albums",
+              "%2_RELATIONSHIP_Albums"."Albums" AS "Albums"
             FROM
-              "public"."Artist" AS "Artist"
+              "public"."Artist" AS "%0_Artist"
               LEFT OUTER JOIN LATERAL (
                 SELECT
-                  row_to_json("%RELATIONSHIP_0_FOR_albums") AS "albums"
+                  row_to_json("%1_RELATIONSHIP_albums") AS "albums"
                 FROM
                   (
                     SELECT
@@ -29,25 +29,25 @@ FROM
                     FROM
                       (
                         SELECT
-                          coalesce(json_agg(row_to_json("rows")), '[]') AS "rows"
+                          coalesce(json_agg(row_to_json("%4_rows")), '[]') AS "rows"
                         FROM
                           (
                             SELECT
-                              "Album"."Title" AS "title"
+                              "%3_Album"."Title" AS "title"
                             FROM
-                              "public"."Album" AS "Album"
+                              "public"."Album" AS "%3_Album"
                             WHERE
                               (
                                 true
-                                AND ("Artist"."ArtistId" = "Album"."ArtistId")
+                                AND ("%0_Artist"."ArtistId" = "%3_Album"."ArtistId")
                               )
-                          ) AS "rows"
-                      ) AS "rows"
-                  ) AS "%RELATIONSHIP_0_FOR_albums"
-              ) AS "%RELATIONSHIP_0_FOR_albums" ON ('true')
+                          ) AS "%4_rows"
+                      ) AS "%4_rows"
+                  ) AS "%1_RELATIONSHIP_albums"
+              ) AS "%1_RELATIONSHIP_albums" ON ('true')
               LEFT OUTER JOIN LATERAL (
                 SELECT
-                  row_to_json("%RELATIONSHIP_1_FOR_Albums") AS "Albums"
+                  row_to_json("%2_RELATIONSHIP_Albums") AS "Albums"
                 FROM
                   (
                     SELECT
@@ -55,26 +55,26 @@ FROM
                     FROM
                       (
                         SELECT
-                          coalesce(json_agg(row_to_json("rows")), '[]') AS "rows"
+                          coalesce(json_agg(row_to_json("%7_rows")), '[]') AS "rows"
                         FROM
                           (
                             SELECT
-                              "Album"."Title" AS "title"
+                              "%6_Album"."Title" AS "title"
                             FROM
-                              "public"."Album" AS "Album"
+                              "public"."Album" AS "%6_Album"
                             WHERE
                               (
                                 true
-                                AND ("Artist"."ArtistId" = "Album"."ArtistId")
+                                AND ("%0_Artist"."ArtistId" = "%6_Album"."ArtistId")
                               )
-                          ) AS "rows"
-                      ) AS "rows"
-                  ) AS "%RELATIONSHIP_1_FOR_Albums"
-              ) AS "%RELATIONSHIP_1_FOR_Albums" ON ('true')
+                          ) AS "%7_rows"
+                      ) AS "%7_rows"
+                  ) AS "%2_RELATIONSHIP_Albums"
+              ) AS "%2_RELATIONSHIP_Albums" ON ('true')
             LIMIT
               5
-          ) AS "rows"
-      ) AS "rows"
-  ) AS "universe"
+          ) AS "%10_rows"
+      ) AS "%10_rows"
+  ) AS "%9_universe"
 
 []

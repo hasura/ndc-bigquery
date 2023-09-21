@@ -327,6 +327,7 @@ pub enum ColumnReference {
 /// aliases that we give to relations
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct TableAlias {
+    pub unique_index: u64,
     pub name: String,
 }
 

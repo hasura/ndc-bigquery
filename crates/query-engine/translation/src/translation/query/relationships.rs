@@ -121,9 +121,9 @@ pub fn translate_joins(
             let json_select = sql::helpers::select_rowset(
                 join_field.column_alias.clone(),
                 join_field.table_alias.clone(),
-                sql::helpers::make_table_alias("rows".to_string()),
+                state.make_table_alias("rows".to_string()),
                 sql::helpers::make_column_alias("rows".to_string()),
-                sql::helpers::make_table_alias("aggregates".to_string()),
+                state.make_table_alias("aggregates".to_string()),
                 sql::helpers::make_column_alias("aggregates".to_string()),
                 final_select_set,
             );
@@ -181,6 +181,7 @@ pub fn translate_column_mapping(
         })
 }
 
+#[derive(Debug)]
 /// Used in `make_relationship_arguments()` below.
 pub struct MakeRelationshipArguments {
     pub relationship_arguments: BTreeMap<String, models::RelationshipArgument>,

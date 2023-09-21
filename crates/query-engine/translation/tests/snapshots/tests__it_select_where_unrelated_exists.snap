@@ -1,9 +1,9 @@
 ---
-source: crates/query-engine/tests/tests.rs
+source: crates/query-engine/translation/tests/tests.rs
 expression: result
 ---
 SELECT
-  row_to_json("universe") AS "universe"
+  row_to_json("%2_universe") AS "universe"
 FROM
   (
     SELECT
@@ -11,29 +11,29 @@ FROM
     FROM
       (
         SELECT
-          coalesce(json_agg(row_to_json("rows")), '[]') AS "rows"
+          coalesce(json_agg(row_to_json("%3_rows")), '[]') AS "rows"
         FROM
           (
             SELECT
-              "album"."Title" AS "title"
+              "%0_album"."Title" AS "title"
             FROM
-              "public"."Album" AS "album"
+              "public"."Album" AS "%0_album"
             WHERE
               EXISTS (
                 SELECT
                 FROM
-                  "public"."Artist" AS "artist"
+                  "public"."Artist" AS "%1_artist"
                 WHERE
                   (
                     (
                       true
-                      AND ("artist"."Name" = $1)
+                      AND ("%1_artist"."Name" = $1)
                     )
-                    AND ("album"."ArtistId" = "artist"."ArtistId")
+                    AND ("%0_album"."ArtistId" = "%1_artist"."ArtistId")
                   )
               )
-          ) AS "rows"
-      ) AS "rows"
-  ) AS "universe"
+          ) AS "%3_rows"
+      ) AS "%3_rows"
+  ) AS "%2_universe"
 
 [(1, String("Gilberto Gil"))]

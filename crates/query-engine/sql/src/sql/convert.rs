@@ -451,7 +451,7 @@ impl TableReference {
 
 impl TableAlias {
     pub fn to_sql(&self, sql: &mut SQL) {
-        let name = self.name.to_string();
+        let name = format!("%{}_{}", self.unique_index, self.name);
         sql.append_identifier(&name);
     }
 }

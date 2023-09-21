@@ -374,6 +374,16 @@ mod native_queries {
         .await;
         insta::assert_json_snapshot!(result);
     }
+
+    #[tokio::test]
+    async fn select_order_by_artist_album_count() {
+        let result = run_query(
+            create_router().await,
+            "native_queries/select_order_by_artist_album_count",
+        )
+        .await;
+        insta::assert_json_snapshot!(result);
+    }
 }
 
 #[cfg(test)]

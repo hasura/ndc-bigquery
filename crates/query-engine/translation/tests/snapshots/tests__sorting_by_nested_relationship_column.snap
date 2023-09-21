@@ -1,9 +1,9 @@
 ---
-source: crates/query-engine/tests/tests.rs
+source: crates/query-engine/translation/tests/tests.rs
 expression: result
 ---
 SELECT
-  row_to_json("universe") AS "universe"
+  row_to_json("%4_universe") AS "universe"
 FROM
   (
     SELECT
@@ -11,48 +11,48 @@ FROM
     FROM
       (
         SELECT
-          coalesce(json_agg(row_to_json("rows")), '[]') AS "rows"
+          coalesce(json_agg(row_to_json("%5_rows")), '[]') AS "rows"
         FROM
           (
             SELECT
-              "track"."Name" AS "Name"
+              "%0_track"."Name" AS "Name"
             FROM
-              "public"."Track" AS "track"
+              "public"."Track" AS "%0_track"
               LEFT OUTER JOIN LATERAL (
                 SELECT
-                  "%ORDER_PATH_PART_1_artist"."Name" AS "name"
+                  "%2_ORDER_PART_artist"."Name" AS "name"
                 FROM
                   (
                     SELECT
-                      "%ORDER_PATH_PART_0_album"."ArtistId" AS "ArtistId"
+                      "%1_ORDER_PART_album"."ArtistId" AS "ArtistId"
                     FROM
-                      "public"."Album" AS "%ORDER_PATH_PART_0_album"
+                      "public"."Album" AS "%1_ORDER_PART_album"
                     WHERE
                       (
                         true
                         AND (
-                          "track"."AlbumId" = "%ORDER_PATH_PART_0_album"."AlbumId"
+                          "%0_track"."AlbumId" = "%1_ORDER_PART_album"."AlbumId"
                         )
                       )
-                  ) AS "%ORDER_PATH_PART_0_album"
+                  ) AS "%1_ORDER_PART_album"
                   LEFT OUTER JOIN LATERAL (
                     SELECT
-                      "%ORDER_PATH_PART_1_artist"."Name" AS "Name"
+                      "%2_ORDER_PART_artist"."Name" AS "Name"
                     FROM
-                      "public"."Artist" AS "%ORDER_PATH_PART_1_artist"
+                      "public"."Artist" AS "%2_ORDER_PART_artist"
                     WHERE
                       (
                         true
                         AND (
-                          "%ORDER_PATH_PART_0_album"."ArtistId" = "%ORDER_PATH_PART_1_artist"."ArtistId"
+                          "%1_ORDER_PART_album"."ArtistId" = "%2_ORDER_PART_artist"."ArtistId"
                         )
                       )
-                  ) AS "%ORDER_PATH_PART_1_artist" ON ('true')
-              ) AS "%ORDER_0_FOR_track" ON ('true')
+                  ) AS "%2_ORDER_PART_artist" ON ('true')
+              ) AS "%3_ORDER_FOR_track" ON ('true')
             ORDER BY
-              "%ORDER_0_FOR_track"."name" ASC
-          ) AS "rows"
-      ) AS "rows"
-  ) AS "universe"
+              "%3_ORDER_FOR_track"."name" ASC
+          ) AS "%5_rows"
+      ) AS "%5_rows"
+  ) AS "%4_universe"
 
 []

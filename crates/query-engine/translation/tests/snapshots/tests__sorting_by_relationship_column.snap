@@ -1,9 +1,9 @@
 ---
-source: crates/query-engine/tests/tests.rs
+source: crates/query-engine/translation/tests/tests.rs
 expression: result
 ---
 SELECT
-  row_to_json("universe") AS "universe"
+  row_to_json("%3_universe") AS "universe"
 FROM
   (
     SELECT
@@ -11,37 +11,37 @@ FROM
     FROM
       (
         SELECT
-          coalesce(json_agg(row_to_json("rows")), '[]') AS "rows"
+          coalesce(json_agg(row_to_json("%4_rows")), '[]') AS "rows"
         FROM
           (
             SELECT
-              "Album"."Title" AS "Name"
+              "%0_Album"."Title" AS "Name"
             FROM
-              "public"."Album" AS "Album"
+              "public"."Album" AS "%0_Album"
               LEFT OUTER JOIN LATERAL (
                 SELECT
-                  "%ORDER_PATH_PART_0_Artist"."Name" AS "Name"
+                  "%1_ORDER_PART_Artist"."Name" AS "Name"
                 FROM
                   (
                     SELECT
-                      "%ORDER_PATH_PART_0_Artist"."Name" AS "Name"
+                      "%1_ORDER_PART_Artist"."Name" AS "Name"
                     FROM
-                      "public"."Artist" AS "%ORDER_PATH_PART_0_Artist"
+                      "public"."Artist" AS "%1_ORDER_PART_Artist"
                     WHERE
                       (
                         true
                         AND (
-                          "Album"."ArtistId" = "%ORDER_PATH_PART_0_Artist"."ArtistId"
+                          "%0_Album"."ArtistId" = "%1_ORDER_PART_Artist"."ArtistId"
                         )
                       )
-                  ) AS "%ORDER_PATH_PART_0_Artist"
-              ) AS "%ORDER_0_FOR_Album" ON ('true')
+                  ) AS "%1_ORDER_PART_Artist"
+              ) AS "%2_ORDER_FOR_Album" ON ('true')
             ORDER BY
-              "%ORDER_0_FOR_Album"."Name" ASC
+              "%2_ORDER_FOR_Album"."Name" ASC
             LIMIT
               5 OFFSET 3
-          ) AS "rows"
-      ) AS "rows"
-  ) AS "universe"
+          ) AS "%4_rows"
+      ) AS "%4_rows"
+  ) AS "%3_universe"
 
 []

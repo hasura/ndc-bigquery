@@ -1,9 +1,9 @@
 ---
-source: crates/query-engine/tests/tests.rs
+source: crates/query-engine/translation/tests/tests.rs
 expression: result
 ---
 SELECT
-  row_to_json("universe") AS "universe"
+  row_to_json("%3_universe") AS "universe"
 FROM
   (
     SELECT
@@ -11,30 +11,30 @@ FROM
     FROM
       (
         SELECT
-          coalesce(json_agg(row_to_json("rows")), '[]') AS "rows"
+          coalesce(json_agg(row_to_json("%4_rows")), '[]') AS "rows"
         FROM
           (
             SELECT
-              "Artist"."Name" AS "Name"
+              "%0_Artist"."Name" AS "Name"
             FROM
-              "public"."Artist" AS "Artist"
+              "public"."Artist" AS "%0_Artist"
               LEFT OUTER JOIN LATERAL (
                 SELECT
                   COUNT(*) AS "count"
                 FROM
-                  "Album" AS "Album"
+                  "public"."Album" AS "%1_Album"
                 WHERE
                   (
                     true
-                    AND ("Artist"."ArtistId" = "Album"."ArtistId")
+                    AND ("%0_Artist"."ArtistId" = "%1_Album"."ArtistId")
                   )
-              ) AS "%ORDER_0_COUNT_FOR_Artist" ON ('true')
+              ) AS "%2_ORDER_COUNT_FOR_Artist" ON ('true')
             ORDER BY
-              "%ORDER_0_COUNT_FOR_Artist"."count" DESC
+              "%2_ORDER_COUNT_FOR_Artist"."count" DESC
             LIMIT
               5
-          ) AS "rows"
-      ) AS "rows"
-  ) AS "universe"
+          ) AS "%4_rows"
+      ) AS "%4_rows"
+  ) AS "%3_universe"
 
 []

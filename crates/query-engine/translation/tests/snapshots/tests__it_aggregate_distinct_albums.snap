@@ -1,9 +1,9 @@
 ---
-source: crates/query-engine/tests/tests.rs
+source: crates/query-engine/translation/tests/tests.rs
 expression: result
 ---
 SELECT
-  row_to_json("universe") AS "universe"
+  row_to_json("%1_universe") AS "universe"
 FROM
   (
     SELECT
@@ -11,15 +11,15 @@ FROM
     FROM
       (
         SELECT
-          coalesce(row_to_json("aggregates"), '[]') AS "aggregates"
+          coalesce(row_to_json("%3_aggregates"), '[]') AS "aggregates"
         FROM
           (
             SELECT
-              COUNT(DISTINCT "Album"."ArtistId") AS "how_many_distinct_artist_ids"
+              COUNT(DISTINCT "%0_Album"."ArtistId") AS "how_many_distinct_artist_ids"
             FROM
-              "public"."Album" AS "Album"
-          ) AS "aggregates"
-      ) AS "aggregates"
-  ) AS "universe"
+              "public"."Album" AS "%0_Album"
+          ) AS "%3_aggregates"
+      ) AS "%3_aggregates"
+  ) AS "%1_universe"
 
 []

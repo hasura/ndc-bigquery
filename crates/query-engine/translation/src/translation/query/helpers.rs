@@ -8,17 +8,24 @@ use super::error::Error;
 use query_engine_metadata::metadata;
 use query_engine_sql::sql;
 
+#[derive(Debug)]
 /// Static information from the query and metadata.
 pub struct Env {
     metadata: metadata::Metadata,
     relationships: BTreeMap<String, models::Relationship>,
 }
 
+#[derive(Debug)]
 /// Stateful information changed throughout the translation process.
 pub struct State {
     native_queries: NativeQueries,
+    global_table_index: TableAliasIndex,
 }
 
+#[derive(Debug)]
+pub struct TableAliasIndex(pub u64);
+
+#[derive(Debug)]
 /// Store top-level native queries generated throughout the translation process.
 ///
 /// Native queries are implemented as `WITH <native_query_name_<index>> AS (<native_query>) <query>`
@@ -26,9 +33,9 @@ struct NativeQueries {
     /// native queries that receive different arguments should result in different CTEs,
     /// and be used via a AliasedTable in the query.
     native_queries: Vec<NativeQueryInfo>,
-    index: usize,
 }
 
+#[derive(Debug)]
 /// Information we store about a native query call.
 pub struct NativeQueryInfo {
     pub info: metadata::NativeQueryInfo,
@@ -59,12 +66,14 @@ pub struct TableNameAndReference {
     pub reference: sql::ast::TableReference,
 }
 
+#[derive(Debug)]
 /// Information about columns
 pub struct ColumnInfo {
     pub name: sql::ast::ColumnName,
     pub r#type: metadata::ScalarType,
 }
 
+#[derive(Debug)]
 /// Metadata information about a specific collection.
 pub enum CollectionInfo {
     Table {
@@ -156,6 +165,7 @@ impl Default for State {
     fn default() -> State {
         State {
             native_queries: NativeQueries::new(),
+            global_table_index: TableAliasIndex(0),
         }
     }
 }
@@ -163,9 +173,7 @@ impl Default for State {
 impl State {
     /// Build a new state.
     pub fn new() -> State {
-        State {
-            native_queries: NativeQueries::new(),
-        }
+        State::default()
     }
 
     /// Introduce a new native query to the generated sql.
@@ -175,13 +183,86 @@ impl State {
         info: metadata::NativeQueryInfo,
         arguments: BTreeMap<String, models::Argument>,
     ) -> sql::ast::TableReference {
-        self.native_queries
-            .insert_native_query(name, info, arguments)
+        let alias = self.make_native_query_table_alias(&name);
+        self.native_queries.native_queries.push(NativeQueryInfo {
+            info,
+            arguments,
+            alias: alias.clone(),
+        });
+        sql::ast::TableReference::AliasedTable(alias)
     }
 
     /// Fetch the tracked native queries used in the query plan and their table alias.
     pub fn get_native_queries(self) -> Vec<NativeQueryInfo> {
         self.native_queries.native_queries
+    }
+
+    /// increment the table index and return the current one.
+    fn next_global_table_index(&mut self) -> TableAliasIndex {
+        let TableAliasIndex(index) = self.global_table_index;
+        self.global_table_index = TableAliasIndex(index + 1);
+        TableAliasIndex(index)
+    }
+
+    // aliases
+
+    /// Create table aliases using this function so they get a unique index.
+    pub fn make_table_alias(&mut self, name: String) -> sql::ast::TableAlias {
+        sql::ast::TableAlias {
+            unique_index: self.next_global_table_index().0,
+            name,
+        }
+    }
+
+    /// Create a table alias for left outer join lateral part.
+    /// Provide an index and a source table name so we avoid name clashes,
+    /// and get an alias.
+    pub fn make_relationship_table_alias(&mut self, name: &String) -> sql::ast::TableAlias {
+        self.make_table_alias(format!("RELATIONSHIP_{}", name))
+    }
+
+    /// Create a table alias for order by target part.
+    /// Provide an index and a source table name (to disambiguate the table being queried),
+    /// and get an alias.
+    pub fn make_order_path_part_table_alias(
+        &mut self,
+        table_name: &String,
+    ) -> sql::ast::TableAlias {
+        self.make_table_alias(format!("ORDER_PART_{}", table_name))
+    }
+
+    /// Create a table alias for order by column.
+    /// Provide an index and a source table name (to point at the table being ordered),
+    /// and get an alias.
+    pub fn make_order_by_table_alias(
+        &mut self,
+        source_table_name: &String,
+    ) -> sql::ast::TableAlias {
+        self.make_table_alias(format!("ORDER_FOR_{}", source_table_name))
+    }
+
+    /// Create a table alias for count aggregate order by column.
+    /// Provide an index and a source table name /// (to point at the table being ordered),
+    /// and get an alias.
+    pub fn make_order_by_count_table_alias(
+        &mut self,
+        source_table_name: &String,
+    ) -> sql::ast::TableAlias {
+        self.make_table_alias(format!("ORDER_COUNT_FOR_{}", source_table_name))
+    }
+
+    pub fn make_native_query_table_alias(&mut self, name: &String) -> sql::ast::TableAlias {
+        self.make_table_alias(format!("NATIVE_QUERY_{}", name))
+    }
+
+    /// Create a table alias for boolean expressions.
+    /// Provide state for fresh names and a source table name (to point at the table
+    /// being filtered), and get an alias.
+    pub fn make_boolean_expression_table_alias(
+        &mut self,
+        source_table_name: &String,
+    ) -> sql::ast::TableAlias {
+        self.make_table_alias(format!("BOOLEXP_{}", source_table_name))
     }
 }
 
@@ -189,25 +270,6 @@ impl NativeQueries {
     fn new() -> NativeQueries {
         NativeQueries {
             native_queries: vec![],
-            index: 0,
         }
-    }
-
-    /// Introduce a new native query to the generated sql.
-    fn insert_native_query(
-        &mut self,
-        name: String,
-        info: metadata::NativeQueryInfo,
-        arguments: BTreeMap<String, models::Argument>,
-    ) -> sql::ast::TableReference {
-        let index = self.index;
-        self.index += 1;
-        let alias = sql::helpers::make_native_query_table_alias(index, &name);
-        self.native_queries.push(NativeQueryInfo {
-            info,
-            arguments,
-            alias: alias.clone(),
-        });
-        sql::ast::TableReference::AliasedTable(alias)
     }
 }

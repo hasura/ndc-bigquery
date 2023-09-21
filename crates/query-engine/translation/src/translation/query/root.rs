@@ -70,8 +70,7 @@ pub fn translate_rows_query(
     // translate fields to columns or relationships.
     let columns: Vec<(sql::ast::ColumnAlias, sql::ast::Expression)> = fields
         .into_iter()
-        .enumerate()
-        .map(|(index, (alias, field))| match field {
+        .map(|(alias, field)| match field {
             models::Field::Column { column, .. } => {
                 let column_info = collection_info.lookup_column(&column)?;
                 Ok(sql::helpers::make_column(
@@ -85,7 +84,7 @@ pub fn translate_rows_query(
                 relationship,
                 arguments,
             } => {
-                let table_alias = sql::helpers::make_relationship_table_alias(index, &alias);
+                let table_alias = state.make_relationship_table_alias(&alias);
                 let column_alias = sql::helpers::make_column_alias(alias);
                 let column_name = sql::ast::ColumnReference::AliasedColumn {
                     table: sql::ast::TableReference::AliasedTable(table_alias.clone()),
@@ -158,19 +157,14 @@ fn translate_query_part(
     relationship_joins.extend(order_by_joins);
 
     // translate where
-    let mut next_fresh_name = 0;
     let (filter, filter_joins) = match query.clone().predicate {
         None => Ok((
             sql::ast::Expression::Value(sql::ast::Value::Bool(true)),
             vec![],
         )),
-        Some(predicate) => filtering::translate_expression(
-            env,
-            state,
-            &mut next_fresh_name,
-            &root_and_current_tables,
-            predicate,
-        ),
+        Some(predicate) => {
+            filtering::translate_expression(env, state, &root_and_current_tables, predicate)
+        }
     }?;
 
     select.where_ = sql::ast::Where(filter);
@@ -193,7 +187,7 @@ pub fn make_from_clause_and_reference(
     collection_alias: Option<sql::ast::TableAlias>,
 ) -> Result<(TableNameAndReference, sql::ast::From), Error> {
     let collection_alias = match collection_alias {
-        None => sql::helpers::make_table_alias(collection_name.to_string()),
+        None => state.make_table_alias(collection_name.to_string()),
         Some(alias) => alias,
     };
     let collection_alias_name = sql::ast::TableReference::AliasedTable(collection_alias.clone());
