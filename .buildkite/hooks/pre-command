@@ -1,8 +1,0 @@
-#!/bin/bash
-set -eu -o pipefail
-
-# a clean docker config for each job, for improved isolation
-echo "~~~ :docker: Configuring docker config folder"
-BUILDKITE_DOCKER_CONFIG_TEMP_DIRECTORY=$(mktemp -d)
-export BUILDKITE_DOCKER_CONFIG_TEMP_DIRECTORY
-export DOCKER_CONFIG="$BUILDKITE_DOCKER_CONFIG_TEMP_DIRECTORY"
