@@ -227,38 +227,7 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "never",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
+            "mode": "thresholds"
           },
           "mappings": [],
           "thresholds": {
@@ -285,16 +254,17 @@
       },
       "id": 2,
       "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
+        "displayMode": "gradient",
+        "minVizHeight": 10,
+        "minVizWidth": 0,
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
         },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
+        "showUnfilled": true,
+        "valueMode": "color"
       },
       "pluginVersion": "10.1.1",
       "targets": [
@@ -304,8 +274,9 @@
             "uid": "PBFA97CFB590B2093"
           },
           "disableTextWrap": false,
-          "editorMode": "builder",
-          "expr": "rate(postgres_ndc_connection_acquisition_wait_time_bucket[$__rate_interval])",
+          "editorMode": "code",
+          "expr": "postgres_ndc_connection_acquisition_wait_time_bucket",
+          "format": "heatmap",
           "fullMetaSearch": false,
           "includeNullMetadata": false,
           "instant": false,
@@ -315,8 +286,8 @@
           "useBackend": false
         }
       ],
-      "title": "Connection acquisition wait time (buckets)",
-      "type": "timeseries"
+      "title": "Connection acquisition wait time",
+      "type": "bargauge"
     },
     {
       "datasource": {
@@ -326,38 +297,7 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "never",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
+            "mode": "thresholds"
           },
           "mappings": [],
           "thresholds": {
@@ -374,7 +314,23 @@
             ]
           }
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "{instance=\"host.docker.internal:8100\", job=\"postgres-ndc\", le=\"0.005\"}"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "yellow",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
         "h": 10,
@@ -384,17 +340,19 @@
       },
       "id": 6,
       "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
+        "displayMode": "gradient",
+        "minVizHeight": 10,
+        "minVizWidth": 0,
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": ["last"],
+          "fields": "",
+          "values": false
         },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
+        "showUnfilled": true,
+        "valueMode": "color"
       },
+      "pluginVersion": "10.1.1",
       "targets": [
         {
           "datasource": {
@@ -402,8 +360,9 @@
             "uid": "PBFA97CFB590B2093"
           },
           "disableTextWrap": false,
-          "editorMode": "builder",
-          "expr": "rate(postgres_ndc_query_execution_time_bucket[$__rate_interval])",
+          "editorMode": "code",
+          "expr": "postgres_ndc_query_execution_time_bucket",
+          "format": "heatmap",
           "fullMetaSearch": false,
           "includeNullMetadata": false,
           "instant": false,
@@ -413,8 +372,9 @@
           "useBackend": false
         }
       ],
-      "title": "Query execution time (buckets)",
-      "type": "timeseries"
+      "title": "Query execution time",
+      "transparent": true,
+      "type": "bargauge"
     },
     {
       "datasource": {
@@ -678,6 +638,6 @@
   "timezone": "",
   "title": "Postgres NDC",
   "uid": "fa23d46b-326f-4e0a-aa3b-0495f5f984d5",
-  "version": 2,
+  "version": 1,
   "weekStart": ""
 }
