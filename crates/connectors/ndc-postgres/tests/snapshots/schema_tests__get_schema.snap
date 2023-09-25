@@ -1,12 +1,49 @@
 ---
-source: crates/ndc-postgres/tests/schema_tests.rs
+source: crates/connectors/ndc-postgres/tests/schema_tests.rs
 expression: result
 ---
 {
   "scalar_types": {
     "any": {
       "aggregate_functions": {},
-      "comparison_operators": {},
+      "comparison_operators": {
+        "_eq": {
+          "argument_type": {
+            "type": "named",
+            "name": "any"
+          }
+        },
+        "_gt": {
+          "argument_type": {
+            "type": "named",
+            "name": "any"
+          }
+        },
+        "_gte": {
+          "argument_type": {
+            "type": "named",
+            "name": "any"
+          }
+        },
+        "_lt": {
+          "argument_type": {
+            "type": "named",
+            "name": "any"
+          }
+        },
+        "_lte": {
+          "argument_type": {
+            "type": "named",
+            "name": "any"
+          }
+        },
+        "_neq": {
+          "argument_type": {
+            "type": "named",
+            "name": "any"
+          }
+        }
+      },
       "update_operators": {}
     },
     "bigint": {
@@ -1238,48 +1275,6 @@ expression: result
           "argument_type": {
             "type": "named",
             "name": "timestamp without time zone"
-          }
-        }
-      },
-      "update_operators": {}
-    },
-    "uuid": {
-      "aggregate_functions": {},
-      "comparison_operators": {
-        "_eq": {
-          "argument_type": {
-            "type": "named",
-            "name": "uuid"
-          }
-        },
-        "_gt": {
-          "argument_type": {
-            "type": "named",
-            "name": "uuid"
-          }
-        },
-        "_gte": {
-          "argument_type": {
-            "type": "named",
-            "name": "uuid"
-          }
-        },
-        "_lt": {
-          "argument_type": {
-            "type": "named",
-            "name": "uuid"
-          }
-        },
-        "_lte": {
-          "argument_type": {
-            "type": "named",
-            "name": "uuid"
-          }
-        },
-        "_neq": {
-          "argument_type": {
-            "type": "named",
-            "name": "uuid"
           }
         }
       },

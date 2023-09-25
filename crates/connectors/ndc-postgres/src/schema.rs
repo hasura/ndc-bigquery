@@ -3,7 +3,7 @@
 //! [Native Data Connector Specification](https://hasura.github.io/ndc-spec/specification/schema/index.html)
 //! for further details.
 
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 
 use ndc_sdk::connector;
 use ndc_sdk::models;
@@ -11,73 +11,78 @@ use query_engine_metadata::metadata;
 
 use super::configuration;
 
+/// Collect all the types that can occur in the metadata. This is a bit circumstantial. A better
+/// approach is likely to record scalar type names directly in the metadata via configuration.sql.
+fn occurring_scalar_types(
+    config: &configuration::RawConfiguration,
+) -> BTreeSet<metadata::ScalarType> {
+    let column_types = config
+        .metadata
+        .tables
+        .0
+        .values()
+        .flat_map(|v| v.columns.values().map(|c| c.r#type.clone()));
+
+    let aggregate_types = config.aggregate_functions.0.keys().cloned();
+
+    column_types
+        .chain(aggregate_types)
+        .collect::<BTreeSet<metadata::ScalarType>>()
+}
+
 /// Get the connector's schema.
 ///
 /// This function implements the [schema endpoint](https://hasura.github.io/ndc-spec/specification/schema/index.html)
 /// from the NDC specification.
 pub async fn get_schema(
-    configuration::Configuration {
-        config:
-            configuration::RawConfiguration {
-                metadata,
-                aggregate_functions,
-                ..
-            },
-        ..
-    }: &configuration::Configuration,
+    configuration::Configuration { config, .. }: &configuration::Configuration,
 ) -> Result<models::SchemaResponse, connector::SchemaError> {
-    let mut scalar_types: BTreeMap<String, models::ScalarType> = enum_iterator::all::<
-        metadata::ScalarType,
-    >()
-    .map(|scalar_type| {
-        (
-            scalar_type.to_string(),
-            models::ScalarType {
-                aggregate_functions: aggregate_functions
-                    .0
-                    .get(&scalar_type)
-                    .unwrap_or(&BTreeMap::new())
-                    .iter()
-                    .map(|(function_name, function_definition)| {
-                        (
-                            function_name.clone(),
-                            models::AggregateFunctionDefinition {
-                                result_type: models::Type::Named {
-                                    name: function_definition.return_type.to_string(),
+    let configuration::RawConfiguration {
+        metadata,
+        aggregate_functions,
+        ..
+    } = config;
+    let scalar_types: BTreeMap<String, models::ScalarType> = occurring_scalar_types(config)
+        .iter()
+        .map(|scalar_type| {
+            (
+                scalar_type.0.clone(),
+                models::ScalarType {
+                    aggregate_functions: aggregate_functions
+                        .0
+                        .get(scalar_type)
+                        .unwrap_or(&BTreeMap::new())
+                        .iter()
+                        .map(|(function_name, function_definition)| {
+                            (
+                                function_name.clone(),
+                                models::AggregateFunctionDefinition {
+                                    result_type: models::Type::Named {
+                                        name: function_definition.return_type.0.clone(),
+                                    },
                                 },
-                            },
-                        )
-                    })
-                    .collect(),
-                comparison_operators: scalar_type
-                    .comparison_operators()
-                    .into_iter()
-                    .map(|operator| {
-                        (
-                            operator.to_string(),
-                            models::ComparisonOperatorDefinition {
-                                argument_type: models::Type::Named {
-                                    name: operator.rhs_argument_type(scalar_type).to_string(),
+                            )
+                        })
+                        .collect(),
+                    comparison_operators: scalar_type
+                        .comparison_operators()
+                        .into_iter()
+                        .map(|operator| {
+                            (
+                                operator.to_string(),
+                                models::ComparisonOperatorDefinition {
+                                    argument_type: models::Type::Named {
+                                        name: operator.rhs_argument_type(scalar_type.clone()).0,
+                                    },
                                 },
-                            },
-                        )
-                    })
-                    .collect(),
-                update_operators: BTreeMap::new(),
-            },
-        )
-    })
-    .collect();
-
-    // Used for types we don't yet support
-    scalar_types.insert(
-        "any".into(),
-        models::ScalarType {
-            aggregate_functions: BTreeMap::new(),
-            comparison_operators: BTreeMap::new(),
-            update_operators: BTreeMap::new(),
-        },
-    );
+                            )
+                        })
+                        .collect(),
+                    update_operators: BTreeMap::new(),
+                },
+            )
+        })
+        .collect();
 
     let collections = metadata
         .tables
@@ -140,7 +145,7 @@ pub async fn get_schema(
                     models::ObjectField {
                         description: None,
                         r#type: models::Type::Named {
-                            name: column.r#type.to_string(),
+                            name: column.r#type.0.clone(),
                         },
                     },
                 )

@@ -7,37 +7,9 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 /// The scalar types supported by the Engine.
-#[derive(
-    Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Sequence, Serialize, Deserialize, JsonSchema,
-)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "lowercase")]
-pub enum ScalarType {
-    Boolean,
-    Smallint,
-    Integer,
-    Bigint,
-    Real,
-    #[serde(rename = "double precision")]
-    DoublePrecision,
-    Numeric,
-    Character,
-    #[serde(rename = "character varying")]
-    CharacterVarying,
-    Text,
-    Json,
-    Jsonb,
-    Date,
-    #[serde(rename = "time with time zone")]
-    TimeWithTimeZone,
-    #[serde(rename = "time without time zone")]
-    TimeWithoutTimeZone,
-    #[serde(rename = "timestamp with time zone")]
-    TimestampWithTimeZone,
-    #[serde(rename = "timestamp without time zone")]
-    TimestampWithoutTimeZone,
-    Uuid,
-    Any,
-}
+pub struct ScalarType(pub String);
 
 impl ScalarType {
     const OPERATORS_SUPPORTED_BY_ALL_TYPES: &[ComparisonOperator] = &[
@@ -66,26 +38,12 @@ impl ScalarType {
     pub fn comparison_operators(&self) -> BTreeSet<ComparisonOperator> {
         let mut operators =
             BTreeSet::from_iter(Self::OPERATORS_SUPPORTED_BY_ALL_TYPES.iter().copied());
-        operators.extend(match self {
-            ScalarType::CharacterVarying => Self::STRING_OPERATORS.iter(),
-            ScalarType::Text => Self::STRING_OPERATORS.iter(),
+        operators.extend(match self.0.as_str() {
+            "character varying" => Self::STRING_OPERATORS.iter(),
+            "text" => Self::STRING_OPERATORS.iter(),
             _ => [].iter(),
         });
         operators
-    }
-}
-
-impl ToString for ScalarType {
-    fn to_string(&self) -> String {
-        match self {
-            ScalarType::DoublePrecision => "double precision".to_string(),
-            ScalarType::CharacterVarying => "character varying".to_string(),
-            ScalarType::TimeWithTimeZone => "time with time zone".to_string(),
-            ScalarType::TimeWithoutTimeZone => "time without time zone".to_string(),
-            ScalarType::TimestampWithTimeZone => "timestamp with time zone".to_string(),
-            ScalarType::TimestampWithoutTimeZone => "timestamp without time zone".to_string(),
-            _ => format!("{:?}", self).to_lowercase(),
-        }
     }
 }
 
@@ -224,25 +182,4 @@ pub struct AggregateFunctions(pub BTreeMap<ScalarType, BTreeMap<String, Aggregat
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
 pub struct AggregateFunction {
     pub return_type: ScalarType,
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_ensure_all_binary_comparison_operators_are_used() {
-        // This is the set of all operators exposed through the schema.
-        let exposed_operators = enum_iterator::all::<ScalarType>()
-            .flat_map(|scalar_type| scalar_type.comparison_operators())
-            .collect::<BTreeSet<ComparisonOperator>>();
-
-        for operator in enum_iterator::all::<ComparisonOperator>() {
-            assert!(
-                exposed_operators.contains(&operator),
-                "The operator {:?} is not exposed anywhere.",
-                operator
-            );
-        }
-    }
 }

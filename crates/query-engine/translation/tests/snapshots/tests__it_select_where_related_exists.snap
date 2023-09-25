@@ -52,7 +52,9 @@ FROM
                   "public"."Album" AS "%5_album"
                 WHERE
                   (
-                    ("%5_album"."Title" LIKE $1)
+                    (
+                      "%5_album"."Title" LIKE cast($1 as character varying)
+                    )
                     AND ("%0_artist"."ArtistId" = "%5_album"."ArtistId")
                   )
               )

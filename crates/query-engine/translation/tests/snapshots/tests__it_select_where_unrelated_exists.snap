@@ -27,7 +27,9 @@ FROM
                   (
                     (
                       true
-                      AND ("%1_artist"."Name" = $1)
+                      AND (
+                        "%1_artist"."Name" = cast($1 as character varying)
+                      )
                     )
                     AND ("%0_album"."ArtistId" = "%1_artist"."ArtistId")
                   )

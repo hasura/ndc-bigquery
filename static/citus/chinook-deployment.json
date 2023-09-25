@@ -753,54 +753,6 @@
     }
   },
   "aggregate_functions": {
-    "boolean": {
-      "bool_and": {
-        "return_type": "boolean"
-      },
-      "bool_or": {
-        "return_type": "boolean"
-      },
-      "every": {
-        "return_type": "boolean"
-      }
-    },
-    "smallint": {
-      "bit_and": {
-        "return_type": "smallint"
-      },
-      "bit_or": {
-        "return_type": "smallint"
-      },
-      "bit_xor": {
-        "return_type": "smallint"
-      },
-      "max": {
-        "return_type": "smallint"
-      },
-      "min": {
-        "return_type": "smallint"
-      }
-    },
-    "integer": {
-      "bit_and": {
-        "return_type": "integer"
-      },
-      "bit_or": {
-        "return_type": "integer"
-      },
-      "bit_xor": {
-        "return_type": "integer"
-      },
-      "max": {
-        "return_type": "integer"
-      },
-      "min": {
-        "return_type": "integer"
-      },
-      "ntile": {
-        "return_type": "integer"
-      }
-    },
     "bigint": {
       "bit_and": {
         "return_type": "bigint"
@@ -830,15 +782,31 @@
         "return_type": "bigint"
       }
     },
-    "real": {
+    "boolean": {
+      "bool_and": {
+        "return_type": "boolean"
+      },
+      "bool_or": {
+        "return_type": "boolean"
+      },
+      "every": {
+        "return_type": "boolean"
+      }
+    },
+    "character": {
       "max": {
-        "return_type": "real"
+        "return_type": "character"
       },
       "min": {
-        "return_type": "real"
+        "return_type": "character"
+      }
+    },
+    "date": {
+      "max": {
+        "return_type": "date"
       },
-      "sum": {
-        "return_type": "real"
+      "min": {
+        "return_type": "date"
       }
     },
     "double precision": {
@@ -879,6 +847,42 @@
         "return_type": "double precision"
       }
     },
+    "integer": {
+      "bit_and": {
+        "return_type": "integer"
+      },
+      "bit_or": {
+        "return_type": "integer"
+      },
+      "bit_xor": {
+        "return_type": "integer"
+      },
+      "max": {
+        "return_type": "integer"
+      },
+      "min": {
+        "return_type": "integer"
+      },
+      "ntile": {
+        "return_type": "integer"
+      }
+    },
+    "json": {
+      "json_agg": {
+        "return_type": "json"
+      },
+      "json_cat_agg": {
+        "return_type": "json"
+      }
+    },
+    "jsonb": {
+      "jsonb_agg": {
+        "return_type": "jsonb"
+      },
+      "jsonb_cat_agg": {
+        "return_type": "jsonb"
+      }
+    },
     "numeric": {
       "avg": {
         "return_type": "numeric"
@@ -911,12 +915,32 @@
         "return_type": "numeric"
       }
     },
-    "character": {
+    "real": {
       "max": {
-        "return_type": "character"
+        "return_type": "real"
       },
       "min": {
-        "return_type": "character"
+        "return_type": "real"
+      },
+      "sum": {
+        "return_type": "real"
+      }
+    },
+    "smallint": {
+      "bit_and": {
+        "return_type": "smallint"
+      },
+      "bit_or": {
+        "return_type": "smallint"
+      },
+      "bit_xor": {
+        "return_type": "smallint"
+      },
+      "max": {
+        "return_type": "smallint"
+      },
+      "min": {
+        "return_type": "smallint"
       }
     },
     "text": {
@@ -925,30 +949,6 @@
       },
       "min": {
         "return_type": "text"
-      }
-    },
-    "json": {
-      "json_agg": {
-        "return_type": "json"
-      },
-      "json_cat_agg": {
-        "return_type": "json"
-      }
-    },
-    "jsonb": {
-      "jsonb_agg": {
-        "return_type": "jsonb"
-      },
-      "jsonb_cat_agg": {
-        "return_type": "jsonb"
-      }
-    },
-    "date": {
-      "max": {
-        "return_type": "date"
-      },
-      "min": {
-        "return_type": "date"
       }
     },
     "time with time zone": {

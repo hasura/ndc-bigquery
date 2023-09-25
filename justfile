@@ -23,7 +23,7 @@ AURORA_CHINOOK_DEPLOYMENT_TEMPLATE := "static/aurora/chinook-deployment-template
 #     just --set CONNECTOR_IMAGE_TAG dev-main <targets>
 
 # check everything
-check: build lint format-check test
+check: format-check build lint test
 
 # run the connector
 run: start-dependencies
@@ -154,8 +154,8 @@ test: start-dependencies start-cockroach-dependencies start-citus-dependencies c
   else
     echo "$(tput bold)$(tput setaf 3)WARNING:$(tput sgr0) Skipping the Aurora tests because the connection string is unset."; \
   fi
-  echo "$(tput bold)cargo test ${features[@]}$(tput sgr0)"
-  RUST_LOG=DEBUG cargo test "${features[@]}"
+  echo "$(tput bold)cargo test --no-fail-fast ${features[@]}$(tput sgr0)"
+  RUST_LOG=DEBUG cargo test --no-fail-fast "${features[@]}"
 
 # re-generate the deployment configuration file
 generate-chinook-configuration: build start-dependencies start-cockroach-dependencies start-citus-dependencies

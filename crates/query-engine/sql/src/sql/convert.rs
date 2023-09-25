@@ -60,7 +60,7 @@ impl RawSql {
     pub fn to_sql(&self, sql: &mut SQL) {
         match self {
             RawSql::RawText(text) => sql.append_syntax(text),
-            RawSql::Value(value) => value.to_sql(sql),
+            RawSql::Expression(exp) => exp.to_sql(sql),
         }
     }
 }
@@ -190,6 +190,14 @@ impl Expression {
         match &self {
             Expression::ColumnReference(column_reference) => column_reference.to_sql(sql),
             Expression::Value(value) => value.to_sql(sql),
+            Expression::Cast { expression, r#type } => {
+                sql.append_syntax("cast");
+                sql.append_syntax("(");
+                expression.to_sql(sql);
+                sql.append_syntax(" as ");
+                r#type.to_sql(sql);
+                sql.append_syntax(")");
+            }
             Expression::And { left, right } => {
                 sql.append_syntax("(");
                 left.to_sql(sql);
@@ -369,14 +377,6 @@ impl Value {
             Value::Float8(n) => sql.append_syntax(format!("{}", n).as_str()),
             Value::Character(s) => sql.append_param(Param::String(s.clone())),
             Value::String(s) => sql.append_param(Param::String(s.clone())),
-            Value::Cast { value, r#type } => {
-                sql.append_syntax("cast");
-                sql.append_syntax("(");
-                sql.append_param(Param::String(value.clone()));
-                sql.append_syntax(" as ");
-                r#type.to_sql(sql);
-                sql.append_syntax(")");
-            }
             Value::Variable(v) => sql.append_param(Param::Variable(v.clone())),
             Value::Bool(true) => sql.append_syntax("true"),
             Value::Bool(false) => sql.append_syntax("false"),
@@ -397,22 +397,7 @@ impl Value {
 
 impl ScalarType {
     pub fn to_sql(&self, sql: &mut SQL) {
-        match &self {
-            ScalarType::Date => sql.append_syntax("date"),
-            ScalarType::TimeWithTimeZone => sql.append_syntax("time with time zone"),
-            ScalarType::TimeWithoutTimeZone => sql.append_syntax("time without time zone"),
-            ScalarType::TimestampWithTimeZone => sql.append_syntax("timestamp with time zone"),
-            ScalarType::TimestampWithoutTimeZone => {
-                sql.append_syntax("timestamp without time zone")
-            }
-            ScalarType::Smallint => sql.append_syntax("smallint"),
-            ScalarType::Integer => sql.append_syntax("integer"),
-            ScalarType::Bigint => sql.append_syntax("bigint"),
-            ScalarType::Real => sql.append_syntax("real"),
-            ScalarType::DoublePrecision => sql.append_syntax("double precision"),
-            ScalarType::Numeric => sql.append_syntax("numeric"),
-            ScalarType::Uuid => sql.append_syntax("uuid"),
-        }
+        sql.append_syntax(self.0.as_str())
     }
 }
 

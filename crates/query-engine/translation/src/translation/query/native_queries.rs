@@ -26,20 +26,20 @@ pub fn translate(state: State) -> Result<Vec<sql::ast::CommonTableExpression>, E
                 metadata::NativeQueryPart::Parameter(param) => {
                     let typ = match native_query.info.arguments.get(&param) {
                         None => Err(Error::ArgumentNotFound(param.clone())),
-                        Some(argument) => Ok(argument.r#type),
+                        Some(argument) => Ok(argument.r#type.clone()),
                     }?;
-                    let value = match native_query.arguments.get(&param) {
+                    let exp = match native_query.arguments.get(&param) {
                         None => Err(Error::ArgumentNotFound(param.clone())),
                         Some(argument) => match argument {
                             models::Argument::Literal { value } => {
                                 values::translate_json_value(value, typ)
                             }
-                            models::Argument::Variable { name } => {
-                                Ok(sql::ast::Value::Variable(name.clone()))
-                            }
+                            models::Argument::Variable { name } => Ok(sql::ast::Expression::Value(
+                                sql::ast::Value::Variable(name.clone()),
+                            )),
                         },
                     }?;
-                    Ok(sql::ast::RawSql::Value(value))
+                    Ok(sql::ast::RawSql::Expression(exp))
                 }
             })
             .collect::<Result<Vec<sql::ast::RawSql>, Error>>()?;

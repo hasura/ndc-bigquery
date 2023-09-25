@@ -33,8 +33,8 @@ pub enum CTExpr {
 pub enum RawSql {
     /// Raw SQL text
     RawText(String),
-    /// A value or variable
-    Value(Value),
+    /// An expression
+    Expression(Expression),
 }
 
 /// A SELECT clause
@@ -190,6 +190,10 @@ pub enum Expression {
     ColumnReference(ColumnReference),
     /// An irreducible value
     Value(Value),
+    Cast {
+        expression: Box<Expression>,
+        r#type: ScalarType,
+    },
     /// A COUNT clause
     Count(CountType),
 }
@@ -255,11 +259,6 @@ pub enum Value {
     Bool(bool),
     Character(String),
     String(String),
-    /// values that need to be cast
-    Cast {
-        value: String,
-        r#type: ScalarType,
-    },
     Null,
     Array(Vec<Value>),
     EmptyJsonArray,
@@ -268,20 +267,7 @@ pub enum Value {
 
 /// Scalar type
 #[derive(Debug, Clone, PartialEq)]
-pub enum ScalarType {
-    Smallint,
-    Integer,
-    Bigint,
-    Real,
-    DoublePrecision,
-    Numeric,
-    Date,
-    TimeWithTimeZone,
-    TimeWithoutTimeZone,
-    TimestampWithTimeZone,
-    TimestampWithoutTimeZone,
-    Uuid,
-}
+pub struct ScalarType(pub String);
 
 /// A database schema name
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]

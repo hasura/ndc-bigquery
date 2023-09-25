@@ -19,7 +19,12 @@ FROM
             FROM
               "public"."Album" AS "%0_Album"
             WHERE
-              ("%0_Album"."Title" IN ($1, $2))
+              (
+                "%0_Album"."Title" IN (
+                  cast($1 as character varying),
+                  cast($2 as character varying)
+                )
+              )
           ) AS "%2_rows"
       ) AS "%2_rows"
   ) AS "%1_universe"

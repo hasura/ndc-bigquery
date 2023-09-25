@@ -257,28 +257,7 @@ expression: schema
     },
     "ScalarType": {
       "description": "The scalar types supported by the Engine.",
-      "type": "string",
-      "enum": [
-        "boolean",
-        "smallint",
-        "integer",
-        "bigint",
-        "real",
-        "double precision",
-        "numeric",
-        "character",
-        "character varying",
-        "text",
-        "json",
-        "jsonb",
-        "date",
-        "time with time zone",
-        "time without time zone",
-        "timestamp with time zone",
-        "timestamp without time zone",
-        "uuid",
-        "any"
-      ]
+      "type": "string"
     },
     "Nullable": {
       "description": "Can this column contain null values",

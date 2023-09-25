@@ -83,7 +83,9 @@ FROM
                   (
                     (
                       true
-                      AND ("%9_BOOLEXP_Album"."Title" = $1)
+                      AND (
+                        "%9_BOOLEXP_Album"."Title" = cast($1 as character varying)
+                      )
                     )
                     AND (
                       "%0_Track"."AlbumId" = "%9_BOOLEXP_Album"."AlbumId"
@@ -99,7 +101,9 @@ FROM
                   (
                     (
                       true
-                      AND ("%10_BOOLEXP_Album"."Title" = $2)
+                      AND (
+                        "%10_BOOLEXP_Album"."Title" = cast($2 as character varying)
+                      )
                     )
                     AND (
                       "%0_Track"."AlbumId" = "%10_BOOLEXP_Album"."AlbumId"
@@ -115,7 +119,9 @@ FROM
                   (
                     (
                       true
-                      AND ("%11_BOOLEXP_Artist"."Name" = $3)
+                      AND (
+                        "%11_BOOLEXP_Artist"."Name" = cast($3 as character varying)
+                      )
                     )
                     AND (
                       "%10_BOOLEXP_Album"."ArtistId" = "%11_BOOLEXP_Artist"."ArtistId"

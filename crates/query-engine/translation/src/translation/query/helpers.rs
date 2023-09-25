@@ -140,7 +140,7 @@ impl CollectionInfo {
                 .get(column_name)
                 .map(|column_info| ColumnInfo {
                     name: sql::ast::ColumnName(column_info.name.clone()),
-                    r#type: column_info.r#type,
+                    r#type: column_info.r#type.clone(),
                 })
                 .ok_or(Error::ColumnNotFoundInCollection(
                     column_name.to_string(),
@@ -151,7 +151,7 @@ impl CollectionInfo {
                 .get(column_name)
                 .map(|column_info| ColumnInfo {
                     name: sql::ast::ColumnName(column_info.name.clone()),
-                    r#type: column_info.r#type,
+                    r#type: column_info.r#type.clone(),
                 })
                 .ok_or(Error::ColumnNotFoundInCollection(
                     column_name.to_string(),

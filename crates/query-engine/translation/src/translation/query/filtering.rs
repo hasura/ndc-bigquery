@@ -103,7 +103,7 @@ pub fn translate_expression(
                         state,
                         root_and_current_tables,
                         value.clone(),
-                        typ,
+                        typ.clone(),
                     )?;
                     joins.extend(right_joins);
                     Ok(right)
@@ -352,10 +352,9 @@ fn translate_comparison_value(
         models::ComparisonValue::Column { column } => {
             translate_comparison_target(env, state, root_and_current_tables, column)
         }
-        models::ComparisonValue::Scalar { value: json_value } => Ok((
-            sql::ast::Expression::Value(values::translate_json_value(&json_value, typ)?),
-            vec![],
-        )),
+        models::ComparisonValue::Scalar { value: json_value } => {
+            Ok((values::translate_json_value(&json_value, typ)?, vec![]))
+        }
         models::ComparisonValue::Variable { name: var } => Ok((
             sql::ast::Expression::Value(sql::ast::Value::Variable(var)),
             vec![],
