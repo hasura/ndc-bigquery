@@ -45,17 +45,16 @@ jobs:
             | tee ./generated/deployment.json
           docker compose down agent-configuration
 
-      - name: Start the agent ▶️
-        run: |
-          cd benchmarks/component
-          docker compose up --detach --wait agent
-
       - name: Run benchmarks 🏃
         run: |
           cd benchmarks/component
           for benchmark in $(ls benchmarks); do
+            echo "Starting agent..."
+            docker compose up --wait agent
             echo "Running ${benchmark}..."
             docker compose run --rm benchmark run "/benchmarks/$benchmark"
+            echo "Stopping agent..."
+            docker compose down agent
           done
 
       - name: Extract summaries ⛏️
