@@ -98,7 +98,7 @@ impl connector::Connector for Postgres {
         _configuration: &Self::Configuration,
         state: &Self::State,
     ) -> Result<(), connector::HealthError> {
-        health::health_check(&state.pool).await
+        health::health_check(&state.bigquery_client).await
     }
 
     /// Get the connector's capabilities.

@@ -52,10 +52,11 @@ impl<'a> version1::Configuration {
 }
 
 /// State for our connector.
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct State {
     pub pool: PgPool,
     pub metrics: metrics::Metrics,
+    pub bigquery_client: gcp_bigquery_client::Client,
 }
 
 /// Create a connection pool and wrap it inside a connector State.
@@ -76,7 +77,22 @@ pub async fn create_state(
     .instrument(info_span!("Setup metrics"))
     .await?;
 
-    Ok(State { pool, metrics })
+    let service_account_key_json = std::env::var("HASURA_BIGQUERY_SERVICE_KEY").unwrap();
+
+    let service_account_key =
+        yup_oauth2::parse_service_account_key(service_account_key_json).unwrap();
+
+    // Init BigQuery client
+    let bigquery_client =
+        gcp_bigquery_client::Client::from_service_account_key(service_account_key, false)
+            .await
+            .unwrap();
+
+    Ok(State {
+        pool,
+        metrics,
+        bigquery_client,
+    })
 }
 
 /// Create a connection pool with default settings.
