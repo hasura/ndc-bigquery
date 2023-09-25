@@ -1,7 +1,7 @@
 [package]
 name = "query-engine-execution"
-version = "0.1.0"
-edition = "2021"
+version.workspace = true
+edition.workspace = true
 
 [dependencies]
 ndc-sdk = { git = "https://github.com/hasura/ndc-hub.git", rev = "e16b85a", package = "ndc-sdk" }

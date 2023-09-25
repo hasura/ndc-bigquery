@@ -1,7 +1,7 @@
 [package]
 name = "other-db-tests"
-version = "0.1.0"
-edition = "2021"
+version.workspace = true
+edition.workspace = true
 
 [features]
 # We only run the AWS Aurora tests if this feature is enabled.
