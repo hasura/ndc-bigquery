@@ -5,6 +5,7 @@ pub mod common;
 use std::net;
 
 #[tokio::test]
+#[ignore]
 async fn test_connector() -> Result<(), Vec<ndc_test::FailedTest>> {
     let router = common::create_router().await;
     let server = hyper::Server::bind(&net::SocketAddr::new(

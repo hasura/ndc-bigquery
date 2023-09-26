@@ -11,7 +11,6 @@ pub struct Metrics {
     explain_total: IntCounter,
     query_plan_time: Histogram,
     query_execution_time: Histogram,
-    connection_acquisition_wait_time: Histogram,
     pool_size: IntGauge,
     pool_idle_count: IntGauge,
     pool_active_count: IntGauge,
@@ -47,12 +46,6 @@ impl Metrics {
             metrics_registry,
             "postgres_ndc_query_execution_time",
             "Time taken to execute an already-planned query, in seconds.",
-        )?;
-
-        let connection_acquisition_wait_time = add_histogram_metric(
-            metrics_registry,
-            "postgres_ndc_connection_acquisition_wait_time",
-            "Time taken to acquire a connection.",
         )?;
 
         let pool_size = add_int_gauge_metric(
@@ -108,7 +101,6 @@ impl Metrics {
             explain_total,
             query_plan_time,
             query_execution_time,
-            connection_acquisition_wait_time,
             pool_size,
             pool_idle_count,
             pool_active_count,
@@ -134,10 +126,6 @@ impl Metrics {
 
     pub fn time_query_execution(&self) -> Timer {
         Timer(self.query_execution_time.start_timer())
-    }
-
-    pub fn time_connection_acquisition_wait(&self) -> Timer {
-        Timer(self.connection_acquisition_wait_time.start_timer())
     }
 
     // Set the metrics populated from the pool options.

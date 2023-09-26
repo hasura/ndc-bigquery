@@ -123,8 +123,6 @@ pub fn translate_joins(
                 join_field.table_alias.clone(),
                 state.make_table_alias("rows".to_string()),
                 sql::helpers::make_column_alias("rows".to_string()),
-                state.make_table_alias("aggregates".to_string()),
-                sql::helpers::make_column_alias("aggregates".to_string()),
                 final_select_set,
             );
 

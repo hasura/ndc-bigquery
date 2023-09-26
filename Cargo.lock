@@ -2036,6 +2036,7 @@ checksum = "106dd99e98437432fed6519dedecfade6a06a73bb7b2a1e019fdd2bee5778d94"
 name = "query-engine-execution"
 version = "0.1.0"
 dependencies = [
+ "gcp-bigquery-client",
  "ndc-sdk 0.1.0 (git+https://github.com/hasura/ndc-hub.git?rev=e16b85a)",
  "prometheus",
  "query-engine-sql",

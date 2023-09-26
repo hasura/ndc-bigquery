@@ -4,8 +4,8 @@
   "metadata": {
     "tables": {
       "Album": {
-        "schema_name": "public",
-        "table_name": "Album",
+        "schema_name": "hasura-development.chinook_sample",
+        "table_name": "albums",
         "columns": {
           "AlbumId": {
             "name": "AlbumId",
@@ -36,8 +36,8 @@
         }
       },
       "Artist": {
-        "schema_name": "public",
-        "table_name": "Artist",
+        "schema_name": "hasura-development.chinook_sample",
+        "table_name": "artists",
         "columns": {
           "ArtistId": {
             "name": "ArtistId",
@@ -56,7 +56,7 @@
         "foreign_relations": {}
       },
       "Customer": {
-        "schema_name": "public",
+        "schema_name": "hasura-development.chinook_sample",
         "table_name": "Customer",
         "columns": {
           "Address": {
@@ -138,8 +138,8 @@
         }
       },
       "Employee": {
-        "schema_name": "public",
-        "table_name": "Employee",
+        "schema_name": "hasura-development.chinook_sample",
+        "table_name": "employees",
         "columns": {
           "Address": {
             "name": "Address",
@@ -230,8 +230,8 @@
         }
       },
       "Genre": {
-        "schema_name": "public",
-        "table_name": "Genre",
+        "schema_name": "hasura-development.chinook_sample",
+        "table_name": "genres",
         "columns": {
           "GenreId": {
             "name": "GenreId",
@@ -250,8 +250,8 @@
         "foreign_relations": {}
       },
       "Invoice": {
-        "schema_name": "public",
-        "table_name": "Invoice",
+        "schema_name": "hasura-development.chinook_sample",
+        "table_name": "invoices",
         "columns": {
           "BillingAddress": {
             "name": "BillingAddress",
@@ -312,8 +312,8 @@
         }
       },
       "InvoiceLine": {
-        "schema_name": "public",
-        "table_name": "InvoiceLine",
+        "schema_name": "hasura-development.chinook_sample",
+        "table_name": "invoice_items",
         "columns": {
           "InvoiceId": {
             "name": "InvoiceId",
@@ -360,8 +360,8 @@
         }
       },
       "MediaType": {
-        "schema_name": "public",
-        "table_name": "MediaType",
+        "schema_name": "hasura-development.chinook_sample",
+        "table_name": "media_types",
         "columns": {
           "MediaTypeId": {
             "name": "MediaTypeId",
@@ -380,8 +380,8 @@
         "foreign_relations": {}
       },
       "Playlist": {
-        "schema_name": "public",
-        "table_name": "Playlist",
+        "schema_name": "hasura-development.chinook_sample",
+        "table_name": "playlists",
         "columns": {
           "Name": {
             "name": "Name",
@@ -400,8 +400,8 @@
         "foreign_relations": {}
       },
       "PlaylistTrack": {
-        "schema_name": "public",
-        "table_name": "PlaylistTrack",
+        "schema_name": "hasura-development.chinook_sample",
+        "table_name": "playlist_track",
         "columns": {
           "PlaylistId": {
             "name": "PlaylistId",
@@ -433,8 +433,8 @@
         }
       },
       "Track": {
-        "schema_name": "public",
-        "table_name": "Track",
+        "schema_name": "hasura-development.chinook_sample",
+        "table_name": "track",
         "columns": {
           "AlbumId": {
             "name": "AlbumId",
@@ -505,132 +505,11 @@
             }
           }
         }
-      },
-      "geography_columns": {
-        "schema_name": "public",
-        "table_name": "geography_columns",
-        "columns": {
-          "coord_dimension": {
-            "name": "coord_dimension",
-            "type": "integer",
-            "nullable": "Nullable"
-          },
-          "f_geography_column": {
-            "name": "f_geography_column",
-            "type": "any",
-            "nullable": "Nullable"
-          },
-          "f_table_catalog": {
-            "name": "f_table_catalog",
-            "type": "any",
-            "nullable": "Nullable"
-          },
-          "f_table_name": {
-            "name": "f_table_name",
-            "type": "any",
-            "nullable": "Nullable"
-          },
-          "f_table_schema": {
-            "name": "f_table_schema",
-            "type": "any",
-            "nullable": "Nullable"
-          },
-          "srid": {
-            "name": "srid",
-            "type": "integer",
-            "nullable": "Nullable"
-          },
-          "type": {
-            "name": "type",
-            "type": "text",
-            "nullable": "Nullable"
-          }
-        },
-        "uniqueness_constraints": {},
-        "foreign_relations": {}
-      },
-      "geometry_columns": {
-        "schema_name": "public",
-        "table_name": "geometry_columns",
-        "columns": {
-          "coord_dimension": {
-            "name": "coord_dimension",
-            "type": "integer",
-            "nullable": "Nullable"
-          },
-          "f_geometry_column": {
-            "name": "f_geometry_column",
-            "type": "any",
-            "nullable": "Nullable"
-          },
-          "f_table_catalog": {
-            "name": "f_table_catalog",
-            "type": "character varying",
-            "nullable": "Nullable"
-          },
-          "f_table_name": {
-            "name": "f_table_name",
-            "type": "any",
-            "nullable": "Nullable"
-          },
-          "f_table_schema": {
-            "name": "f_table_schema",
-            "type": "any",
-            "nullable": "Nullable"
-          },
-          "srid": {
-            "name": "srid",
-            "type": "integer",
-            "nullable": "Nullable"
-          },
-          "type": {
-            "name": "type",
-            "type": "character varying",
-            "nullable": "Nullable"
-          }
-        },
-        "uniqueness_constraints": {},
-        "foreign_relations": {}
-      },
-      "spatial_ref_sys": {
-        "schema_name": "public",
-        "table_name": "spatial_ref_sys",
-        "columns": {
-          "auth_name": {
-            "name": "auth_name",
-            "type": "character varying",
-            "nullable": "Nullable"
-          },
-          "auth_srid": {
-            "name": "auth_srid",
-            "type": "integer",
-            "nullable": "Nullable"
-          },
-          "proj4text": {
-            "name": "proj4text",
-            "type": "character varying",
-            "nullable": "Nullable"
-          },
-          "srid": {
-            "name": "srid",
-            "type": "integer",
-            "nullable": "NonNullable"
-          },
-          "srtext": {
-            "name": "srtext",
-            "type": "character varying",
-            "nullable": "Nullable"
-          }
-        },
-        "uniqueness_constraints": {
-          "spatial_ref_sys_pkey": ["srid"]
-        },
-        "foreign_relations": {}
       }
     },
     "native_queries": {
       "artist": {
-        "sql": "SELECT * FROM public.\"Artist\"",
+        "sql": "SELECT * FROM hasura-development.chinook_sample.\"artists\"",
         "columns": {
           "ArtistId": {
             "name": "ArtistId",
@@ -643,7 +522,7 @@
         }
       },
       "artist_below_id": {
-        "sql": "SELECT * FROM public.\"Artist\" WHERE \"ArtistId\" < {{id}}",
+        "sql": "SELECT * FROM hasura-development.chinook_sample.\"artists\" WHERE \"ArtistId\" < {{id}}",
         "columns": {
           "ArtistId": {
             "name": "ArtistId",
@@ -662,7 +541,7 @@
         }
       },
       "album_by_title": {
-        "sql": "SELECT * FROM public.\"Album\" WHERE \"Title\" LIKE {{title}} AND \"AlbumId\" < {{id}}",
+        "sql": "SELECT * FROM hasura-development.chinook_sample.\"Album\" WHERE \"Title\" LIKE {{title}} AND \"AlbumId\" < {{id}}",
         "columns": {
           "AlbumId": {
             "name": "AlbumId",

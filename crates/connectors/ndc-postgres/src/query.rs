@@ -68,7 +68,7 @@ async fn execute_query(
     plan: sql::execution_plan::ExecutionPlan,
 ) -> Result<models::QueryResponse, connector::QueryError> {
     let timer = state.metrics.time_query_execution();
-    let result = execution::execute(&state.pool, &state.metrics, plan)
+    let result = execution::execute(&state.bigquery_client, plan)
         .await
         .map_err(|err| match err {
             execution::Error::Query(err) => {

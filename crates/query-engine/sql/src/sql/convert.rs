@@ -189,6 +189,7 @@ impl Expression {
     pub fn to_sql(&self, sql: &mut SQL) {
         match &self {
             Expression::ColumnReference(column_reference) => column_reference.to_sql(sql),
+            Expression::TableReference(table_reference) => table_reference.to_sql(sql),
             Expression::Value(value) => value.to_sql(sql),
             Expression::Cast { expression, r#type } => {
                 sql.append_syntax("cast");
@@ -274,7 +275,7 @@ impl Expression {
                 sql.append_syntax(")");
             }
             Expression::JsonBuildObject(map) => {
-                sql.append_syntax("json_build_object");
+                sql.append_syntax("JSON_OBJECT");
                 sql.append_syntax("(");
 
                 for (index, (label, item)) in map.iter().enumerate() {
@@ -289,12 +290,6 @@ impl Expression {
                     }
                 }
 
-                sql.append_syntax(")");
-            }
-            Expression::RowToJson(select) => {
-                sql.append_syntax("row_to_json");
-                sql.append_syntax("(");
-                select.to_sql(sql);
                 sql.append_syntax(")");
             }
             Expression::Count(count_type) => {
@@ -351,6 +346,7 @@ impl Function {
         match self {
             Function::Coalesce => sql.append_syntax("coalesce"),
             Function::JsonAgg => sql.append_syntax("json_agg"),
+            Function::ArrayAgg => sql.append_syntax("ARRAY_AGG"),
             Function::Unknown(name) => sql.append_syntax(name),
         }
     }
@@ -436,7 +432,7 @@ impl TableReference {
 
 impl TableAlias {
     pub fn to_sql(&self, sql: &mut SQL) {
-        let name = format!("%{}_{}", self.unique_index, self.name);
+        let name = format!("{}_{}", self.name, self.unique_index);
         sql.append_identifier(&name);
     }
 }

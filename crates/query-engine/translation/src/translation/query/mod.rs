@@ -49,8 +49,6 @@ pub fn translate(
         state.make_table_alias("universe".to_string()),
         state.make_table_alias("rows".to_string()),
         sql::helpers::make_column_alias("rows".to_string()),
-        state.make_table_alias("aggregates".to_string()),
-        sql::helpers::make_column_alias("aggregates".to_string()),
         select_set,
     );
 
