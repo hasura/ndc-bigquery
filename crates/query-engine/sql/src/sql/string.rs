@@ -51,6 +51,6 @@ impl SQL {
         // so we first push the param and then check the length of the vector.
         self.params.push(param);
         self.sql
-            .push_str(format!("${}", self.params.len()).as_str());
+            .push_str(format!("@param{}", self.params.len()).as_str());
     }
 }

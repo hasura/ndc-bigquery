@@ -10,7 +10,7 @@
         },
         "Name": {
           "name": "Name",
-          "type": "character varying"
+          "type": "string"
         },
         "CEOId": {
           "name": "CEOId",
@@ -28,7 +28,7 @@
         },
         "Name": {
           "name": "Name",
-          "type": "character varying"
+          "type": "string"
         },
         "ParentId": {
           "name": "ParentId",

@@ -9,7 +9,7 @@
         },
         "Name": {
           "name": "Name",
-          "type": "character varying"
+          "type": "string"
         }
       },
       "arguments": {}
@@ -23,7 +23,7 @@
         },
         "Title": {
           "name": "Title",
-          "type": "character varying"
+          "type": "string"
         },
         "ArtistId": {
           "name": "ArtistId",
@@ -33,7 +33,7 @@
       "arguments": {
         "title": {
           "name": "title",
-          "type": "character varying"
+          "type": "string"
         }
       }
     }

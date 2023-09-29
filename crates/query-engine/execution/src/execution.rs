@@ -35,6 +35,8 @@ pub async fn execute(
 
             let mut inner_rows = vec![];
 
+            println!("{}", query.sql.as_str());
+
             // Query
             let mut rs = bigquery_client
                 .job()

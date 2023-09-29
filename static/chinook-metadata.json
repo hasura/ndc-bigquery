@@ -7,13 +7,13 @@
     },
     "schema": {
       "scalar_types": {
-        "character varying": {
+        "string": {
           "aggregate_functions": {},
           "comparison_operators": {
             "_like": {
               "argument_type": {
                 "type": "named",
-                "name": "character varying"
+                "name": "string"
               }
             }
           },
@@ -61,7 +61,7 @@
               "arguments": {},
               "type": {
                 "type": "named",
-                "name": "character varying"
+                "name": "string"
               }
             }
           }
@@ -82,7 +82,7 @@
               "arguments": {},
               "type": {
                 "type": "named",
-                "name": "character varying"
+                "name": "string"
               }
             },
             "ArtistId": {
@@ -111,7 +111,7 @@
               "arguments": {},
               "type": {
                 "type": "named",
-                "name": "character varying"
+                "name": "string"
               }
             },
             "AlbumId": {
@@ -148,7 +148,7 @@
               "arguments": {},
               "type": {
                 "type": "named",
-                "name": "character varying"
+                "name": "string"
               }
             }
           }
@@ -633,6 +633,6 @@
     },
     "kind": "DataConnectorScalarRepresentation",
     "representation": "String",
-    "scalarType": "character varying"
+    "scalarType": "string"
   }
 ]

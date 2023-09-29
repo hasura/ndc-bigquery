@@ -1,24 +1,21 @@
 ---
-source: crates/ndc-postgres/tests/query_tests.rs
+source: crates/connectors/ndc-postgres/tests/query_tests.rs
 expression: result
 ---
 [
   {
     "rows": [
       {
-        "Title": "A Matter of Life and Death"
+        "Title": "Facelift"
       },
       {
-        "Title": "A Real Dead One"
+        "Title": "For Those About To Rock We Salute You"
       },
       {
-        "Title": "A Real Live One"
+        "Title": "Jagged Little Pill"
       },
       {
-        "Title": "A Soprano Inspired"
-      },
-      {
-        "Title": "A TempestadeTempestade Ou O Livro Dos Dias"
+        "Title": "Permanent Vacation"
       }
     ]
   }

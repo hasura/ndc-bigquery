@@ -9,7 +9,7 @@ expression: result
         "bigint": 245555555,
         "boolean": true,
         "character": "s",
-        "character varying": "character varying string",
+        "string": "string string",
         "date": "2021-12-21",
         "double precision": 2455.555,
         "integer": 24555,

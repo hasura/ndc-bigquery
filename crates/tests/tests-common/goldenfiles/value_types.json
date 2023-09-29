@@ -42,9 +42,9 @@
         "column": "character",
         "arguments": {}
       },
-      "character varying": {
+      "string": {
         "type": "column",
-        "column": "character varying",
+        "column": "string",
         "arguments": {}
       },
       "text": {
@@ -210,7 +210,7 @@
           "type": "binary_comparison_operator",
           "column": {
             "type": "column",
-            "name": "character varying",
+            "name": "string",
             "path": []
           },
           "operator": {
@@ -218,7 +218,7 @@
           },
           "value": {
             "type": "scalar",
-            "value": "character varying string"
+            "value": "string string"
           }
         },
         {
@@ -362,9 +362,9 @@
       "type": "literal",
       "value": "s"
     },
-    "character varying": {
+    "string": {
       "type": "literal",
-      "value": "character varying string"
+      "value": "string string"
     },
     "text": {
       "type": "literal",

@@ -53,7 +53,7 @@ FROM
                 WHERE
                   (
                     (
-                      "%5_album"."Title" LIKE cast($1 as character varying)
+                      "%5_album"."Title" LIKE cast($1 as string)
                     )
                     AND ("%0_artist"."ArtistId" = "%5_album"."ArtistId")
                   )

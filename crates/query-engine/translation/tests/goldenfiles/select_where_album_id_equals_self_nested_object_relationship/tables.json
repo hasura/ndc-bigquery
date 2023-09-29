@@ -14,7 +14,7 @@
         },
         "Title": {
           "name": "Title",
-          "type": "character varying"
+          "type": "string"
         }
       },
       "uniqueness_constraints": {
@@ -39,7 +39,7 @@
         },
         "Name": {
           "name": "Name",
-          "type": "character varying"
+          "type": "string"
         }
       },
       "uniqueness_constraints": {
@@ -53,15 +53,15 @@
       "columns": {
         "AlbumId": {
           "name": "AlbumId",
-          "type": "character varying"
+          "type": "string"
         },
         "Bytes": {
           "name": "Bytes",
-          "type": "character varying"
+          "type": "string"
         },
         "Composer": {
           "name": "Composer",
-          "type": "character varying"
+          "type": "string"
         },
         "GenreId": {
           "name": "GenreId",
@@ -77,7 +77,7 @@
         },
         "Name": {
           "name": "Name",
-          "type": "character varying"
+          "type": "string"
         },
         "TrackId": {
           "name": "TrackId",

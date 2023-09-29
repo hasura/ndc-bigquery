@@ -126,12 +126,10 @@ pub fn translate_joins(
                 final_select_set,
             );
 
-            Ok(sql::ast::Join::LeftOuterJoinLateral(
-                sql::ast::LeftOuterJoinLateral {
-                    select: Box::new(json_select),
-                    alias: join_field.table_alias,
-                },
-            ))
+            Ok(sql::ast::Join::LeftOuterJoin(sql::ast::LeftOuterJoin {
+                select: Box::new(json_select),
+                alias: join_field.table_alias,
+            }))
         })
         .collect::<Result<Vec<sql::ast::Join>, Error>>()
 }

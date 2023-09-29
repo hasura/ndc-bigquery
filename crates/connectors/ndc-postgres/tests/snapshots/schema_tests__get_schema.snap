@@ -259,103 +259,103 @@ expression: result
       },
       "update_operators": {}
     },
-    "character varying": {
+    "string": {
       "aggregate_functions": {},
       "comparison_operators": {
         "_eq": {
           "argument_type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "_gt": {
           "argument_type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "_gte": {
           "argument_type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "_ilike": {
           "argument_type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "_iregex": {
           "argument_type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "_like": {
           "argument_type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "_lt": {
           "argument_type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "_lte": {
           "argument_type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "_neq": {
           "argument_type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "_nilike": {
           "argument_type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "_niregex": {
           "argument_type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "_nlike": {
           "argument_type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "_nregex": {
           "argument_type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "_nsimilar": {
           "argument_type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "_regex": {
           "argument_type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "_similar": {
           "argument_type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         }
       },
@@ -1299,7 +1299,7 @@ expression: result
         "Title": {
           "type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         }
       }
@@ -1315,7 +1315,7 @@ expression: result
         "Name": {
           "type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         }
       }
@@ -1325,25 +1325,25 @@ expression: result
         "Address": {
           "type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "City": {
           "type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "Company": {
           "type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "Country": {
           "type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "CustomerId": {
@@ -1355,43 +1355,43 @@ expression: result
         "Email": {
           "type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "Fax": {
           "type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "FirstName": {
           "type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "LastName": {
           "type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "Phone": {
           "type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "PostalCode": {
           "type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "State": {
           "type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "SupportRepId": {
@@ -1407,7 +1407,7 @@ expression: result
         "Address": {
           "type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "BirthDate": {
@@ -1419,19 +1419,19 @@ expression: result
         "City": {
           "type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "Country": {
           "type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "Email": {
           "type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "EmployeeId": {
@@ -1443,13 +1443,13 @@ expression: result
         "Fax": {
           "type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "FirstName": {
           "type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "HireDate": {
@@ -1461,19 +1461,19 @@ expression: result
         "LastName": {
           "type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "Phone": {
           "type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "PostalCode": {
           "type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "ReportsTo": {
@@ -1485,13 +1485,13 @@ expression: result
         "State": {
           "type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "Title": {
           "type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         }
       }
@@ -1507,7 +1507,7 @@ expression: result
         "Name": {
           "type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         }
       }
@@ -1517,31 +1517,31 @@ expression: result
         "BillingAddress": {
           "type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "BillingCity": {
           "type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "BillingCountry": {
           "type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "BillingPostalCode": {
           "type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "BillingState": {
           "type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "CustomerId": {
@@ -1615,7 +1615,7 @@ expression: result
         "Name": {
           "type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         }
       }
@@ -1625,7 +1625,7 @@ expression: result
         "Name": {
           "type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "PlaylistId": {
@@ -1669,7 +1669,7 @@ expression: result
         "Composer": {
           "type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "GenreId": {
@@ -1693,7 +1693,7 @@ expression: result
         "Name": {
           "type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "TrackId": {
@@ -1773,7 +1773,7 @@ expression: result
         "f_table_catalog": {
           "type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "f_table_name": {
@@ -1797,7 +1797,7 @@ expression: result
         "type": {
           "type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         }
       }
@@ -1807,7 +1807,7 @@ expression: result
         "auth_name": {
           "type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "auth_srid": {
@@ -1819,7 +1819,7 @@ expression: result
         "proj4text": {
           "type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "srid": {
@@ -1831,7 +1831,7 @@ expression: result
         "srtext": {
           "type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         }
       }

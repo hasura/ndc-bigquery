@@ -1,24 +1,18 @@
 ---
-source: crates/ndc-postgres/tests/query_tests.rs
+source: crates/connectors/ndc-postgres/tests/query_tests.rs
 expression: result
 ---
 [
   {
     "rows": [
       {
-        "Title": "Let There Be Rock"
-      },
-      {
-        "Title": "Big Ones"
-      },
-      {
-        "Title": "Jagged Little Pill"
-      },
-      {
         "Title": "Facelift"
       },
       {
-        "Title": "Warner 25 Anos"
+        "Title": "Balls to the Wall"
+      },
+      {
+        "Title": "Jagged Little Pill"
       }
     ]
   }

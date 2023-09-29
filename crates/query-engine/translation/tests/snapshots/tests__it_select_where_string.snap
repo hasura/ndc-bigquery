@@ -21,8 +21,8 @@ FROM
             WHERE
               (
                 "%0_Album"."Title" IN (
-                  cast($1 as character varying),
-                  cast($2 as character varying)
+                  cast($1 as string),
+                  cast($2 as string)
                 )
               )
           ) AS "%2_rows"

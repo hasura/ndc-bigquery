@@ -10,7 +10,7 @@
         },
         "title": {
           "name": "Title",
-          "type": "character varying"
+          "type": "string"
         },
         "artist_id": {
           "name": "ArtistId",
@@ -28,7 +28,7 @@
         },
         "name": {
           "name": "Name",
-          "type": "character varying"
+          "type": "string"
         }
       }
     }

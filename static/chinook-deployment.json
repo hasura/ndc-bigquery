@@ -19,7 +19,7 @@
           },
           "Title": {
             "name": "Title",
-            "type": "character varying",
+            "type": "string",
             "nullable": "NonNullable"
           }
         },
@@ -46,7 +46,7 @@
           },
           "Name": {
             "name": "Name",
-            "type": "character varying",
+            "type": "string",
             "nullable": "Nullable"
           }
         },
@@ -61,22 +61,22 @@
         "columns": {
           "Address": {
             "name": "Address",
-            "type": "character varying",
+            "type": "string",
             "nullable": "Nullable"
           },
           "City": {
             "name": "City",
-            "type": "character varying",
+            "type": "string",
             "nullable": "Nullable"
           },
           "Company": {
             "name": "Company",
-            "type": "character varying",
+            "type": "string",
             "nullable": "Nullable"
           },
           "Country": {
             "name": "Country",
-            "type": "character varying",
+            "type": "string",
             "nullable": "Nullable"
           },
           "CustomerId": {
@@ -86,37 +86,37 @@
           },
           "Email": {
             "name": "Email",
-            "type": "character varying",
+            "type": "string",
             "nullable": "NonNullable"
           },
           "Fax": {
             "name": "Fax",
-            "type": "character varying",
+            "type": "string",
             "nullable": "Nullable"
           },
           "FirstName": {
             "name": "FirstName",
-            "type": "character varying",
+            "type": "string",
             "nullable": "NonNullable"
           },
           "LastName": {
             "name": "LastName",
-            "type": "character varying",
+            "type": "string",
             "nullable": "NonNullable"
           },
           "Phone": {
             "name": "Phone",
-            "type": "character varying",
+            "type": "string",
             "nullable": "Nullable"
           },
           "PostalCode": {
             "name": "PostalCode",
-            "type": "character varying",
+            "type": "string",
             "nullable": "Nullable"
           },
           "State": {
             "name": "State",
-            "type": "character varying",
+            "type": "string",
             "nullable": "Nullable"
           },
           "SupportRepId": {
@@ -143,7 +143,7 @@
         "columns": {
           "Address": {
             "name": "Address",
-            "type": "character varying",
+            "type": "string",
             "nullable": "Nullable"
           },
           "BirthDate": {
@@ -153,17 +153,17 @@
           },
           "City": {
             "name": "City",
-            "type": "character varying",
+            "type": "string",
             "nullable": "Nullable"
           },
           "Country": {
             "name": "Country",
-            "type": "character varying",
+            "type": "string",
             "nullable": "Nullable"
           },
           "Email": {
             "name": "Email",
-            "type": "character varying",
+            "type": "string",
             "nullable": "Nullable"
           },
           "EmployeeId": {
@@ -173,12 +173,12 @@
           },
           "Fax": {
             "name": "Fax",
-            "type": "character varying",
+            "type": "string",
             "nullable": "Nullable"
           },
           "FirstName": {
             "name": "FirstName",
-            "type": "character varying",
+            "type": "string",
             "nullable": "NonNullable"
           },
           "HireDate": {
@@ -188,17 +188,17 @@
           },
           "LastName": {
             "name": "LastName",
-            "type": "character varying",
+            "type": "string",
             "nullable": "NonNullable"
           },
           "Phone": {
             "name": "Phone",
-            "type": "character varying",
+            "type": "string",
             "nullable": "Nullable"
           },
           "PostalCode": {
             "name": "PostalCode",
-            "type": "character varying",
+            "type": "string",
             "nullable": "Nullable"
           },
           "ReportsTo": {
@@ -208,12 +208,12 @@
           },
           "State": {
             "name": "State",
-            "type": "character varying",
+            "type": "string",
             "nullable": "Nullable"
           },
           "Title": {
             "name": "Title",
-            "type": "character varying",
+            "type": "string",
             "nullable": "Nullable"
           }
         },
@@ -240,7 +240,7 @@
           },
           "Name": {
             "name": "Name",
-            "type": "character varying",
+            "type": "string",
             "nullable": "Nullable"
           }
         },
@@ -255,27 +255,27 @@
         "columns": {
           "BillingAddress": {
             "name": "BillingAddress",
-            "type": "character varying",
+            "type": "string",
             "nullable": "Nullable"
           },
           "BillingCity": {
             "name": "BillingCity",
-            "type": "character varying",
+            "type": "string",
             "nullable": "Nullable"
           },
           "BillingCountry": {
             "name": "BillingCountry",
-            "type": "character varying",
+            "type": "string",
             "nullable": "Nullable"
           },
           "BillingPostalCode": {
             "name": "BillingPostalCode",
-            "type": "character varying",
+            "type": "string",
             "nullable": "Nullable"
           },
           "BillingState": {
             "name": "BillingState",
-            "type": "character varying",
+            "type": "string",
             "nullable": "Nullable"
           },
           "CustomerId": {
@@ -370,7 +370,7 @@
           },
           "Name": {
             "name": "Name",
-            "type": "character varying",
+            "type": "string",
             "nullable": "Nullable"
           }
         },
@@ -385,7 +385,7 @@
         "columns": {
           "Name": {
             "name": "Name",
-            "type": "character varying",
+            "type": "string",
             "nullable": "Nullable"
           },
           "PlaylistId": {
@@ -434,7 +434,7 @@
       },
       "Track": {
         "schema_name": "hasura-development.chinook_sample",
-        "table_name": "track",
+        "table_name": "tracks",
         "columns": {
           "AlbumId": {
             "name": "AlbumId",
@@ -448,7 +448,7 @@
           },
           "Composer": {
             "name": "Composer",
-            "type": "character varying",
+            "type": "string",
             "nullable": "Nullable"
           },
           "GenreId": {
@@ -468,7 +468,7 @@
           },
           "Name": {
             "name": "Name",
-            "type": "character varying",
+            "type": "string",
             "nullable": "NonNullable"
           },
           "TrackId": {
@@ -517,7 +517,7 @@
           },
           "Name": {
             "name": "Name",
-            "type": "character varying"
+            "type": "string"
           }
         }
       },
@@ -530,7 +530,7 @@
           },
           "Name": {
             "name": "Name",
-            "type": "character varying"
+            "type": "string"
           }
         },
         "arguments": {
@@ -549,7 +549,7 @@
           },
           "Title": {
             "name": "Title",
-            "type": "character varying"
+            "type": "string"
           },
           "ArtistId": {
             "name": "ArtistId",
@@ -563,12 +563,12 @@
           },
           "title": {
             "name": "title",
-            "type": "character varying"
+            "type": "string"
           }
         }
       },
       "value_types": {
-        "sql": "SELECT {{boolean}} as boolean, {{integer}} as integer, {{smallint}} as smallint, {{bigint}} as bigint, {{real}} as real, {{double precision}} as \"double precision\", {{numeric}} as numeric, {{character}} as character, {{character varying}} as \"character varying\", {{text}} as text, {{date}} as date, {{time}} as time, {{timetz}} as timetz, {{timestamp}} as timestamp, {{timestamptz}} as timestamptz, {{uuid}} as uuid",
+        "sql": "SELECT {{boolean}} as boolean, {{integer}} as integer, {{smallint}} as smallint, {{bigint}} as bigint, {{real}} as real, {{double precision}} as \"double precision\", {{numeric}} as numeric, {{character}} as character, {{string}} as \"string\", {{text}} as text, {{date}} as date, {{time}} as time, {{timetz}} as timetz, {{timestamp}} as timestamp, {{timestamptz}} as timestamptz, {{uuid}} as uuid",
         "columns": {
           "boolean": {
             "name": "boolean",
@@ -602,9 +602,9 @@
             "name": "character",
             "type": "character"
           },
-          "character varying": {
-            "name": "character varying",
-            "type": "character varying"
+          "string": {
+            "name": "string",
+            "type": "string"
           },
           "text": {
             "name": "text",
@@ -668,9 +668,9 @@
             "name": "character",
             "type": "character"
           },
-          "character varying": {
-            "name": "character varying",
-            "type": "character varying"
+          "string": {
+            "name": "string",
+            "type": "string"
           },
           "text": {
             "name": "text",
