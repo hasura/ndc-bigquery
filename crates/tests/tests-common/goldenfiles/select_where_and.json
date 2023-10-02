@@ -15,7 +15,7 @@
                   "type": "binary_comparison_operator",
                   "column": { "type": "column", "name": "Title", "path": [] },
                   "operator": { "type": "other", "name": "_like" },
-                  "value": { "type": "scalar", "value": "Van %" }
+                  "value": { "type": "scalar", "value": "Jagged %" }
                 }
               ]
             },
@@ -26,7 +26,7 @@
                   "type": "binary_comparison_operator",
                   "column": { "type": "column", "name": "Title", "path": [] },
                   "operator": { "type": "other", "name": "_like" },
-                  "value": { "type": "scalar", "value": "% Halen III" }
+                  "value": { "type": "scalar", "value": "% Little Pill" }
                 }
               ]
             }

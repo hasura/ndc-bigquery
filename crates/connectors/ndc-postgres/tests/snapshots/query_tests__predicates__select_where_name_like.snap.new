@@ -1,12 +1,14 @@
 ---
 source: crates/connectors/ndc-postgres/tests/query_tests.rs
+assertion_line: 48
 expression: result
 ---
 [
   {
     "rows": [
       {
-        "Title": "Jagged Little Pill"
+        "AlbumId": 1,
+        "Title": "For Those About To Rock We Salute You"
       }
     ]
   }

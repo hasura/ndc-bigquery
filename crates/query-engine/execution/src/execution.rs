@@ -1,12 +1,13 @@
 //! Execute an execution plan against the database.
 
 use gcp_bigquery_client::model::query_request::QueryRequest;
-use std::collections::BTreeMap;
-
+use gcp_bigquery_client::model::{query_parameter, query_parameter_type, query_parameter_value};
+use query_engine_sql::sql::string::Param;
 use serde_json;
 use sqlformat;
 use sqlx;
 use sqlx::Row;
+use std::collections::BTreeMap;
 use tracing::{info_span, Instrument};
 
 use ndc_sdk::models;
@@ -37,10 +38,41 @@ pub async fn execute(
 
             println!("{}", query.sql.as_str());
 
+            let mut query_request = QueryRequest::new(query.sql.as_str());
+
+            // smash query.params in here pls
+            query_request.query_parameters = Some(
+                query
+                    .params
+                    .iter()
+                    .enumerate()
+                    .map(|(i, param)| match param {
+                        Param::String(str) => {
+                            let value = query_parameter_value::QueryParameterValue {
+                                array_values: None,
+                                struct_values: None,
+                                value: Some(str.to_string()),
+                            };
+                            let value_type = query_parameter_type::QueryParameterType {
+                                array_type: None,
+                                struct_types: None,
+                                r#type: "STRING".to_string(),
+                            };
+                            query_parameter::QueryParameter {
+                                name: Some(format!("param{}", i + 1)),
+                                parameter_type: Some(value_type),
+                                parameter_value: Some(value),
+                            }
+                        }
+                        Param::Variable(_var) => todo!("Variables not implemented yet"),
+                    })
+                    .collect(),
+            );
+
             // Query
             let mut rs = bigquery_client
                 .job()
-                .query(project_id, QueryRequest::new(query.sql.as_str()))
+                .query(project_id, query_request)
                 .await
                 .unwrap();
 
