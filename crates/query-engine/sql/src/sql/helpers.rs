@@ -110,7 +110,7 @@ pub fn select_rowset(
     row_table_alias: TableAlias,
     row_inner_table_alias: TableAlias,
     aggregate_table_alias: TableAlias,
-    aggregate_inner_table_alias: TableAlias,
+    _aggregate_inner_table_alias: TableAlias,
     select_set: SelectSet,
 ) -> Select {
     match select_set {
@@ -163,13 +163,9 @@ pub fn select_rowset(
 
             let mut final_select = simple_select(row);
 
-            let select_star = star_select(From::Select {
-                alias: aggregate_inner_table_alias.clone(),
-                select: Box::new(aggregate_select),
-            });
             final_select.from = Some(From::Select {
                 alias: aggregate_table_alias,
-                select: Box::new(select_star),
+                select: Box::new(aggregate_select),
             });
             final_select
         }
