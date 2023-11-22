@@ -3,7 +3,7 @@ source: crates/query-engine/translation/tests/tests.rs
 expression: result
 ---
 SELECT
-  row_to_json("%9_universe") AS "universe"
+  JSON_OBJECT('rows', ARRAY_AGG(universe_7)) AS universe
 FROM
   (
     SELECT
@@ -11,70 +11,55 @@ FROM
     FROM
       (
         SELECT
-          coalesce(json_agg(row_to_json("%10_rows")), '[]') AS "rows"
+          RELATIONSHIP_albums_1.albums AS albums,
+          RELATIONSHIP_Albums_2.Albums AS Albums
         FROM
-          (
+          public.Artist AS Artist_0
+          LEFT OUTER JOIN (
             SELECT
-              "%1_RELATIONSHIP_albums"."albums" AS "albums",
-              "%2_RELATIONSHIP_Albums"."Albums" AS "Albums"
+              JSON_OBJECT('rows', ARRAY_AGG(RELATIONSHIP_albums_1)) AS albums
             FROM
-              "public"."Artist" AS "%0_Artist"
-              LEFT OUTER JOIN LATERAL (
+              (
                 SELECT
-                  row_to_json("%1_RELATIONSHIP_albums") AS "albums"
+                  *
                 FROM
                   (
                     SELECT
-                      *
+                      Album_3.Title AS title
                     FROM
+                      public.Album AS Album_3
+                    WHERE
                       (
-                        SELECT
-                          coalesce(json_agg(row_to_json("%4_rows")), '[]') AS "rows"
-                        FROM
-                          (
-                            SELECT
-                              "%3_Album"."Title" AS "title"
-                            FROM
-                              "public"."Album" AS "%3_Album"
-                            WHERE
-                              (
-                                true
-                                AND ("%0_Artist"."ArtistId" = "%3_Album"."ArtistId")
-                              )
-                          ) AS "%4_rows"
-                      ) AS "%4_rows"
-                  ) AS "%1_RELATIONSHIP_albums"
-              ) AS "%1_RELATIONSHIP_albums" ON ('true')
-              LEFT OUTER JOIN LATERAL (
+                        true
+                        AND (Artist_0.ArtistId = Album_3.ArtistId)
+                      )
+                  ) AS rows_4
+              ) AS RELATIONSHIP_albums_1
+          ) AS RELATIONSHIP_albums_1 ON (true)
+          LEFT OUTER JOIN (
+            SELECT
+              JSON_OBJECT('rows', ARRAY_AGG(RELATIONSHIP_Albums_2)) AS Albums
+            FROM
+              (
                 SELECT
-                  row_to_json("%2_RELATIONSHIP_Albums") AS "Albums"
+                  *
                 FROM
                   (
                     SELECT
-                      *
+                      Album_5.Title AS title
                     FROM
+                      public.Album AS Album_5
+                    WHERE
                       (
-                        SELECT
-                          coalesce(json_agg(row_to_json("%7_rows")), '[]') AS "rows"
-                        FROM
-                          (
-                            SELECT
-                              "%6_Album"."Title" AS "title"
-                            FROM
-                              "public"."Album" AS "%6_Album"
-                            WHERE
-                              (
-                                true
-                                AND ("%0_Artist"."ArtistId" = "%6_Album"."ArtistId")
-                              )
-                          ) AS "%7_rows"
-                      ) AS "%7_rows"
-                  ) AS "%2_RELATIONSHIP_Albums"
-              ) AS "%2_RELATIONSHIP_Albums" ON ('true')
-            LIMIT
-              5
-          ) AS "%10_rows"
-      ) AS "%10_rows"
-  ) AS "%9_universe"
+                        true
+                        AND (Artist_0.ArtistId = Album_5.ArtistId)
+                      )
+                  ) AS rows_6
+              ) AS RELATIONSHIP_Albums_2
+          ) AS RELATIONSHIP_Albums_2 ON (true)
+        LIMIT
+          5
+      ) AS rows_8
+  ) AS universe_7
 
 []

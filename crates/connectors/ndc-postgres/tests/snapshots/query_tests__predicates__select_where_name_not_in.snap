@@ -1,5 +1,5 @@
 ---
-source: crates/ndc-postgres/tests/query_tests.rs
+source: crates/connectors/ndc-postgres/tests/query_tests.rs
 expression: result
 ---
 [
@@ -10,20 +10,20 @@ expression: result
         "Title": "For Those About To Rock We Salute You"
       },
       {
+        "AlbumId": 3,
+        "Title": "Permanent Vacation"
+      },
+      {
+        "AlbumId": 5,
+        "Title": "Facelift"
+      },
+      {
         "AlbumId": 2,
         "Title": "Balls to the Wall"
       },
       {
-        "AlbumId": 3,
-        "Title": "Restless and Wild"
-      },
-      {
         "AlbumId": 4,
-        "Title": "Let There Be Rock"
-      },
-      {
-        "AlbumId": 5,
-        "Title": "Big Ones"
+        "Title": "Jagged Little Pill"
       }
     ]
   }

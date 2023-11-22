@@ -62,6 +62,7 @@ pub fn translate_order_by(
                             let new_join = sql::ast::LeftOuterJoin {
                                 select: Box::new(select),
                                 alias: table_alias.clone(),
+                                on: sql::helpers::true_expr(),
                             };
 
                             // ... push it to the accumulated joins.
@@ -214,6 +215,7 @@ fn translate_order_by_target(
             let new_join = sql::ast::LeftOuterJoin {
                 select: Box::new(select),
                 alias: table_alias.clone(),
+                on: sql::helpers::true_expr(),
             };
 
             joins.push(sql::ast::Join::LeftOuterJoin(new_join));
@@ -379,7 +381,6 @@ fn translate_order_by_target_for_column(
             // build a select query from this table where join condition.
             let mut select = sql::helpers::simple_select(select_cols);
 
-            select.where_ = sql::ast::Where(join_condition);
 
             select.from = Some(from_clause);
 
@@ -387,6 +388,8 @@ fn translate_order_by_target_for_column(
             let join = sql::ast::LeftOuterJoin {
                 select: Box::new(select),
                 alias: target_collection_alias,
+                on: join_condition
+
             };
 
             // add the join to our pile'o'joins

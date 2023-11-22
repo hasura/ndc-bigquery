@@ -11,9 +11,6 @@ pub struct Metrics {
     explain_total: IntCounter,
     query_plan_time: Histogram,
     query_execution_time: Histogram,
-    pool_size: IntGauge,
-    pool_idle_count: IntGauge,
-    pool_active_count: IntGauge,
     pool_max_connections: IntGauge,
     pool_min_connections: IntGauge,
     pool_acquire_timeout: Gauge,
@@ -46,24 +43,6 @@ impl Metrics {
             metrics_registry,
             "postgres_ndc_query_execution_time",
             "Time taken to execute an already-planned query, in seconds.",
-        )?;
-
-        let pool_size = add_int_gauge_metric(
-            metrics_registry,
-            "postgres_ndc_pool_size",
-            "The number of connections currently active. This includes idle connections.",
-        )?;
-
-        let pool_idle_count = add_int_gauge_metric(
-            metrics_registry,
-            "postgres_ndc_pool_idle",
-            "The number of connections active and idle (not in use).",
-        )?;
-
-        let pool_active_count = add_int_gauge_metric(
-            metrics_registry,
-            "postgres_ndc_pool_active",
-            "The number of connections current active. This does not include idle connections.",
         )?;
 
         let pool_max_connections = add_int_gauge_metric(
@@ -101,9 +80,6 @@ impl Metrics {
             explain_total,
             query_plan_time,
             query_execution_time,
-            pool_size,
-            pool_idle_count,
-            pool_active_count,
             pool_max_connections,
             pool_min_connections,
             pool_acquire_timeout,
@@ -154,18 +130,6 @@ impl Metrics {
             .unwrap_or(Duration::ZERO)
             .as_secs_f64();
         self.pool_max_lifetime.set(max_lifetime);
-    }
-
-    // Update all metrics fed from the database pool.
-    pub fn update_pool_metrics(&self, pool: &sqlx::PgPool) {
-        let pool_size: i64 = pool.size().into();
-        self.pool_size.set(pool_size);
-
-        let pool_idle: i64 = pool.num_idle().try_into().unwrap();
-        self.pool_idle_count.set(pool_idle);
-
-        let pool_active: i64 = pool_size - pool_idle;
-        self.pool_active_count.set(pool_active);
     }
 }
 

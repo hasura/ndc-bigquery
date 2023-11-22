@@ -3,7 +3,7 @@ source: crates/query-engine/translation/tests/tests.rs
 expression: result
 ---
 SELECT
-  row_to_json("%4_universe") AS "universe"
+  JSON_OBJECT('rows', ARRAY_AGG(universe_4)) AS universe
 FROM
   (
     SELECT
@@ -11,48 +11,36 @@ FROM
     FROM
       (
         SELECT
-          coalesce(json_agg(row_to_json("%5_rows")), '[]') AS "rows"
+          track_0.Name AS Name
         FROM
-          (
+          public.Track AS track_0
+          LEFT OUTER JOIN (
             SELECT
-              "%0_track"."Name" AS "Name"
+              ORDER_PART_artist_2.Name AS name
             FROM
-              "public"."Track" AS "%0_track"
-              LEFT OUTER JOIN LATERAL (
+              (
                 SELECT
-                  "%2_ORDER_PART_artist"."Name" AS "name"
+                  ORDER_PART_album_1.ArtistId AS ArtistId
                 FROM
-                  (
-                    SELECT
-                      "%1_ORDER_PART_album"."ArtistId" AS "ArtistId"
-                    FROM
-                      "public"."Album" AS "%1_ORDER_PART_album"
-                    WHERE
-                      (
-                        true
-                        AND (
-                          "%0_track"."AlbumId" = "%1_ORDER_PART_album"."AlbumId"
-                        )
-                      )
-                  ) AS "%1_ORDER_PART_album"
-                  LEFT OUTER JOIN LATERAL (
-                    SELECT
-                      "%2_ORDER_PART_artist"."Name" AS "Name"
-                    FROM
-                      "public"."Artist" AS "%2_ORDER_PART_artist"
-                    WHERE
-                      (
-                        true
-                        AND (
-                          "%1_ORDER_PART_album"."ArtistId" = "%2_ORDER_PART_artist"."ArtistId"
-                        )
-                      )
-                  ) AS "%2_ORDER_PART_artist" ON ('true')
-              ) AS "%3_ORDER_FOR_track" ON ('true')
-            ORDER BY
-              "%3_ORDER_FOR_track"."name" ASC
-          ) AS "%5_rows"
-      ) AS "%5_rows"
-  ) AS "%4_universe"
+                  public.Album AS ORDER_PART_album_1
+              ) AS ORDER_PART_album_1
+              LEFT OUTER JOIN (
+                SELECT
+                  ORDER_PART_artist_2.Name AS Name
+                FROM
+                  public.Artist AS ORDER_PART_artist_2
+              ) AS ORDER_PART_artist_2 ON (
+                (
+                  true
+                  AND (
+                    ORDER_PART_album_1.ArtistId = ORDER_PART_artist_2.ArtistId
+                  )
+                )
+              )
+          ) AS ORDER_FOR_track_3 ON (true)
+        ORDER BY
+          ORDER_FOR_track_3.name ASC
+      ) AS rows_5
+  ) AS universe_4
 
 []

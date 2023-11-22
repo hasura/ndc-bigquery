@@ -3,7 +3,7 @@ source: crates/query-engine/translation/tests/tests.rs
 expression: result
 ---
 SELECT
-  row_to_json("%5_universe") AS "universe"
+  JSON_OBJECT('rows', ARRAY_AGG(universe_4)) AS universe
 FROM
   (
     SELECT
@@ -11,43 +11,33 @@ FROM
     FROM
       (
         SELECT
-          coalesce(json_agg(row_to_json("%6_rows")), '[]') AS "rows"
+          RELATIONSHIP_Albums_1.Albums AS Albums
         FROM
-          (
+          public.Artist AS Artist_0
+          LEFT OUTER JOIN (
             SELECT
-              "%1_RELATIONSHIP_Albums"."Albums" AS "Albums"
+              JSON_OBJECT('rows', ARRAY_AGG(RELATIONSHIP_Albums_1)) AS Albums
             FROM
-              "public"."Artist" AS "%0_Artist"
-              LEFT OUTER JOIN LATERAL (
+              (
                 SELECT
-                  row_to_json("%1_RELATIONSHIP_Albums") AS "Albums"
+                  *
                 FROM
                   (
                     SELECT
-                      *
+                      Album_2.Title AS title
                     FROM
+                      public.Album AS Album_2
+                    WHERE
                       (
-                        SELECT
-                          coalesce(json_agg(row_to_json("%3_rows")), '[]') AS "rows"
-                        FROM
-                          (
-                            SELECT
-                              "%2_Album"."Title" AS "title"
-                            FROM
-                              "public"."Album" AS "%2_Album"
-                            WHERE
-                              (
-                                true
-                                AND ("%0_Artist"."ArtistId" = "%2_Album"."ArtistId")
-                              )
-                          ) AS "%3_rows"
-                      ) AS "%3_rows"
-                  ) AS "%1_RELATIONSHIP_Albums"
-              ) AS "%1_RELATIONSHIP_Albums" ON ('true')
-            LIMIT
-              5
-          ) AS "%6_rows"
-      ) AS "%6_rows"
-  ) AS "%5_universe"
+                        true
+                        AND (Artist_0.ArtistId = Album_2.ArtistId)
+                      )
+                  ) AS rows_3
+              ) AS RELATIONSHIP_Albums_1
+          ) AS RELATIONSHIP_Albums_1 ON (true)
+        LIMIT
+          5
+      ) AS rows_5
+  ) AS universe_4
 
 []

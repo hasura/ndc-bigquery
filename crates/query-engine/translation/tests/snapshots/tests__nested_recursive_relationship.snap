@@ -3,7 +3,7 @@ source: crates/query-engine/translation/tests/tests.rs
 expression: result
 ---
 SELECT
-  row_to_json("%9_universe") AS "universe"
+  JSON_OBJECT('rows', ARRAY_AGG(universe_7)) AS universe
 FROM
   (
     SELECT
@@ -11,67 +11,52 @@ FROM
     FROM
       (
         SELECT
-          coalesce(json_agg(row_to_json("%10_rows")), '[]') AS "rows"
+          RELATIONSHIP_Albums_1.Albums AS Albums
         FROM
-          (
+          public.Artist AS Artist_0
+          LEFT OUTER JOIN (
             SELECT
-              "%1_RELATIONSHIP_Albums"."Albums" AS "Albums"
+              JSON_OBJECT('rows', ARRAY_AGG(RELATIONSHIP_Albums_1)) AS Albums
             FROM
-              "public"."Artist" AS "%0_Artist"
-              LEFT OUTER JOIN LATERAL (
+              (
                 SELECT
-                  row_to_json("%1_RELATIONSHIP_Albums") AS "Albums"
+                  *
                 FROM
                   (
                     SELECT
-                      *
+                      RELATIONSHIP_Artist_3.Artist AS Artist
                     FROM
-                      (
+                      public.Album AS Album_2
+                      LEFT OUTER JOIN (
                         SELECT
-                          coalesce(json_agg(row_to_json("%7_rows")), '[]') AS "rows"
+                          JSON_OBJECT('rows', ARRAY_AGG(RELATIONSHIP_Artist_3)) AS Artist
                         FROM
                           (
                             SELECT
-                              "%3_RELATIONSHIP_Artist"."Artist" AS "Artist"
+                              *
                             FROM
-                              "public"."Album" AS "%2_Album"
-                              LEFT OUTER JOIN LATERAL (
-                                SELECT
-                                  row_to_json("%3_RELATIONSHIP_Artist") AS "Artist"
-                                FROM
-                                  (
-                                    SELECT
-                                      *
-                                    FROM
-                                      (
-                                        SELECT
-                                          coalesce(json_agg(row_to_json("%5_rows")), '[]') AS "rows"
-                                        FROM
-                                          (
-                                            SELECT
-                                              "%4_Artist"."Name" AS "name"
-                                            FROM
-                                              "public"."Artist" AS "%4_Artist"
-                                            WHERE
-                                              (
-                                                true
-                                                AND ("%2_Album"."ArtistId" = "%4_Artist"."ArtistId")
-                                              )
-                                          ) AS "%5_rows"
-                                      ) AS "%5_rows"
-                                  ) AS "%3_RELATIONSHIP_Artist"
-                              ) AS "%3_RELATIONSHIP_Artist" ON ('true')
-                            WHERE
                               (
-                                true
-                                AND ("%0_Artist"."ArtistId" = "%2_Album"."ArtistId")
-                              )
-                          ) AS "%7_rows"
-                      ) AS "%7_rows"
-                  ) AS "%1_RELATIONSHIP_Albums"
-              ) AS "%1_RELATIONSHIP_Albums" ON ('true')
-          ) AS "%10_rows"
-      ) AS "%10_rows"
-  ) AS "%9_universe"
+                                SELECT
+                                  Artist_4.Name AS name
+                                FROM
+                                  public.Artist AS Artist_4
+                                WHERE
+                                  (
+                                    true
+                                    AND (Album_2.ArtistId = Artist_4.ArtistId)
+                                  )
+                              ) AS rows_5
+                          ) AS RELATIONSHIP_Artist_3
+                      ) AS RELATIONSHIP_Artist_3 ON (true)
+                    WHERE
+                      (
+                        true
+                        AND (Artist_0.ArtistId = Album_2.ArtistId)
+                      )
+                  ) AS rows_6
+              ) AS RELATIONSHIP_Albums_1
+          ) AS RELATIONSHIP_Albums_1 ON (true)
+      ) AS rows_8
+  ) AS universe_7
 
 []

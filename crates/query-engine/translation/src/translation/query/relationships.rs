@@ -122,13 +122,16 @@ pub fn translate_joins(
                 join_field.column_alias.clone(),
                 join_field.table_alias.clone(),
                 state.make_table_alias("rows".to_string()),
-                sql::helpers::make_column_alias("rows".to_string()),
+                state.make_table_alias("rows_inner".to_string()),
+                state.make_table_alias("aggregates".to_string()),
+                state.make_table_alias("aggregates_inner".to_string()),
                 final_select_set,
             );
 
             Ok(sql::ast::Join::LeftOuterJoin(sql::ast::LeftOuterJoin {
                 select: Box::new(json_select),
                 alias: join_field.table_alias,
+                on: sql::helpers::true_expr(),
             }))
         })
         .collect::<Result<Vec<sql::ast::Join>, Error>>()

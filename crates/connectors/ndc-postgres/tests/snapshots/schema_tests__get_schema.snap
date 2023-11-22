@@ -4,48 +4,6 @@ expression: result
 ---
 {
   "scalar_types": {
-    "any": {
-      "aggregate_functions": {},
-      "comparison_operators": {
-        "_eq": {
-          "argument_type": {
-            "type": "named",
-            "name": "any"
-          }
-        },
-        "_gt": {
-          "argument_type": {
-            "type": "named",
-            "name": "any"
-          }
-        },
-        "_gte": {
-          "argument_type": {
-            "type": "named",
-            "name": "any"
-          }
-        },
-        "_lt": {
-          "argument_type": {
-            "type": "named",
-            "name": "any"
-          }
-        },
-        "_lte": {
-          "argument_type": {
-            "type": "named",
-            "name": "any"
-          }
-        },
-        "_neq": {
-          "argument_type": {
-            "type": "named",
-            "name": "any"
-          }
-        }
-      },
-      "update_operators": {}
-    },
     "bigint": {
       "aggregate_functions": {
         "bit_and": {
@@ -254,108 +212,6 @@ expression: result
           "argument_type": {
             "type": "named",
             "name": "character"
-          }
-        }
-      },
-      "update_operators": {}
-    },
-    "string": {
-      "aggregate_functions": {},
-      "comparison_operators": {
-        "_eq": {
-          "argument_type": {
-            "type": "named",
-            "name": "string"
-          }
-        },
-        "_gt": {
-          "argument_type": {
-            "type": "named",
-            "name": "string"
-          }
-        },
-        "_gte": {
-          "argument_type": {
-            "type": "named",
-            "name": "string"
-          }
-        },
-        "_ilike": {
-          "argument_type": {
-            "type": "named",
-            "name": "string"
-          }
-        },
-        "_iregex": {
-          "argument_type": {
-            "type": "named",
-            "name": "string"
-          }
-        },
-        "_like": {
-          "argument_type": {
-            "type": "named",
-            "name": "string"
-          }
-        },
-        "_lt": {
-          "argument_type": {
-            "type": "named",
-            "name": "string"
-          }
-        },
-        "_lte": {
-          "argument_type": {
-            "type": "named",
-            "name": "string"
-          }
-        },
-        "_neq": {
-          "argument_type": {
-            "type": "named",
-            "name": "string"
-          }
-        },
-        "_nilike": {
-          "argument_type": {
-            "type": "named",
-            "name": "string"
-          }
-        },
-        "_niregex": {
-          "argument_type": {
-            "type": "named",
-            "name": "string"
-          }
-        },
-        "_nlike": {
-          "argument_type": {
-            "type": "named",
-            "name": "string"
-          }
-        },
-        "_nregex": {
-          "argument_type": {
-            "type": "named",
-            "name": "string"
-          }
-        },
-        "_nsimilar": {
-          "argument_type": {
-            "type": "named",
-            "name": "string"
-          }
-        },
-        "_regex": {
-          "argument_type": {
-            "type": "named",
-            "name": "string"
-          }
-        },
-        "_similar": {
-          "argument_type": {
-            "type": "named",
-            "name": "string"
           }
         }
       },
@@ -940,6 +796,108 @@ expression: result
           "argument_type": {
             "type": "named",
             "name": "smallint"
+          }
+        }
+      },
+      "update_operators": {}
+    },
+    "string": {
+      "aggregate_functions": {},
+      "comparison_operators": {
+        "_eq": {
+          "argument_type": {
+            "type": "named",
+            "name": "string"
+          }
+        },
+        "_gt": {
+          "argument_type": {
+            "type": "named",
+            "name": "string"
+          }
+        },
+        "_gte": {
+          "argument_type": {
+            "type": "named",
+            "name": "string"
+          }
+        },
+        "_ilike": {
+          "argument_type": {
+            "type": "named",
+            "name": "string"
+          }
+        },
+        "_iregex": {
+          "argument_type": {
+            "type": "named",
+            "name": "string"
+          }
+        },
+        "_like": {
+          "argument_type": {
+            "type": "named",
+            "name": "string"
+          }
+        },
+        "_lt": {
+          "argument_type": {
+            "type": "named",
+            "name": "string"
+          }
+        },
+        "_lte": {
+          "argument_type": {
+            "type": "named",
+            "name": "string"
+          }
+        },
+        "_neq": {
+          "argument_type": {
+            "type": "named",
+            "name": "string"
+          }
+        },
+        "_nilike": {
+          "argument_type": {
+            "type": "named",
+            "name": "string"
+          }
+        },
+        "_niregex": {
+          "argument_type": {
+            "type": "named",
+            "name": "string"
+          }
+        },
+        "_nlike": {
+          "argument_type": {
+            "type": "named",
+            "name": "string"
+          }
+        },
+        "_nregex": {
+          "argument_type": {
+            "type": "named",
+            "name": "string"
+          }
+        },
+        "_nsimilar": {
+          "argument_type": {
+            "type": "named",
+            "name": "string"
+          }
+        },
+        "_regex": {
+          "argument_type": {
+            "type": "named",
+            "name": "string"
+          }
+        },
+        "_similar": {
+          "argument_type": {
+            "type": "named",
+            "name": "string"
           }
         }
       },
@@ -1709,132 +1667,6 @@ expression: result
           }
         }
       }
-    },
-    "geography_columns": {
-      "fields": {
-        "coord_dimension": {
-          "type": {
-            "type": "named",
-            "name": "integer"
-          }
-        },
-        "f_geography_column": {
-          "type": {
-            "type": "named",
-            "name": "any"
-          }
-        },
-        "f_table_catalog": {
-          "type": {
-            "type": "named",
-            "name": "any"
-          }
-        },
-        "f_table_name": {
-          "type": {
-            "type": "named",
-            "name": "any"
-          }
-        },
-        "f_table_schema": {
-          "type": {
-            "type": "named",
-            "name": "any"
-          }
-        },
-        "srid": {
-          "type": {
-            "type": "named",
-            "name": "integer"
-          }
-        },
-        "type": {
-          "type": {
-            "type": "named",
-            "name": "text"
-          }
-        }
-      }
-    },
-    "geometry_columns": {
-      "fields": {
-        "coord_dimension": {
-          "type": {
-            "type": "named",
-            "name": "integer"
-          }
-        },
-        "f_geometry_column": {
-          "type": {
-            "type": "named",
-            "name": "any"
-          }
-        },
-        "f_table_catalog": {
-          "type": {
-            "type": "named",
-            "name": "string"
-          }
-        },
-        "f_table_name": {
-          "type": {
-            "type": "named",
-            "name": "any"
-          }
-        },
-        "f_table_schema": {
-          "type": {
-            "type": "named",
-            "name": "any"
-          }
-        },
-        "srid": {
-          "type": {
-            "type": "named",
-            "name": "integer"
-          }
-        },
-        "type": {
-          "type": {
-            "type": "named",
-            "name": "string"
-          }
-        }
-      }
-    },
-    "spatial_ref_sys": {
-      "fields": {
-        "auth_name": {
-          "type": {
-            "type": "named",
-            "name": "string"
-          }
-        },
-        "auth_srid": {
-          "type": {
-            "type": "named",
-            "name": "integer"
-          }
-        },
-        "proj4text": {
-          "type": {
-            "type": "named",
-            "name": "string"
-          }
-        },
-        "srid": {
-          "type": {
-            "type": "named",
-            "name": "integer"
-          }
-        },
-        "srtext": {
-          "type": {
-            "type": "named",
-            "name": "string"
-          }
-        }
-      }
     }
   },
   "collections": [
@@ -2065,36 +1897,6 @@ expression: result
           "foreign_collection": "MediaType"
         }
       }
-    },
-    {
-      "name": "geography_columns",
-      "arguments": {},
-      "type": "geography_columns",
-      "deletable": false,
-      "uniqueness_constraints": {},
-      "foreign_keys": {}
-    },
-    {
-      "name": "geometry_columns",
-      "arguments": {},
-      "type": "geometry_columns",
-      "deletable": false,
-      "uniqueness_constraints": {},
-      "foreign_keys": {}
-    },
-    {
-      "name": "spatial_ref_sys",
-      "arguments": {},
-      "type": "spatial_ref_sys",
-      "deletable": false,
-      "uniqueness_constraints": {
-        "spatial_ref_sys_pkey": {
-          "unique_columns": [
-            "srid"
-          ]
-        }
-      },
-      "foreign_keys": {}
     }
   ],
   "functions": [],

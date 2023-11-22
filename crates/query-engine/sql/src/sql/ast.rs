@@ -95,6 +95,7 @@ pub struct CrossJoin {
 pub struct LeftOuterJoin {
     pub select: Box<Select>,
     pub alias: TableAlias,
+    pub on: Expression,
 }
 
 /// An INNER JOIN clause

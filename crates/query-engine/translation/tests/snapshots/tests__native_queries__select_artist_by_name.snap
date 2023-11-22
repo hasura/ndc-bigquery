@@ -2,16 +2,16 @@
 source: crates/query-engine/translation/tests/tests.rs
 expression: result
 ---
-WITH "%1_NATIVE_QUERY_artist_by_name" AS (
+WITH NATIVE_QUERY_artist_by_name_1 AS (
   SELECT
     *
   FROM
     public."Artist"
   WHERE
-    "Name" = cast($1 as string)
+    "Name" = cast(@param1 as string)
 )
 SELECT
-  row_to_json("%2_universe") AS "universe"
+  JSON_OBJECT('rows', ARRAY_AGG(universe_2)) AS universe
 FROM
   (
     SELECT
@@ -19,15 +19,10 @@ FROM
     FROM
       (
         SELECT
-          coalesce(json_agg(row_to_json("%3_rows")), '[]') AS "rows"
+          artist_by_name_0.ArtistId AS Id
         FROM
-          (
-            SELECT
-              "%0_artist_by_name"."ArtistId" AS "Id"
-            FROM
-              "%1_NATIVE_QUERY_artist_by_name" AS "%0_artist_by_name"
-          ) AS "%3_rows"
-      ) AS "%3_rows"
-  ) AS "%2_universe"
+          NATIVE_QUERY_artist_by_name_1 AS artist_by_name_0
+      ) AS rows_3
+  ) AS universe_2
 
 [(1, String("Rush"))]

@@ -144,31 +144,33 @@ impl From {
 impl Join {
     pub fn to_sql(&self, sql: &mut SQL) {
         match self {
-            Join::LeftOuterJoin(join) => {
+            Join::LeftOuterJoin(LeftOuterJoin { select, alias, on }) => {
                 sql.append_syntax(" LEFT OUTER JOIN ");
                 sql.append_syntax("(");
-                join.select.to_sql(sql);
+                select.to_sql(sql);
                 sql.append_syntax(")");
                 sql.append_syntax(" AS ");
-                join.alias.to_sql(sql);
-                sql.append_syntax(" ON ('true') ");
+                alias.to_sql(sql);
+                sql.append_syntax(" ON (");
+                on.to_sql(sql);
+                sql.append_syntax(") ");
             }
-            Join::InnerJoin(join) => {
+            Join::InnerJoin(InnerJoin { select, alias }) => {
                 sql.append_syntax(" INNER JOIN ");
                 sql.append_syntax("(");
-                join.select.to_sql(sql);
+                select.to_sql(sql);
                 sql.append_syntax(")");
                 sql.append_syntax(" AS ");
-                join.alias.to_sql(sql);
+                alias.to_sql(sql);
                 sql.append_syntax(" ON ('true') ");
             }
-            Join::CrossJoin(join) => {
+            Join::CrossJoin(CrossJoin { select, alias }) => {
                 sql.append_syntax(" CROSS JOIN ");
                 sql.append_syntax("(");
-                join.select.to_sql(sql);
+                select.to_sql(sql);
                 sql.append_syntax(")");
                 sql.append_syntax(" AS ");
-                join.alias.to_sql(sql);
+                alias.to_sql(sql);
             }
         }
     }

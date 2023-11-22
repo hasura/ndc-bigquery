@@ -20,6 +20,7 @@ pub async fn execute(
     plan: sql::execution_plan::ExecutionPlan,
 ) -> Result<models::QueryResponse, Error> {
     let query = plan.query();
+    print!("{:?}", query.params);
 
     tracing::info!(
         generated_sql = query.sql,
@@ -35,8 +36,6 @@ pub async fn execute(
             let project_id = "hasura-development";
 
             let mut inner_rows = vec![];
-
-            println!("{}", query.sql.as_str());
 
             let mut query_request = QueryRequest::new(query.sql.as_str());
 

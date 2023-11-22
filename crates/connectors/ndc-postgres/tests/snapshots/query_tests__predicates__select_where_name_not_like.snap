@@ -1,29 +1,25 @@
 ---
-source: crates/ndc-postgres/tests/query_tests.rs
+source: crates/connectors/ndc-postgres/tests/query_tests.rs
 expression: result
 ---
 [
   {
     "rows": [
       {
+        "AlbumId": 3,
+        "Title": "Permanent Vacation"
+      },
+      {
+        "AlbumId": 5,
+        "Title": "Facelift"
+      },
+      {
         "AlbumId": 2,
         "Title": "Balls to the Wall"
       },
       {
-        "AlbumId": 3,
-        "Title": "Restless and Wild"
-      },
-      {
-        "AlbumId": 5,
-        "Title": "Big Ones"
-      },
-      {
-        "AlbumId": 6,
+        "AlbumId": 4,
         "Title": "Jagged Little Pill"
-      },
-      {
-        "AlbumId": 7,
-        "Title": "Facelift"
       }
     ]
   }

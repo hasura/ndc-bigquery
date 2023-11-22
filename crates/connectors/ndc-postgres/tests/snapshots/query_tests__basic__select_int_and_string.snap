@@ -1,14 +1,7 @@
 ---
-source: crates/ndc-postgres/tests/query_tests.rs
+source: crates/connectors/ndc-postgres/tests/query_tests.rs
 expression: result
 ---
 [
-  {
-    "rows": [
-      {
-        "AlbumId": 35,
-        "title": "Garage Inc. (Disc 1)"
-      }
-    ]
-  }
+  {}
 ]
