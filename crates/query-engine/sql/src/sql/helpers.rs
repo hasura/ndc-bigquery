@@ -1,6 +1,7 @@
 //! Helpers for building sql::ast types in certain shapes and patterns.
 
 use super::ast::*;
+use std::collections::BTreeMap;
 
 /// Used as input to helpers to construct SELECTs which return 'rows' and/or 'aggregates' results.
 pub enum SelectSet {
@@ -102,154 +103,72 @@ pub fn star_select(from: From) -> Select {
 /// given a set of rows and aggregate queries, combine them into
 /// one Select
 ///
-/// ```sql
-/// SELECT row_to_json(<output_table_alias>) AS <output_column_alias>
-/// FROM (
-///   SELECT *
-///     FROM (
-///       SELECT coalesce(json_agg(row_to_json(<row_column_alias>)), '[]') AS "rows"
-///         FROM (<row_select>) AS <row_table_alias>
-///       ) AS <row_column_alias>
-///         CROSS JOIN (
-///           SELECT coalesce(row_to_json(<aggregate_column_alias>), '[]') AS "aggregates"
-///             FROM (<aggregate_select>) AS <aggregate_table_alias>
-///           ) AS <aggregate_column_alias>
-///        ) AS <output_column_alias>
-/// ```
-///
 /// The `row_select` and `aggregate_set` will not be included if they are not relevant
 pub fn select_rowset(
     output_column_alias: ColumnAlias,
-    output_table_alias: TableAlias,
+    _output_table_alias: TableAlias,
     row_table_alias: TableAlias,
-    row_column_alias: ColumnAlias,
+    row_inner_table_alias: TableAlias,
     aggregate_table_alias: TableAlias,
-    aggregate_column_alias: ColumnAlias,
+    _aggregate_inner_table_alias: TableAlias,
     select_set: SelectSet,
 ) -> Select {
-    let row = vec![(
-        output_column_alias,
-        (Expression::RowToJson(TableReference::AliasedTable(output_table_alias.clone()))),
-    )];
-
-    let mut final_select = simple_select(row);
-
-    let wrap_row =
-        |row_sel| select_rows_as_json(row_sel, row_column_alias, row_table_alias.clone());
-
-    let wrap_aggregate = |aggregate_sel| {
-        select_row_as_json_with_default(
-            aggregate_sel,
-            aggregate_column_alias,
-            aggregate_table_alias.clone(),
-        )
-    };
-
     match select_set {
         SelectSet::Rows(row_select) => {
+            let mut json_items = BTreeMap::new();
+
+            json_items.insert(
+                "rows".to_string(),
+                Box::new(Expression::FunctionCall {
+                    function: Function::ArrayAgg,
+                    args: vec![Expression::TableReference(TableReference::AliasedTable(
+                        row_table_alias.clone(),
+                    ))],
+                }),
+            );
+
+            let row = vec![(
+                output_column_alias,
+                (Expression::JsonBuildObject(json_items)),
+            )];
+
+            //  TableReference::AliasedTable(output_table_alias.clone()))),
+
+            let mut final_select = simple_select(row);
+
             let select_star = star_select(From::Select {
-                alias: row_table_alias.clone(),
-                select: Box::new(wrap_row(row_select)),
+                alias: row_inner_table_alias.clone(),
+                select: Box::new(row_select),
             });
             final_select.from = Some(From::Select {
-                alias: output_table_alias,
+                alias: row_table_alias,
                 select: Box::new(select_star),
-            })
+            });
+            final_select
         }
         SelectSet::Aggregates(aggregate_select) => {
-            let select_star = star_select(From::Select {
-                alias: aggregate_table_alias.clone(),
-                select: Box::new(wrap_aggregate(aggregate_select)),
-            });
-            final_select.from = Some(From::Select {
-                alias: output_table_alias,
-                select: Box::new(select_star),
-            })
-        }
-        SelectSet::RowsAndAggregates(row_select, aggregate_select) => {
-            let mut select_star = star_select(From::Select {
-                alias: row_table_alias.clone(),
-                select: Box::new(wrap_row(row_select)),
-            });
+            let mut json_items = BTreeMap::new();
 
-            select_star.joins = vec![Join::CrossJoin(CrossJoin {
-                select: Box::new(wrap_aggregate(aggregate_select)),
-                alias: aggregate_table_alias.clone(),
-            })];
+            json_items.insert(
+                "aggregates".to_string(),
+                Box::new(Expression::TableReference(TableReference::AliasedTable(
+                    aggregate_table_alias.clone(),
+                ))),
+            );
+
+            let row = vec![(
+                output_column_alias,
+                (Expression::JsonBuildObject(json_items)),
+            )];
+
+            let mut final_select = simple_select(row);
 
             final_select.from = Some(From::Select {
-                alias: output_table_alias,
-                select: Box::new(select_star),
-            })
+                alias: aggregate_table_alias,
+                select: Box::new(aggregate_select),
+            });
+            final_select
         }
+        _ => todo!("no select rowset for rows + aggregates"),
     }
-    final_select
-}
-
-/// Wrap an query that returns multiple rows in
-///
-/// ```sql
-/// SELECT
-///   coalesce(json_agg(row_to_json(<table_alias>)), '[]')) AS <column_alias>
-/// FROM <query> as <table_alias>
-/// ```
-///
-/// - `row_to_json` takes a row and converts it to a json object.
-/// - `json_agg` aggregates the json objects to a json array.
-/// - `coalesce(<thing>, <otherwise>)` returns `<thing>` if it is not null, and `<otherwise>` if it is null.
-///
-pub fn select_rows_as_json(
-    row_select: Select,
-    column_alias: ColumnAlias,
-    table_alias: TableAlias,
-) -> Select {
-    let expression = Expression::FunctionCall {
-        function: Function::Coalesce,
-        args: vec![
-            Expression::FunctionCall {
-                function: Function::JsonAgg,
-                args: vec![Expression::RowToJson(TableReference::AliasedTable(
-                    table_alias.clone(),
-                ))],
-            },
-            Expression::Value(Value::EmptyJsonArray),
-        ],
-    };
-    let mut select = simple_select(vec![(column_alias, expression)]);
-    select.from = Some(From::Select {
-        select: Box::new(row_select),
-        alias: table_alias,
-    });
-    select
-}
-
-/// Wrap an query that returns a single row in
-///
-/// ```sql
-/// SELECT
-///   coalesce(row_to_json(<table_alias>), '{}'::json)) AS <column_alias>
-/// FROM <query> as <table_alias>
-/// ```
-///
-/// - `row_to_json` takes a row and converts it to a json object.
-/// - `coalesce(<thing>, <otherwise>)` returns `<thing>` if it is not null, and `<otherwise>` if it is null.
-///
-pub fn select_row_as_json_with_default(
-    select: Select,
-    column_alias: ColumnAlias,
-    table_alias: TableAlias,
-) -> Select {
-    let expression = Expression::FunctionCall {
-        function: Function::Coalesce,
-        args: vec![
-            Expression::RowToJson(TableReference::AliasedTable(table_alias.clone())),
-            Expression::Value(Value::EmptyJsonArray),
-        ],
-    };
-    let mut final_select = simple_select(vec![(column_alias, expression)]);
-    final_select.from = Some(From::Select {
-        select: Box::new(select),
-        alias: table_alias,
-    });
-    final_select
 }

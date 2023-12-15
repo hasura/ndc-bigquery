@@ -295,43 +295,6 @@ pub fn select_first_connection_url(urls: &ConnectionUris) -> String {
     }
 }
 
-/// Select a single connection uri to use, given an application region.
-///
-/// Currently we simply select the first specified connection uri, and in the case of multi-region,
-/// only the first from the list of read-only servers.
-///
-/// Eventually we want to support load-balancing between multiple read-replicas within a region,
-/// and then we'll be passing the full list of connection uris to the connection pool.
-pub fn select_connection_url(
-    urls: &ConnectionUris,
-    region_routing: &BTreeMap<HasuraRegionName, Vec<RegionName>>,
-) -> Result<String, ConfigurationError> {
-    match &urls {
-        ConnectionUris::SingleRegion(urls) => Ok(urls.to_vec()[0].clone()),
-        ConnectionUris::MultiRegion(MultipleRegionsConnectionUris { reads, .. }) => {
-            let region = route_region(region_routing)?;
-            let urls = reads
-                .get(region)
-                .ok_or_else(|| ConfigurationError::UnableToMapApplicationRegion(region.clone()))?;
-            Ok(urls.to_vec()[0].clone())
-        }
-    }
-}
-
-/// Select the database region to use, observing the DDN_REGION environment variable.
-pub fn route_region(
-    region_routing: &BTreeMap<HasuraRegionName, Vec<RegionName>>,
-) -> Result<&RegionName, ConfigurationError> {
-    let ddn_region = HasuraRegionName(
-        std::env::var("DDN_REGION").or(Err(ConfigurationError::DdnRegionIsNotSet))?,
-    );
-    let connection_uris = &region_routing
-        .get(&ddn_region)
-        .ok_or_else(|| ConfigurationError::UnableToMapHasuraRegion(ddn_region.clone()))?;
-
-    Ok(&connection_uris[0])
-}
-
 /// Construct the deployment configuration by introspecting the database.
 pub async fn configure(
     args: &RawConfiguration,

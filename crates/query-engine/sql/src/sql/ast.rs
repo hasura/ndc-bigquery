@@ -75,10 +75,10 @@ pub enum From {
 /// A JOIN clause
 #[derive(Debug, Clone, PartialEq)]
 pub enum Join {
-    /// LEFT OUTER JOIN LATERAL
-    LeftOuterJoinLateral(LeftOuterJoinLateral),
+    /// LEFT OUTER JOIN
+    LeftOuterJoin(LeftOuterJoin),
     /// INNER JOIN LATERAL
-    InnerJoinLateral(InnerJoinLateral),
+    InnerJoin(InnerJoin),
     /// CROSS JOIN
     CrossJoin(CrossJoin),
 }
@@ -90,16 +90,17 @@ pub struct CrossJoin {
     pub alias: TableAlias,
 }
 
-/// A LEFT OUTER JOIN LATERAL clause
+/// A LEFT OUTER JOIN clause
 #[derive(Debug, Clone, PartialEq)]
-pub struct LeftOuterJoinLateral {
+pub struct LeftOuterJoin {
     pub select: Box<Select>,
     pub alias: TableAlias,
+    pub on: Expression,
 }
 
-/// An INNER JOIN LATERAL clause
+/// An INNER JOIN clause
 #[derive(Debug, Clone, PartialEq)]
-pub struct InnerJoinLateral {
+pub struct InnerJoin {
     pub select: Box<Select>,
     pub alias: TableAlias,
 }
@@ -184,10 +185,10 @@ pub enum Expression {
     // SELECT queries can appear in a select list if they return
     // one row. For now we can only do this with 'row_to_json'.
     // Consider changing this if we encounter more ways.
-    /// A row_to_json function call
-    RowToJson(TableReference),
     /// A column reference
     ColumnReference(ColumnReference),
+    /// A table reference
+    TableReference(TableReference),
     /// An irreducible value
     Value(Value),
     Cast {
@@ -240,6 +241,7 @@ pub enum BinaryArrayOperator {
 pub enum Function {
     Coalesce,
     JsonAgg,
+    ArrayAgg,
     Unknown(String),
 }
 

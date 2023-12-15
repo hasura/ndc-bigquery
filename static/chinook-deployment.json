@@ -4,8 +4,8 @@
   "metadata": {
     "tables": {
       "Album": {
-        "schema_name": "public",
-        "table_name": "Album",
+        "schema_name": "hasura-development.chinook_sample",
+        "table_name": "albums",
         "columns": {
           "AlbumId": {
             "name": "AlbumId",
@@ -19,7 +19,7 @@
           },
           "Title": {
             "name": "Title",
-            "type": "character varying",
+            "type": "string",
             "nullable": "NonNullable"
           }
         },
@@ -36,8 +36,8 @@
         }
       },
       "Artist": {
-        "schema_name": "public",
-        "table_name": "Artist",
+        "schema_name": "hasura-development.chinook_sample",
+        "table_name": "artists",
         "columns": {
           "ArtistId": {
             "name": "ArtistId",
@@ -46,7 +46,7 @@
           },
           "Name": {
             "name": "Name",
-            "type": "character varying",
+            "type": "string",
             "nullable": "Nullable"
           }
         },
@@ -56,27 +56,27 @@
         "foreign_relations": {}
       },
       "Customer": {
-        "schema_name": "public",
+        "schema_name": "hasura-development.chinook_sample",
         "table_name": "Customer",
         "columns": {
           "Address": {
             "name": "Address",
-            "type": "character varying",
+            "type": "string",
             "nullable": "Nullable"
           },
           "City": {
             "name": "City",
-            "type": "character varying",
+            "type": "string",
             "nullable": "Nullable"
           },
           "Company": {
             "name": "Company",
-            "type": "character varying",
+            "type": "string",
             "nullable": "Nullable"
           },
           "Country": {
             "name": "Country",
-            "type": "character varying",
+            "type": "string",
             "nullable": "Nullable"
           },
           "CustomerId": {
@@ -86,37 +86,37 @@
           },
           "Email": {
             "name": "Email",
-            "type": "character varying",
+            "type": "string",
             "nullable": "NonNullable"
           },
           "Fax": {
             "name": "Fax",
-            "type": "character varying",
+            "type": "string",
             "nullable": "Nullable"
           },
           "FirstName": {
             "name": "FirstName",
-            "type": "character varying",
+            "type": "string",
             "nullable": "NonNullable"
           },
           "LastName": {
             "name": "LastName",
-            "type": "character varying",
+            "type": "string",
             "nullable": "NonNullable"
           },
           "Phone": {
             "name": "Phone",
-            "type": "character varying",
+            "type": "string",
             "nullable": "Nullable"
           },
           "PostalCode": {
             "name": "PostalCode",
-            "type": "character varying",
+            "type": "string",
             "nullable": "Nullable"
           },
           "State": {
             "name": "State",
-            "type": "character varying",
+            "type": "string",
             "nullable": "Nullable"
           },
           "SupportRepId": {
@@ -138,12 +138,12 @@
         }
       },
       "Employee": {
-        "schema_name": "public",
-        "table_name": "Employee",
+        "schema_name": "hasura-development.chinook_sample",
+        "table_name": "employees",
         "columns": {
           "Address": {
             "name": "Address",
-            "type": "character varying",
+            "type": "string",
             "nullable": "Nullable"
           },
           "BirthDate": {
@@ -153,17 +153,17 @@
           },
           "City": {
             "name": "City",
-            "type": "character varying",
+            "type": "string",
             "nullable": "Nullable"
           },
           "Country": {
             "name": "Country",
-            "type": "character varying",
+            "type": "string",
             "nullable": "Nullable"
           },
           "Email": {
             "name": "Email",
-            "type": "character varying",
+            "type": "string",
             "nullable": "Nullable"
           },
           "EmployeeId": {
@@ -173,12 +173,12 @@
           },
           "Fax": {
             "name": "Fax",
-            "type": "character varying",
+            "type": "string",
             "nullable": "Nullable"
           },
           "FirstName": {
             "name": "FirstName",
-            "type": "character varying",
+            "type": "string",
             "nullable": "NonNullable"
           },
           "HireDate": {
@@ -188,17 +188,17 @@
           },
           "LastName": {
             "name": "LastName",
-            "type": "character varying",
+            "type": "string",
             "nullable": "NonNullable"
           },
           "Phone": {
             "name": "Phone",
-            "type": "character varying",
+            "type": "string",
             "nullable": "Nullable"
           },
           "PostalCode": {
             "name": "PostalCode",
-            "type": "character varying",
+            "type": "string",
             "nullable": "Nullable"
           },
           "ReportsTo": {
@@ -208,12 +208,12 @@
           },
           "State": {
             "name": "State",
-            "type": "character varying",
+            "type": "string",
             "nullable": "Nullable"
           },
           "Title": {
             "name": "Title",
-            "type": "character varying",
+            "type": "string",
             "nullable": "Nullable"
           }
         },
@@ -230,8 +230,8 @@
         }
       },
       "Genre": {
-        "schema_name": "public",
-        "table_name": "Genre",
+        "schema_name": "hasura-development.chinook_sample",
+        "table_name": "genres",
         "columns": {
           "GenreId": {
             "name": "GenreId",
@@ -240,7 +240,7 @@
           },
           "Name": {
             "name": "Name",
-            "type": "character varying",
+            "type": "string",
             "nullable": "Nullable"
           }
         },
@@ -250,32 +250,32 @@
         "foreign_relations": {}
       },
       "Invoice": {
-        "schema_name": "public",
-        "table_name": "Invoice",
+        "schema_name": "hasura-development.chinook_sample",
+        "table_name": "invoices",
         "columns": {
           "BillingAddress": {
             "name": "BillingAddress",
-            "type": "character varying",
+            "type": "string",
             "nullable": "Nullable"
           },
           "BillingCity": {
             "name": "BillingCity",
-            "type": "character varying",
+            "type": "string",
             "nullable": "Nullable"
           },
           "BillingCountry": {
             "name": "BillingCountry",
-            "type": "character varying",
+            "type": "string",
             "nullable": "Nullable"
           },
           "BillingPostalCode": {
             "name": "BillingPostalCode",
-            "type": "character varying",
+            "type": "string",
             "nullable": "Nullable"
           },
           "BillingState": {
             "name": "BillingState",
-            "type": "character varying",
+            "type": "string",
             "nullable": "Nullable"
           },
           "CustomerId": {
@@ -312,8 +312,8 @@
         }
       },
       "InvoiceLine": {
-        "schema_name": "public",
-        "table_name": "InvoiceLine",
+        "schema_name": "hasura-development.chinook_sample",
+        "table_name": "invoice_items",
         "columns": {
           "InvoiceId": {
             "name": "InvoiceId",
@@ -360,8 +360,8 @@
         }
       },
       "MediaType": {
-        "schema_name": "public",
-        "table_name": "MediaType",
+        "schema_name": "hasura-development.chinook_sample",
+        "table_name": "media_types",
         "columns": {
           "MediaTypeId": {
             "name": "MediaTypeId",
@@ -370,7 +370,7 @@
           },
           "Name": {
             "name": "Name",
-            "type": "character varying",
+            "type": "string",
             "nullable": "Nullable"
           }
         },
@@ -380,12 +380,12 @@
         "foreign_relations": {}
       },
       "Playlist": {
-        "schema_name": "public",
-        "table_name": "Playlist",
+        "schema_name": "hasura-development.chinook_sample",
+        "table_name": "playlists",
         "columns": {
           "Name": {
             "name": "Name",
-            "type": "character varying",
+            "type": "string",
             "nullable": "Nullable"
           },
           "PlaylistId": {
@@ -400,8 +400,8 @@
         "foreign_relations": {}
       },
       "PlaylistTrack": {
-        "schema_name": "public",
-        "table_name": "PlaylistTrack",
+        "schema_name": "hasura-development.chinook_sample",
+        "table_name": "playlist_track",
         "columns": {
           "PlaylistId": {
             "name": "PlaylistId",
@@ -433,8 +433,8 @@
         }
       },
       "Track": {
-        "schema_name": "public",
-        "table_name": "Track",
+        "schema_name": "hasura-development.chinook_sample",
+        "table_name": "tracks",
         "columns": {
           "AlbumId": {
             "name": "AlbumId",
@@ -448,7 +448,7 @@
           },
           "Composer": {
             "name": "Composer",
-            "type": "character varying",
+            "type": "string",
             "nullable": "Nullable"
           },
           "GenreId": {
@@ -468,7 +468,7 @@
           },
           "Name": {
             "name": "Name",
-            "type": "character varying",
+            "type": "string",
             "nullable": "NonNullable"
           },
           "TrackId": {
@@ -505,132 +505,11 @@
             }
           }
         }
-      },
-      "geography_columns": {
-        "schema_name": "public",
-        "table_name": "geography_columns",
-        "columns": {
-          "coord_dimension": {
-            "name": "coord_dimension",
-            "type": "integer",
-            "nullable": "Nullable"
-          },
-          "f_geography_column": {
-            "name": "f_geography_column",
-            "type": "any",
-            "nullable": "Nullable"
-          },
-          "f_table_catalog": {
-            "name": "f_table_catalog",
-            "type": "any",
-            "nullable": "Nullable"
-          },
-          "f_table_name": {
-            "name": "f_table_name",
-            "type": "any",
-            "nullable": "Nullable"
-          },
-          "f_table_schema": {
-            "name": "f_table_schema",
-            "type": "any",
-            "nullable": "Nullable"
-          },
-          "srid": {
-            "name": "srid",
-            "type": "integer",
-            "nullable": "Nullable"
-          },
-          "type": {
-            "name": "type",
-            "type": "text",
-            "nullable": "Nullable"
-          }
-        },
-        "uniqueness_constraints": {},
-        "foreign_relations": {}
-      },
-      "geometry_columns": {
-        "schema_name": "public",
-        "table_name": "geometry_columns",
-        "columns": {
-          "coord_dimension": {
-            "name": "coord_dimension",
-            "type": "integer",
-            "nullable": "Nullable"
-          },
-          "f_geometry_column": {
-            "name": "f_geometry_column",
-            "type": "any",
-            "nullable": "Nullable"
-          },
-          "f_table_catalog": {
-            "name": "f_table_catalog",
-            "type": "character varying",
-            "nullable": "Nullable"
-          },
-          "f_table_name": {
-            "name": "f_table_name",
-            "type": "any",
-            "nullable": "Nullable"
-          },
-          "f_table_schema": {
-            "name": "f_table_schema",
-            "type": "any",
-            "nullable": "Nullable"
-          },
-          "srid": {
-            "name": "srid",
-            "type": "integer",
-            "nullable": "Nullable"
-          },
-          "type": {
-            "name": "type",
-            "type": "character varying",
-            "nullable": "Nullable"
-          }
-        },
-        "uniqueness_constraints": {},
-        "foreign_relations": {}
-      },
-      "spatial_ref_sys": {
-        "schema_name": "public",
-        "table_name": "spatial_ref_sys",
-        "columns": {
-          "auth_name": {
-            "name": "auth_name",
-            "type": "character varying",
-            "nullable": "Nullable"
-          },
-          "auth_srid": {
-            "name": "auth_srid",
-            "type": "integer",
-            "nullable": "Nullable"
-          },
-          "proj4text": {
-            "name": "proj4text",
-            "type": "character varying",
-            "nullable": "Nullable"
-          },
-          "srid": {
-            "name": "srid",
-            "type": "integer",
-            "nullable": "NonNullable"
-          },
-          "srtext": {
-            "name": "srtext",
-            "type": "character varying",
-            "nullable": "Nullable"
-          }
-        },
-        "uniqueness_constraints": {
-          "spatial_ref_sys_pkey": ["srid"]
-        },
-        "foreign_relations": {}
       }
     },
     "native_queries": {
       "artist": {
-        "sql": "SELECT * FROM public.\"Artist\"",
+        "sql": "SELECT * FROM hasura-development.chinook_sample.\"artists\"",
         "columns": {
           "ArtistId": {
             "name": "ArtistId",
@@ -638,12 +517,12 @@
           },
           "Name": {
             "name": "Name",
-            "type": "character varying"
+            "type": "string"
           }
         }
       },
       "artist_below_id": {
-        "sql": "SELECT * FROM public.\"Artist\" WHERE \"ArtistId\" < {{id}}",
+        "sql": "SELECT * FROM hasura-development.chinook_sample.\"artists\" WHERE \"ArtistId\" < {{id}}",
         "columns": {
           "ArtistId": {
             "name": "ArtistId",
@@ -651,7 +530,7 @@
           },
           "Name": {
             "name": "Name",
-            "type": "character varying"
+            "type": "string"
           }
         },
         "arguments": {
@@ -662,7 +541,7 @@
         }
       },
       "album_by_title": {
-        "sql": "SELECT * FROM public.\"Album\" WHERE \"Title\" LIKE {{title}} AND \"AlbumId\" < {{id}}",
+        "sql": "SELECT * FROM hasura-development.chinook_sample.\"Album\" WHERE \"Title\" LIKE {{title}} AND \"AlbumId\" < {{id}}",
         "columns": {
           "AlbumId": {
             "name": "AlbumId",
@@ -670,7 +549,7 @@
           },
           "Title": {
             "name": "Title",
-            "type": "character varying"
+            "type": "string"
           },
           "ArtistId": {
             "name": "ArtistId",
@@ -684,12 +563,12 @@
           },
           "title": {
             "name": "title",
-            "type": "character varying"
+            "type": "string"
           }
         }
       },
       "value_types": {
-        "sql": "SELECT {{boolean}} as boolean, {{integer}} as integer, {{smallint}} as smallint, {{bigint}} as bigint, {{real}} as real, {{double precision}} as \"double precision\", {{numeric}} as numeric, {{character}} as character, {{character varying}} as \"character varying\", {{text}} as text, {{date}} as date, {{time}} as time, {{timetz}} as timetz, {{timestamp}} as timestamp, {{timestamptz}} as timestamptz, {{uuid}} as uuid",
+        "sql": "SELECT {{boolean}} as boolean, {{integer}} as integer, {{smallint}} as smallint, {{bigint}} as bigint, {{real}} as real, {{double precision}} as \"double precision\", {{numeric}} as numeric, {{character}} as character, {{string}} as \"string\", {{text}} as text, {{date}} as date, {{time}} as time, {{timetz}} as timetz, {{timestamp}} as timestamp, {{timestamptz}} as timestamptz, {{uuid}} as uuid",
         "columns": {
           "boolean": {
             "name": "boolean",
@@ -723,9 +602,9 @@
             "name": "character",
             "type": "character"
           },
-          "character varying": {
-            "name": "character varying",
-            "type": "character varying"
+          "string": {
+            "name": "string",
+            "type": "string"
           },
           "text": {
             "name": "text",
@@ -789,9 +668,9 @@
             "name": "character",
             "type": "character"
           },
-          "character varying": {
-            "name": "character varying",
-            "type": "character varying"
+          "string": {
+            "name": "string",
+            "type": "string"
           },
           "text": {
             "name": "text",

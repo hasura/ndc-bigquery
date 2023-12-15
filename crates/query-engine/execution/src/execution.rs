@@ -1,26 +1,26 @@
 //! Execute an execution plan against the database.
 
-use std::collections::BTreeMap;
-
+use gcp_bigquery_client::model::query_request::QueryRequest;
+use gcp_bigquery_client::model::{query_parameter, query_parameter_type, query_parameter_value};
+use query_engine_sql::sql::string::Param;
 use serde_json;
 use sqlformat;
 use sqlx;
-use sqlx::pool::PoolConnection;
-use sqlx::{Postgres, Row};
+use sqlx::Row;
+use std::collections::BTreeMap;
 use tracing::{info_span, Instrument};
 
 use ndc_sdk::models;
 
-use crate::metrics;
 use query_engine_sql::sql;
 
 /// Execute a query against postgres.
 pub async fn execute(
-    pool: &sqlx::PgPool,
-    metrics: &metrics::Metrics,
+    bigquery_client: &gcp_bigquery_client::Client,
     plan: sql::execution_plan::ExecutionPlan,
 ) -> Result<models::QueryResponse, Error> {
     let query = plan.query();
+    print!("{:?}", query.params);
 
     tracing::info!(
         generated_sql = query.sql,
@@ -28,30 +28,62 @@ pub async fn execute(
         variables = ?&plan.variables,
     );
 
-    let acquisition_timer = metrics.time_connection_acquisition_wait();
-
-    let connection_result = pool
-        .acquire()
-        .instrument(info_span!("Acquire connection"))
-        .await;
-
-    let mut connection = acquisition_timer.complete_with(connection_result)?;
-
     // run the query on each set of variables. The result is a vector of rows each
     // element in the vector is the result of running the query on one set of variables.
     let rows: Vec<serde_json::Value> = match plan.variables {
         None => {
-            let empty_map = BTreeMap::new();
-            let rows = execute_query(&mut connection, &query, &empty_map).await?;
-            vec![rows]
-        }
-        Some(variable_sets) => {
-            let mut sets_of_rows = vec![];
-            for vars in &variable_sets {
-                let rows = execute_query(&mut connection, &query, vars).await?;
-                sets_of_rows.push(rows);
+            // TODO: need to parse this from service account key or allow user to provide it
+            let project_id = "hasura-development";
+
+            let mut inner_rows = vec![];
+
+            let mut query_request = QueryRequest::new(query.sql.as_str());
+
+            // smash query.params in here pls
+            query_request.query_parameters = Some(
+                query
+                    .params
+                    .iter()
+                    .enumerate()
+                    .map(|(i, param)| match param {
+                        Param::String(str) => {
+                            let value = query_parameter_value::QueryParameterValue {
+                                array_values: None,
+                                struct_values: None,
+                                value: Some(str.to_string()),
+                            };
+                            let value_type = query_parameter_type::QueryParameterType {
+                                array_type: None,
+                                struct_types: None,
+                                r#type: "STRING".to_string(),
+                            };
+                            query_parameter::QueryParameter {
+                                name: Some(format!("param{}", i + 1)),
+                                parameter_type: Some(value_type),
+                                parameter_value: Some(value),
+                            }
+                        }
+                        Param::Variable(_var) => todo!("Variables not implemented yet"),
+                    })
+                    .collect(),
+            );
+
+            // Query
+            let mut rs = bigquery_client
+                .job()
+                .query(project_id, query_request)
+                .await
+                .unwrap();
+
+            while rs.next_row() {
+                let this_row = rs.get_string(0).unwrap().unwrap(); // we should only have one row called 'universe'
+                let json_value = serde_json::from_str(&this_row).unwrap();
+                inner_rows.push(json_value);
             }
-            sets_of_rows
+            inner_rows
+        }
+        Some(_variable_sets) => {
+            todo!("foreach/variables not implemented in query engine / execution")
         }
     };
 
@@ -122,27 +154,6 @@ pub async fn explain(
     );
 
     Ok((pretty, results.join("\n")))
-}
-
-/// Execute the query on one set of variables.
-async fn execute_query(
-    connection: &mut PoolConnection<Postgres>,
-    query: &sql::string::SQL,
-    variables: &BTreeMap<String, serde_json::Value>,
-) -> Result<serde_json::Value, Error> {
-    // build query
-    let sqlx_query = build_query_with_params(query, variables)
-        .instrument(info_span!("Build query with params"))
-        .await?;
-
-    // run and fetch from the database
-    let rows = sqlx_query
-        .map(|row: sqlx::postgres::PgRow| row.get(0))
-        .fetch_one(connection.as_mut())
-        .instrument(info_span!("Execute query"))
-        .await?;
-
-    Ok(rows)
 }
 
 /// Create a SQLx query based on our SQL query and bind our parameters and variables to it.

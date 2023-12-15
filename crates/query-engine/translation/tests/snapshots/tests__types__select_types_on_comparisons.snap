@@ -3,7 +3,7 @@ source: crates/query-engine/translation/tests/tests.rs
 expression: result
 ---
 SELECT
-  row_to_json("%1_universe") AS "universe"
+  JSON_OBJECT('rows', ARRAY_AGG(universe_1)) AS universe
 FROM
   (
     SELECT
@@ -11,40 +11,35 @@ FROM
     FROM
       (
         SELECT
-          coalesce(json_agg(row_to_json("%2_rows")), '[]') AS "rows"
+          types_0.date AS date
         FROM
+          public.types AS types_0
+        WHERE
           (
-            SELECT
-              "%0_types"."date" AS "date"
-            FROM
-              "public"."types" AS "%0_types"
-            WHERE
+            (
               (
                 (
                   (
-                    (
-                      (
-                        true
-                        AND ("%0_types"."date" = cast($1 as date))
-                      )
-                      AND (
-                        "%0_types"."time" = cast($2 as time without time zone)
-                      )
-                    )
-                    AND (
-                      "%0_types"."timetz" = cast($3 as time with time zone)
-                    )
+                    true
+                    AND (types_0.date = cast(@param1 as date))
                   )
                   AND (
-                    "%0_types"."timestamp" = cast($4 as timestamp without time zone)
+                    types_0.time = cast(@param2 as time without time zone)
                   )
                 )
                 AND (
-                  "%0_types"."timestamptz" = cast($5 as timestamp with time zone)
+                  types_0.timetz = cast(@param3 as time with time zone)
                 )
               )
-          ) AS "%2_rows"
-      ) AS "%2_rows"
-  ) AS "%1_universe"
+              AND (
+                types_0.timestamp = cast(@param4 as timestamp without time zone)
+              )
+            )
+            AND (
+              types_0.timestamptz = cast(@param5 as timestamp with time zone)
+            )
+          )
+      ) AS rows_2
+  ) AS universe_1
 
 [(1, String("2021-12-21")), (2, String("02:35:59")), (3, String("02:35:59-07")), (4, String("2013-11-03 02:35:59")), (5, String("2013-11-03 02:35:59-07"))]

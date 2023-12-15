@@ -1,7 +1,5 @@
 //! Internal Configuration and state for our connector.
 
-use sqlx::postgres::{PgPool, PgPoolOptions};
-
 use thiserror::Error;
 
 use query_engine_execution::metrics;
@@ -52,60 +50,40 @@ impl<'a> version1::Configuration {
 }
 
 /// State for our connector.
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct State {
-    pub pool: PgPool,
     pub metrics: metrics::Metrics,
+    pub bigquery_client: gcp_bigquery_client::Client,
 }
 
 /// Create a connection pool and wrap it inside a connector State.
 pub async fn create_state(
-    configuration: &Configuration,
+    _configuration: &Configuration,
     metrics_registry: &mut prometheus::Registry,
 ) -> Result<State, InitializationError> {
-    let pool = create_pool(configuration)
-        .instrument(info_span!("Create connection pool"))
-        .await?;
-
     let metrics = async {
         let metrics_inner = metrics::Metrics::initialize(metrics_registry)
             .map_err(InitializationError::MetricsError)?;
-        metrics_inner.set_pool_options_metrics(pool.options());
         Ok(metrics_inner)
     }
     .instrument(info_span!("Setup metrics"))
     .await?;
 
-    Ok(State { pool, metrics })
-}
+    let service_account_key_json = std::env::var("HASURA_BIGQUERY_SERVICE_KEY").unwrap();
 
-/// Create a connection pool with default settings.
-/// - <https://docs.rs/sqlx/latest/sqlx/pool/struct.PoolOptions.html>
-async fn create_pool(configuration: &Configuration) -> Result<PgPool, InitializationError> {
-    let url = version1::select_connection_url(
-        &configuration.config.connection_uris,
-        &configuration.region_routing,
-    )
-    .map_err(InitializationError::ConfigurationError)?;
+    let service_account_key =
+        yup_oauth2::parse_service_account_key(service_account_key_json).unwrap();
 
-    let pool_settings = &configuration.config.pool_settings;
+    // Init BigQuery client
+    let bigquery_client =
+        gcp_bigquery_client::Client::from_service_account_key(service_account_key, false)
+            .await
+            .unwrap();
 
-    PgPoolOptions::new()
-        .max_connections(pool_settings.max_connections)
-        .acquire_timeout(std::time::Duration::from_secs(pool_settings.pool_timeout))
-        .idle_timeout(
-            pool_settings
-                .idle_timeout
-                .map(std::time::Duration::from_secs),
-        )
-        .max_lifetime(
-            pool_settings
-                .connection_lifetime
-                .map(std::time::Duration::from_secs),
-        )
-        .connect(&url)
-        .await
-        .map_err(InitializationError::UnableToCreatePool)
+    Ok(State {
+        metrics,
+        bigquery_client,
+    })
 }
 
 /// State initialization error.

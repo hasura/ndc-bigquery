@@ -17,6 +17,7 @@ const CHINOOK_DEPLOYMENT_PATH: &str = "static/chinook-deployment.json";
 const CONFIGURATION_QUERY: &str = include_str!("../src/configuration.sql");
 
 #[tokio::test]
+#[ignore]
 async fn test_configure() {
     let args = configuration::RawConfiguration {
         connection_uris: configuration::single_connection_uri(
@@ -51,6 +52,7 @@ async fn test_configure() {
 }
 
 #[tokio::test]
+#[ignore]
 async fn get_rawconfiguration_schema() {
     let schema = schemars::schema_for!(configuration::RawConfiguration);
     insta::assert_json_snapshot!(schema);

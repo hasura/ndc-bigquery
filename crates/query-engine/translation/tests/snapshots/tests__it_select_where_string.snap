@@ -3,7 +3,7 @@ source: crates/query-engine/translation/tests/tests.rs
 expression: result
 ---
 SELECT
-  row_to_json("%1_universe") AS "universe"
+  JSON_OBJECT('rows', ARRAY_AGG(universe_1)) AS universe
 FROM
   (
     SELECT
@@ -11,22 +11,14 @@ FROM
     FROM
       (
         SELECT
-          coalesce(json_agg(row_to_json("%2_rows")), '[]') AS "rows"
+          Album_0.AlbumId AS AlbumId
         FROM
+          public.Album AS Album_0
+        WHERE
           (
-            SELECT
-              "%0_Album"."AlbumId" AS "AlbumId"
-            FROM
-              "public"."Album" AS "%0_Album"
-            WHERE
-              (
-                "%0_Album"."Title" IN (
-                  cast($1 as character varying),
-                  cast($2 as character varying)
-                )
-              )
-          ) AS "%2_rows"
-      ) AS "%2_rows"
-  ) AS "%1_universe"
+            Album_0.Title IN (cast(@param1 as string), cast(@param2 as string))
+          )
+      ) AS rows_2
+  ) AS universe_1
 
 [(1, String("Mozart: Chamber Music")), (2, String("Something else"))]

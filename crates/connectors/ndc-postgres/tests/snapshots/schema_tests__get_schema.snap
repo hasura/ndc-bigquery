@@ -4,48 +4,6 @@ expression: result
 ---
 {
   "scalar_types": {
-    "any": {
-      "aggregate_functions": {},
-      "comparison_operators": {
-        "_eq": {
-          "argument_type": {
-            "type": "named",
-            "name": "any"
-          }
-        },
-        "_gt": {
-          "argument_type": {
-            "type": "named",
-            "name": "any"
-          }
-        },
-        "_gte": {
-          "argument_type": {
-            "type": "named",
-            "name": "any"
-          }
-        },
-        "_lt": {
-          "argument_type": {
-            "type": "named",
-            "name": "any"
-          }
-        },
-        "_lte": {
-          "argument_type": {
-            "type": "named",
-            "name": "any"
-          }
-        },
-        "_neq": {
-          "argument_type": {
-            "type": "named",
-            "name": "any"
-          }
-        }
-      },
-      "update_operators": {}
-    },
     "bigint": {
       "aggregate_functions": {
         "bit_and": {
@@ -254,108 +212,6 @@ expression: result
           "argument_type": {
             "type": "named",
             "name": "character"
-          }
-        }
-      },
-      "update_operators": {}
-    },
-    "character varying": {
-      "aggregate_functions": {},
-      "comparison_operators": {
-        "_eq": {
-          "argument_type": {
-            "type": "named",
-            "name": "character varying"
-          }
-        },
-        "_gt": {
-          "argument_type": {
-            "type": "named",
-            "name": "character varying"
-          }
-        },
-        "_gte": {
-          "argument_type": {
-            "type": "named",
-            "name": "character varying"
-          }
-        },
-        "_ilike": {
-          "argument_type": {
-            "type": "named",
-            "name": "character varying"
-          }
-        },
-        "_iregex": {
-          "argument_type": {
-            "type": "named",
-            "name": "character varying"
-          }
-        },
-        "_like": {
-          "argument_type": {
-            "type": "named",
-            "name": "character varying"
-          }
-        },
-        "_lt": {
-          "argument_type": {
-            "type": "named",
-            "name": "character varying"
-          }
-        },
-        "_lte": {
-          "argument_type": {
-            "type": "named",
-            "name": "character varying"
-          }
-        },
-        "_neq": {
-          "argument_type": {
-            "type": "named",
-            "name": "character varying"
-          }
-        },
-        "_nilike": {
-          "argument_type": {
-            "type": "named",
-            "name": "character varying"
-          }
-        },
-        "_niregex": {
-          "argument_type": {
-            "type": "named",
-            "name": "character varying"
-          }
-        },
-        "_nlike": {
-          "argument_type": {
-            "type": "named",
-            "name": "character varying"
-          }
-        },
-        "_nregex": {
-          "argument_type": {
-            "type": "named",
-            "name": "character varying"
-          }
-        },
-        "_nsimilar": {
-          "argument_type": {
-            "type": "named",
-            "name": "character varying"
-          }
-        },
-        "_regex": {
-          "argument_type": {
-            "type": "named",
-            "name": "character varying"
-          }
-        },
-        "_similar": {
-          "argument_type": {
-            "type": "named",
-            "name": "character varying"
           }
         }
       },
@@ -945,6 +801,108 @@ expression: result
       },
       "update_operators": {}
     },
+    "string": {
+      "aggregate_functions": {},
+      "comparison_operators": {
+        "_eq": {
+          "argument_type": {
+            "type": "named",
+            "name": "string"
+          }
+        },
+        "_gt": {
+          "argument_type": {
+            "type": "named",
+            "name": "string"
+          }
+        },
+        "_gte": {
+          "argument_type": {
+            "type": "named",
+            "name": "string"
+          }
+        },
+        "_ilike": {
+          "argument_type": {
+            "type": "named",
+            "name": "string"
+          }
+        },
+        "_iregex": {
+          "argument_type": {
+            "type": "named",
+            "name": "string"
+          }
+        },
+        "_like": {
+          "argument_type": {
+            "type": "named",
+            "name": "string"
+          }
+        },
+        "_lt": {
+          "argument_type": {
+            "type": "named",
+            "name": "string"
+          }
+        },
+        "_lte": {
+          "argument_type": {
+            "type": "named",
+            "name": "string"
+          }
+        },
+        "_neq": {
+          "argument_type": {
+            "type": "named",
+            "name": "string"
+          }
+        },
+        "_nilike": {
+          "argument_type": {
+            "type": "named",
+            "name": "string"
+          }
+        },
+        "_niregex": {
+          "argument_type": {
+            "type": "named",
+            "name": "string"
+          }
+        },
+        "_nlike": {
+          "argument_type": {
+            "type": "named",
+            "name": "string"
+          }
+        },
+        "_nregex": {
+          "argument_type": {
+            "type": "named",
+            "name": "string"
+          }
+        },
+        "_nsimilar": {
+          "argument_type": {
+            "type": "named",
+            "name": "string"
+          }
+        },
+        "_regex": {
+          "argument_type": {
+            "type": "named",
+            "name": "string"
+          }
+        },
+        "_similar": {
+          "argument_type": {
+            "type": "named",
+            "name": "string"
+          }
+        }
+      },
+      "update_operators": {}
+    },
     "text": {
       "aggregate_functions": {
         "max": {
@@ -1299,7 +1257,7 @@ expression: result
         "Title": {
           "type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         }
       }
@@ -1315,7 +1273,7 @@ expression: result
         "Name": {
           "type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         }
       }
@@ -1325,25 +1283,25 @@ expression: result
         "Address": {
           "type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "City": {
           "type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "Company": {
           "type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "Country": {
           "type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "CustomerId": {
@@ -1355,43 +1313,43 @@ expression: result
         "Email": {
           "type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "Fax": {
           "type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "FirstName": {
           "type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "LastName": {
           "type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "Phone": {
           "type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "PostalCode": {
           "type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "State": {
           "type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "SupportRepId": {
@@ -1407,7 +1365,7 @@ expression: result
         "Address": {
           "type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "BirthDate": {
@@ -1419,19 +1377,19 @@ expression: result
         "City": {
           "type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "Country": {
           "type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "Email": {
           "type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "EmployeeId": {
@@ -1443,13 +1401,13 @@ expression: result
         "Fax": {
           "type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "FirstName": {
           "type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "HireDate": {
@@ -1461,19 +1419,19 @@ expression: result
         "LastName": {
           "type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "Phone": {
           "type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "PostalCode": {
           "type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "ReportsTo": {
@@ -1485,13 +1443,13 @@ expression: result
         "State": {
           "type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "Title": {
           "type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         }
       }
@@ -1507,7 +1465,7 @@ expression: result
         "Name": {
           "type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         }
       }
@@ -1517,31 +1475,31 @@ expression: result
         "BillingAddress": {
           "type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "BillingCity": {
           "type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "BillingCountry": {
           "type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "BillingPostalCode": {
           "type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "BillingState": {
           "type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "CustomerId": {
@@ -1615,7 +1573,7 @@ expression: result
         "Name": {
           "type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         }
       }
@@ -1625,7 +1583,7 @@ expression: result
         "Name": {
           "type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "PlaylistId": {
@@ -1669,7 +1627,7 @@ expression: result
         "Composer": {
           "type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "GenreId": {
@@ -1693,7 +1651,7 @@ expression: result
         "Name": {
           "type": {
             "type": "named",
-            "name": "character varying"
+            "name": "string"
           }
         },
         "TrackId": {
@@ -1706,132 +1664,6 @@ expression: result
           "type": {
             "type": "named",
             "name": "numeric"
-          }
-        }
-      }
-    },
-    "geography_columns": {
-      "fields": {
-        "coord_dimension": {
-          "type": {
-            "type": "named",
-            "name": "integer"
-          }
-        },
-        "f_geography_column": {
-          "type": {
-            "type": "named",
-            "name": "any"
-          }
-        },
-        "f_table_catalog": {
-          "type": {
-            "type": "named",
-            "name": "any"
-          }
-        },
-        "f_table_name": {
-          "type": {
-            "type": "named",
-            "name": "any"
-          }
-        },
-        "f_table_schema": {
-          "type": {
-            "type": "named",
-            "name": "any"
-          }
-        },
-        "srid": {
-          "type": {
-            "type": "named",
-            "name": "integer"
-          }
-        },
-        "type": {
-          "type": {
-            "type": "named",
-            "name": "text"
-          }
-        }
-      }
-    },
-    "geometry_columns": {
-      "fields": {
-        "coord_dimension": {
-          "type": {
-            "type": "named",
-            "name": "integer"
-          }
-        },
-        "f_geometry_column": {
-          "type": {
-            "type": "named",
-            "name": "any"
-          }
-        },
-        "f_table_catalog": {
-          "type": {
-            "type": "named",
-            "name": "character varying"
-          }
-        },
-        "f_table_name": {
-          "type": {
-            "type": "named",
-            "name": "any"
-          }
-        },
-        "f_table_schema": {
-          "type": {
-            "type": "named",
-            "name": "any"
-          }
-        },
-        "srid": {
-          "type": {
-            "type": "named",
-            "name": "integer"
-          }
-        },
-        "type": {
-          "type": {
-            "type": "named",
-            "name": "character varying"
-          }
-        }
-      }
-    },
-    "spatial_ref_sys": {
-      "fields": {
-        "auth_name": {
-          "type": {
-            "type": "named",
-            "name": "character varying"
-          }
-        },
-        "auth_srid": {
-          "type": {
-            "type": "named",
-            "name": "integer"
-          }
-        },
-        "proj4text": {
-          "type": {
-            "type": "named",
-            "name": "character varying"
-          }
-        },
-        "srid": {
-          "type": {
-            "type": "named",
-            "name": "integer"
-          }
-        },
-        "srtext": {
-          "type": {
-            "type": "named",
-            "name": "character varying"
           }
         }
       }
@@ -2065,36 +1897,6 @@ expression: result
           "foreign_collection": "MediaType"
         }
       }
-    },
-    {
-      "name": "geography_columns",
-      "arguments": {},
-      "type": "geography_columns",
-      "deletable": false,
-      "uniqueness_constraints": {},
-      "foreign_keys": {}
-    },
-    {
-      "name": "geometry_columns",
-      "arguments": {},
-      "type": "geometry_columns",
-      "deletable": false,
-      "uniqueness_constraints": {},
-      "foreign_keys": {}
-    },
-    {
-      "name": "spatial_ref_sys",
-      "arguments": {},
-      "type": "spatial_ref_sys",
-      "deletable": false,
-      "uniqueness_constraints": {
-        "spatial_ref_sys_pkey": {
-          "unique_columns": [
-            "srid"
-          ]
-        }
-      },
-      "foreign_keys": {}
     }
   ],
   "functions": [],

@@ -1,12 +1,12 @@
 ---
-source: crates/ndc-postgres/tests/query_tests.rs
+source: crates/connectors/ndc-postgres/tests/query_tests.rs
 expression: result
 ---
 [
   {
     "rows": [
       {
-        "Title": "Garage Inc. (Disc 1)"
+        "Title": "Balls to the Wall"
       }
     ]
   }

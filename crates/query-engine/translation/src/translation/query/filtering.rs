@@ -252,8 +252,16 @@ fn translate_comparison_pathelements(
                 Some(target_table_alias.clone()),
             )?;
 
+            // BigQuery doesn't like empty selects, so we do "SELECT 1 as 'one' ..."
+            let column_alias = sql::helpers::make_column_alias("one".to_string());
+
+            let select_cols = vec![(
+                column_alias.clone(),
+                sql::ast::Expression::Value(sql::ast::Value::Int8(1)),
+            )];
+
             // build a SELECT querying this table with the relevant predicate.
-            let mut select = sql::helpers::simple_select(vec![]);
+            let mut select = sql::helpers::simple_select(select_cols);
             select.from = Some(from_clause);
 
             select.select_list = sql::ast::SelectList::SelectStar;
@@ -282,12 +290,10 @@ fn translate_comparison_pathelements(
 
             select.joins = rel_joins;
 
-            joins.push(sql::ast::Join::InnerJoinLateral(
-                sql::ast::InnerJoinLateral {
-                    select: Box::new(select),
-                    alias: target_table_alias,
-                },
-            ));
+            joins.push(sql::ast::Join::InnerJoin(sql::ast::InnerJoin {
+                select: Box::new(select),
+                alias: target_table_alias,
+            }));
             Ok(new_root_and_current_tables.current_table)
         },
     )?;
@@ -388,8 +394,16 @@ pub fn translate_exists_in_collection(
             let (table, from_clause) =
                 root::make_from_clause_and_reference(&collection, &arguments, env, state, None)?;
 
+            // BigQuery doesn't like empty selects, so we do "SELECT 1 as 'one' ..."
+            let column_alias = sql::helpers::make_column_alias("one".to_string());
+
+            let select_cols = vec![(
+                column_alias.clone(),
+                sql::ast::Expression::Value(sql::ast::Value::Int8(1)),
+            )];
+
             // build a SELECT querying this table with the relevant predicate.
-            let mut select = sql::helpers::simple_select(vec![]);
+            let mut select = sql::helpers::simple_select(select_cols);
             select.from = Some(from_clause);
 
             let new_root_and_current_tables = RootAndCurrentTables {
@@ -447,8 +461,16 @@ pub fn translate_exists_in_collection(
                 None,
             )?;
 
+            // BigQuery doesn't like empty selects, so we do "SELECT 1 as 'one' ..."
+            let column_alias = sql::helpers::make_column_alias("one".to_string());
+
+            let select_cols = vec![(
+                column_alias.clone(),
+                sql::ast::Expression::Value(sql::ast::Value::Int8(1)),
+            )];
+
             // build a SELECT querying this table with the relevant predicate.
-            let mut select = sql::helpers::simple_select(vec![]);
+            let mut select = sql::helpers::simple_select(select_cols);
             select.from = Some(from_clause);
 
             let new_root_and_current_tables = RootAndCurrentTables {

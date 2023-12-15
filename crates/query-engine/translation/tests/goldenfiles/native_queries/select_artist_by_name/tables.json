@@ -9,13 +9,13 @@
         },
         "Name": {
           "name": "Name",
-          "type": "character varying"
+          "type": "string"
         }
       },
       "arguments": {
         "name": {
           "name": "name",
-          "type": "character varying"
+          "type": "string"
         }
       }
     }

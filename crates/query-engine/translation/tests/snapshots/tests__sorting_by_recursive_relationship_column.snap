@@ -3,7 +3,7 @@ source: crates/query-engine/translation/tests/tests.rs
 expression: result
 ---
 SELECT
-  row_to_json("%4_universe") AS "universe"
+  JSON_OBJECT('rows', ARRAY_AGG(universe_4)) AS universe
 FROM
   (
     SELECT
@@ -11,48 +11,36 @@ FROM
     FROM
       (
         SELECT
-          coalesce(json_agg(row_to_json("%5_rows")), '[]') AS "rows"
+          Company_0.Name AS Name
         FROM
-          (
+          public.Company AS Company_0
+          LEFT OUTER JOIN (
             SELECT
-              "%0_Company"."Name" AS "Name"
+              ORDER_PART_Person_2.Name AS Name
             FROM
-              "public"."Company" AS "%0_Company"
-              LEFT OUTER JOIN LATERAL (
+              (
                 SELECT
-                  "%2_ORDER_PART_Person"."Name" AS "Name"
+                  ORDER_PART_Person_1.ParentId AS ParentId
                 FROM
-                  (
-                    SELECT
-                      "%1_ORDER_PART_Person"."ParentId" AS "ParentId"
-                    FROM
-                      "public"."Person" AS "%1_ORDER_PART_Person"
-                    WHERE
-                      (
-                        true
-                        AND (
-                          "%0_Company"."CEOId" = "%1_ORDER_PART_Person"."PersonId"
-                        )
-                      )
-                  ) AS "%1_ORDER_PART_Person"
-                  LEFT OUTER JOIN LATERAL (
-                    SELECT
-                      "%2_ORDER_PART_Person"."Name" AS "Name"
-                    FROM
-                      "public"."Person" AS "%2_ORDER_PART_Person"
-                    WHERE
-                      (
-                        true
-                        AND (
-                          "%1_ORDER_PART_Person"."ParentId" = "%2_ORDER_PART_Person"."PersonId"
-                        )
-                      )
-                  ) AS "%2_ORDER_PART_Person" ON ('true')
-              ) AS "%3_ORDER_FOR_Company" ON ('true')
-            ORDER BY
-              "%3_ORDER_FOR_Company"."Name" ASC
-          ) AS "%5_rows"
-      ) AS "%5_rows"
-  ) AS "%4_universe"
+                  public.Person AS ORDER_PART_Person_1
+              ) AS ORDER_PART_Person_1
+              LEFT OUTER JOIN (
+                SELECT
+                  ORDER_PART_Person_2.Name AS Name
+                FROM
+                  public.Person AS ORDER_PART_Person_2
+              ) AS ORDER_PART_Person_2 ON (
+                (
+                  true
+                  AND (
+                    ORDER_PART_Person_1.ParentId = ORDER_PART_Person_2.PersonId
+                  )
+                )
+              )
+          ) AS ORDER_FOR_Company_3 ON (true)
+        ORDER BY
+          ORDER_FOR_Company_3.Name ASC
+      ) AS rows_5
+  ) AS universe_4
 
 []

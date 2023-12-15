@@ -11,7 +11,7 @@ use tracing::{info_span, Instrument};
 use ndc_sdk::connector;
 use ndc_sdk::models;
 
-use super::{capabilities, configuration, explain, health, query, schema};
+use super::{capabilities, configuration, health, query, schema};
 
 const CONFIGURATION_QUERY: &str = include_str!("configuration.sql");
 
@@ -84,9 +84,8 @@ impl connector::Connector for Postgres {
     /// can be polled but not updated directly.
     fn fetch_metrics(
         _configuration: &configuration::Configuration,
-        state: &configuration::State,
+        _state: &configuration::State,
     ) -> Result<(), connector::FetchMetricsError> {
-        state.metrics.update_pool_metrics(&state.pool);
         Ok(())
     }
 
@@ -98,7 +97,7 @@ impl connector::Connector for Postgres {
         _configuration: &Self::Configuration,
         state: &Self::State,
     ) -> Result<(), connector::HealthError> {
-        health::health_check(&state.pool).await
+        health::health_check(&state.bigquery_client).await
     }
 
     /// Get the connector's capabilities.
@@ -124,14 +123,11 @@ impl connector::Connector for Postgres {
     /// This function implements the [explain endpoint](https://hasura.github.io/ndc-spec/specification/explain.html)
     /// from the NDC specification.
     async fn explain(
-        configuration: &Self::Configuration,
-        state: &Self::State,
-        query_request: models::QueryRequest,
+        _configuration: &Self::Configuration,
+        _state: &Self::State,
+        _query_request: models::QueryRequest,
     ) -> Result<models::ExplainResponse, connector::ExplainError> {
-        let conf = &configuration
-            .as_runtime_configuration()
-            .map_err(|err| connector::ExplainError::Other(err.into()))?;
-        explain::explain(conf, state, query_request).await
+        todo!("explain not implemented")
     }
 
     /// Execute a mutation

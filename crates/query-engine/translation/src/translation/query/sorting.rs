@@ -59,13 +59,14 @@ pub fn translate_order_by(
                             );
 
                             // Build a join ...
-                            let new_join = sql::ast::LeftOuterJoinLateral {
+                            let new_join = sql::ast::LeftOuterJoin {
                                 select: Box::new(select),
                                 alias: table_alias.clone(),
+                                on: sql::helpers::true_expr(),
                             };
 
                             // ... push it to the accumulated joins.
-                            joins.push(sql::ast::Join::LeftOuterJoinLateral(new_join));
+                            joins.push(sql::ast::Join::LeftOuterJoin(new_join));
 
                             // Build an alias to query the column from this select.
                             let column_name = sql::ast::Expression::ColumnReference(
@@ -211,12 +212,13 @@ fn translate_order_by_target(
                 state.make_order_by_table_alias(&root_and_current_tables.current_table.name);
 
             // Build a join and push it to the accumulated joins.
-            let new_join = sql::ast::LeftOuterJoinLateral {
+            let new_join = sql::ast::LeftOuterJoin {
                 select: Box::new(select),
                 alias: table_alias.clone(),
+                on: sql::helpers::true_expr(),
             };
 
-            joins.push(sql::ast::Join::LeftOuterJoinLateral(new_join));
+            joins.push(sql::ast::Join::LeftOuterJoin(new_join));
 
             // Build an alias to query the column from this select.
             let column_name =
@@ -271,7 +273,7 @@ fn translate_order_by_target_for_column(
     // Note that "Track" will be supplied by the caller of this function.
 
     // We will add joins according to the path element.
-    let mut joins: Vec<sql::ast::LeftOuterJoinLateral> = vec![];
+    let mut joins: Vec<sql::ast::LeftOuterJoin> = vec![];
 
     // Loop through relationships,
     // building up new joins and replacing the selected column for the order by.
@@ -379,14 +381,15 @@ fn translate_order_by_target_for_column(
             // build a select query from this table where join condition.
             let mut select = sql::helpers::simple_select(select_cols);
 
-            select.where_ = sql::ast::Where(join_condition);
 
             select.from = Some(from_clause);
 
             // build a join from it, and
-            let join = sql::ast::LeftOuterJoinLateral {
+            let join = sql::ast::LeftOuterJoin {
                 select: Box::new(select),
                 alias: target_collection_alias,
+                on: join_condition
+
             };
 
             // add the join to our pile'o'joins
@@ -457,7 +460,7 @@ fn translate_order_by_target_for_column(
         // and add the joins
         select.joins = joins
             .into_iter()
-            .map(sql::ast::Join::LeftOuterJoinLateral)
+            .map(sql::ast::Join::LeftOuterJoin)
             .collect::<Vec<sql::ast::Join>>();
 
         // and return the requested column alias and the inner select.

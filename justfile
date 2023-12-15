@@ -84,39 +84,6 @@ dev: start-dependencies
     -x clippy \
     -x 'run --bin ndc-postgres -- serve --configuration {{POSTGRES_CHINOOK_DEPLOYMENT}}'
 
-# watch the code, then test and re-run on changes
-dev-cockroach: start-cockroach-dependencies
-  RUST_LOG=INFO \
-    OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://localhost:4317 \
-    OTEL_SERVICE_NAME=cockroach-ndc \
-    cargo watch -i "**/snapshots/*" \
-    -c \
-    -x 'test -p query-engine-translation -p ndc-cockroach' \
-    -x clippy \
-    -x 'run --bin ndc-cockroach -- serve --configuration {{COCKROACH_CHINOOK_DEPLOYMENT}}'
-
-# watch the code, then test and re-run on changes
-dev-citus: start-citus-dependencies
-  RUST_LOG=INFO \
-    OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://localhost:4317 \
-    OTEL_SERVICE_NAME=citus-ndc \
-    cargo watch -i "**/snapshots/*" \
-    -c \
-    -x 'test -p query-engine-translation -p ndc-citus' \
-    -x clippy \
-    -x 'run --bin ndc-citus -- serve --configuration {{CITUS_CHINOOK_DEPLOYMENT}}'
-
-# Run postgres, testing against external DBs like Aurora
-test-other-dbs: create-aurora-deployment start-dependencies
-  RUST_LOG=INFO \
-    OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://localhost:4317 \
-    OTEL_SERVICE_NAME=postgres-ndc \
-    cargo watch -i "**/snapshots/*" \
-    -c \
-    -x 'test -p other-db-tests --all-features' \
-    -x clippy \
-    -x 'run --bin ndc-postgres -- serve --configuration {{AURORA_CHINOOK_DEPLOYMENT}}'
-
 # watch the code, and re-run on changes
 watch-run: start-dependencies
   RUST_LOG=DEBUG \
@@ -145,7 +112,7 @@ doc:
   cargo doc --lib --no-deps --open
 
 # run all tests
-test: start-dependencies start-cockroach-dependencies start-citus-dependencies create-aurora-deployment
+test: start-dependencies create-aurora-deployment
   #!/usr/bin/env bash
   # enable the "aurora" feature if the connection string is set
   features=()
@@ -154,11 +121,11 @@ test: start-dependencies start-cockroach-dependencies start-citus-dependencies c
   else
     echo "$(tput bold)$(tput setaf 3)WARNING:$(tput sgr0) Skipping the Aurora tests because the connection string is unset."; \
   fi
-  echo "$(tput bold)cargo test --no-fail-fast ${features[@]}$(tput sgr0)"
-  RUST_LOG=DEBUG cargo test --no-fail-fast "${features[@]}"
+  echo "$(tput bold)cargo test ${features[@]}$(tput sgr0)"
+  RUST_LOG=DEBUG cargo test "${features[@]}"
 
 # re-generate the deployment configuration file
-generate-chinook-configuration: build start-dependencies start-cockroach-dependencies start-citus-dependencies
+generate-chinook-configuration: build start-dependencies
   ./scripts/generate-chinook-configuration.sh 'ndc-postgres' '{{POSTGRESQL_CONNECTION_STRING}}' '{{POSTGRES_CHINOOK_DEPLOYMENT}}'
   ./scripts/generate-chinook-configuration.sh 'ndc-citus' '{{CITUS_CONNECTION_STRING}}' '{{CITUS_CHINOOK_DEPLOYMENT}}'
   ./scripts/generate-chinook-configuration.sh 'ndc-cockroach' '{{COCKROACH_CONNECTION_STRING}}' '{{COCKROACH_CHINOOK_DEPLOYMENT}}'
@@ -174,22 +141,6 @@ generate-chinook-configuration: build start-dependencies start-cockroach-depende
 start-dependencies:
   # start jaeger, configured to listen to V3
   docker compose -f ../v3-engine/docker-compose.yaml up -d jaeger
-  # start postgres
-  docker compose up --wait postgres
-
-# run cockroach + jaeger
-start-cockroach-dependencies:
-  # start jaeger, configured to listen to V3
-  docker compose -f ../v3-engine/docker-compose.yaml up -d jaeger
-  # start cockroach
-  docker compose up --wait cockroach
-
-# run citus + jaeger
-start-citus-dependencies:
-  # start jaeger, configured to listen to V3
-  docker compose -f ../v3-engine/docker-compose.yaml up -d jaeger
-  # start citus
-  docker compose up --wait citus
 
 # setup aurora + jaeger
 # aurora is a big different, the 'setup' step is taking the

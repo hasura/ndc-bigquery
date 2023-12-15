@@ -3,7 +3,7 @@ source: crates/query-engine/translation/tests/tests.rs
 expression: result
 ---
 SELECT
-  row_to_json("%3_universe") AS "universe"
+  JSON_OBJECT('rows', ARRAY_AGG(universe_3)) AS universe
 FROM
   (
     SELECT
@@ -11,37 +11,25 @@ FROM
     FROM
       (
         SELECT
-          coalesce(json_agg(row_to_json("%4_rows")), '[]') AS "rows"
+          Album_0.Title AS Name
         FROM
-          (
+          public.Album AS Album_0
+          LEFT OUTER JOIN (
             SELECT
-              "%0_Album"."Title" AS "Name"
+              ORDER_PART_Artist_1.Name AS Name
             FROM
-              "public"."Album" AS "%0_Album"
-              LEFT OUTER JOIN LATERAL (
+              (
                 SELECT
-                  "%1_ORDER_PART_Artist"."Name" AS "Name"
+                  ORDER_PART_Artist_1.Name AS Name
                 FROM
-                  (
-                    SELECT
-                      "%1_ORDER_PART_Artist"."Name" AS "Name"
-                    FROM
-                      "public"."Artist" AS "%1_ORDER_PART_Artist"
-                    WHERE
-                      (
-                        true
-                        AND (
-                          "%0_Album"."ArtistId" = "%1_ORDER_PART_Artist"."ArtistId"
-                        )
-                      )
-                  ) AS "%1_ORDER_PART_Artist"
-              ) AS "%2_ORDER_FOR_Album" ON ('true')
-            ORDER BY
-              "%2_ORDER_FOR_Album"."Name" ASC
-            LIMIT
-              5 OFFSET 3
-          ) AS "%4_rows"
-      ) AS "%4_rows"
-  ) AS "%3_universe"
+                  public.Artist AS ORDER_PART_Artist_1
+              ) AS ORDER_PART_Artist_1
+          ) AS ORDER_FOR_Album_2 ON (true)
+        ORDER BY
+          ORDER_FOR_Album_2.Name ASC
+        LIMIT
+          5 OFFSET 3
+      ) AS rows_4
+  ) AS universe_3
 
 []
