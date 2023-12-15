@@ -25,7 +25,7 @@ enum-iterator = "1.4.1"
 gcp-bigquery-client = "0.17.0"
 prometheus = "0.13.3"
 schemars = { version = "0.8.15", features = ["smol_str", "preserve_order"] }
-serde = "1.0.188"
+serde = "1.0.193"
 serde_derive = "^1.0"
 serde_json = { version = "1.0.107", features = ["raw_value"] }
 sqlx = { version = "0.7.1", features = [ "json", "postgres", "runtime-tokio-rustls" ] }

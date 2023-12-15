@@ -6,4 +6,4 @@ edition.workspace = true
 [dependencies]
 enum-iterator = "1.4.1"
 schemars = { version = "0.8.15", features = ["smol_str"] }
-serde = { version = "1.0.188", features = ["derive"] }
+serde = { version = "1.0.193", features = ["derive"] }
