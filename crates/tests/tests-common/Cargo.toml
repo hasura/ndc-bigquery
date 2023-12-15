@@ -14,7 +14,7 @@ serde = "1.0.188"
 serde_derive = "^1.0"
 serde_json = { version = "1.0.107", features = ["raw_value"] }
 tracing = "0.1.37"
-axum = "0.6.19"
+axum = "0.7.2"
 axum-test-helper = "0.3.0"
 reqwest = "0.11.20"
 tokio-postgres = "0.7.10"
