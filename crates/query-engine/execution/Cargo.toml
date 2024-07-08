@@ -4,7 +4,7 @@ version.workspace = true
 edition.workspace = true
 
 [dependencies]
-ndc-sdk = { git = "https://github.com/hasura/ndc-hub.git", rev = "e16b85a", package = "ndc-sdk" }
+ndc-sdk = { git = "https://github.com/hasura/ndc-sdk-rs.git", rev = "a273a01efccfc71ef3341cf5f357b2c9ae2d109f",  default-features = false, features = ["rustls"]}
 
 query-engine-sql = { path = "../sql" }
 

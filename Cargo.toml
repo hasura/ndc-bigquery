@@ -5,7 +5,7 @@ package.version = "0.1.0"
 package.edition = "2021"
 
 members = [
-  "crates/connectors/ndc-postgres",
+  "crates/connectors/ndc-bigquery",
   "crates/query-engine/sql",
   "crates/query-engine/translation",
   "crates/query-engine/metadata",
