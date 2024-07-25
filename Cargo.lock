@@ -77,9 +77,9 @@ dependencies = [
 
 [[package]]
 name = "anstyle"
-version = "1.0.2"
+version = "1.0.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "15c4c2c83f81532e5845a733998b6971faca23490340a418e9b72a3ec9de12ea"
+checksum = "038dfcf04a5feb68e9c60b21c9625a54c2c0616e79b72b0fd87075a056ae1d1b"
 
 [[package]]
 name = "anstyle-parse"
@@ -653,16 +653,26 @@ dependencies = [
 ]
 
 [[package]]
-name = "env_logger"
-version = "0.10.0"
+name = "env_filter"
+version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "85cdab6a89accf66733ad5a1693a4dcced6aeff64602b634530dd73c1f3ee9f0"
+checksum = "a009aa4810eb158359dda09d0c87378e4bbb89b5a801f016885a4707ba24f7ea"
 dependencies = [
- "humantime",
- "is-terminal",
  "log",
  "regex",
- "termcolor",
+]
+
+[[package]]
+name = "env_logger"
+version = "0.11.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "38b35839ba51819680ba087cd351788c9a3c476841207e0b8cee0b04722343b9"
+dependencies = [
+ "anstream",
+ "anstyle",
+ "env_filter",
+ "humantime",
+ "log",
 ]
 
 [[package]]
@@ -1220,17 +1230,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "28b29a3cd74f0f4598934efe3aeba42bae0eb4680554128851ebbecb02af14e6"
 
 [[package]]
-name = "is-terminal"
-version = "0.4.9"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cb0889898416213fab133e1d33a0e5858a48177452750691bde3666d0fdbaf8b"
-dependencies = [
- "hermit-abi",
- "rustix",
- "windows-sys 0.48.0",
-]
-
-[[package]]
 name = "is_terminal_polyfill"
 version = "1.70.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1325,9 +1324,9 @@ dependencies = [
 
 [[package]]
 name = "log"
-version = "0.4.20"
+version = "0.4.22"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b5e6163cb8c49088c2c36f57875e58ccd8c87c7427f7fbd50ea6710b2f3f2e8f"
+checksum = "a7a70ba024b9dc04c27ea2f0c0548feb474ec5c54bba33a7f72f873a39d07b24"
 
 [[package]]
 name = "matchers"
@@ -1402,6 +1401,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "multimap"
+version = "0.9.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e1a5d38b9b352dbd913288736af36af41c48d61b1a8cd34bcecd727561b7d511"
+dependencies = [
+ "serde",
+]
+
+[[package]]
 name = "native-tls"
 version = "0.2.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1431,7 +1439,7 @@ dependencies = [
  "gcp-bigquery-client",
  "hyper",
  "insta",
- "ndc-models 0.1.2 (git+https://github.com/hasura/ndc-spec.git?rev=c59f824ff95e6a376c34f85816e80164bc1f3894)",
+ "ndc-models",
  "ndc-sdk",
  "ndc-test",
  "prometheus",
@@ -1455,32 +1463,22 @@ dependencies = [
 
 [[package]]
 name = "ndc-models"
-version = "0.1.2"
-source = "git+https://github.com/hasura/ndc-spec.git?tag=v0.1.2#6e7d12a31787d5f618099a42ddc0bea786438c00"
+version = "0.1.5"
+source = "git+https://github.com/hasura/ndc-spec.git?tag=v0.1.5#78f52768bd02a8289194078a5abc2432c8e3a758"
 dependencies = [
  "indexmap 2.2.6",
+ "ref-cast",
  "schemars",
  "serde",
  "serde_json",
  "serde_with",
-]
-
-[[package]]
-name = "ndc-models"
-version = "0.1.2"
-source = "git+https://github.com/hasura/ndc-spec.git?rev=c59f824ff95e6a376c34f85816e80164bc1f3894#c59f824ff95e6a376c34f85816e80164bc1f3894"
-dependencies = [
- "indexmap 2.2.6",
- "schemars",
- "serde",
- "serde_json",
- "serde_with",
+ "smol_str",
 ]
 
 [[package]]
 name = "ndc-sdk"
-version = "0.1.0"
-source = "git+https://github.com/hasura/ndc-sdk-rs.git?rev=a273a01efccfc71ef3341cf5f357b2c9ae2d109f#a273a01efccfc71ef3341cf5f357b2c9ae2d109f"
+version = "0.2.1"
+source = "git+https://github.com/hasura/ndc-sdk-rs.git?tag=v0.2.1#83a906e8a744ee78d84aeee95f61bf3298a982ea"
 dependencies = [
  "async-trait",
  "axum",
@@ -1489,7 +1487,8 @@ dependencies = [
  "clap",
  "http",
  "mime",
- "ndc-models 0.1.2 (git+https://github.com/hasura/ndc-spec.git?tag=v0.1.2)",
+ "ndc-models",
+ "ndc-test",
  "opentelemetry",
  "opentelemetry-http",
  "opentelemetry-otlp",
@@ -1511,19 +1510,20 @@ dependencies = [
 
 [[package]]
 name = "ndc-test"
-version = "0.1.2"
-source = "git+https://github.com/hasura/ndc-spec.git?tag=v0.1.2#6e7d12a31787d5f618099a42ddc0bea786438c00"
+version = "0.1.5"
+source = "git+https://github.com/hasura/ndc-spec.git?tag=v0.1.5#78f52768bd02a8289194078a5abc2432c8e3a758"
 dependencies = [
  "async-trait",
  "clap",
  "colorful",
  "indexmap 2.2.6",
- "ndc-models 0.1.2 (git+https://github.com/hasura/ndc-spec.git?tag=v0.1.2)",
+ "ndc-models",
  "rand",
  "reqwest",
  "semver",
  "serde",
  "serde_json",
+ "smol_str",
  "thiserror",
  "tokio",
  "url",
@@ -2014,12 +2014,13 @@ name = "query-engine-execution"
 version = "0.1.0"
 dependencies = [
  "gcp-bigquery-client",
- "ndc-sdk",
+ "ndc-models",
  "prometheus",
  "query-engine-sql",
  "serde_json",
  "sqlformat",
  "sqlx",
+ "thiserror",
  "tracing",
 ]
 
@@ -2028,14 +2029,20 @@ name = "query-engine-metadata"
 version = "0.1.0"
 dependencies = [
  "enum-iterator",
+ "ndc-models",
  "schemars",
  "serde",
+ "serde_json",
+ "smol_str",
 ]
 
 [[package]]
 name = "query-engine-sql"
 version = "0.1.0"
 dependencies = [
+ "ndc-models",
+ "schemars",
+ "serde",
  "serde_json",
 ]
 
@@ -2044,13 +2051,17 @@ name = "query-engine-translation"
 version = "0.1.0"
 dependencies = [
  "enum-iterator",
- "indexmap 1.9.3",
+ "indexmap 2.2.6",
  "insta",
+ "multimap",
+ "ndc-models",
  "ndc-sdk",
  "query-engine-metadata",
  "query-engine-sql",
+ "ref-cast",
  "serde_json",
  "sqlformat",
+ "thiserror",
  "tracing",
 ]
 
@@ -2100,6 +2111,26 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "567664f262709473930a4bf9e51bf2ebf3348f2e748ccc50dea20646858f8f29"
 dependencies = [
  "bitflags 1.3.2",
+]
+
+[[package]]
+name = "ref-cast"
+version = "1.0.23"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ccf0a6f84d5f1d581da8b41b47ec8600871962f2a528115b542b362d4b744931"
+dependencies = [
+ "ref-cast-impl",
+]
+
+[[package]]
+name = "ref-cast-impl"
+version = "1.0.23"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bcc303e793d3734489387d205e9b186fac9c6cfacedd98cbb2e8a5943595f3e6"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.69",
 ]
 
 [[package]]
@@ -2527,15 +2558,17 @@ dependencies = [
 
 [[package]]
 name = "serde_with"
-version = "2.3.3"
+version = "3.8.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "07ff71d2c147a7b57362cead5e22f772cd52f6ab31cfcd9edcd7f6aeb2a0afbe"
+checksum = "0ad483d2ab0149d5a5ebcd9972a3852711e0153d863bf5a5d0391d28883c4a20"
 dependencies = [
- "base64 0.13.1",
+ "base64 0.22.1",
  "chrono",
  "hex",
  "indexmap 1.9.3",
+ "indexmap 2.2.6",
  "serde",
+ "serde_derive",
  "serde_json",
  "serde_with_macros",
  "time",
@@ -2543,9 +2576,9 @@ dependencies = [
 
 [[package]]
 name = "serde_with_macros"
-version = "2.3.3"
+version = "3.8.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "881b6f881b17d13214e5d494c939ebab463d01264ce1811e9d4ac3a882e7695f"
+checksum = "65569b702f41443e8bc8bbb1c5779bd0450bbe723b56198980e80ec45780bce2"
 dependencies = [
  "darling",
  "proc-macro2",
@@ -3002,26 +3035,22 @@ dependencies = [
 ]
 
 [[package]]
-name = "termcolor"
-version = "1.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "be55cf8942feac5c765c2c993422806843c9a9a45d4d5c407ad6dd2ea95eb9b6"
-dependencies = [
- "winapi-util",
-]
-
-[[package]]
 name = "tests-common"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "axum",
  "axum-test-helper",
+ "env_logger",
+ "hyper",
+ "ndc-bigquery",
  "ndc-sdk",
+ "ndc-test",
  "reqwest",
  "serde",
- "serde_derive",
  "serde_json",
  "sqlx",
+ "tokio",
  "tokio-postgres",
  "tracing",
  "uuid",
@@ -3702,15 +3731,6 @@ name = "winapi-i686-pc-windows-gnu"
 version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ac3b87c63620426dd9b991e5ce0329eff545bccbbb34f3be09ff6fb6ab51b7b6"
-
-[[package]]
-name = "winapi-util"
-version = "0.1.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "70ec6ce85bb158151cae5e5c87f95a8e97d2c0c4b001223f33a334e3ce5de178"
-dependencies = [
- "winapi",
-]
 
 [[package]]
 name = "winapi-x86_64-pc-windows-gnu"

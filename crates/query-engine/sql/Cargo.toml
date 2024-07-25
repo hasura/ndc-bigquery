@@ -2,6 +2,14 @@
 name = "query-engine-sql"
 version.workspace = true
 edition.workspace = true
+license.workspace = true
+
+[lints]
+workspace = true
 
 [dependencies]
-serde_json = "1.0.107"
+ndc-models = { workspace = true }
+
+schemars = { workspace = true, features = ["smol_str", "preserve_order"] }
+serde = { workspace = true }
+serde_json = { workspace = true }

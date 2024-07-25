@@ -1,21 +1,18 @@
 //! Translate an incoming `QueryRequest`.
 
-pub mod error;
-
 mod aggregates;
-mod filtering;
-mod helpers;
-mod native_queries;
-mod operators;
-mod relationships;
-mod root;
+pub mod fields;
+pub mod filtering;
+pub mod native_queries;
+pub mod relationships;
+pub mod root;
 mod sorting;
-mod values;
+pub mod values;
 
-use ndc_sdk::models;
+use ndc_models as models;
 
-use error::Error;
-use helpers::{Env, State, TableNameAndReference};
+use crate::translation::error::Error;
+use crate::translation::helpers::{Env, State};
 use query_engine_metadata::metadata;
 use query_engine_sql::sql;
 
@@ -23,87 +20,64 @@ use query_engine_sql::sql;
 pub fn translate(
     metadata: &metadata::Metadata,
     query_request: models::QueryRequest,
-) -> Result<sql::execution_plan::ExecutionPlan, Error> {
-    let env = Env::new(metadata.clone(), query_request.collection_relationships);
+) -> Result<sql::execution_plan::ExecutionPlan<sql::execution_plan::Query>, Error> {
     let mut state = State::new();
-    let (current_table, from_clause) = root::make_from_clause_and_reference(
-        &query_request.collection,
-        &query_request.arguments,
-        &env,
-        &mut state,
+    let variables_from = state.make_variables_table(&query_request.variables);
+    let variables_table_ref = variables_from.clone().map(|(_, table_ref)| table_ref);
+    let env = Env::new(
+        metadata,
+        query_request.collection_relationships,
         None,
-    )?;
+        variables_table_ref,
+    );
 
-    let select_set = translate_query(
+    let select_set = root::translate_query(
         &env,
         &mut state,
-        &current_table,
-        &from_clause,
-        query_request.query,
+        &root::MakeFrom::Collection {
+            name: query_request.collection.clone(),
+            arguments: query_request.arguments.clone(),
+        },
+        &None,
+        &query_request.query,
     )?;
 
     // form a single JSON item shaped `{ rows: [], aggregates: {} }`
     // that matches the models::RowSet type
-    let mut json_select = sql::helpers::select_rowset(
-        sql::helpers::make_column_alias("universe".to_string()),
-        state.make_table_alias("universe".to_string()),
-        state.make_table_alias("rows".to_string()),
-        state.make_table_alias("rows_inner".to_string()),
-        state.make_table_alias("aggregates".to_string()),
-        state.make_table_alias("aggregates_inner".to_string()),
+    let json_select = sql::helpers::select_rowset(
+        (
+            state.make_table_alias("universe".to_string()),
+            sql::helpers::make_column_alias("universe".to_string()),
+        ),
+        (
+            state.make_table_alias("rows".to_string()),
+            sql::helpers::make_column_alias("rows".to_string()),
+        ),
+        (
+            state.make_table_alias("aggregates".to_string()),
+            sql::helpers::make_column_alias("aggregates".to_string()),
+        ),
+        variables_from,
+        &state.make_table_alias("universe_agg".to_string()),
+        // native queries if there are any
+        sql::ast::With {
+            common_table_expressions: {
+                let (ctes, mut global_table_index) = native_queries::translate(&env, state)?;
+                // wrap ctes in another cte to guard against mutations in queries
+                ctes.into_iter()
+                    .map(|cte| native_queries::wrap_cte_in_cte(&mut global_table_index, cte))
+                    .collect()
+            },
+        },
         select_set,
     );
 
-    // add native queries if there are any
-    json_select.with = sql::ast::With {
-        common_table_expressions: native_queries::translate(state)?,
-    };
+    // normalize ast
+    let json_select = sql::rewrites::constant_folding::normalize_select(json_select);
 
-    // log and return
-    tracing::info!(sql_ast = ?json_select);
-
-    Ok(sql::execution_plan::simple_exec_plan(
+    Ok(sql::execution_plan::simple_query_execution_plan(
         query_request.variables,
         query_request.collection,
         json_select,
     ))
-}
-
-/// Translate a query to sql ast.
-/// We return a SELECT for the 'rows' field and a SELECT for the 'aggregates' field.
-pub fn translate_query(
-    env: &Env,
-    state: &mut State,
-    current_table: &TableNameAndReference,
-    from_clause: &sql::ast::From,
-    query: models::Query,
-) -> Result<sql::helpers::SelectSet, Error> {
-    // Error::NoFields becomes Ok(None)
-    // everything stays Err
-    let map_no_fields_error_to_none = |err| match err {
-        Error::NoFields => Ok(None),
-        other_error => Err(other_error),
-    };
-
-    // wrap valid result in Some
-    let wrap_ok = |a| Ok(Some(a));
-
-    // translate rows query. if there are no fields, make this a None
-    let row_select: Option<sql::ast::Select> =
-        root::translate_rows_query(env, state, current_table, from_clause, &query)
-            .map_or_else(map_no_fields_error_to_none, wrap_ok)?;
-
-    // translate aggregate select. if there are no fields, make this a None
-    let aggregate_select: Option<sql::ast::Select> =
-        root::translate_aggregate_query(env, state, current_table, from_clause, &query)
-            .map_or_else(map_no_fields_error_to_none, wrap_ok)?;
-
-    match (row_select, aggregate_select) {
-        (Some(rows), None) => Ok(sql::helpers::SelectSet::Rows(rows)),
-        (None, Some(aggregates)) => Ok(sql::helpers::SelectSet::Aggregates(aggregates)),
-        (Some(rows), Some(aggregates)) => {
-            Ok(sql::helpers::SelectSet::RowsAndAggregates(rows, aggregates))
-        }
-        _ => Err(Error::NoFields),
-    }
 }

@@ -2,15 +2,20 @@
 name = "query-engine-execution"
 version.workspace = true
 edition.workspace = true
+license.workspace = true
+
+[lints]
+workspace = true
 
 [dependencies]
-ndc-sdk = { git = "https://github.com/hasura/ndc-sdk-rs.git", rev = "a273a01efccfc71ef3341cf5f357b2c9ae2d109f",  default-features = false, features = ["rustls"]}
+ndc-models = { workspace = true }
 
 query-engine-sql = { path = "../sql" }
 
-gcp-bigquery-client = "0.17.0"
-prometheus = "0.13.3"
-serde_json = "1.0.107"
-sqlformat = "0.2.2"
-sqlx = { version = "0.7.1", features = [ "json", "postgres", "runtime-tokio-rustls", "uuid" ] }
-tracing = "0.1.37"
+gcp-bigquery-client = { workspace = true }
+prometheus = { workspace = true }
+serde_json = { workspace = true }
+sqlformat = { workspace = true }
+sqlx = { workspace = true, features = [ "json", "postgres", "runtime-tokio-rustls", "uuid" ] }
+thiserror = { workspace = true }
+tracing = { workspace = true }

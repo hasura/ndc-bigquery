@@ -47,11 +47,17 @@ impl CommonTableExpression {
 impl CTExpr {
     pub fn to_sql(&self, sql: &mut SQL) {
         match self {
+            CTExpr::Select(select) => {
+                select.to_sql(sql);
+            }
             CTExpr::RawSql(raw_vec) => {
                 for item in raw_vec {
                     item.to_sql(sql);
                 }
             }
+            // CTExpr::Delete(delete) => delete.to_sql(sql),
+            // CTExpr::Insert(insert) => insert.to_sql(sql),
+            // CTExpr::Update(update) => update.to_sql(sql),
         }
     }
 }
@@ -90,6 +96,23 @@ impl SelectList {
             SelectList::SelectStar => {
                 sql.append_syntax("*");
             }
+            SelectList::SelectStarFrom(table_reference) => {
+                table_reference.to_sql(sql);
+                sql.append_syntax(".*");
+            }
+            SelectList::SelectStarComposite(expr) => {
+                sql.append_syntax("(");
+                expr.to_sql(sql);
+                sql.append_syntax(").*");
+            }
+            SelectList::Select1 => {
+                sql.append_syntax("1");
+            }
+            SelectList::SelectListComposite(select_list1, select_list2) => {
+                select_list1.to_sql(sql);
+                sql.append_syntax(", ");
+                select_list2.to_sql(sql);
+            }
         }
     }
 }
@@ -121,6 +144,120 @@ impl Select {
     }
 }
 
+impl Insert {
+    pub fn to_sql(&self, sql: &mut SQL) {
+        sql.append_syntax("INSERT INTO ");
+
+        self.schema.to_sql(sql);
+        sql.append_syntax(".");
+        self.table.to_sql(sql);
+
+        if let Some(columns) = &self.columns {
+            sql.append_syntax("(");
+            for (index, column_name) in columns.iter().enumerate() {
+                column_name.to_sql(sql);
+                if index < (columns.len() - 1) {
+                    sql.append_syntax(", ");
+                }
+            }
+            sql.append_syntax(")");
+        }
+
+        sql.append_syntax(" ");
+
+        self.from.to_sql(sql);
+
+        sql.append_syntax(" ");
+
+        self.returning.to_sql(sql);
+    }
+}
+
+impl InsertFrom {
+    pub fn to_sql(&self, sql: &mut SQL) {
+        match self {
+            InsertFrom::Select(select) => select.to_sql(sql),
+            InsertFrom::Values(values) => {
+                sql.append_syntax("VALUES ");
+
+                for (index, object) in values.iter().enumerate() {
+                    sql.append_syntax("(");
+                    for (index, value) in object.iter().enumerate() {
+                        value.to_sql(sql);
+                        if index < (object.len() - 1) {
+                            sql.append_syntax(", ");
+                        }
+                    }
+                    sql.append_syntax(")");
+
+                    if index < (values.len() - 1) {
+                        sql.append_syntax(", ");
+                    }
+                }
+            }
+        }
+    }
+}
+
+impl Delete {
+    pub fn to_sql(&self, sql: &mut SQL) {
+        let Delete {
+            from,
+            where_,
+            returning,
+        } = &self;
+
+        sql.append_syntax("DELETE ");
+
+        from.to_sql(sql);
+
+        sql.append_syntax(" ");
+
+        where_.to_sql(sql);
+
+        sql.append_syntax(" ");
+
+        returning.to_sql(sql);
+    }
+}
+
+impl Update {
+    pub fn to_sql(&self, sql: &mut SQL) {
+        sql.append_syntax("UPDATE ");
+
+        self.schema.to_sql(sql);
+        sql.append_syntax(".");
+        self.table.to_sql(sql);
+
+        sql.append_syntax(" SET ");
+
+        // Set values to columns
+        for (index, (column, expression)) in self.set.iter().enumerate() {
+            column.to_sql(sql);
+            sql.append_syntax(" = ");
+            expression.to_sql(sql);
+            if index < (self.set.len() - 1) {
+                sql.append_syntax(", ");
+            }
+        }
+
+        sql.append_syntax(" ");
+
+        self.where_.to_sql(sql);
+
+        sql.append_syntax(" ");
+
+        self.returning.to_sql(sql);
+    }
+}
+
+impl Returning {
+    pub fn to_sql(&self, sql: &mut SQL) {
+        sql.append_syntax("RETURNING ");
+        self.0.to_sql(sql);
+    }
+}
+
 impl From {
     pub fn to_sql(&self, sql: &mut SQL) {
         sql.append_syntax("FROM ");
@@ -137,10 +274,64 @@ impl From {
                 sql.append_syntax(" AS ");
                 alias.to_sql(sql);
             }
+            From::JsonbToRecordset {
+                expression,
+                alias,
+                columns,
+            } => {
+                sql.append_syntax("jsonb_to_recordset");
+                sql.append_syntax("(");
+                expression.to_sql(sql);
+                sql.append_syntax(")");
+                sql.append_syntax(" AS ");
+                alias.to_sql(sql);
+                sql.append_syntax("(");
+
+                for (index, (column, scalar_type)) in columns.iter().enumerate() {
+                    column.to_sql(sql);
+                    sql.append_syntax(" ");
+                    scalar_type.to_sql(sql);
+                    if index < (columns.len() - 1) {
+                        sql.append_syntax(", ");
+                    }
+                }
+                sql.append_syntax(")");
+            }
+            From::JsonbArrayElements {
+                expression,
+                alias,
+                column,
+            } => {
+                sql.append_syntax("jsonb_array_elements");
+                sql.append_syntax("(");
+                expression.to_sql(sql);
+                sql.append_syntax(")");
+                sql.append_syntax(" AS ");
+                alias.to_sql(sql);
+                sql.append_syntax("(");
+                column.to_sql(sql);
+                sql.append_syntax(")");
+            }
+            From::Unnest {
+                expression,
+                alias,
+                column,
+            } => {
+                sql.append_syntax("UNNEST");
+                sql.append_syntax("(");
+                expression.to_sql(sql);
+                sql.append_syntax(")");
+                sql.append_syntax(" AS ");
+                alias.to_sql(sql);
+                sql.append_syntax("(");
+                column.to_sql(sql);
+                sql.append_syntax(")");
+            }
         }
     }
 }
 
+// todo(PY): correct the join syntax for each join type
 impl Join {
     pub fn to_sql(&self, sql: &mut SQL) {
         match self {
@@ -171,6 +362,15 @@ impl Join {
                 sql.append_syntax(")");
                 sql.append_syntax(" AS ");
                 alias.to_sql(sql);
+            }
+            Join::FullOuterJoin(join) => {
+                sql.append_syntax(" FULL OUTER JOIN ");
+                sql.append_syntax("(");
+                join.select.to_sql(sql);
+                sql.append_syntax(")");
+                sql.append_syntax(" AS ");
+                join.alias.to_sql(sql);
+                sql.append_syntax(" ON ('true') ");
             }
         }
     }
@@ -294,11 +494,43 @@ impl Expression {
 
                 sql.append_syntax(")");
             }
+            Expression::RowToJson(select) => {
+                sql.append_syntax("row_to_json");
+                sql.append_syntax("(");
+                select.to_sql(sql);
+                sql.append_syntax(")");
+            }
             Expression::Count(count_type) => {
                 sql.append_syntax("COUNT");
                 sql.append_syntax("(");
                 count_type.to_sql(sql);
                 sql.append_syntax(")")
+            }
+            Expression::ArrayConstructor(elements) => {
+                sql.append_syntax("ARRAY[");
+                for (index, element) in elements.iter().enumerate() {
+                    element.to_sql(sql);
+
+                    if index < (elements.len() - 1) {
+                        sql.append_syntax(", ");
+                    }
+                }
+                sql.append_syntax("]");
+            }
+            Expression::CorrelatedSubSelect(select) => {
+                sql.append_syntax("(");
+                select.to_sql(sql);
+                sql.append_syntax(")");
+            }
+            Expression::NestedFieldSelect {
+                expression,
+                nested_field,
+            } => {
+                sql.append_syntax("(");
+                expression.to_sql(sql);
+                sql.append_syntax(")");
+                sql.append_syntax(".");
+                nested_field.to_sql(sql);
             }
         }
     }
@@ -314,24 +546,9 @@ impl UnaryOperator {
 
 impl BinaryOperator {
     pub fn to_sql(&self, sql: &mut SQL) {
-        match self {
-            BinaryOperator::Equals => sql.append_syntax(" = "),
-            BinaryOperator::NotEquals => sql.append_syntax(" <> "),
-            BinaryOperator::GreaterThan => sql.append_syntax(" > "),
-            BinaryOperator::GreaterThanOrEqualTo => sql.append_syntax(" >= "),
-            BinaryOperator::LessThan => sql.append_syntax(" < "),
-            BinaryOperator::LessThanOrEqualTo => sql.append_syntax(" <= "),
-            BinaryOperator::Like => sql.append_syntax(" LIKE "),
-            BinaryOperator::NotLike => sql.append_syntax(" NOT LIKE "),
-            BinaryOperator::CaseInsensitiveLike => sql.append_syntax(" ILIKE "),
-            BinaryOperator::NotCaseInsensitiveLike => sql.append_syntax(" NOT ILIKE "),
-            BinaryOperator::Similar => sql.append_syntax(" SIMILAR TO "),
-            BinaryOperator::NotSimilar => sql.append_syntax(" NOT SIMILAR TO "),
-            BinaryOperator::Regex => sql.append_syntax(" ~ "),
-            BinaryOperator::NotRegex => sql.append_syntax(" !~ "),
-            BinaryOperator::CaseInsensitiveRegex => sql.append_syntax(" ~* "),
-            BinaryOperator::NotCaseInsensitiveRegex => sql.append_syntax(" !~* "),
-        }
+        sql.append_syntax(" ");
+        sql.append_syntax(&self.0);
+        sql.append_syntax(" ");
     }
 }
 
@@ -343,12 +560,20 @@ impl BinaryArrayOperator {
     }
 }
 
+impl NestedField {
+    pub fn to_sql(&self, sql: &mut SQL) {
+        sql.append_identifier(&self.0);
+    }
+}
+
 impl Function {
     pub fn to_sql(&self, sql: &mut SQL) {
         match self {
             Function::Coalesce => sql.append_syntax("coalesce"),
             Function::JsonAgg => sql.append_syntax("json_agg"),
+            Function::JsonbPopulateRecord => sql.append_syntax("jsonb_populate_record"),
             Function::ArrayAgg => sql.append_syntax("ARRAY_AGG"),
+            Function::Unnest => sql.append_syntax("unnest"),
             Function::Unknown(name) => sql.append_syntax(name),
         }
     }
@@ -379,6 +604,7 @@ impl Value {
             Value::Bool(true) => sql.append_syntax("true"),
             Value::Bool(false) => sql.append_syntax("false"),
             Value::Null => sql.append_syntax("null"),
+            Value::JsonValue(v) => sql.append_param(Param::Value(v.clone())),
             Value::Array(items) => {
                 sql.append_syntax("ARRAY [");
                 for (index, item) in items.iter().enumerate() {
@@ -393,9 +619,44 @@ impl Value {
     }
 }
 
+impl MutationValueExpression {
+    pub fn to_sql(&self, sql: &mut SQL) {
+        match &self {
+            MutationValueExpression::Expression(expression) => expression.to_sql(sql),
+            MutationValueExpression::Default => sql.append_syntax("DEFAULT"),
+        }
+    }
+}
+
 impl ScalarType {
     pub fn to_sql(&self, sql: &mut SQL) {
-        sql.append_syntax(self.0.as_str())
+        match &self {
+            ScalarType::BaseType(scalar_type_name) => {
+                scalar_type_name.to_sql(sql);
+            }
+            ScalarType::ArrayType(scalar_type_name) => {
+                scalar_type_name.to_sql(sql);
+                sql.append_syntax("[]");
+            }
+        };
+    }
+}
+
+impl ScalarTypeName {
+    pub fn to_sql(&self, sql: &mut SQL) {
+        match &self {
+            ScalarTypeName::Qualified {
+                schema_name,
+                type_name,
+            } => {
+                schema_name.to_sql(sql);
+                sql.append_syntax(".");
+                sql.append_identifier(type_name);
+            }
+            ScalarTypeName::Unqualified(type_name) => {
+                sql.append_identifier(type_name);
+            }
+        };
     }
 }
 
@@ -432,6 +693,18 @@ impl TableReference {
     }
 }
 
+impl SchemaName {
+    pub fn to_sql(&self, sql: &mut SQL) {
+        sql.append_identifier(&self.0);
+    }
+}
+
+impl TableName {
+    pub fn to_sql(&self, sql: &mut SQL) {
+        sql.append_identifier(&self.0);
+    }
+}
+
 impl TableAlias {
     pub fn to_sql(&self, sql: &mut SQL) {
         let name = format!("{}_{}", self.name, self.unique_index);
@@ -453,6 +726,12 @@ impl ColumnReference {
                 column.to_sql(sql);
             }
         };
+    }
+}
+
+impl ColumnName {
+    pub fn to_sql(&self, sql: &mut SQL) {
+        sql.append_identifier(&self.0);
     }
 }
 

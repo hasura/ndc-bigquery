@@ -18,6 +18,8 @@ impl Default for SQL {
 pub enum Param {
     /// A literal string
     String(String),
+    /// A JSON value
+    Value(serde_json::Value),
     /// A variable name to look up in the `variables` field in a `QueryRequest`.
     Variable(String),
 }
@@ -25,6 +27,10 @@ pub enum Param {
 /// A DDL statement.
 #[derive(Debug)]
 pub struct DDL(pub SQL);
+
+/// A statement.
+#[derive(Debug)]
+pub struct Statement(pub SQL);
 
 impl SQL {
     pub fn new() -> SQL {

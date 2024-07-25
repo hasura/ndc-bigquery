@@ -14,35 +14,36 @@ name = "ndc-bigquery"
 path = "bin/main.rs"
 
 [dependencies]
-ndc-sdk = { git = "https://github.com/hasura/ndc-sdk-rs.git", rev = "a273a01efccfc71ef3341cf5f357b2c9ae2d109f",  default-features = false, features = ["rustls"]}
 query-engine-sql = { path = "../../query-engine/sql" }
 query-engine-translation = { path = "../../query-engine/translation" }
 query-engine-execution = { path = "../../query-engine/execution" }
 query-engine-metadata = { path = "../../query-engine/metadata" }
 
-async-trait = "0.1.73"
-enum-iterator = "1.4.1"
-gcp-bigquery-client = "0.17.0"
-prometheus = "0.13.3"
-schemars = { version = "0.8.15", features = ["smol_str", "preserve_order"] }
-serde = "1.0.188"
-serde_derive = "^1.0"
-serde_json = { version = "1.0.107", features = ["raw_value"] }
-sqlx = { version = "0.7.1", features = [ "json", "postgres", "runtime-tokio-rustls" ] }
-tokio = { version = "1.32.0", features = ["full"] }
-tracing = "0.1.37"
-thiserror = "1.0.59"
-yup-oauth2 = "8.3.0"
+ndc-sdk = { workspace = true }
+
+async-trait = { workspace = true }
+enum-iterator = { workspace = true }
+gcp-bigquery-client = { workspace = true }
+prometheus = { workspace = true }
+schemars = { workspace = true, features = ["smol_str", "preserve_order"] }
+serde = { workspace = true }
+serde_derive = { workspace = true }
+serde_json = { workspace = true, features = ["raw_value"] }
+sqlx = { workspace = true, features = [ "json", "postgres", "runtime-tokio-rustls" ] }
+tokio = { workspace = true, features = ["full"] }
+tracing = { workspace = true }
+thiserror = { workspace = true }
+yup-oauth2 = { workspace = true }
 
 [dev-dependencies]
-ndc-models = { git = "https://github.com/hasura/ndc-spec.git", rev = "c59f824ff95e6a376c34f85816e80164bc1f3894" }
-ndc-test = { git = "https://github.com/hasura/ndc-spec.git", tag = "v0.1.2" }
+ndc-models = { workspace = true }
+ndc-test = { workspace = true }
 tests-common = { path = "../../tests/tests-common" }
 
-axum = "0.6.19"
-axum-test-helper = "0.3.0"
-insta = { version = "1.31.0", features = ["json"] }
-env_logger = "0.10.0"
-hyper = { version = "0.14.27", features = ["tcp"] }
-reqwest = { version = "0.11.27", default-features = false, features = ["rustls-tls"] }
-similar-asserts = "1.5.0"
+axum = { workspace = true }
+axum-test-helper = { workspace = true }
+insta = { workspace = true, features = ["json"] }
+env_logger = { workspace = true }
+hyper = { workspace = true, features = ["tcp"] }
+reqwest = { workspace = true, default-features = false, features = ["rustls-tls"] }
+similar-asserts = { workspace = true }
