@@ -249,36 +249,104 @@ pub fn select_rowset_without_variables(
 /// Given a set of rows, a set of aggregate queries and a variables from clause & table reference,
 /// combine them into one Select.
 pub fn select_rowset(
-    output_table: (TableAlias, ColumnAlias),
-    row_table: (TableAlias, ColumnAlias),
-    aggregate_table: (TableAlias, ColumnAlias),
-    variables: Option<(From, TableReference)>,
-    output_agg_table_alias: &TableAlias,
-    with: With,
+    (output_table_alias, output_column_alias): (TableAlias, ColumnAlias),
+    (row_table_alias, row_inner_table_alias_): (TableAlias, TableAlias),
+    (aggregate_table_alias, _aggregate_inner_table_alias): (TableAlias, TableAlias),
+    // variables: Option<(From, TableReference)>,
+    // output_agg_table_alias: &TableAlias,
+    // with: With,
     select_set: SelectSet,
 ) -> Select {
-    match variables {
-        None => wrap_with(
-            with,
-            select_rowset_without_variables(
-                ResultsKind::AggregateResults,
-                output_table,
-                row_table,
-                aggregate_table,
-                select_set,
-            ),
-        ),
-        Some(variables) => select_rowset_with_variables(
-            with,
-            output_table,
-            row_table,
-            aggregate_table,
-            variables,
-            output_agg_table_alias,
-            select_set,
-        ),
+    match select_set {
+        SelectSet::Rows(row_select) => {
+            let mut json_items = BTreeMap::new();
+
+            json_items.insert(
+                "rows".to_string(),
+                (Expression::FunctionCall {
+                    function: Function::ArrayAgg,
+                    args: vec![Expression::TableReference(TableReference::AliasedTable(
+                        row_table_alias.clone(),
+                    ))],
+                }),
+            );
+
+            let row = vec![(
+                output_column_alias,
+                (Expression::JsonBuildObject(json_items)),
+            )];
+
+            //  TableReference::AliasedTable(output_table_alias.clone()))),
+
+            let mut final_select = simple_select(row);
+
+            let select_star = star_select(From::Select {
+                alias: row_inner_table_alias_.clone(),
+                select: Box::new(row_select),
+            });
+            final_select.from = Some(From::Select {
+                alias: row_table_alias,
+                select: Box::new(select_star),
+            });
+            final_select
+        }
+        SelectSet::Aggregates(aggregate_select) => {
+            let mut json_items = BTreeMap::new();
+
+            json_items.insert(
+                "aggregates".to_string(),
+                (Expression::TableReference(TableReference::AliasedTable(
+                    aggregate_table_alias.clone(),
+                ))),
+            );
+
+            let row = vec![(
+                output_column_alias,
+                (Expression::JsonBuildObject(json_items)),
+            )];
+
+            let mut final_select = simple_select(row);
+
+            final_select.from = Some(From::Select {
+                alias: aggregate_table_alias,
+                select: Box::new(aggregate_select),
+            });
+            final_select
+        }
+        _ => todo!("no select rowset for rows + aggregates"),
     }
 }
+// pub fn select_rowset(
+//     output_table: (TableAlias, ColumnAlias),
+//     row_table: (TableAlias, ColumnAlias),
+//     aggregate_table: (TableAlias, ColumnAlias),
+//     variables: Option<(From, TableReference)>,
+//     output_agg_table_alias: &TableAlias,
+//     with: With,
+//     select_set: SelectSet,
+// ) -> Select {
+//     match variables {
+//         None => wrap_with(
+//             with,
+//             select_rowset_without_variables(
+//                 ResultsKind::AggregateResults,
+//                 output_table,
+//                 row_table,
+//                 aggregate_table,
+//                 select_set,
+//             ),
+//         ),
+//         Some(variables) => select_rowset_with_variables(
+//             with,
+//             output_table,
+//             row_table,
+//             aggregate_table,
+//             variables,
+//             output_agg_table_alias,
+//             select_set,
+//         ),
+//     }
+// }
 
 /// Given a set of rows, a set of aggregate queries and a variables from clause & table reference,
 /// combine them into one Select.

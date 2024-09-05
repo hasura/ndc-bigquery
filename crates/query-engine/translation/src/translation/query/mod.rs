@@ -51,25 +51,25 @@ pub fn translate(
         ),
         (
             state.make_table_alias("rows".to_string()),
-            sql::helpers::make_column_alias("rows".to_string()),
+            state.make_table_alias("rows_inner".to_string()),
         ),
         (
             state.make_table_alias("aggregates".to_string()),
-            sql::helpers::make_column_alias("aggregates".to_string()),
+            state.make_table_alias("aggregates_inner".to_string()),
         ),
-        variables_from,
-        &state.make_table_alias("universe_agg".to_string()),
+        // variables_from,
+        // &state.make_table_alias("universe_agg".to_string()),
         // native queries if there are any
-        sql::ast::With {
-            common_table_expressions: {
-                let (ctes, mut global_table_index) = native_queries::translate(&env, state)?;
-                // wrap ctes in another cte to guard against mutations in queries
-                ctes.into_iter()
-                    .map(|cte| native_queries::wrap_cte_in_cte(&mut global_table_index, cte))
-                    .collect()
-            },
-        },
-        select_set,
+        // sql::ast::With {
+        //     common_table_expressions: {
+        //         let (ctes, mut global_table_index) = native_queries::translate(&env, state)?;
+        //         // wrap ctes in another cte to guard against mutations in queries
+        //         ctes.into_iter()
+        //             .map(|cte| native_queries::wrap_cte_in_cte(&mut global_table_index, cte))
+        //             .collect()
+        //     },
+        // },
+        select_set
     );
 
     // normalize ast

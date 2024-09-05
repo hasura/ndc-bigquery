@@ -19,3 +19,4 @@ sqlformat = { workspace = true }
 sqlx = { workspace = true, features = [ "json", "postgres", "runtime-tokio-rustls", "uuid" ] }
 thiserror = { workspace = true }
 tracing = { workspace = true }
+bytes = { workspace = true }

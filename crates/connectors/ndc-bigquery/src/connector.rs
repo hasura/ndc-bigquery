@@ -1,79 +1,39 @@
-//! This defines a `Connector` implementation for PostgreSQL.
+//! This defines a `Connector` implementation for BigQuery.
 //!
 //! The routes are defined here.
-//!
-//! The relevant types for configuration and state are defined in
-//! `super::configuration`.
+
+use std::path::Path;
+use std::sync::Arc;
 
 use async_trait::async_trait;
 use tracing::{info_span, Instrument};
 
 use ndc_sdk::connector;
+use ndc_sdk::connector::{Connector, ConnectorSetup};
+use ndc_sdk::json_response::JsonResponse;
 use ndc_sdk::models;
 
-use super::{capabilities, configuration, health, query, schema};
+use ndc_bigquery_configuration as configuration;
+// use super::configuration;
+use ndc_bigquery_configuration::environment::Environment;
+// use super::configuration::environment::Environment;
+use super::configuration as conf;
 
-const CONFIGURATION_QUERY: &str = include_str!("configuration.sql");
+use super::capabilities;
+use super::health;
+// use super::mutation;
+use super::query;
+use super::schema;
+use super::state;
 
-#[derive(Clone, Default)]
-pub struct Postgres {}
+pub struct BigQuery;
 
 #[async_trait]
-impl connector::Connector for Postgres {
-    /// RawConfiguration is what the user specifies as JSON
-    type RawConfiguration = configuration::RawConfiguration;
-    /// The type of validated configuration
-    type Configuration = configuration::Configuration;
-    /// The type of unserializable state
-    type State = configuration::State;
-
-    fn make_empty_configuration() -> Self::RawConfiguration {
-        configuration::RawConfiguration::empty()
-    }
-
-    fn get_read_regions(config: &Self::Configuration) -> Vec<String> {
-        config.read_regions.iter().map(|r| r.to_string()).collect()
-    }
-
-    fn get_write_regions(config: &Self::Configuration) -> Vec<String> {
-        config.write_regions.iter().map(|r| r.to_string()).collect()
-    }
-
-    /// Configure a configuration maybe?
-    async fn update_configuration(
-        args: &Self::RawConfiguration,
-    ) -> Result<configuration::RawConfiguration, connector::UpdateConfigurationError> {
-        configuration::configure(args, CONFIGURATION_QUERY)
-            .instrument(info_span!("Update configuration"))
-            .await
-    }
-
-    /// Validate the raw configuration provided by the user,
-    /// returning a configuration error or a validated `Connector::Configuration`.
-    async fn validate_raw_configuration(
-        configuration: &Self::RawConfiguration,
-    ) -> Result<Self::Configuration, connector::ValidateError> {
-        configuration::validate_raw_configuration(configuration)
-            .instrument(info_span!("Validate raw configuration"))
-            .await
-    }
-
-    /// Initialize the connector's in-memory state.
-    ///
-    /// For example, any connection pools, prepared queries,
-    /// or other managed resources would be allocated here.
-    ///
-    /// In addition, this function should register any
-    /// connector-specific metrics with the metrics registry.
-    async fn try_init_state(
-        configuration: &Self::Configuration,
-        metrics: &mut prometheus::Registry,
-    ) -> Result<Self::State, connector::InitializationError> {
-        configuration::create_state(configuration, metrics)
-            .instrument(info_span!("Initialise state"))
-            .await
-            .map_err(|err| connector::InitializationError::Other(err.into()))
-    }
+impl Connector for BigQuery {
+    /// The parsed configuration
+    type Configuration = Arc<configuration::Configuration>;
+    /// The unserializable, transient state
+    type State = Arc<state::State>;
 
     /// Update any metrics from the state
     ///
@@ -83,8 +43,8 @@ impl connector::Connector for Postgres {
     /// the number of idle connections in a connection pool
     /// can be polled but not updated directly.
     fn fetch_metrics(
-        _configuration: &configuration::Configuration,
-        _state: &configuration::State,
+        _configuration: &Arc<ndc_bigquery_configuration::Configuration>,
+        _state: &Self::State,
     ) -> Result<(), connector::FetchMetricsError> {
         Ok(())
     }
@@ -97,14 +57,24 @@ impl connector::Connector for Postgres {
         _configuration: &Self::Configuration,
         state: &Self::State,
     ) -> Result<(), connector::HealthError> {
-        health::health_check(&state.bigquery_client).await
+        health::health_check(&state.bigquery_client).await.map_err(|err| {
+            tracing::error!(
+                meta.signal_type = "log",
+                event.domain = "ndc",
+                event.name = "Health check error",
+                name = "Health check error",
+                body = %err,
+                error = true,
+            );
+            err
+        })
     }
 
     /// Get the connector's capabilities.
     ///
     /// This function implements the [capabilities endpoint](https://hasura.github.io/ndc-spec/specification/capabilities.html)
     /// from the NDC specification.
-    async fn get_capabilities() -> models::CapabilitiesResponse {
+    async fn get_capabilities() -> models::Capabilities {
         capabilities::get_capabilities()
     }
 
@@ -114,20 +84,72 @@ impl connector::Connector for Postgres {
     /// from the NDC specification.
     async fn get_schema(
         configuration: &Self::Configuration,
-    ) -> Result<models::SchemaResponse, connector::SchemaError> {
-        schema::get_schema(configuration).await
+    ) -> Result<JsonResponse<models::SchemaResponse>, connector::SchemaError> {
+        schema::get_schema(configuration)
+            .await.map_err(|err| { // TODO(PY): await?
+                tracing::error!(
+                    meta.signal_type = "log",
+                    event.domain = "ndc",
+                    event.name = "Schema error",
+                    name = "Schema error",
+                    body = %err,
+                    error = true,
+                );
+                err
+            })
+            .map(Into::into)
     }
 
     /// Explain a query by creating an execution plan
     ///
-    /// This function implements the [explain endpoint](https://hasura.github.io/ndc-spec/specification/explain.html)
+    /// This function implements the [query/explain endpoint](https://hasura.github.io/ndc-spec/specification/explain.html)
     /// from the NDC specification.
-    async fn explain(
-        _configuration: &Self::Configuration,
-        _state: &Self::State,
-        _query_request: models::QueryRequest,
-    ) -> Result<models::ExplainResponse, connector::ExplainError> {
-        todo!("explain not implemented")
+    async fn query_explain(
+        configuration: &Self::Configuration,
+        state: &Self::State,
+        request: models::QueryRequest,
+    ) -> Result<JsonResponse<models::ExplainResponse>, connector::ExplainError> {
+        todo!("query explain is currently not implemented")
+        // query::explain(configuration, state, request)
+        //     .await
+        //     .map_err(|err| {
+        //         tracing::error!(
+        //             meta.signal_type = "log",
+        //             event.domain = "ndc",
+        //             event.name = "Explain error",
+        //             name = "Explain error",
+        //             body = %err,
+        //             error = true,
+        //         );
+        //         err
+        //     })
+        //     .map(Into::into)
+    }
+
+    /// Explain a mutation by creating an execution plan
+    ///
+    /// This function implements the [mutation/explain endpoint](https://hasura.github.io/ndc-spec/specification/explain.html)
+    /// from the NDC specification.
+    async fn mutation_explain(
+        configuration: &Self::Configuration,
+        state: &Self::State,
+        request: models::MutationRequest,
+    ) -> Result<JsonResponse<models::ExplainResponse>, connector::ExplainError> {
+        todo!("mutation explain is currently not implemented")
+        // mutation::explain(configuration, state, request)
+        //     .await
+        //     .map_err(|err| {
+        //         tracing::error!(
+        //             meta.signal_type = "log",
+        //             event.domain = "ndc",
+        //             event.name = "Explain error",
+        //             name = "Explain error",
+        //             body = %err,
+        //             error = true,
+        //         );
+        //         err
+        //     })
+        //     .map(Into::into)
     }
 
     /// Execute a mutation
@@ -135,11 +157,24 @@ impl connector::Connector for Postgres {
     /// This function implements the [mutation endpoint](https://hasura.github.io/ndc-spec/specification/mutations/index.html)
     /// from the NDC specification.
     async fn mutation(
-        _configuration: &Self::Configuration,
-        _state: &Self::State,
-        _request: models::MutationRequest,
-    ) -> Result<models::MutationResponse, connector::MutationError> {
-        todo!("mutations are currently not implemented")
+        configuration: &Self::Configuration,
+        state: &Self::State,
+        request: models::MutationRequest,
+    ) -> Result<JsonResponse<models::MutationResponse>, connector::MutationError> {
+        todo!("mutation is currently not implemented")
+        // mutation::mutation(configuration, state, request)
+        //     .await
+        //     .map_err(|err| {
+        //         tracing::error!(
+        //             meta.signal_type = "log",
+        //             event.domain = "ndc",
+        //             event.name = "Mutation error",
+        //             name = "Mutation error",
+        //             body = %err,
+        //             error = true,
+        //         );
+        //         err
+        //     })
     }
 
     /// Execute a query
@@ -150,10 +185,134 @@ impl connector::Connector for Postgres {
         configuration: &Self::Configuration,
         state: &Self::State,
         query_request: models::QueryRequest,
-    ) -> Result<models::QueryResponse, connector::QueryError> {
-        let conf = &configuration
-            .as_runtime_configuration()
-            .map_err(|err| connector::QueryError::Other(err.into()))?;
-        query::query(conf, state, query_request).await
+    ) -> Result<JsonResponse<models::QueryResponse>, connector::QueryError> {
+        query::query(configuration, state, query_request)
+            .await
+            .map_err(|err| {
+                tracing::error!(
+                    meta.signal_type = "log",
+                    event.domain = "ndc",
+                    event.name = "Query error",
+                    name = "Query error",
+                    body = %err,
+                    error = true,
+                );
+                err
+            })
+    }
+}
+
+pub struct BigQuerySetup<Env: Environment> {
+    environment: Env,
+}
+
+impl<Env: Environment> BigQuerySetup<Env> {
+    pub fn new(environment: Env) -> Self {
+        Self { environment }
+    }
+}
+
+#[async_trait]
+impl<Env: Environment + Send + Sync> ConnectorSetup for BigQuerySetup<Env> {
+    type Connector = BigQuery;
+    
+    /// Validate the raw configuration provided by the user,
+    /// returning a configuration error or a validated `Connector::Configuration`.
+    async fn parse_configuration(
+        &self,
+        configuration_dir: impl AsRef<Path> + Send,
+    ) -> Result<<Self::Connector as Connector>::Configuration, connector::ParseError> {
+        // Note that we don't log validation errors, because they are part of the normal business
+        // operation of configuration validation, i.e. they don't represent an error condition that
+        // signifies that anything has gone wrong with the ndc process or infrastructure.
+        let parsed_configuration = configuration::parse_configuration(configuration_dir)
+            .instrument(info_span!("parse configuration"))
+            .await
+            .map_err(|error| match error {
+                configuration::error::ParseConfigurationError::ParseError {
+                    file_path,
+                    line,
+                    column,
+                    message,
+                } => connector::ParseError::ParseError(connector::LocatedError {
+                    file_path,
+                    line,
+                    column,
+                    message,
+                }),
+                configuration::error::ParseConfigurationError::EmptyConnectionUri { file_path } => {
+                    connector::ParseError::ValidateError(connector::InvalidNodes(vec![
+                        connector::InvalidNode {
+                            file_path,
+                            node_path: vec![connector::KeyOrIndex::Key("connectionUri".into())],
+                            message: "database connection URI must be specified".to_string(),
+                        },
+                    ]))
+                }
+                configuration::error::ParseConfigurationError::IoError(inner) => {
+                    connector::ParseError::IoError(inner)
+                }
+                configuration::error::ParseConfigurationError::IoErrorButStringified(inner) => {
+                    connector::ParseError::Other(inner.into())
+                }
+                configuration::error::ParseConfigurationError::DidNotFindExpectedVersionTag(_)
+                | configuration::error::ParseConfigurationError::UnableToParseAnyVersions(_) => {
+                    connector::ParseError::Other(Box::new(error))
+                }
+            })?;
+
+        let runtime_configuration =
+            configuration::make_runtime_configuration(parsed_configuration, &self.environment)
+                .map_err(|error| {
+                    match error {
+            configuration::error::MakeRuntimeConfigurationError::MissingEnvironmentVariable {
+                file_path,
+                message,
+            } => connector::ParseError::ValidateError(connector::InvalidNodes(vec![
+                connector::InvalidNode {
+                    file_path,
+                    node_path: vec![connector::KeyOrIndex::Key("connectionUri".into())],
+                    message,
+                },
+            ])),
+        }
+                })?;
+
+        Ok(Arc::new(runtime_configuration))
+    }
+
+    /// Initialize the connector's in-memory state.
+    ///
+    /// For example, any connection pools, prepared queries,
+    /// or other managed resources would be allocated here.
+    ///
+    /// In addition, this function should register any
+    /// connector-specific metrics with the metrics registry.
+    async fn try_init_state(
+        &self,
+        _configuration: &<Self::Connector as Connector>::Configuration,
+        metrics: &mut prometheus::Registry,
+    ) -> Result<<Self::Connector as Connector>::State, connector::InitializationError> {
+        state::create_state(
+            // &configuration.connection_uri,
+            // &configuration.pool_settings,
+            metrics,
+            // configuration.configuration_version_tag,
+        )
+        .instrument(info_span!("Initialise state"))
+        .await
+        .map(Arc::new)
+        .map_err(|err| connector::InitializationError::Other(err.into()))
+        .map_err(|err| {
+            tracing::error!(
+                meta.signal_type = "log",
+                event.domain = "ndc",
+                event.name = "Initialization error",
+                name = "Initialization error",
+                body = %err,
+                error = true,
+            );
+            err
+        })
     }
 }

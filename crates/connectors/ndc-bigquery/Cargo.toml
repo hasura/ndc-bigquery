@@ -14,10 +14,12 @@ name = "ndc-bigquery"
 path = "bin/main.rs"
 
 [dependencies]
+
 query-engine-sql = { path = "../../query-engine/sql" }
 query-engine-translation = { path = "../../query-engine/translation" }
 query-engine-execution = { path = "../../query-engine/execution" }
 query-engine-metadata = { path = "../../query-engine/metadata" }
+ndc-bigquery-configuration = { path = "../../configuration" }
 
 ndc-sdk = { workspace = true }
 
@@ -47,3 +49,4 @@ env_logger = { workspace = true }
 hyper = { workspace = true, features = ["tcp"] }
 reqwest = { workspace = true, default-features = false, features = ["rustls-tls"] }
 similar-asserts = { workspace = true }
+url = { workspace = true }

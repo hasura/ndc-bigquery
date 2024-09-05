@@ -25,6 +25,7 @@ hyper = { workspace = true, features = ["tcp"] }
 reqwest = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true, features = ["raw_value"] }
+serde_derive = { workspace = true }
 sqlx = { workspace = true, features = [ "json", "postgres", "runtime-tokio-rustls" ] }
 tokio = { workspace = true, features = ["full"] }
 tokio-postgres = { workspace = true }

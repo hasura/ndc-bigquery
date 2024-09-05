@@ -1,0 +1,29 @@
+[package]
+name = "ndc-bigquery-cli"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+ndc-bigquery-configuration = { path = "../configuration" }
+
+anyhow = { workspace = true }
+clap = { workspace = true, features = ["derive", "env"] }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+serde_yaml = { workspace = true }
+thiserror = { workspace = true }
+tokio = { workspace = true, features = ["full"] }
+
+[build-dependencies]
+build-data = { workspace = true }
+
+[dev-dependencies]
+insta = { workspace = true }
+tempfile = { workspace = true }
+
+[package.metadata.cargo-machete]
+ignored = ["build_data"] # apparently cargo-machete doesn't find dependencies used by build scripts

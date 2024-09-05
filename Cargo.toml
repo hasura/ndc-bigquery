@@ -6,6 +6,8 @@ package.edition = "2021"
 package.license = "Apache-2.0"
 
 members = [
+  "crates/cli",
+  "crates/configuration",
   "crates/connectors/ndc-bigquery",
   "crates/query-engine/sql",
   "crates/query-engine/translation",

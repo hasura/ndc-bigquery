@@ -4,11 +4,11 @@
 
 pub mod common;
 
-use std::fs;
+use std::{collections::HashMap, fs};
 
 use similar_asserts::assert_eq;
 
-use ndc_postgres::configuration;
+use ndc_bigquery_configuration::{configuration, values::Secret, version1, ConnectionUri};
 
 use tests_common::deployment::helpers::get_path_from_project_root;
 
@@ -19,30 +19,27 @@ const CONFIGURATION_QUERY: &str = include_str!("../src/configuration.sql");
 #[tokio::test]
 #[ignore]
 async fn test_configure() {
-    let args = configuration::RawConfiguration {
-        connection_uris: configuration::single_connection_uri(
-            POSTGRESQL_CONNECTION_STRING.to_string(),
-        ),
-        ..configuration::RawConfiguration::empty()
-    };
-
     let expected_value: serde_json::Value = {
         let file = fs::File::open(get_path_from_project_root(CHINOOK_DEPLOYMENT_PATH))
             .expect("fs::File::open");
-        let mut result: serde_json::Value =
+        let result: serde_json::Value =
             serde_json::from_reader(file).expect("serde_json::from_reader");
 
-        // native queries cannot be configured from the database alone,
-        // so we ignore the native queries in the configuration file
-        // for the purpose of comparing the checked in file with the comparison.
-        result["metadata"]["native_queries"]
-            .as_object_mut()
-            .unwrap()
-            .clear();
         result
     };
 
-    let actual = configuration::configure(&args, CONFIGURATION_QUERY)
+    let mut args: version1::ParsedConfiguration = serde_json::from_value(expected_value.clone())
+    .expect("Unable to deserialize as RawConfiguration");
+
+    let environment = HashMap::from([(
+        version1::DEFAULT_CONNECTION_URI_VARIABLE.into(),
+        POSTGRESQL_CONNECTION_STRING.into(),
+    )]);
+
+    args.connection_uri =
+        ConnectionUri(Secret::Plain((POSTGRESQL_CONNECTION_STRING.to_string())));
+
+    let actual = version1::configure(&args, environment)
         .await
         .expect("configuration::configure");
 
@@ -54,12 +51,12 @@ async fn test_configure() {
 #[tokio::test]
 #[ignore]
 async fn get_rawconfiguration_schema() {
-    let schema = schemars::schema_for!(configuration::RawConfiguration);
+    let schema = schemars::schema_for!(version1::ParsedConfiguration);
     insta::assert_json_snapshot!(schema);
 }
 
 #[tokio::test]
 async fn get_configuration_schema() {
-    let schema = schemars::schema_for!(configuration::Configuration);
+    let schema = schemars::schema_for!(version1::Configuration);
     insta::assert_json_snapshot!(schema);
 }

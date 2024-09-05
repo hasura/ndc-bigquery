@@ -7,9 +7,11 @@ pub mod mutations;
 // re-export without modules
 pub use database::*;
 pub use native_queries::*;
+use schemars::JsonSchema;
+use serde::{Deserialize, Serialize};
 
 /// Metadata information.
-#[derive(Clone, PartialEq, Eq, Debug, Default)]
+#[derive(Clone, PartialEq, Eq, Debug, Default, Serialize, Deserialize, JsonSchema)]
 pub struct Metadata {
     pub tables: TablesInfo,
     pub composite_types: CompositeTypes,

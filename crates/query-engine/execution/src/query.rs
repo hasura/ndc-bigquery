@@ -10,6 +10,8 @@ use sqlx::Row;
 use std::collections::BTreeMap;
 use tracing::{info_span, Instrument};
 use crate::error::{Error, QueryError};
+use crate::metrics;
+use bytes::{BufMut, Bytes, BytesMut};
 
 use ndc_models as models;
 
@@ -18,8 +20,10 @@ use query_engine_sql::sql;
 /// Execute a query against postgres.
 pub async fn execute(
     bigquery_client: &gcp_bigquery_client::Client,
+    metrics: &metrics::Metrics,
     plan: sql::execution_plan::ExecutionPlan<sql::execution_plan::Query>,
-) -> Result<models::QueryResponse, Error> {
+) -> Result<Bytes, Error> {
+    // let query_timer = metrics.time_query_execution();
     // let query = plan.query;
     // print!("{:?}", query.params);
 
@@ -29,14 +33,17 @@ pub async fn execute(
     //     variables = ?&plan.variables,
     // );
 
+    let mut buffer = BytesMut::new();
+
     // run the query on each set of variables. The result is a vector of rows each
     // element in the vector is the result of running the query on one set of variables.
-    let rows: Vec<serde_json::Value> = match plan.query.variables {
+    let rows = match plan.query.variables {
         None => {
             // TODO: need to parse this from service account key or allow user to provide it
+            // TODO(PY)
             let project_id = "hasura-development";
 
-            let mut inner_rows = vec![];
+            // let mut inner_rows = vec![];
 
             let mut query_request = QueryRequest::new(plan.query.query_sql().sql);
 
@@ -69,6 +76,7 @@ pub async fn execute(
                     })
                     .collect(),
             );
+            dbg!(&query_request);
 
             // Query
             let mut rs = bigquery_client
@@ -79,26 +87,32 @@ pub async fn execute(
 
             while rs.next_row() {
                 let this_row = rs.get_string(0).unwrap().unwrap(); // we should only have one row called 'universe'
-                let json_value = serde_json::from_str(&this_row).unwrap();
-                inner_rows.push(json_value);
+                // let json_value = serde_json::from_str(&this_row).unwrap();
+                let b: Bytes = Bytes::from(this_row);
+                buffer.put(b);
+                // inner_rows.push(json_value);
             }
-            inner_rows
+            // let b: Bytes = Bytes::from(serde_json::to_string(&inner_rows).unwrap());
+            // inner_rows
         }
         Some(_variable_sets) => {
             todo!("foreach/variables not implemented in query engine / execution")
         }
     };
 
+    Ok(buffer.freeze())
+
     // tracing::info!(rows_result = ?rows);
+    // query_timer.complete_with(rows)
 
     // Make a response from rows.
-    let response = async { rows_to_response(rows) }
-        .instrument(info_span!("Create response"))
-        .await;
+    // let response = async { rows_to_response(rows) }
+    //     .instrument(info_span!("Create response"))
+    //     .await;
 
     // tracing::info!(query_response = serde_json::to_string(&response).unwrap());
 
-    Ok(response)
+    // Ok(response)
 }
 
 /// Take the postgres results and return them as a QueryResponse.
