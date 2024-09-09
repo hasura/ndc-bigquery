@@ -4,7 +4,721 @@
     "variable": "CONNECTION_URI"
   },
   "metadata": {
-    "tables": {},
+    "tables": {
+      "albums": {
+        "schemaName": "hasura-development.chinook_sample",
+        "tableName": "albums",
+        "columns": {
+          "AlbumId": {
+            "name": "AlbumId",
+            "type": {
+              "ScalarType": "INT64"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "ArtistId": {
+            "name": "ArtistId",
+            "type": {
+              "ScalarType": "INT64"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "Title": {
+            "name": "Title",
+            "type": {
+              "ScalarType": "STRING"
+            },
+            "nullable": "nullable",
+            "description": null
+          }
+        },
+        "uniquenessConstraints": {},
+        "foreignRelations": {},
+        "description": null
+      },
+      "artists": {
+        "schemaName": "hasura-development.chinook_sample",
+        "tableName": "artists",
+        "columns": {
+          "ArtistId": {
+            "name": "ArtistId",
+            "type": {
+              "ScalarType": "INT64"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "Name": {
+            "name": "Name",
+            "type": {
+              "ScalarType": "STRING"
+            },
+            "nullable": "nullable",
+            "description": null
+          }
+        },
+        "uniquenessConstraints": {},
+        "foreignRelations": {},
+        "description": null
+      },
+      "customers": {
+        "schemaName": "hasura-development.chinook_sample",
+        "tableName": "customers",
+        "columns": {
+          "Address": {
+            "name": "Address",
+            "type": {
+              "ScalarType": "STRING"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "City": {
+            "name": "City",
+            "type": {
+              "ScalarType": "STRING"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "Company": {
+            "name": "Company",
+            "type": {
+              "ScalarType": "STRING"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "Country": {
+            "name": "Country",
+            "type": {
+              "ScalarType": "STRING"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "CustomerId": {
+            "name": "CustomerId",
+            "type": {
+              "ScalarType": "INT64"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "Email": {
+            "name": "Email",
+            "type": {
+              "ScalarType": "STRING"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "Fax": {
+            "name": "Fax",
+            "type": {
+              "ScalarType": "STRING"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "FirstName": {
+            "name": "FirstName",
+            "type": {
+              "ScalarType": "STRING"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "LastName": {
+            "name": "LastName",
+            "type": {
+              "ScalarType": "STRING"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "Phone": {
+            "name": "Phone",
+            "type": {
+              "ScalarType": "STRING"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "PostalCode": {
+            "name": "PostalCode",
+            "type": {
+              "ScalarType": "STRING"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "State": {
+            "name": "State",
+            "type": {
+              "ScalarType": "STRING"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "SupportRepId": {
+            "name": "SupportRepId",
+            "type": {
+              "ScalarType": "INT64"
+            },
+            "nullable": "nullable",
+            "description": null
+          }
+        },
+        "uniquenessConstraints": {},
+        "foreignRelations": {},
+        "description": null
+      },
+      "employees": {
+        "schemaName": "hasura-development.chinook_sample",
+        "tableName": "employees",
+        "columns": {
+          "Address": {
+            "name": "Address",
+            "type": {
+              "ScalarType": "STRING"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "BirthDate": {
+            "name": "BirthDate",
+            "type": {
+              "ScalarType": "DATE"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "City": {
+            "name": "City",
+            "type": {
+              "ScalarType": "STRING"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "Country": {
+            "name": "Country",
+            "type": {
+              "ScalarType": "STRING"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "Email": {
+            "name": "Email",
+            "type": {
+              "ScalarType": "STRING"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "EmployeeId": {
+            "name": "EmployeeId",
+            "type": {
+              "ScalarType": "INT64"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "Fax": {
+            "name": "Fax",
+            "type": {
+              "ScalarType": "STRING"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "FirstName": {
+            "name": "FirstName",
+            "type": {
+              "ScalarType": "STRING"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "HireDate": {
+            "name": "HireDate",
+            "type": {
+              "ScalarType": "DATE"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "LastName": {
+            "name": "LastName",
+            "type": {
+              "ScalarType": "STRING"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "Phone": {
+            "name": "Phone",
+            "type": {
+              "ScalarType": "STRING"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "PostalCode": {
+            "name": "PostalCode",
+            "type": {
+              "ScalarType": "STRING"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "ReportsTo": {
+            "name": "ReportsTo",
+            "type": {
+              "ScalarType": "INT64"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "State": {
+            "name": "State",
+            "type": {
+              "ScalarType": "STRING"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "Title": {
+            "name": "Title",
+            "type": {
+              "ScalarType": "STRING"
+            },
+            "nullable": "nullable",
+            "description": null
+          }
+        },
+        "uniquenessConstraints": {},
+        "foreignRelations": {},
+        "description": null
+      },
+      "genres": {
+        "schemaName": "hasura-development.chinook_sample",
+        "tableName": "genres",
+        "columns": {
+          "GenreId": {
+            "name": "GenreId",
+            "type": {
+              "ScalarType": "INT64"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "Name": {
+            "name": "Name",
+            "type": {
+              "ScalarType": "STRING"
+            },
+            "nullable": "nullable",
+            "description": null
+          }
+        },
+        "uniquenessConstraints": {},
+        "foreignRelations": {},
+        "description": null
+      },
+      "invoice_items": {
+        "schemaName": "hasura-development.chinook_sample",
+        "tableName": "invoice_items",
+        "columns": {
+          "InvoiceId": {
+            "name": "InvoiceId",
+            "type": {
+              "ScalarType": "INT64"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "InvoiceLineId": {
+            "name": "InvoiceLineId",
+            "type": {
+              "ScalarType": "INT64"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "Quantity": {
+            "name": "Quantity",
+            "type": {
+              "ScalarType": "INT64"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "TrackId": {
+            "name": "TrackId",
+            "type": {
+              "ScalarType": "INT64"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "UnitPrice": {
+            "name": "UnitPrice",
+            "type": {
+              "ScalarType": "FLOAT64"
+            },
+            "nullable": "nullable",
+            "description": null
+          }
+        },
+        "uniquenessConstraints": {},
+        "foreignRelations": {},
+        "description": null
+      },
+      "invoices": {
+        "schemaName": "hasura-development.chinook_sample",
+        "tableName": "invoices",
+        "columns": {
+          "BillingAddress": {
+            "name": "BillingAddress",
+            "type": {
+              "ScalarType": "STRING"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "BillingCity": {
+            "name": "BillingCity",
+            "type": {
+              "ScalarType": "STRING"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "BillingCountry": {
+            "name": "BillingCountry",
+            "type": {
+              "ScalarType": "STRING"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "BillingPostalCode": {
+            "name": "BillingPostalCode",
+            "type": {
+              "ScalarType": "STRING"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "BillingState": {
+            "name": "BillingState",
+            "type": {
+              "ScalarType": "STRING"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "CustomerId": {
+            "name": "CustomerId",
+            "type": {
+              "ScalarType": "INT64"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "InvoiceDate": {
+            "name": "InvoiceDate",
+            "type": {
+              "ScalarType": "DATE"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "InvoiceId": {
+            "name": "InvoiceId",
+            "type": {
+              "ScalarType": "INT64"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "Total": {
+            "name": "Total",
+            "type": {
+              "ScalarType": "FLOAT64"
+            },
+            "nullable": "nullable",
+            "description": null
+          }
+        },
+        "uniquenessConstraints": {},
+        "foreignRelations": {},
+        "description": null
+      },
+      "media_types": {
+        "schemaName": "hasura-development.chinook_sample",
+        "tableName": "media_types",
+        "columns": {
+          "MediaTypeId": {
+            "name": "MediaTypeId",
+            "type": {
+              "ScalarType": "INT64"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "Name": {
+            "name": "Name",
+            "type": {
+              "ScalarType": "STRING"
+            },
+            "nullable": "nullable",
+            "description": null
+          }
+        },
+        "uniquenessConstraints": {},
+        "foreignRelations": {},
+        "description": null
+      },
+      "playlist_track": {
+        "schemaName": "hasura-development.chinook_sample",
+        "tableName": "playlist_track",
+        "columns": {
+          "PlaylistId": {
+            "name": "PlaylistId",
+            "type": {
+              "ScalarType": "INT64"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "TrackId": {
+            "name": "TrackId",
+            "type": {
+              "ScalarType": "INT64"
+            },
+            "nullable": "nullable",
+            "description": null
+          }
+        },
+        "uniquenessConstraints": {},
+        "foreignRelations": {},
+        "description": null
+      },
+      "playlists": {
+        "schemaName": "hasura-development.chinook_sample",
+        "tableName": "playlists",
+        "columns": {
+          "Name": {
+            "name": "Name",
+            "type": {
+              "ScalarType": "STRING"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "PlaylistId": {
+            "name": "PlaylistId",
+            "type": {
+              "ScalarType": "INT64"
+            },
+            "nullable": "nullable",
+            "description": null
+          }
+        },
+        "uniquenessConstraints": {},
+        "foreignRelations": {},
+        "description": null
+      },
+      "test_table": {
+        "schemaName": "hasura-development.chinook_sample",
+        "tableName": "test_table",
+        "columns": {
+          "album_id": {
+            "name": "album_id",
+            "type": {
+              "ScalarType": "INT64"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "id": {
+            "name": "id",
+            "type": {
+              "ScalarType": "INT64"
+            },
+            "nullable": "nullable",
+            "description": null
+          }
+        },
+        "uniquenessConstraints": {
+          "test_table.pk$": [
+            "id"
+          ]
+        },
+        "foreignRelations": {
+          "test_table.fk$1": {
+            "foreign_schema": null,
+            "foreign_table": "test_table_2",
+            "column_mapping": {
+              "album_id": "id"
+            }
+          },
+          "test_table.fk$2": {
+            "foreign_schema": null,
+            "foreign_table": "test_table_3",
+            "column_mapping": {
+              "album_id": "id"
+            }
+          }
+        },
+        "description": null
+      },
+      "test_table_2": {
+        "schemaName": "hasura-development.chinook_sample",
+        "tableName": "test_table_2",
+        "columns": {
+          "album_id": {
+            "name": "album_id",
+            "type": {
+              "ScalarType": "INT64"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "id": {
+            "name": "id",
+            "type": {
+              "ScalarType": "INT64"
+            },
+            "nullable": "nullable",
+            "description": null
+          }
+        },
+        "uniquenessConstraints": {
+          "test_table_2.pk$": [
+            "id"
+          ]
+        },
+        "foreignRelations": {},
+        "description": null
+      },
+      "test_table_3": {
+        "schemaName": "hasura-development.chinook_sample",
+        "tableName": "test_table_3",
+        "columns": {
+          "album_id3": {
+            "name": "album_id3",
+            "type": {
+              "ScalarType": "INT64"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "id": {
+            "name": "id",
+            "type": {
+              "ScalarType": "INT64"
+            },
+            "nullable": "nullable",
+            "description": null
+          }
+        },
+        "uniquenessConstraints": {
+          "test_table_3.pk$": [
+            "id"
+          ]
+        },
+        "foreignRelations": {},
+        "description": null
+      },
+      "tracks": {
+        "schemaName": "hasura-development.chinook_sample",
+        "tableName": "tracks",
+        "columns": {
+          "AlbumId": {
+            "name": "AlbumId",
+            "type": {
+              "ScalarType": "INT64"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "Bytes": {
+            "name": "Bytes",
+            "type": {
+              "ScalarType": "INT64"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "Composer": {
+            "name": "Composer",
+            "type": {
+              "ScalarType": "STRING"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "GenreId": {
+            "name": "GenreId",
+            "type": {
+              "ScalarType": "INT64"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "MediaTypeId": {
+            "name": "MediaTypeId",
+            "type": {
+              "ScalarType": "INT64"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "Milliseconds": {
+            "name": "Milliseconds",
+            "type": {
+              "ScalarType": "INT64"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "Name": {
+            "name": "Name",
+            "type": {
+              "ScalarType": "STRING"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "TrackId": {
+            "name": "TrackId",
+            "type": {
+              "ScalarType": "INT64"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "UnitPrice": {
+            "name": "UnitPrice",
+            "type": {
+              "ScalarType": "FLOAT64"
+            },
+            "nullable": "nullable",
+            "description": null
+          }
+        },
+        "uniquenessConstraints": {},
+        "foreignRelations": {},
+        "description": null
+      }
+    },
     "composite_types": {},
     "native_operations": {
       "queries": {},

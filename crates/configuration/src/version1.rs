@@ -23,7 +23,7 @@ use thiserror::Error;
 //TODO(PY): temp, needs to be removed from the crate
 // use ndc_sdk::connector;
 
-use query_engine_metadata::metadata::{self, database, ScalarTypeTypeName, TablesInfo};
+use query_engine_metadata::metadata::{self, database, CompositeTypes, ScalarTypeTypeName, ScalarTypes, TablesInfo};
 
 const CURRENT_VERSION: u32 = 1;
 pub const CONFIGURATION_FILENAME: &str = "configuration.json";
@@ -463,7 +463,7 @@ pub async fn configure(
         }
     }
 
-    dbg!(tables_info);
+    dbg!(&tables_info);
 
 
     // let table_info: TablesInfo = table_rows.rows.as_ref().unwrap().into_iter().map(|row| {
@@ -474,14 +474,14 @@ pub async fn configure(
     // let r = rs.query_response().rows.unwrap().get(0).unwrap();
     // dbg!(r);
     dbg!("query done");
-    let mut connection = PgConnection::connect(uri.as_str())
-        .await?;
+    // let mut connection = PgConnection::connect(uri.as_str())
+    //     .await?;
 
     dbg!("pg connection done");
 
-    let row = connection // TODO(PY): why is this PG connection
-        .fetch_one(CONFIGURATION_QUERY)
-        .await?;
+    // let row = connection // TODO(PY): why is this PG connection
+    //     .fetch_one(CONFIGURATION_QUERY)
+    //     .await?;
         // .map_err(|e| connector::UpdateConfigurationError::Other(e.into()))?;
 
     // let (scalar_types, composite_types) = transitively_occurring_types(
@@ -493,19 +493,19 @@ pub async fn configure(
     //     &occurring_composite_types(&tables, &args.metadata.native_queries),
     //     composite_types,
     // );
-    let (scalar_types, composite_types) = async {
-        let scalar_types: metadata::ScalarTypes = serde_json::from_value(row.get(1))?;
-        let composite_types: metadata::CompositeTypes = serde_json::from_value(row.get(2))?;
+    // let (scalar_types, composite_types) = async {
+    //     let scalar_types: metadata::ScalarTypes = serde_json::from_value(row.get(1))?;
+    //     let composite_types: metadata::CompositeTypes = serde_json::from_value(row.get(2))?;
 
-        // We need to specify the concrete return type explicitly so that rustc knows that it can
-        // be sent across an async boundary.
-        // (last verified with rustc 1.72.1)
-        Ok::<_, anyhow::Error>((scalar_types, composite_types))
-    }
-    .instrument(info_span!("Decode introspection result"))
-    .await?;
+    //     // We need to specify the concrete return type explicitly so that rustc knows that it can
+    //     // be sent across an async boundary.
+    //     // (last verified with rustc 1.72.1)
+    //     Ok::<_, anyhow::Error>((scalar_types, composite_types))
+    // }
+    // .instrument(info_span!("Decode introspection result"))
+    // .await?;
 
-    let tables: metadata::TablesInfo = serde_json::from_value(row.get(0))?;
+    // let tables: metadata::TablesInfo = serde_json::from_value(row.get(0))?;
         // .map_err(|e| connector::UpdateConfigurationError::Other(e.into()))?;
 
     // let aggregate_functions: metadata::AggregateFunctions = serde_json::from_value(row.get(1))?;
@@ -519,10 +519,10 @@ pub async fn configure(
         connection_uri: args.connection_uri.clone(),
         pool_settings: args.pool_settings.clone(),
         metadata: metadata::Metadata {
-            tables,
+            tables: tables_info,
             native_operations: args.metadata.native_operations.clone(),
-            scalar_types: scalar_types,
-            composite_types: composite_types,
+            scalar_types: ScalarTypes::empty(),
+            composite_types: CompositeTypes::empty(),
         },
         // aggregate_functions,
     })
