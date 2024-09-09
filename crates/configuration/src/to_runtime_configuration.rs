@@ -16,7 +16,7 @@ pub fn make_runtime_configuration(
     parsed_config: ParsedConfiguration,
     environment: impl Environment,
 ) -> Result<crate::Configuration, MakeRuntimeConfigurationError> {
-    let connection_uri = match parsed_config.connection_uri {
+    let connection_uri = match parsed_config.service_key {
         ConnectionUri(Secret::Plain(uri)) => Ok(uri),
         ConnectionUri(Secret::FromEnvironment { variable }) => {
             environment.read(&variable).map_err(|error| {

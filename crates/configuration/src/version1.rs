@@ -27,7 +27,7 @@ use query_engine_metadata::metadata::{self, database, CompositeTypes, ScalarType
 
 const CURRENT_VERSION: u32 = 1;
 pub const CONFIGURATION_FILENAME: &str = "configuration.json";
-pub const DEFAULT_CONNECTION_URI_VARIABLE: &str = "CONNECTION_URI";
+pub const DEFAULT_CONNECTION_URI_VARIABLE: &str = "HASURA_BIGQUERY_SERVICE_KEY";
 const CONFIGURATION_QUERY: &str = include_str!("config2.sql");
 const CONFIGURATION_JSONSCHEMA_FILENAME: &str = "schema.json";
 
@@ -58,7 +58,7 @@ pub struct ParsedConfiguration {
     // Which version of the configuration format are we using
     pub version: u32,
     // Connection string for a Postgres-compatible database
-    pub connection_uri: ConnectionUri,
+    pub service_key: ConnectionUri,
     #[serde(skip_serializing_if = "PoolSettings::is_default")]
     #[serde(default)]
     pub pool_settings: PoolSettings,
@@ -166,7 +166,7 @@ impl ParsedConfiguration {
     pub fn empty() -> Self {
         Self {
             version: CURRENT_VERSION,
-            connection_uri: ConnectionUri(Secret::FromEnvironment {
+            service_key: ConnectionUri(Secret::FromEnvironment {
                  variable: DEFAULT_CONNECTION_URI_VARIABLE.into(),
             }),
             pool_settings: PoolSettings::default(),
@@ -355,7 +355,7 @@ pub async fn configure(
     // configuration_query: &str,
 ) -> anyhow::Result<ParsedConfiguration> {
     // dbg!(args);
-    let uri = match &args.connection_uri {
+    let uri = match &args.service_key {
         ConnectionUri(Secret::Plain(value)) => Cow::Borrowed(value),
         ConnectionUri(Secret::FromEnvironment { variable }) => {
             Cow::Owned(environment.read(variable)?)
@@ -524,7 +524,7 @@ pub async fn configure(
 
     Ok(ParsedConfiguration {
         version: 1,
-        connection_uri: args.connection_uri.clone(),
+        service_key: args.service_key.clone(),
         pool_settings: args.pool_settings.clone(),
         metadata: metadata::Metadata {
             tables: tables_info,

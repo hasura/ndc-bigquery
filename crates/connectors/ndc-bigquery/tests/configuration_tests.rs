@@ -36,7 +36,7 @@ async fn test_configure() {
         POSTGRESQL_CONNECTION_STRING.into(),
     )]);
 
-    args.connection_uri =
+    args.service_key =
         ConnectionUri(Secret::Plain((POSTGRESQL_CONNECTION_STRING.to_string())));
 
     let actual = version1::configure(&args, environment)
