@@ -9,8 +9,8 @@ WITH column_data AS (
       JSON_OBJECT('ScalarType', c.data_type) AS type,
       CASE WHEN c.is_nullable = 'YES' THEN 'nullable' ELSE 'nonNullable' END AS nullable
     )) AS column_info
-  FROM chinook_sample.INFORMATION_SCHEMA.TABLES AS t
-  JOIN chinook_sample.INFORMATION_SCHEMA.COLUMNS AS c
+  FROM hasura_database_name.INFORMATION_SCHEMA.TABLES AS t
+  JOIN hasura_database_name.INFORMATION_SCHEMA.COLUMNS AS c
     ON c.table_catalog = t.table_catalog
     AND c.table_schema = t.table_schema
     AND c.table_name = t.table_name
@@ -40,16 +40,16 @@ relationship_data AS (
         rc.table_name AS foreign_table,
         json_object(fc.column_name, rc.column_name) as column_mapping
     )) AS relationship_info
-  FROM chinook_sample.INFORMATION_SCHEMA.TABLES AS t
-  JOIN chinook_sample.INFORMATION_SCHEMA.TABLE_CONSTRAINTS as c
+  FROM hasura_database_name.INFORMATION_SCHEMA.TABLES AS t
+  JOIN hasura_database_name.INFORMATION_SCHEMA.TABLE_CONSTRAINTS as c
     ON c.table_catalog = t.table_catalog
     AND c.table_schema = t.table_schema
     AND c.table_name = t.table_name
-  JOIN chinook_sample.INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE as rc
+  JOIN hasura_database_name.INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE as rc
     ON c.constraint_catalog = rc.constraint_catalog
     AND c.constraint_schema = rc.constraint_schema
     AND c.constraint_name = rc.constraint_name
-  JOIN chinook_sample.INFORMATION_SCHEMA.KEY_COLUMN_USAGE as fc ON c.constraint_name = fc.constraint_name
+  JOIN hasura_database_name.INFORMATION_SCHEMA.KEY_COLUMN_USAGE as fc ON c.constraint_name = fc.constraint_name
   WHERE t.table_schema = 'chinook_sample' AND c.constraint_type = 'FOREIGN KEY'
   GROUP BY t.table_name, table_catalog, table_schema, constraint_name, rc.table_name, fc.column_name, rc.column_name
 ),
@@ -74,12 +74,12 @@ unique_constraint_data AS (
     t.table_schema,
     c.constraint_name,
     TO_JSON_STRING(JSON_ARRAY(cc.column_name)) AS unique_constraint_info
-  FROM chinook_sample.INFORMATION_SCHEMA.TABLES AS t
-  JOIN chinook_sample.INFORMATION_SCHEMA.TABLE_CONSTRAINTS as c
+  FROM hasura_database_name.INFORMATION_SCHEMA.TABLES AS t
+  JOIN hasura_database_name.INFORMATION_SCHEMA.TABLE_CONSTRAINTS as c
     ON c.table_catalog = t.table_catalog
     AND c.table_schema = t.table_schema
     AND c.table_name = t.table_name
-  JOIN chinook_sample.INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE as cc
+  JOIN hasura_database_name.INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE as cc
     ON c.constraint_name = cc.constraint_name
   WHERE t.table_schema = 'chinook_sample' 
     AND c.constraint_type in ('PRIMARY KEY', 'UNIQUE')
@@ -120,24 +120,3 @@ SELECT
 FROM columns_struct 
 LEFT JOIN relationship_struct ON columns_struct.table_name = relationship_struct.table_name 
 LEFT JOIN unique_constraint_struct ON columns_struct.table_name = unique_constraint_struct.table_name
--- SELECT
---   CONCAT(
---     '{',
---       '"', columns_struct.table_name, '": {',
---         '"schemaName": ',
---         '"', CONCAT(columns_struct.table_catalog , '.', columns_struct.table_schema), '", ',
---         '"tableName": ' , '"', columns_struct.table_name, '", '
---         '"columns": {', 
---           columns_struct.columns.columns_json,
---         '},',
---         '"uniquenessConstraints": {',
---           coalesce(unique_constraint_struct.unique_constraint.unique_constraint_json, ""),
---         '},',
---         '"foreignRelations": {',
---           coalesce(relationship_struct.relationships.relationships_json, ""),
---         '}'
---       '}',
---     '}'
---   ) AS result
--- FROM columns_struct LEFT JOIN relationship_struct ON columns_struct.table_name = relationship_struct.table_name 
---   LEFT JOIN unique_constraint_struct ON columns_struct.table_name = unique_constraint_struct.table_name
