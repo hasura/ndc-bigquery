@@ -38,22 +38,27 @@ pub fn translate(
                         ))
                     }
                 }
-                models::Aggregate::SingleColumn { column, function, field_path: _ } => {
-                    sql::ast::Expression::FunctionCall {
-                        function: sql::ast::Function::Unknown(function.to_string()),
-                        args: vec![sql::ast::Expression::ColumnReference(
-                            sql::ast::ColumnReference::AliasedColumn {
-                                table: table.clone(),
-                                column: sql::helpers::make_column_alias(column.to_string()),
-                            },
-                        )],
-                    }
-                }
+                models::Aggregate::SingleColumn {
+                    column,
+                    function,
+                    field_path: _,
+                } => sql::ast::Expression::FunctionCall {
+                    function: sql::ast::Function::Unknown(function.to_string()),
+                    args: vec![sql::ast::Expression::ColumnReference(
+                        sql::ast::ColumnReference::AliasedColumn {
+                            table: table.clone(),
+                            column: sql::helpers::make_column_alias(column.to_string()),
+                        },
+                    )],
+                },
                 models::Aggregate::StarCount {} => {
                     sql::ast::Expression::Count(sql::ast::CountType::Star)
                 }
             };
-            Ok((sql::helpers::make_column_alias(alias.to_string()), expression))
+            Ok((
+                sql::helpers::make_column_alias(alias.to_string()),
+                expression,
+            ))
         })
         .collect::<Result<Vec<_>, Error>>()
 }

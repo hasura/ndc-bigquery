@@ -54,10 +54,9 @@ impl CTExpr {
                 for item in raw_vec {
                     item.to_sql(sql);
                 }
-            }
-            // CTExpr::Delete(delete) => delete.to_sql(sql),
-            // CTExpr::Insert(insert) => insert.to_sql(sql),
-            // CTExpr::Update(update) => update.to_sql(sql),
+            } // CTExpr::Delete(delete) => delete.to_sql(sql),
+              // CTExpr::Insert(insert) => insert.to_sql(sql),
+              // CTExpr::Update(update) => update.to_sql(sql),
         }
     }
 }

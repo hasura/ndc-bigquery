@@ -57,17 +57,19 @@ impl Connector for BigQuery {
         _configuration: &Self::Configuration,
         state: &Self::State,
     ) -> Result<(), connector::HealthError> {
-        health::health_check(&state.bigquery_client).await.map_err(|err| {
-            tracing::error!(
-                meta.signal_type = "log",
-                event.domain = "ndc",
-                event.name = "Health check error",
-                name = "Health check error",
-                body = %err,
-                error = true,
-            );
-            err
-        })
+        health::health_check(&state.bigquery_client)
+            .await
+            .map_err(|err| {
+                tracing::error!(
+                    meta.signal_type = "log",
+                    event.domain = "ndc",
+                    event.name = "Health check error",
+                    name = "Health check error",
+                    body = %err,
+                    error = true,
+                );
+                err
+            })
     }
 
     /// Get the connector's capabilities.
@@ -86,7 +88,9 @@ impl Connector for BigQuery {
         configuration: &Self::Configuration,
     ) -> Result<JsonResponse<models::SchemaResponse>, connector::SchemaError> {
         schema::get_schema(configuration)
-            .await.map_err(|err| { // TODO(PY): await?
+            .await
+            .map_err(|err| {
+                // TODO(PY): await?
                 tracing::error!(
                     meta.signal_type = "log",
                     event.domain = "ndc",
@@ -215,7 +219,7 @@ impl<Env: Environment> BigQuerySetup<Env> {
 #[async_trait]
 impl<Env: Environment + Send + Sync> ConnectorSetup for BigQuerySetup<Env> {
     type Connector = BigQuery;
-    
+
     /// Validate the raw configuration provided by the user,
     /// returning a configuration error or a validated `Connector::Configuration`.
     async fn parse_configuration(

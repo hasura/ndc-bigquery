@@ -29,12 +29,10 @@ pub async fn create_router_from_deployment(deployment_path: &str) -> axum::Route
         tests_common::deployment::helpers::get_path_from_project_root(deployment_path);
 
     // initialise server state with the static configuration.
-    let state = ndc_sdk::default_main::init_server_state(
-        setup,
-        test_deployment_file.display().to_string(),
-    )
-    .await
-    .unwrap();
+    let state =
+        ndc_sdk::default_main::init_server_state(setup, test_deployment_file.display().to_string())
+            .await
+            .unwrap();
 
     ndc_sdk::default_main::create_router(state, None)
 }

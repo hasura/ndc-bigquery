@@ -162,9 +162,9 @@ impl Join {
     pub fn get_select_and_alias(self) -> (Box<Select>, TableAlias) {
         match self {
             Join::LeftOuterJoin(LeftOuterJoin { select, alias, .. }) => (select, alias),
-            | Join::InnerJoin(InnerJoin { select, alias }) => (select, alias),
-            | Join::CrossJoin(CrossJoin { select, alias }) => (select, alias),
-            | Join::FullOuterJoin(FullOuterJoin { select, alias }) => (select, alias),
+            Join::InnerJoin(InnerJoin { select, alias }) => (select, alias),
+            Join::CrossJoin(CrossJoin { select, alias }) => (select, alias),
+            Join::FullOuterJoin(FullOuterJoin { select, alias }) => (select, alias),
         }
     }
 }
@@ -272,7 +272,9 @@ pub enum Expression {
         args: Vec<Expression>,
     },
     /// An EXISTS clause
-    Exists { select: Box<Select> },
+    Exists {
+        select: Box<Select>,
+    },
     /// A json_build_object function call
     JsonBuildObject(BTreeMap<String, Expression>),
     // SELECT queries can appear in a select list if they return

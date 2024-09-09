@@ -1,6 +1,6 @@
 mod pool_settings;
-pub mod uri;
 mod secret;
+pub mod uri;
 
 pub use pool_settings::PoolSettings;
 pub use secret::Secret;

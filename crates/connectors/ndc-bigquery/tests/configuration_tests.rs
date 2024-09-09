@@ -29,15 +29,14 @@ async fn test_configure() {
     };
 
     let mut args: version1::ParsedConfiguration = serde_json::from_value(expected_value.clone())
-    .expect("Unable to deserialize as RawConfiguration");
+        .expect("Unable to deserialize as RawConfiguration");
 
     let environment = HashMap::from([(
         version1::DEFAULT_CONNECTION_URI_VARIABLE.into(),
         POSTGRESQL_CONNECTION_STRING.into(),
     )]);
 
-    args.service_key =
-        ConnectionUri(Secret::Plain((POSTGRESQL_CONNECTION_STRING.to_string())));
+    args.service_key = ConnectionUri(Secret::Plain((POSTGRESQL_CONNECTION_STRING.to_string())));
 
     let actual = version1::configure(&args, environment)
         .await

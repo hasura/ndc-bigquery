@@ -13,7 +13,7 @@ use query_engine_metadata::metadata::OperatorKind;
 use query_engine_metadata::metadata::ScalarTypes;
 use serde::de::IntoDeserializer;
 
-use ndc_bigquery_configuration::configuration as configuration;
+use ndc_bigquery_configuration::configuration;
 
 // /// Collect all the types that can occur in the metadata. This is a bit circumstantial. A better
 // /// approach is likely to record scalar type names directly in the metadata via configuration.sql.
@@ -47,74 +47,69 @@ pub async fn get_schema(
     //     ..
     // } = config;
     let metadata = &configuration.metadata;
-    let scalar_types: BTreeMap<models::ScalarTypeName, models::ScalarType> = metadata.scalar_types
+    let scalar_types: BTreeMap<models::ScalarTypeName, models::ScalarType> = metadata
+        .scalar_types
         .0
         .iter()
         .map(|(scalar_type_name, scalar_type_info)| {
-            
-                let result = models::ScalarType {
-                    representation: scalar_type_info
+            let result = models::ScalarType {
+                representation: scalar_type_info
                     .type_representation
                     .as_ref()
                     .map(map_type_representation),
-                    aggregate_functions: scalar_type_info
-                        .aggregate_functions
-                        .iter()
-                        .map(|(function_name, function_definition)| {
-                            (
-                                function_name.clone(),
-                                models::AggregateFunctionDefinition {
-                                    result_type: models::Type::Nullable {
-                                        underlying_type: Box::new(models::Type::Named {
-                                            name: function_definition.return_type.clone(),
-                                        }),
-                                    },
+                aggregate_functions: scalar_type_info
+                    .aggregate_functions
+                    .iter()
+                    .map(|(function_name, function_definition)| {
+                        (
+                            function_name.clone(),
+                            models::AggregateFunctionDefinition {
+                                result_type: models::Type::Nullable {
+                                    underlying_type: Box::new(models::Type::Named {
+                                        name: function_definition.return_type.clone(),
+                                    }),
                                 },
-                            )
-                        })
-                        .collect(),
-                    comparison_operators: scalar_type_info
-                        .comparison_operators
-                        .iter()
-                        .map(|(op_name, op_def)| {
-                            (
-                                op_name.clone(),
-                                match op_def.operator_kind{
-                                    OperatorKind::Equal => {
-                                        models::ComparisonOperatorDefinition::Equal
+                            },
+                        )
+                    })
+                    .collect(),
+                comparison_operators: scalar_type_info
+                    .comparison_operators
+                    .iter()
+                    .map(|(op_name, op_def)| {
+                        (
+                            op_name.clone(),
+                            match op_def.operator_kind {
+                                OperatorKind::Equal => models::ComparisonOperatorDefinition::Equal,
+                                OperatorKind::In => models::ComparisonOperatorDefinition::In,
+                                OperatorKind::Custom => {
+                                    models::ComparisonOperatorDefinition::Custom {
+                                        argument_type: models::Type::Named {
+                                            name: op_def.argument_type.as_str().into(),
+                                        },
                                     }
-                                    OperatorKind::In => {
-                                        models::ComparisonOperatorDefinition::In
-                                    }
-                                    OperatorKind::Custom => {
-                                        models::ComparisonOperatorDefinition::Custom {
-                                            argument_type: models::Type::Named {
-                                                name: op_def.argument_type.as_str().into(),
-                                            },
-                                        }
-                                    }
-                                },
-                            )
-                        })
-                        .collect(),
-                    // update_operators: BTreeMap::new(),
-                };
-                (scalar_type_name.clone(), result)
-            
+                                }
+                            },
+                        )
+                    })
+                    .collect(),
+                // update_operators: BTreeMap::new(),
+            };
+            (scalar_type_name.clone(), result)
         })
         .collect();
 
     let collections_by_identifier: BTreeMap<(&str, &str), &str> = metadata
-    .tables
-    .0
-    .iter()
-    .map(|(collection_name, table)| {
-        (
-            (table.schema_name.as_ref(), table.table_name.as_ref()),
-            collection_name.as_str(),
-        )
-    })
-    .collect();
+        .tables
+        .0
+        .iter()
+        .map(|(collection_name, table)| {
+            (
+                (table.schema_name.as_ref(), table.table_name.as_ref()),
+                collection_name.as_str(),
+            )
+        })
+        .collect();
 
     let collections = metadata
         .tables

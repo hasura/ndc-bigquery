@@ -1,5 +1,8 @@
 //! Execute an execution plan against the database.
 
+use crate::error::{Error, QueryError};
+use crate::metrics;
+use bytes::{BufMut, Bytes, BytesMut};
 use gcp_bigquery_client::model::query_request::QueryRequest;
 use gcp_bigquery_client::model::{query_parameter, query_parameter_type, query_parameter_value};
 use query_engine_sql::sql::string::Param;
@@ -9,9 +12,6 @@ use sqlx;
 use sqlx::Row;
 use std::collections::BTreeMap;
 use tracing::{info_span, Instrument};
-use crate::error::{Error, QueryError};
-use crate::metrics;
-use bytes::{BufMut, Bytes, BytesMut};
 
 use ndc_models as models;
 
@@ -49,7 +49,9 @@ pub async fn execute(
 
             // smash query.params in here pls
             query_request.query_parameters = Some(
-                plan.query.query_sql().params
+                plan.query
+                    .query_sql()
+                    .params
                     // .params
                     .iter()
                     .enumerate()
@@ -87,7 +89,7 @@ pub async fn execute(
 
             while rs.next_row() {
                 let this_row = rs.get_string(0).unwrap().unwrap(); // we should only have one row called 'universe'
-                // let json_value = serde_json::from_str(&this_row).unwrap();
+                                                                   // let json_value = serde_json::from_str(&this_row).unwrap();
                 let b: Bytes = Bytes::from(this_row);
                 buffer.put(b);
                 // inner_rows.push(json_value);
@@ -200,25 +202,24 @@ async fn build_query_with_params<'a>(
             }
             sql::string::Param::Variable(var) => {
                 Err(Error::Query(QueryError::VariableNotFound(var.to_string())))
-            }
-            // sql::string::Param::Variable(var) => match variables.get(var) {
-            //     Some(value) => match value {
-            //         serde_json::Value::String(s) => Ok(sqlx_query.bind(s)),
-            //         serde_json::Value::Number(n) => Ok(sqlx_query.bind(n.as_f64())),
-            //         serde_json::Value::Bool(b) => Ok(sqlx_query.bind(b)),
-            //         // this is a problem - we don't know the type of the value!
-            //         serde_json::Value::Null => Err(Error::Query(
-            //             "null variable not currently supported".to_string(),
-            //         )),
-            //         serde_json::Value::Array(_array) => Err(Error::Query(
-            //             "array variable not currently supported".to_string(),
-            //         )),
-            //         serde_json::Value::Object(_object) => Err(Error::Query(
-            //             "object variable not currently supported".to_string(),
-            //         )),
-            //     },
-            //     None => Err(Error::Query(format!("Variable not found '{}'", var))),
-            // },
+            } // sql::string::Param::Variable(var) => match variables.get(var) {
+              //     Some(value) => match value {
+              //         serde_json::Value::String(s) => Ok(sqlx_query.bind(s)),
+              //         serde_json::Value::Number(n) => Ok(sqlx_query.bind(n.as_f64())),
+              //         serde_json::Value::Bool(b) => Ok(sqlx_query.bind(b)),
+              //         // this is a problem - we don't know the type of the value!
+              //         serde_json::Value::Null => Err(Error::Query(
+              //             "null variable not currently supported".to_string(),
+              //         )),
+              //         serde_json::Value::Array(_array) => Err(Error::Query(
+              //             "array variable not currently supported".to_string(),
+              //         )),
+              //         serde_json::Value::Object(_object) => Err(Error::Query(
+              //             "object variable not currently supported".to_string(),
+              //         )),
+              //     },
+              //     None => Err(Error::Query(format!("Variable not found '{}'", var))),
+              // },
         })
 
     // Ok(sqlx_query)

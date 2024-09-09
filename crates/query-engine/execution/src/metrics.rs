@@ -143,7 +143,8 @@ fn add_int_counter_metric(
     metric_name: &str,
     metric_description: &str,
 ) -> Result<IntCounter, prometheus::Error> {
-    let int_counter = IntCounter::with_opts(prometheus::Opts::new(metric_name, metric_description))?;
+    let int_counter =
+        IntCounter::with_opts(prometheus::Opts::new(metric_name, metric_description))?;
     register_collector(metrics_registry, int_counter)
 }
 
@@ -163,8 +164,7 @@ fn add_gauge_metric(
     metric_name: &str,
     metric_description: &str,
 ) -> Result<Gauge, prometheus::Error> {
-    let gauge =
-        Gauge::with_opts(prometheus::Opts::new(metric_name, metric_description))?;
+    let gauge = Gauge::with_opts(prometheus::Opts::new(metric_name, metric_description))?;
     register_collector(metrics_registry, gauge)
 }
 
@@ -187,8 +187,7 @@ fn register_collector<Collector: prometheus::core::Collector + std::clone::Clone
     metrics_registry: &mut Registry,
     collector: Collector,
 ) -> Result<Collector, prometheus::Error> {
-    metrics_registry
-        .register(Box::new(collector.clone()))?;
+    metrics_registry.register(Box::new(collector.clone()))?;
     Ok(collector)
 }
 
@@ -313,4 +312,3 @@ impl ErrorMetrics {
         self.connection_acquisition_error_total.inc();
     }
 }
-

@@ -70,13 +70,11 @@ pub fn translate_joins(
                 select_set,
             );
 
-            Ok(sql::ast::Join::LeftOuterJoin(
-                sql::ast::LeftOuterJoin {
-                    select: Box::new(json_select),
-                    alias: join_field.table_alias,
-                    on: sql::ast::Expression::Value(sql::ast::Value::Bool(true)) // todo(PY): fixme
-                },
-            ))
+            Ok(sql::ast::Join::LeftOuterJoin(sql::ast::LeftOuterJoin {
+                select: Box::new(json_select),
+                alias: join_field.table_alias,
+                on: sql::ast::Expression::Value(sql::ast::Value::Bool(true)), // todo(PY): fixme
+            }))
         })
         .collect::<Result<Vec<sql::ast::Join>, Error>>()
 }

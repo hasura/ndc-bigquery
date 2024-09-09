@@ -70,12 +70,10 @@ pub fn normalize_join(join: Join) -> Join {
                 on,
             })
         }
-        Join::InnerJoin(InnerJoin { select, alias }) => {
-            Join::InnerJoin(InnerJoin {
-                select: Box::new(normalize_select(*select)),
-                alias,
-            })
-        }
+        Join::InnerJoin(InnerJoin { select, alias }) => Join::InnerJoin(InnerJoin {
+            select: Box::new(normalize_select(*select)),
+            alias,
+        }),
         Join::FullOuterJoin(FullOuterJoin { select, alias }) => {
             Join::FullOuterJoin(FullOuterJoin {
                 select: Box::new(normalize_select(*select)),

@@ -247,23 +247,23 @@ impl<'request> Env<'request> {
         &self,
         type_name: &'request models::TypeName,
     ) -> Result<CompositeTypeInfo<'request>, Error> {
-        let info = self
-            .metadata
-            .tables
-            .0
-            .get(type_name.as_str())
-            .map(|t| CompositeTypeInfo::Table {
-                name: type_name.as_str().into(),
-                info: t,
-            });
-            // .or_else(|| {
-            //     self.metadata.composite_types.0.get(type_name).map(|t| {
-            //         CompositeTypeInfo::CompositeType {
-            //             name: t.type_name.as_str().into(),
-            //             info: t,
-            //         }
-            //     })
-            // });
+        let info =
+            self.metadata
+                .tables
+                .0
+                .get(type_name.as_str())
+                .map(|t| CompositeTypeInfo::Table {
+                    name: type_name.as_str().into(),
+                    info: t,
+                });
+        // .or_else(|| {
+        //     self.metadata.composite_types.0.get(type_name).map(|t| {
+        //         CompositeTypeInfo::CompositeType {
+        //             name: t.type_name.as_str().into(),
+        //             info: t,
+        //         }
+        //     })
+        // });
 
         info.ok_or(Error::CollectionNotFound(type_name.as_str().into()))
     }

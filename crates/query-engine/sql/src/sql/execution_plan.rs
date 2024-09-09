@@ -1,7 +1,7 @@
 //! Describe the SQL execution plan.
 
-use ndc_models as models;
 use crate::sql;
+use ndc_models as models;
 
 use std::collections::BTreeMap;
 

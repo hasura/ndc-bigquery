@@ -69,7 +69,7 @@ pub fn translate(
         //             .collect()
         //     },
         // },
-        select_set
+        select_set,
     );
 
     // normalize ast

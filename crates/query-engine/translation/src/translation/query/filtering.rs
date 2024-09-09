@@ -381,12 +381,10 @@ fn translate_comparison_pathelements(
 
             select.joins = rel_joins;
 
-            joins.push(sql::ast::Join::InnerJoin(
-                sql::ast::InnerJoin {
-                    select: Box::new(select),
-                    alias: target_table_alias,
-                },
-            ));
+            joins.push(sql::ast::Join::InnerJoin(sql::ast::InnerJoin {
+                select: Box::new(select),
+                alias: target_table_alias,
+            }));
 
             Ok(new_root_and_current_tables.current_table)
         },
@@ -417,12 +415,10 @@ fn translate_comparison_pathelements(
                 // We use a full outer join so even if one of the sides does not contain rows,
                 // We can still select values.
                 // See a more elaborated explanation: https://github.com/hasura/ndc-postgres/pull/463#discussion_r1601884534
-                vec![sql::ast::Join::FullOuterJoin(
-                    sql::ast::FullOuterJoin {
-                        select: Box::new(outer_select),
-                        alias,
-                    },
-                )],
+                vec![sql::ast::Join::FullOuterJoin(sql::ast::FullOuterJoin {
+                    select: Box::new(outer_select),
+                    alias,
+                })],
             ))
         }
     }

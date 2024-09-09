@@ -1,7 +1,7 @@
 use std::process::ExitCode;
 
-use ndc_postgres::connector::BigQuerySetup;
 use ndc_bigquery_configuration::environment::ProcessEnvironment;
+use ndc_postgres::connector::BigQuerySetup;
 use ndc_sdk::default_main::default_main_with;
 
 #[tokio::main]

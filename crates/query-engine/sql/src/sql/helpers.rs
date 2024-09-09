@@ -674,7 +674,6 @@ pub fn select_row_as_json_with_default(
     final_select
 }
 
-
 /// Create a FROM clause for variables.
 ///
 /// Something of the form:

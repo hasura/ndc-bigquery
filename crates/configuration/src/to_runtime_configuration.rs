@@ -3,11 +3,11 @@
 
 use std::collections::BTreeMap;
 
-use query_engine_metadata::{self, metadata};
 use super::version1::ParsedConfiguration;
 use crate::environment::Environment;
 use crate::error::MakeRuntimeConfigurationError;
 use crate::values::{ConnectionUri, Secret};
+use query_engine_metadata::{self, metadata};
 // use crate::VersionTag;
 
 /// Convert the parsed configuration metadata to internal engine metadata
@@ -296,7 +296,7 @@ fn convert_type_representation(
         // TODO(PY): do we want to include number and integer?
         // metadata::TypeRepresentation::Number
         // | metadata::TypeRepresentation::Integer
-        | metadata::TypeRepresentation::Json => {
+        metadata::TypeRepresentation::Json => {
             query_engine_metadata::metadata::TypeRepresentation::Json
         }
         metadata::TypeRepresentation::Enum(v) => {

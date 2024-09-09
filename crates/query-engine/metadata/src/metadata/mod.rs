@@ -1,8 +1,8 @@
 //! Metadata information regarding the database and tracked information.
 
 pub mod database;
-pub mod native_queries;
 pub mod mutations;
+pub mod native_queries;
 
 // re-export without modules
 pub use database::*;

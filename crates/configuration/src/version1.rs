@@ -12,18 +12,20 @@ use schemars::{schema, JsonSchema};
 use serde::{Deserialize, Serialize};
 use sqlx::postgres::PgConnection;
 use sqlx::{Connection, Executor, Row};
-use tracing::{info_span, Instrument};
 use std::borrow::Cow;
 use std::collections::BTreeMap;
 use std::fmt::format;
-use tokio::fs;
 use std::path::Path;
 use thiserror::Error;
+use tokio::fs;
+use tracing::{info_span, Instrument};
 
 //TODO(PY): temp, needs to be removed from the crate
 // use ndc_sdk::connector;
 
-use query_engine_metadata::metadata::{self, database, CompositeTypes, ScalarTypeTypeName, ScalarTypes, TablesInfo};
+use query_engine_metadata::metadata::{
+    self, database, CompositeTypes, ScalarTypeTypeName, ScalarTypes, TablesInfo,
+};
 
 const CURRENT_VERSION: u32 = 1;
 pub const CONFIGURATION_FILENAME: &str = "configuration.json";
@@ -49,7 +51,8 @@ const APPROX_NUMERICS: [&str; 2] = ["float", "real"];
 const NOT_COUNTABLE: [&str; 3] = ["image", "ntext", "text"];
 const NOT_APPROX_COUNTABLE: [&str; 4] = ["image", "sql_variant", "ntext", "text"];
 
-const TYPES_QUERY: &str = "select data_type from chinook_sample.INFORMATION_SCHEMA.COLUMN_FIELD_PATHS";
+const TYPES_QUERY: &str =
+    "select data_type from chinook_sample.INFORMATION_SCHEMA.COLUMN_FIELD_PATHS";
 
 /// Initial configuration, just enough to connect to a database and elaborate a full
 /// 'Configuration'.
@@ -167,7 +170,7 @@ impl ParsedConfiguration {
         Self {
             version: CURRENT_VERSION,
             service_key: ConnectionUri(Secret::FromEnvironment {
-                 variable: DEFAULT_CONNECTION_URI_VARIABLE.into(),
+                variable: DEFAULT_CONNECTION_URI_VARIABLE.into(),
             }),
             pool_settings: PoolSettings::default(),
             metadata: metadata::Metadata::default(),
@@ -363,12 +366,12 @@ pub async fn configure(
     };
 
     // .map_err(|e| connector::UpdateConfigurationError::Other(e.into()))?;
-    
+
     // let service_account_key_json = std::env::var("HASURA_BIGQUERY_SERVICE_KEY").unwrap();
     // dbg!(uri.as_ref().as_str());
-    
+
     let service_account_key = yup_oauth2::parse_service_account_key(uri.as_str()).unwrap();
-    
+
     // Init BigQuery client
     let bigquery_client =
         gcp_bigquery_client::Client::from_service_account_key(service_account_key, false)
@@ -384,17 +387,37 @@ pub async fn configure(
         .unwrap();
     // dbg!(datasets);
 
-    let types_row = bigquery_client.job().query(project_id, QueryRequest::new(TYPES_QUERY)).await.unwrap();
-    
+    let types_row = bigquery_client
+        .job()
+        .query(project_id, QueryRequest::new(TYPES_QUERY))
+        .await
+        .unwrap();
+
     // dbg!(types_row.query_response());
     let a = types_row.query_response().clone();
-    
+
     //TODO(PY): to many unwraps!
-    let types = a.rows.as_ref().unwrap().into_iter().map(|row| {
-        TypeItem {
-            name: serde_json::from_value(row.columns.as_ref().unwrap().into_iter().next().unwrap().value.as_ref().unwrap().to_owned()).unwrap(),
-        }
-    }).collect::<Vec<_>>();
+    let types = a
+        .rows
+        .as_ref()
+        .unwrap()
+        .into_iter()
+        .map(|row| TypeItem {
+            name: serde_json::from_value(
+                row.columns
+                    .as_ref()
+                    .unwrap()
+                    .into_iter()
+                    .next()
+                    .unwrap()
+                    .value
+                    .as_ref()
+                    .unwrap()
+                    .to_owned(),
+            )
+            .unwrap(),
+        })
+        .collect::<Vec<_>>();
 
     let comparison_operators = get_comparison_operators(&types);
     // dbg!(comparison_operators);
@@ -405,20 +428,20 @@ pub async fn configure(
     let dataset_id = "chinook_sample";
 
     let schema_name = format!("{}.{}", project_id, dataset_id);
-    
+
     let scalar_types = get_scalar_types(&types, schema_name);
-    
+
     let rs = bigquery_client
         .job()
         // .query_all_with_location
-        //     (project_id, 
-        //         "EU", 
+        //     (project_id,
+        //         "EU",
         //         JobConfigurationQuery {
         //             query: CONFIGURATION_QUERY,
         //             query_parameters: None,
         //             use_legacy_sql: Some(false),
         //             ..Default::default()
-        //         }, 
+        //         },
         //         Some(2)
         //     );
         // .collect::<Result<Vec<_>, _>>()
@@ -426,7 +449,7 @@ pub async fn configure(
         .await
         // .map(|vec_of_vecs| vec_of_vecs.into_iter().flatten().collect());
         .unwrap();
-        // ;
+    // ;
 
     // dbg!(&rs.query_response());
 
@@ -452,7 +475,10 @@ pub async fn configure(
                             // tables_info.merge(foobar);
                             Ok(foobar)
                         } else {
-                            Err(format!("Failed to deserialize TablesInfo from JSON: {}", str))
+                            Err(format!(
+                                "Failed to deserialize TablesInfo from JSON: {}",
+                                str
+                            ))
                         }
                     } else {
                         Err(format!("Expected a string value, found: {:?}", baz))
@@ -473,11 +499,9 @@ pub async fn configure(
 
     // dbg!(&tables_info);
 
-
     // let table_info: TablesInfo = table_rows.rows.as_ref().unwrap().into_iter().map(|row| {
     //     serde_json::from_str(row.columns.as_ref().unwrap().into_iter().next().unwrap().value.as_ref().unwrap().to_owned().as_str().unwrap()).unwrap()
     // }).collect::<Vec<_>>();
-
 
     // let r = rs.query_response().rows.unwrap().get(0).unwrap();
     // dbg!(r);
@@ -490,7 +514,7 @@ pub async fn configure(
     // let row = connection // TODO(PY): why is this PG connection
     //     .fetch_one(CONFIGURATION_QUERY)
     //     .await?;
-        // .map_err(|e| connector::UpdateConfigurationError::Other(e.into()))?;
+    // .map_err(|e| connector::UpdateConfigurationError::Other(e.into()))?;
 
     // let (scalar_types, composite_types) = transitively_occurring_types(
     //     occurring_scalar_types(
@@ -514,10 +538,10 @@ pub async fn configure(
     // .await?;
 
     // let tables: metadata::TablesInfo = serde_json::from_value(row.get(0))?;
-        // .map_err(|e| connector::UpdateConfigurationError::Other(e.into()))?;
+    // .map_err(|e| connector::UpdateConfigurationError::Other(e.into()))?;
 
     // let aggregate_functions: metadata::AggregateFunctions = serde_json::from_value(row.get(1))?;
-        // .map_err(|e| connector::UpdateConfigurationError::Other(e.into()))?;
+    // .map_err(|e| connector::UpdateConfigurationError::Other(e.into()))?;
 
     // let comparison_operators: metadata::ComparisonOperators = serde_json::from_value(row.get(2))
     //     .map_err(|e| connector::UpdateConfigurationError::Other(e.into()))?;
@@ -763,25 +787,25 @@ fn get_aggregate_functions_for_type(
         aggregate_functions.insert(
             AggregateFunctionName::new("STDEV".into()),
             database::AggregateFunction {
-                return_type: TypeName::new("float".to_string().into())
+                return_type: TypeName::new("float".to_string().into()),
             },
         );
         aggregate_functions.insert(
             AggregateFunctionName::new("STDEVP".into()),
             database::AggregateFunction {
-                return_type: TypeName::new("float".to_string().into())
+                return_type: TypeName::new("float".to_string().into()),
             },
         );
         aggregate_functions.insert(
             AggregateFunctionName::new("VAR".into()),
             database::AggregateFunction {
-                return_type: TypeName::new("float".to_string().into())
+                return_type: TypeName::new("float".to_string().into()),
             },
         );
         aggregate_functions.insert(
             AggregateFunctionName::new("VARP".into()),
             database::AggregateFunction {
-                return_type: TypeName::new("float".to_string().into())
+                return_type: TypeName::new("float".to_string().into()),
             },
         );
     }
@@ -818,7 +842,7 @@ fn get_aggregate_functions_for_type(
     aggregate_functions.insert(
         AggregateFunctionName::new("COUNT_BIG".into()),
         database::AggregateFunction {
-            return_type: TypeName::new("bigint".to_string().into())
+            return_type: TypeName::new("bigint".to_string().into()),
         },
     );
 
@@ -831,8 +855,7 @@ fn get_scalar_types(type_names: &Vec<TypeItem>, schema_name: String) -> database
     let mut scalar_types = BTreeMap::new();
     let schema = if schema_name.is_empty() {
         None
-    }
-    else {
+    } else {
         Some(schema_name)
     };
 
@@ -974,7 +997,6 @@ fn get_comparison_operators_for_type(
     }
     comparison_operators
 }
-
 
 // /// Filter predicate for comparison operators. Preserves only comparison operators that are
 // /// relevant to any of the given scalar types.
