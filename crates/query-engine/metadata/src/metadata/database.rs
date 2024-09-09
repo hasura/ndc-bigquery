@@ -117,6 +117,12 @@ impl TablesInfo {
     pub fn empty() -> Self {
         TablesInfo(BTreeMap::new())
     }
+
+    pub fn merge(&mut self, other: TablesInfo) {
+        for (table_name, table_info) in other.0 {
+            self.0.insert(table_name, table_info);
+        }
+    }
 }
 
 /// Information about a database table (or any other kind of relation).

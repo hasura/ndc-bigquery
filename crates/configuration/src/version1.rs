@@ -15,6 +15,7 @@ use sqlx::{Connection, Executor, Row};
 use tracing::{info_span, Instrument};
 use std::borrow::Cow;
 use std::collections::BTreeMap;
+use std::fmt::format;
 use tokio::fs;
 use std::path::Path;
 use thiserror::Error;
@@ -22,7 +23,7 @@ use thiserror::Error;
 //TODO(PY): temp, needs to be removed from the crate
 // use ndc_sdk::connector;
 
-use query_engine_metadata::metadata::{self, database, ScalarTypeTypeName};
+use query_engine_metadata::metadata::{self, database, ScalarTypeTypeName, TablesInfo};
 
 const CURRENT_VERSION: u32 = 1;
 pub const CONFIGURATION_FILENAME: &str = "configuration.json";
@@ -33,6 +34,20 @@ const CONFIGURATION_JSONSCHEMA_FILENAME: &str = "schema.json";
 const CHARACTER_STRINGS: [&str; 4] = ["char", "text", "varchar", "string"];
 const UNICODE_CHARACTER_STRINGS: [&str; 3] = ["nchar", "ntext", "nvarchar"];
 const CANNOT_COMPARE: [&str; 3] = ["text", "ntext", "image"];
+const EXACT_NUMERICS: [&str; 9] = [
+    "bigint",
+    "bit",
+    "decimal",
+    "int",
+    "money",
+    "numeric",
+    "smallint",
+    "smallmoney",
+    "tinyint",
+];
+const APPROX_NUMERICS: [&str; 2] = ["float", "real"];
+const NOT_COUNTABLE: [&str; 3] = ["image", "ntext", "text"];
+const NOT_APPROX_COUNTABLE: [&str; 4] = ["image", "sql_variant", "ntext", "text"];
 
 const TYPES_QUERY: &str = "select data_type from chinook_sample.INFORMATION_SCHEMA.COLUMN_FIELD_PATHS";
 
@@ -405,7 +420,57 @@ pub async fn configure(
         .unwrap();
         // ;
 
-    dbg!(rs);
+    // dbg!(&rs.query_response());
+
+    let table_rows = rs.query_response().clone();
+
+    // let foo : Vec<TablesInfo> = table_rows.rows.unwrap().into_iter().map(|row| {
+    //     let abc = row.columns.unwrap().into_iter().next().unwrap();
+    //     let baz = abc.value.unwrap();
+    //     let foobar : TablesInfo = serde_json::from_value(baz.to_owned()).unwrap();
+    //     foobar
+    // }).collect();
+
+    let mut tables_info = TablesInfo::empty();
+
+    // let table_row = table_rows.rows.unwrap_or_default().into_iter().next().unwrap();
+
+    for row in table_rows.rows.unwrap_or_default() {
+        let foo = if let Some(columns) = row.columns {
+            if let Some(abc) = columns.into_iter().next() {
+                if let Some(baz) = abc.value {
+                    if let serde_json::Value::String(str) = baz {
+                        if let Ok(foobar) = serde_json::from_str::<TablesInfo>(&str) {
+                            // tables_info.merge(foobar);
+                            Ok(foobar)
+                        } else {
+                            Err(format!("Failed to deserialize TablesInfo from JSON: {}", str))
+                        }
+                    } else {
+                        Err(format!("Expected a string value, found: {:?}", baz))
+                    }
+                } else {
+                    Err("Missing value in columns".to_string())
+                }
+            } else {
+                Err("Empty columns".to_string())
+            }
+        } else {
+            Err("Empty rows".to_string())
+        };
+        if let Ok(foobar) = foo {
+            tables_info.merge(foobar);
+        }
+    }
+
+    dbg!(tables_info);
+
+
+    // let table_info: TablesInfo = table_rows.rows.as_ref().unwrap().into_iter().map(|row| {
+    //     serde_json::from_str(row.columns.as_ref().unwrap().into_iter().next().unwrap().value.as_ref().unwrap().to_owned().as_str().unwrap()).unwrap()
+    // }).collect::<Vec<_>>();
+
+
     // let r = rs.query_response().rows.unwrap().get(0).unwrap();
     // dbg!(r);
     dbg!("query done");
@@ -621,6 +686,133 @@ pub enum ConfigurationError {
 struct TypeItem {
     name: ScalarTypeName,
 }
+
+// // we lookup all types in sys.types, then use our hardcoded ideas about each one to attach
+// // aggregate functions
+// fn get_aggregate_functions(type_names: &Vec<TypeItem>) -> database::AggregateFunctions {
+//     let mut aggregate_functions = BTreeMap::new();
+
+//     for type_name in type_names {
+//         aggregate_functions.insert(
+//             type_name.name.clone(),
+//             get_aggregate_functions_for_type(&type_name.name),
+//         );
+//     }
+//     database::AggregateFunctions(aggregate_functions)
+// }
+
+// // we hard code these, essentially
+// // we look up available types in `sys.types` but hard code their behaviour by looking them up below
+// // taken from https://learn.microsoft.com/en-us/sql/t-sql/functions/aggregate-functions-transact-sql?view=sql-server-ver16
+// fn get_aggregate_functions_for_type(
+//     type_name: &ndc_models::ScalarTypeName,
+// ) -> BTreeMap<String, database::AggregateFunction> {
+//     let mut aggregate_functions = BTreeMap::new();
+
+//     if !NOT_APPROX_COUNTABLE.contains(&type_name.as_str()) {
+//         aggregate_functions.insert(
+//             "APPROX_COUNT_DISTINCT".to_string(),
+//             database::AggregateFunction {
+//                 return_type: TypeName::new("bigint".to_string().into()),
+//             },
+//         );
+//     }
+
+//     if !NOT_COUNTABLE.contains(&type_name.as_str()) {
+//         aggregate_functions.insert(
+//             "COUNT".to_string(),
+//             database::AggregateFunction {
+//                 return_type: metadata::ScalarType("int".to_string()),
+//             },
+//         );
+//     }
+
+//     if type_name.as_str() != "bit"
+//         && (EXACT_NUMERICS.contains(&type_name.as_str())
+//             || APPROX_NUMERICS.contains(&type_name.as_str())
+//             || CHARACTER_STRINGS.contains(&type_name.as_str())
+//             || type_name.as_str() == "datetime"
+//             || type_name.as_str() == "uniqueidentifier")
+//     {
+//         aggregate_functions.insert(
+//             "MIN".to_string(),
+//             database::AggregateFunction {
+//                 return_type: type_name.clone(),
+//             },
+//         );
+//         aggregate_functions.insert(
+//             "MAX".to_string(),
+//             database::AggregateFunction {
+//                 return_type: type_name.clone(),
+//             },
+//         );
+//     }
+
+//     if type_name.as_str() != "bit"
+//         && (EXACT_NUMERICS.contains(&type_name.as_str())
+//             || APPROX_NUMERICS.contains(&type_name.as_str()))
+//     {
+//         aggregate_functions.insert(
+//             "STDEV".to_string(),
+//             database::AggregateFunction {
+//                 return_type: database::ScalarType("float".to_string()),
+//             },
+//         );
+//         aggregate_functions.insert(
+//             "STDEVP".to_string(),
+//             database::AggregateFunction {
+//                 return_type: database::ScalarType("float".to_string()),
+//             },
+//         );
+//         aggregate_functions.insert(
+//             "VAR".to_string(),
+//             database::AggregateFunction {
+//                 return_type: database::ScalarType("float".to_string()),
+//             },
+//         );
+//         aggregate_functions.insert(
+//             "VARP".to_string(),
+//             database::AggregateFunction {
+//                 return_type: database::ScalarType("float".to_string()),
+//             },
+//         );
+//     }
+
+//     if let Some(precise_return_type) = match type_name.as_str() {
+//         "tinyint" => Some("int"),
+//         "smallint" => Some("int"),
+//         "int" => Some("int"),
+//         "bigint" => Some("bigint"),
+//         "decimal" => Some("decimal"),
+//         "money" => Some("money"),
+//         "smallmoney" => Some("money"),
+//         "float" => Some("float"),
+//         "real" => Some("float"),
+//         _ => None,
+//     } {
+//         aggregate_functions.insert(
+//             "AVG".to_string(),
+//             database::AggregateFunction {
+//                 return_type: metadata::ScalarType(precise_return_type.to_string()),
+//             },
+//         );
+//         aggregate_functions.insert(
+//             "SUM".to_string(),
+//             database::AggregateFunction {
+//                 return_type: metadata::ScalarType(precise_return_type.to_string()),
+//             },
+//         );
+//     };
+
+//     aggregate_functions.insert(
+//         "COUNT_BIG".to_string(),
+//         database::AggregateFunction {
+//             return_type: metadata::ScalarType("bigint".to_string()),
+//         },
+//     );
+
+//     aggregate_functions
+// }
 
 // we lookup all types in sys.types, then use our hardcoded ideas about each one to attach
 // comparison operators

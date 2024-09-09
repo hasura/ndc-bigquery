@@ -6,8 +6,8 @@ WITH column_data AS (
     c.column_name,
     TO_JSON_STRING(STRUCT(
       c.column_name AS name,
-      c.data_type AS type,
-      CASE WHEN c.is_nullable = 'YES' THEN 'Nullable' ELSE 'nonNullable' END AS nullable
+      JSON_OBJECT('ScalarType', c.data_type) AS type,
+      CASE WHEN c.is_nullable = 'YES' THEN 'nullable' ELSE 'nonNullable' END AS nullable
     )) AS column_info
   FROM chinook_sample.INFORMATION_SCHEMA.TABLES AS t
   JOIN chinook_sample.INFORMATION_SCHEMA.COLUMNS AS c
@@ -101,23 +101,43 @@ unique_constraint_struct AS (
   GROUP BY table_name, table_catalog, table_schema
 )
 SELECT
-  CONCAT(
-    '{',
-      '"', columns_struct.table_name, '": {',
-        '"schemaName": ',
-        '"', CONCAT(columns_struct.table_catalog , '.', columns_struct.table_schema), '", ',
-        '"tableName": ' , '"', columns_struct.table_name, '", '
-        '"columns": {', 
-          columns_struct.columns.columns_json,
-        '},',
-        '"uniqueConstraints": {',
-          coalesce(unique_constraint_struct.unique_constraint.unique_constraint_json, ""),
-        '},',
-        '"foreignRelations": {',
-          coalesce(relationship_struct.relationships.relationships_json, ""),
-        '}'
-      '}',
+  CONCAT('{', STRING_AGG(CONCAT(
+    '"', columns_struct.table_name, '": {',
+      '"schemaName": ',
+      '"', CONCAT(columns_struct.table_catalog , '.', columns_struct.table_schema), '", ',
+      '"tableName": ' , '"', columns_struct.table_name, '", '
+      '"columns": {', 
+        columns_struct.columns.columns_json,
+      '},',
+      '"uniquenessConstraints": {',
+        coalesce(unique_constraint_struct.unique_constraint.unique_constraint_json, ""),
+      '},',
+      '"foreignRelations": {',
+        coalesce(relationship_struct.relationships.relationships_json, ""),
+      '}'
     '}'
-  ) AS result
-FROM columns_struct LEFT JOIN relationship_struct ON columns_struct.table_name = relationship_struct.table_name 
-  LEFT JOIN unique_constraint_struct ON columns_struct.table_name = unique_constraint_struct.table_name
+  )), '}') AS result
+FROM columns_struct 
+LEFT JOIN relationship_struct ON columns_struct.table_name = relationship_struct.table_name 
+LEFT JOIN unique_constraint_struct ON columns_struct.table_name = unique_constraint_struct.table_name
+-- SELECT
+--   CONCAT(
+--     '{',
+--       '"', columns_struct.table_name, '": {',
+--         '"schemaName": ',
+--         '"', CONCAT(columns_struct.table_catalog , '.', columns_struct.table_schema), '", ',
+--         '"tableName": ' , '"', columns_struct.table_name, '", '
+--         '"columns": {', 
+--           columns_struct.columns.columns_json,
+--         '},',
+--         '"uniquenessConstraints": {',
+--           coalesce(unique_constraint_struct.unique_constraint.unique_constraint_json, ""),
+--         '},',
+--         '"foreignRelations": {',
+--           coalesce(relationship_struct.relationships.relationships_json, ""),
+--         '}'
+--       '}',
+--     '}'
+--   ) AS result
+-- FROM columns_struct LEFT JOIN relationship_struct ON columns_struct.table_name = relationship_struct.table_name 
+--   LEFT JOIN unique_constraint_struct ON columns_struct.table_name = unique_constraint_struct.table_name
