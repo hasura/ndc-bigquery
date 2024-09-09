@@ -197,16 +197,16 @@ impl<'request> Env<'request> {
                 name: type_name,
                 info: t,
             })
-            .or_else(|| {
-                self.metadata
-                    .composite_types
-                    .0
-                    .get(type_name.as_str())
-                    .map(|t| FieldsInfo::CompositeType {
-                        name: t.type_name.clone().into(),
-                        info: t,
-                    })
-            })
+            // .or_else(|| {
+            //     self.metadata
+            //         .composite_types
+            //         .0
+            //         .get(type_name.as_str())
+            //         .map(|t| FieldsInfo::CompositeType {
+            //             name: t.type_name.clone().into(),
+            //             info: t,
+            //         })
+            // })
             .or_else(|| {
                 self.metadata
                     .native_operations
@@ -255,15 +255,15 @@ impl<'request> Env<'request> {
             .map(|t| CompositeTypeInfo::Table {
                 name: type_name.as_str().into(),
                 info: t,
-            })
-            .or_else(|| {
-                self.metadata.composite_types.0.get(type_name).map(|t| {
-                    CompositeTypeInfo::CompositeType {
-                        name: t.type_name.as_str().into(),
-                        info: t,
-                    }
-                })
             });
+            // .or_else(|| {
+            //     self.metadata.composite_types.0.get(type_name).map(|t| {
+            //         CompositeTypeInfo::CompositeType {
+            //             name: t.type_name.as_str().into(),
+            //             info: t,
+            //         }
+            //     })
+            // });
 
         info.ok_or(Error::CollectionNotFound(type_name.as_str().into()))
     }

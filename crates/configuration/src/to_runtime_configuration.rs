@@ -41,7 +41,7 @@ pub fn convert_metadata(metadata: metadata::Metadata) -> query_engine_metadata::
     query_engine_metadata::metadata::Metadata {
         tables: convert_tables(metadata.tables),
         scalar_types: convert_scalar_types(metadata.scalar_types),
-        composite_types: convert_composite_types(metadata.composite_types),
+        // composite_types: convert_composite_types(metadata.composite_types),
         native_operations: convert_native_operations(metadata.native_operations),
     }
 }

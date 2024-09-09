@@ -724,6 +724,251 @@
       "queries": {},
       "mutations": {}
     },
-    "scalar_types": {}
+    "scalar_types": {
+      "DATE": {
+        "typeName": "DATE",
+        "schemaName": "hasura-development.chinook_sample",
+        "description": null,
+        "aggregateFunctions": {
+          "APPROX_COUNT_DISTINCT": {
+            "returnType": "bigint"
+          },
+          "COUNT": {
+            "returnType": "int"
+          },
+          "COUNT_BIG": {
+            "returnType": "bigint"
+          }
+        },
+        "comparisonOperators": {
+          "_eq": {
+            "operatorName": "=",
+            "operatorKind": "equal",
+            "argumentType": "DATE",
+            "isInfix": true
+          },
+          "_gt": {
+            "operatorName": ">",
+            "operatorKind": "custom",
+            "argumentType": "DATE",
+            "isInfix": true
+          },
+          "_gte": {
+            "operatorName": ">=",
+            "operatorKind": "custom",
+            "argumentType": "DATE",
+            "isInfix": true
+          },
+          "_in": {
+            "operatorName": "IN",
+            "operatorKind": "in",
+            "argumentType": "DATE",
+            "isInfix": true
+          },
+          "_lt": {
+            "operatorName": "<",
+            "operatorKind": "custom",
+            "argumentType": "DATE",
+            "isInfix": true
+          },
+          "_lte": {
+            "operatorName": "<=",
+            "operatorKind": "custom",
+            "argumentType": "DATE",
+            "isInfix": true
+          },
+          "_neq": {
+            "operatorName": "!=",
+            "operatorKind": "custom",
+            "argumentType": "DATE",
+            "isInfix": true
+          }
+        },
+        "typeRepresentation": null
+      },
+      "FLOAT64": {
+        "typeName": "FLOAT64",
+        "schemaName": "hasura-development.chinook_sample",
+        "description": null,
+        "aggregateFunctions": {
+          "APPROX_COUNT_DISTINCT": {
+            "returnType": "bigint"
+          },
+          "COUNT": {
+            "returnType": "int"
+          },
+          "COUNT_BIG": {
+            "returnType": "bigint"
+          }
+        },
+        "comparisonOperators": {
+          "_eq": {
+            "operatorName": "=",
+            "operatorKind": "equal",
+            "argumentType": "FLOAT64",
+            "isInfix": true
+          },
+          "_gt": {
+            "operatorName": ">",
+            "operatorKind": "custom",
+            "argumentType": "FLOAT64",
+            "isInfix": true
+          },
+          "_gte": {
+            "operatorName": ">=",
+            "operatorKind": "custom",
+            "argumentType": "FLOAT64",
+            "isInfix": true
+          },
+          "_in": {
+            "operatorName": "IN",
+            "operatorKind": "in",
+            "argumentType": "FLOAT64",
+            "isInfix": true
+          },
+          "_lt": {
+            "operatorName": "<",
+            "operatorKind": "custom",
+            "argumentType": "FLOAT64",
+            "isInfix": true
+          },
+          "_lte": {
+            "operatorName": "<=",
+            "operatorKind": "custom",
+            "argumentType": "FLOAT64",
+            "isInfix": true
+          },
+          "_neq": {
+            "operatorName": "!=",
+            "operatorKind": "custom",
+            "argumentType": "FLOAT64",
+            "isInfix": true
+          }
+        },
+        "typeRepresentation": null
+      },
+      "INT64": {
+        "typeName": "INT64",
+        "schemaName": "hasura-development.chinook_sample",
+        "description": null,
+        "aggregateFunctions": {
+          "APPROX_COUNT_DISTINCT": {
+            "returnType": "bigint"
+          },
+          "COUNT": {
+            "returnType": "int"
+          },
+          "COUNT_BIG": {
+            "returnType": "bigint"
+          }
+        },
+        "comparisonOperators": {
+          "_eq": {
+            "operatorName": "=",
+            "operatorKind": "equal",
+            "argumentType": "INT64",
+            "isInfix": true
+          },
+          "_gt": {
+            "operatorName": ">",
+            "operatorKind": "custom",
+            "argumentType": "INT64",
+            "isInfix": true
+          },
+          "_gte": {
+            "operatorName": ">=",
+            "operatorKind": "custom",
+            "argumentType": "INT64",
+            "isInfix": true
+          },
+          "_in": {
+            "operatorName": "IN",
+            "operatorKind": "in",
+            "argumentType": "INT64",
+            "isInfix": true
+          },
+          "_lt": {
+            "operatorName": "<",
+            "operatorKind": "custom",
+            "argumentType": "INT64",
+            "isInfix": true
+          },
+          "_lte": {
+            "operatorName": "<=",
+            "operatorKind": "custom",
+            "argumentType": "INT64",
+            "isInfix": true
+          },
+          "_neq": {
+            "operatorName": "!=",
+            "operatorKind": "custom",
+            "argumentType": "INT64",
+            "isInfix": true
+          }
+        },
+        "typeRepresentation": null
+      },
+      "STRING": {
+        "typeName": "STRING",
+        "schemaName": "hasura-development.chinook_sample",
+        "description": null,
+        "aggregateFunctions": {
+          "APPROX_COUNT_DISTINCT": {
+            "returnType": "bigint"
+          },
+          "COUNT": {
+            "returnType": "int"
+          },
+          "COUNT_BIG": {
+            "returnType": "bigint"
+          }
+        },
+        "comparisonOperators": {
+          "_eq": {
+            "operatorName": "=",
+            "operatorKind": "equal",
+            "argumentType": "STRING",
+            "isInfix": true
+          },
+          "_gt": {
+            "operatorName": ">",
+            "operatorKind": "custom",
+            "argumentType": "STRING",
+            "isInfix": true
+          },
+          "_gte": {
+            "operatorName": ">=",
+            "operatorKind": "custom",
+            "argumentType": "STRING",
+            "isInfix": true
+          },
+          "_in": {
+            "operatorName": "IN",
+            "operatorKind": "in",
+            "argumentType": "STRING",
+            "isInfix": true
+          },
+          "_lt": {
+            "operatorName": "<",
+            "operatorKind": "custom",
+            "argumentType": "STRING",
+            "isInfix": true
+          },
+          "_lte": {
+            "operatorName": "<=",
+            "operatorKind": "custom",
+            "argumentType": "STRING",
+            "isInfix": true
+          },
+          "_neq": {
+            "operatorName": "!=",
+            "operatorKind": "custom",
+            "argumentType": "STRING",
+            "isInfix": true
+          }
+        },
+        "typeRepresentation": null
+      }
+    }
   }
 }

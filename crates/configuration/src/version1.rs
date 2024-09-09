@@ -7,8 +7,8 @@ use crate::values::{self, ConnectionUri, PoolSettings, Secret};
 use super::error::ParseConfigurationError;
 use gcp_bigquery_client::model::job_configuration_query::JobConfigurationQuery;
 use gcp_bigquery_client::model::query_request::QueryRequest;
-use ndc_models::{ComparisonOperatorName, ScalarTypeName};
-use schemars::JsonSchema;
+use ndc_models::{AggregateFunctionName, ComparisonOperatorName, ScalarTypeName, TypeName};
+use schemars::{schema, JsonSchema};
 use serde::{Deserialize, Serialize};
 use sqlx::postgres::PgConnection;
 use sqlx::{Connection, Executor, Row};
@@ -389,6 +389,7 @@ pub async fn configure(
     // dbg!(types_row.query_response());
     let a = types_row.query_response().clone();
     
+    //TODO(PY): to many unwraps!
     let types = a.rows.as_ref().unwrap().into_iter().map(|row| {
         TypeItem {
             name: serde_json::from_value(row.columns.as_ref().unwrap().into_iter().next().unwrap().value.as_ref().unwrap().to_owned()).unwrap(),
@@ -398,7 +399,14 @@ pub async fn configure(
     let comparison_operators = get_comparison_operators(&types);
     // dbg!(comparison_operators);
 
+    let aggregate_functions = get_aggregate_functions(&types);
+    // dbg !(aggregate_functions);
+
     let dataset_id = "chinook_sample";
+
+    let schema_name = format!("{}.{}", project_id, dataset_id);
+    
+    let scalar_types = get_scalar_types(&types, schema_name);
     
     let rs = bigquery_client
         .job()
@@ -463,7 +471,7 @@ pub async fn configure(
         }
     }
 
-    dbg!(&tables_info);
+    // dbg!(&tables_info);
 
 
     // let table_info: TablesInfo = table_rows.rows.as_ref().unwrap().into_iter().map(|row| {
@@ -473,11 +481,11 @@ pub async fn configure(
 
     // let r = rs.query_response().rows.unwrap().get(0).unwrap();
     // dbg!(r);
-    dbg!("query done");
+    // dbg!("query done");
     // let mut connection = PgConnection::connect(uri.as_str())
     //     .await?;
 
-    dbg!("pg connection done");
+    // dbg!("pg connection done");
 
     // let row = connection // TODO(PY): why is this PG connection
     //     .fetch_one(CONFIGURATION_QUERY)
@@ -521,8 +529,8 @@ pub async fn configure(
         metadata: metadata::Metadata {
             tables: tables_info,
             native_operations: args.metadata.native_operations.clone(),
-            scalar_types: ScalarTypes::empty(),
-            composite_types: CompositeTypes::empty(),
+            scalar_types,
+            // composite_types: CompositeTypes::empty(),
         },
         // aggregate_functions,
     })
@@ -687,132 +695,164 @@ struct TypeItem {
     name: ScalarTypeName,
 }
 
-// // we lookup all types in sys.types, then use our hardcoded ideas about each one to attach
-// // aggregate functions
-// fn get_aggregate_functions(type_names: &Vec<TypeItem>) -> database::AggregateFunctions {
-//     let mut aggregate_functions = BTreeMap::new();
+// we lookup all types in sys.types, then use our hardcoded ideas about each one to attach
+// aggregate functions
+fn get_aggregate_functions(type_names: &Vec<TypeItem>) -> database::AggregateFunctions {
+    let mut aggregate_functions = BTreeMap::new();
 
-//     for type_name in type_names {
-//         aggregate_functions.insert(
-//             type_name.name.clone(),
-//             get_aggregate_functions_for_type(&type_name.name),
-//         );
-//     }
-//     database::AggregateFunctions(aggregate_functions)
-// }
+    for type_name in type_names {
+        aggregate_functions.insert(
+            type_name.name.clone(),
+            get_aggregate_functions_for_type(&type_name.name),
+        );
+    }
+    database::AggregateFunctions(aggregate_functions)
+}
 
-// // we hard code these, essentially
-// // we look up available types in `sys.types` but hard code their behaviour by looking them up below
-// // taken from https://learn.microsoft.com/en-us/sql/t-sql/functions/aggregate-functions-transact-sql?view=sql-server-ver16
-// fn get_aggregate_functions_for_type(
-//     type_name: &ndc_models::ScalarTypeName,
-// ) -> BTreeMap<String, database::AggregateFunction> {
-//     let mut aggregate_functions = BTreeMap::new();
+// we hard code these, essentially
+// we look up available types in `sys.types` but hard code their behaviour by looking them up below
+// taken from https://learn.microsoft.com/en-us/sql/t-sql/functions/aggregate-functions-transact-sql?view=sql-server-ver16
+fn get_aggregate_functions_for_type(
+    type_name: &ndc_models::ScalarTypeName,
+) -> BTreeMap<AggregateFunctionName, database::AggregateFunction> {
+    let mut aggregate_functions = BTreeMap::new();
 
-//     if !NOT_APPROX_COUNTABLE.contains(&type_name.as_str()) {
-//         aggregate_functions.insert(
-//             "APPROX_COUNT_DISTINCT".to_string(),
-//             database::AggregateFunction {
-//                 return_type: TypeName::new("bigint".to_string().into()),
-//             },
-//         );
-//     }
+    if !NOT_APPROX_COUNTABLE.contains(&type_name.as_str()) {
+        aggregate_functions.insert(
+            AggregateFunctionName::new("APPROX_COUNT_DISTINCT".into()),
+            database::AggregateFunction {
+                return_type: TypeName::new("bigint".to_string().into()),
+            },
+        );
+    }
 
-//     if !NOT_COUNTABLE.contains(&type_name.as_str()) {
-//         aggregate_functions.insert(
-//             "COUNT".to_string(),
-//             database::AggregateFunction {
-//                 return_type: metadata::ScalarType("int".to_string()),
-//             },
-//         );
-//     }
+    if !NOT_COUNTABLE.contains(&type_name.as_str()) {
+        aggregate_functions.insert(
+            AggregateFunctionName::new("COUNT".into()),
+            database::AggregateFunction {
+                return_type: TypeName::new("int".to_string().into()),
+            },
+        );
+    }
 
-//     if type_name.as_str() != "bit"
-//         && (EXACT_NUMERICS.contains(&type_name.as_str())
-//             || APPROX_NUMERICS.contains(&type_name.as_str())
-//             || CHARACTER_STRINGS.contains(&type_name.as_str())
-//             || type_name.as_str() == "datetime"
-//             || type_name.as_str() == "uniqueidentifier")
-//     {
-//         aggregate_functions.insert(
-//             "MIN".to_string(),
-//             database::AggregateFunction {
-//                 return_type: type_name.clone(),
-//             },
-//         );
-//         aggregate_functions.insert(
-//             "MAX".to_string(),
-//             database::AggregateFunction {
-//                 return_type: type_name.clone(),
-//             },
-//         );
-//     }
+    if type_name.as_str() != "bit"
+        && (EXACT_NUMERICS.contains(&type_name.as_str())
+            || APPROX_NUMERICS.contains(&type_name.as_str())
+            || CHARACTER_STRINGS.contains(&type_name.as_str())
+            || type_name.as_str() == "datetime"
+            || type_name.as_str() == "uniqueidentifier")
+    {
+        aggregate_functions.insert(
+            AggregateFunctionName::new("MIN".into()),
+            database::AggregateFunction {
+                return_type: TypeName::new(type_name.to_string().into()),
+            },
+        );
+        aggregate_functions.insert(
+            AggregateFunctionName::new("MAX".into()),
+            database::AggregateFunction {
+                return_type: TypeName::new(type_name.to_string().into()),
+            },
+        );
+    }
 
-//     if type_name.as_str() != "bit"
-//         && (EXACT_NUMERICS.contains(&type_name.as_str())
-//             || APPROX_NUMERICS.contains(&type_name.as_str()))
-//     {
-//         aggregate_functions.insert(
-//             "STDEV".to_string(),
-//             database::AggregateFunction {
-//                 return_type: database::ScalarType("float".to_string()),
-//             },
-//         );
-//         aggregate_functions.insert(
-//             "STDEVP".to_string(),
-//             database::AggregateFunction {
-//                 return_type: database::ScalarType("float".to_string()),
-//             },
-//         );
-//         aggregate_functions.insert(
-//             "VAR".to_string(),
-//             database::AggregateFunction {
-//                 return_type: database::ScalarType("float".to_string()),
-//             },
-//         );
-//         aggregate_functions.insert(
-//             "VARP".to_string(),
-//             database::AggregateFunction {
-//                 return_type: database::ScalarType("float".to_string()),
-//             },
-//         );
-//     }
+    if type_name.as_str() != "bit"
+        && (EXACT_NUMERICS.contains(&type_name.as_str())
+            || APPROX_NUMERICS.contains(&type_name.as_str()))
+    {
+        aggregate_functions.insert(
+            AggregateFunctionName::new("STDEV".into()),
+            database::AggregateFunction {
+                return_type: TypeName::new("float".to_string().into())
+            },
+        );
+        aggregate_functions.insert(
+            AggregateFunctionName::new("STDEVP".into()),
+            database::AggregateFunction {
+                return_type: TypeName::new("float".to_string().into())
+            },
+        );
+        aggregate_functions.insert(
+            AggregateFunctionName::new("VAR".into()),
+            database::AggregateFunction {
+                return_type: TypeName::new("float".to_string().into())
+            },
+        );
+        aggregate_functions.insert(
+            AggregateFunctionName::new("VARP".into()),
+            database::AggregateFunction {
+                return_type: TypeName::new("float".to_string().into())
+            },
+        );
+    }
 
-//     if let Some(precise_return_type) = match type_name.as_str() {
-//         "tinyint" => Some("int"),
-//         "smallint" => Some("int"),
-//         "int" => Some("int"),
-//         "bigint" => Some("bigint"),
-//         "decimal" => Some("decimal"),
-//         "money" => Some("money"),
-//         "smallmoney" => Some("money"),
-//         "float" => Some("float"),
-//         "real" => Some("float"),
-//         _ => None,
-//     } {
-//         aggregate_functions.insert(
-//             "AVG".to_string(),
-//             database::AggregateFunction {
-//                 return_type: metadata::ScalarType(precise_return_type.to_string()),
-//             },
-//         );
-//         aggregate_functions.insert(
-//             "SUM".to_string(),
-//             database::AggregateFunction {
-//                 return_type: metadata::ScalarType(precise_return_type.to_string()),
-//             },
-//         );
-//     };
+    if let Some(precise_return_type) = match type_name.as_str() {
+        "tinyint" => Some("int"),
+        "smallint" => Some("int"),
+        "int" => Some("int"),
+        "bigint" => Some("bigint"),
+        "decimal" => Some("decimal"),
+        "money" => Some("money"),
+        "smallmoney" => Some("money"),
+        "float" => Some("float"),
+        "real" => Some("float"),
+        "int64" => Some("bigint"),
+        "int32" => Some("int"),
+        "int16" => Some("int"),
+        _ => None,
+    } {
+        aggregate_functions.insert(
+            AggregateFunctionName::new("AVG".into()),
+            database::AggregateFunction {
+                return_type: TypeName::new(precise_return_type.to_string().into()),
+            },
+        );
+        aggregate_functions.insert(
+            AggregateFunctionName::new("SUM".into()),
+            database::AggregateFunction {
+                return_type: TypeName::new(precise_return_type.to_string().into()),
+            },
+        );
+    };
 
-//     aggregate_functions.insert(
-//         "COUNT_BIG".to_string(),
-//         database::AggregateFunction {
-//             return_type: metadata::ScalarType("bigint".to_string()),
-//         },
-//     );
+    aggregate_functions.insert(
+        AggregateFunctionName::new("COUNT_BIG".into()),
+        database::AggregateFunction {
+            return_type: TypeName::new("bigint".to_string().into())
+        },
+    );
 
-//     aggregate_functions
-// }
+    aggregate_functions
+}
+
+// we lookup all types in sys.types, then use our hardcoded ideas about each one to attach
+// comparison operators
+fn get_scalar_types(type_names: &Vec<TypeItem>, schema_name: String) -> database::ScalarTypes {
+    let mut scalar_types = BTreeMap::new();
+    let schema = if schema_name.is_empty() {
+        None
+    }
+    else {
+        Some(schema_name)
+    };
+
+    for type_name in type_names {
+        scalar_types.insert(
+            type_name.name.clone(),
+            database::ScalarType {
+                type_name: type_name.name.clone(),
+                schema_name: schema.clone(),
+                comparison_operators: get_comparison_operators_for_type(&type_name.name),
+                aggregate_functions: get_aggregate_functions_for_type(&type_name.name),
+                description: None,
+                type_representation: None,
+            },
+            // get_comparison_operators_for_type(&type_name.name),
+        );
+    }
+
+    database::ScalarTypes(scalar_types)
+}
 
 // we lookup all types in sys.types, then use our hardcoded ideas about each one to attach
 // comparison operators
