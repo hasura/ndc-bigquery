@@ -1,4 +1,3 @@
-
 //! Generated mutations-related metadata information.
 
 /// Which version of the generated mutations will be included in the schema
