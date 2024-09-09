@@ -7,6 +7,7 @@ use crate::values::{self, ConnectionUri, PoolSettings, Secret};
 use super::error::ParseConfigurationError;
 use gcp_bigquery_client::model::job_configuration_query::JobConfigurationQuery;
 use gcp_bigquery_client::model::query_request::QueryRequest;
+use ndc_models::{ComparisonOperatorName, ScalarTypeName};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use sqlx::postgres::PgConnection;
@@ -21,13 +22,19 @@ use thiserror::Error;
 //TODO(PY): temp, needs to be removed from the crate
 // use ndc_sdk::connector;
 
-use query_engine_metadata::metadata;
+use query_engine_metadata::metadata::{self, database, ScalarTypeTypeName};
 
 const CURRENT_VERSION: u32 = 1;
 pub const CONFIGURATION_FILENAME: &str = "configuration.json";
 pub const DEFAULT_CONNECTION_URI_VARIABLE: &str = "CONNECTION_URI";
-const CONFIGURATION_QUERY: &str = include_str!("configuration.sql");
+const CONFIGURATION_QUERY: &str = include_str!("config2.sql");
 const CONFIGURATION_JSONSCHEMA_FILENAME: &str = "schema.json";
+
+const CHARACTER_STRINGS: [&str; 4] = ["char", "text", "varchar", "string"];
+const UNICODE_CHARACTER_STRINGS: [&str; 3] = ["nchar", "ntext", "nvarchar"];
+const CANNOT_COMPARE: [&str; 3] = ["text", "ntext", "image"];
+
+const TYPES_QUERY: &str = "select data_type from chinook_sample.INFORMATION_SCHEMA.COLUMN_FIELD_PATHS";
 
 /// Initial configuration, just enough to connect to a database and elaborate a full
 /// 'Configuration'.
@@ -360,7 +367,21 @@ pub async fn configure(
         .list(project_id, Default::default())
         .await
         .unwrap();
-    dbg!(datasets);
+    // dbg!(datasets);
+
+    let types_row = bigquery_client.job().query(project_id, QueryRequest::new(TYPES_QUERY)).await.unwrap();
+    
+    // dbg!(types_row.query_response());
+    let a = types_row.query_response().clone();
+    
+    let types = a.rows.as_ref().unwrap().into_iter().map(|row| {
+        TypeItem {
+            name: serde_json::from_value(row.columns.as_ref().unwrap().into_iter().next().unwrap().value.as_ref().unwrap().to_owned()).unwrap(),
+        }
+    }).collect::<Vec<_>>();
+
+    let comparison_operators = get_comparison_operators(&types);
+    // dbg!(comparison_operators);
 
     let dataset_id = "chinook_sample";
     
@@ -387,9 +408,11 @@ pub async fn configure(
     dbg!(rs);
     // let r = rs.query_response().rows.unwrap().get(0).unwrap();
     // dbg!(r);
-
+    dbg!("query done");
     let mut connection = PgConnection::connect(uri.as_str())
         .await?;
+
+    dbg!("pg connection done");
 
     let row = connection // TODO(PY): why is this PG connection
         .fetch_one(CONFIGURATION_QUERY)
@@ -593,6 +616,133 @@ pub enum ConfigurationError {
     #[error("DDN_REGION is not set, but is required for multi-region configuration")]
     DdnRegionIsNotSet,
 }
+
+#[derive(Deserialize, Debug)]
+struct TypeItem {
+    name: ScalarTypeName,
+}
+
+// we lookup all types in sys.types, then use our hardcoded ideas about each one to attach
+// comparison operators
+fn get_comparison_operators(type_names: &Vec<TypeItem>) -> database::ComparisonOperators {
+    let mut comparison_operators = BTreeMap::new();
+
+    for type_name in type_names {
+        comparison_operators.insert(
+            type_name.name.clone(),
+            get_comparison_operators_for_type(&type_name.name),
+        );
+    }
+
+    database::ComparisonOperators(comparison_operators)
+}
+
+// we hard code these, essentially
+// we look up available types in `sys.types` but hard code their behaviour by looking them up below
+// categories taken from https://learn.microsoft.com/en-us/sql/t-sql/data-types/data-types-transact-sql
+fn get_comparison_operators_for_type(
+    type_name: &ndc_models::ScalarTypeName,
+) -> BTreeMap<ComparisonOperatorName, database::ComparisonOperator> {
+    let mut comparison_operators = BTreeMap::new();
+
+    // in ndc-spec, all things can be `==`
+    comparison_operators.insert(
+        ComparisonOperatorName::new("_eq".into()),
+        database::ComparisonOperator {
+            operator_name: "=".to_string(),
+            argument_type: type_name.clone(),
+            operator_kind: database::OperatorKind::Equal,
+            is_infix: true,
+        },
+    );
+
+    comparison_operators.insert(
+        ComparisonOperatorName::new("_in".into()),
+        database::ComparisonOperator {
+            operator_name: "IN".to_string(),
+            argument_type: type_name.clone(),
+            operator_kind: database::OperatorKind::In,
+            is_infix: true,
+        },
+    );
+
+    // include LIKE and NOT LIKE for string-ish types
+    if CHARACTER_STRINGS.contains(&type_name.as_str())
+        || UNICODE_CHARACTER_STRINGS.contains(&type_name.as_str())
+    {
+        comparison_operators.insert(
+            ComparisonOperatorName::new("_like".into()),
+            database::ComparisonOperator {
+                operator_name: "LIKE".to_string(),
+                argument_type: type_name.clone(),
+                operator_kind: database::OperatorKind::Custom,
+                is_infix: true,
+            },
+        );
+        comparison_operators.insert(
+            ComparisonOperatorName::new("_nlike".into()),
+            database::ComparisonOperator {
+                operator_name: "NOT LIKE".to_string(),
+                argument_type: type_name.clone(),
+                operator_kind: database::OperatorKind::Custom,
+                is_infix: true,
+            },
+        );
+    }
+
+    // include comparison operators for types that are comparable, according to
+    // https://learn.microsoft.com/en-us/sql/t-sql/language-elements/comparison-operators-transact-sql?view=sql-server-ver16
+    if !CANNOT_COMPARE.contains(&type_name.as_str()) {
+        comparison_operators.insert(
+            ComparisonOperatorName::new("_neq".into()),
+            database::ComparisonOperator {
+                operator_name: "!=".to_string(),
+                argument_type: type_name.clone(),
+                operator_kind: database::OperatorKind::Custom,
+                is_infix: true,
+            },
+        );
+        comparison_operators.insert(
+            ComparisonOperatorName::new("_lt".into()),
+            database::ComparisonOperator {
+                operator_name: "<".to_string(),
+                argument_type: type_name.clone(),
+                operator_kind: database::OperatorKind::Custom,
+                is_infix: true,
+            },
+        );
+        comparison_operators.insert(
+            ComparisonOperatorName::new("_gt".into()),
+            database::ComparisonOperator {
+                operator_name: ">".to_string(),
+                argument_type: type_name.clone(),
+                operator_kind: database::OperatorKind::Custom,
+                is_infix: true,
+            },
+        );
+
+        comparison_operators.insert(
+            ComparisonOperatorName::new("_gte".into()),
+            database::ComparisonOperator {
+                operator_name: ">=".to_string(),
+                argument_type: type_name.clone(),
+                operator_kind: database::OperatorKind::Custom,
+                is_infix: true,
+            },
+        );
+        comparison_operators.insert(
+            ComparisonOperatorName::new("_lte".into()),
+            database::ComparisonOperator {
+                operator_name: "<=".to_string(),
+                argument_type: type_name.clone(),
+                operator_kind: database::OperatorKind::Custom,
+                is_infix: true,
+            },
+        );
+    }
+    comparison_operators
+}
+
 
 // /// Filter predicate for comparison operators. Preserves only comparison operators that are
 // /// relevant to any of the given scalar types.

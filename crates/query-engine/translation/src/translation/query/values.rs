@@ -80,11 +80,11 @@ fn type_to_ast_scalar_type_name(
                 env.lookup_scalar_type(t)?;
             match scalar_type.schema_name.clone() {
                 None => Ok(sql::ast::ScalarTypeName::Unqualified(
-                    scalar_type.type_name.clone(),
+                    scalar_type.type_name.to_string(),
                 )),
                 Some(schema_name) => Ok(sql::ast::ScalarTypeName::Qualified {
                     schema_name: sql::ast::SchemaName(schema_name),
-                    type_name: scalar_type.type_name.clone(),
+                    type_name: scalar_type.type_name.to_string(),
                 }),
             }
         }

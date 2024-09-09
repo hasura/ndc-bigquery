@@ -1,0 +1,922 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ParsedConfiguration",
+  "description": "Initial configuration, just enough to connect to a database and elaborate a full 'Configuration'.",
+  "type": "object",
+  "required": [
+    "connection_uri",
+    "version"
+  ],
+  "properties": {
+    "version": {
+      "type": "integer",
+      "format": "uint32",
+      "minimum": 0.0
+    },
+    "connection_uri": {
+      "$ref": "#/definitions/ConnectionUri"
+    },
+    "pool_settings": {
+      "$ref": "#/definitions/PoolSettings"
+    },
+    "metadata": {
+      "default": {
+        "tables": {},
+        "composite_types": {},
+        "native_operations": {
+          "queries": {},
+          "mutations": {}
+        },
+        "scalar_types": {}
+      },
+      "allOf": [
+        {
+          "$ref": "#/definitions/Metadata"
+        }
+      ]
+    }
+  },
+  "definitions": {
+    "ConnectionUri": {
+      "$ref": "#/definitions/Secret"
+    },
+    "Secret": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "object",
+          "required": [
+            "variable"
+          ],
+          "properties": {
+            "variable": {
+              "$ref": "#/definitions/Variable"
+            }
+          }
+        }
+      ]
+    },
+    "Variable": {
+      "description": "The name of an an environment variable.",
+      "type": "string"
+    },
+    "PoolSettings": {
+      "description": "Settings for the PostgreSQL connection pool",
+      "type": "object",
+      "properties": {
+        "max_connections": {
+          "description": "maximum number of pool connections",
+          "default": 50,
+          "type": "integer",
+          "format": "uint32",
+          "minimum": 0.0
+        },
+        "pool_timeout": {
+          "description": "timeout for acquiring a connection from the pool (seconds)",
+          "default": 600,
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0.0
+        },
+        "idle_timeout": {
+          "description": "idle timeout for releasing a connection from the pool (seconds)",
+          "default": 180,
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "uint64",
+          "minimum": 0.0
+        },
+        "connection_lifetime": {
+          "description": "maximum lifetime for an individual connection (seconds)",
+          "default": 600,
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "uint64",
+          "minimum": 0.0
+        }
+      }
+    },
+    "Metadata": {
+      "description": "Metadata information.",
+      "type": "object",
+      "required": [
+        "composite_types",
+        "native_operations",
+        "scalar_types",
+        "tables"
+      ],
+      "properties": {
+        "tables": {
+          "$ref": "#/definitions/TablesInfo"
+        },
+        "composite_types": {
+          "$ref": "#/definitions/CompositeTypes"
+        },
+        "native_operations": {
+          "$ref": "#/definitions/NativeOperations"
+        },
+        "scalar_types": {
+          "$ref": "#/definitions/ScalarTypes"
+        }
+      }
+    },
+    "TablesInfo": {
+      "description": "Mapping from a \"table\" name to its information.",
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/TableInfo"
+      }
+    },
+    "TableInfo": {
+      "description": "Information about a database table (or any other kind of relation).",
+      "type": "object",
+      "required": [
+        "columns",
+        "foreignRelations",
+        "schemaName",
+        "tableName",
+        "uniquenessConstraints"
+      ],
+      "properties": {
+        "schemaName": {
+          "type": "string"
+        },
+        "tableName": {
+          "type": "string"
+        },
+        "columns": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/ColumnInfo"
+          }
+        },
+        "uniquenessConstraints": {
+          "$ref": "#/definitions/UniquenessConstraints"
+        },
+        "foreignRelations": {
+          "$ref": "#/definitions/ForeignRelations"
+        },
+        "description": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "ColumnInfo": {
+      "description": "Information about a database column.",
+      "type": "object",
+      "required": [
+        "name",
+        "type"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/Type"
+        },
+        "nullable": {
+          "default": "nullable",
+          "allOf": [
+            {
+              "$ref": "#/definitions/Nullable"
+            }
+          ]
+        },
+        "hasDefault": {
+          "$ref": "#/definitions/HasDefault"
+        },
+        "isIdentity": {
+          "$ref": "#/definitions/IsIdentity"
+        },
+        "isGenerated": {
+          "$ref": "#/definitions/IsGenerated"
+        },
+        "description": {
+          "default": null,
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "Type": {
+      "description": "The type of values that a column, field, or argument may take.",
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "ScalarType"
+          ],
+          "properties": {
+            "ScalarType": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "CompositeType"
+          ],
+          "properties": {
+            "CompositeType": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "ArrayType"
+          ],
+          "properties": {
+            "ArrayType": {
+              "$ref": "#/definitions/Type"
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "Nullable": {
+      "description": "Can this column contain null values",
+      "type": "string",
+      "enum": [
+        "nullable",
+        "nonNullable"
+      ]
+    },
+    "HasDefault": {
+      "description": "Does this column have a default value.",
+      "type": "string",
+      "enum": [
+        "noDefault",
+        "hasDefault"
+      ]
+    },
+    "IsIdentity": {
+      "description": "Is this column an identity column.",
+      "type": "string",
+      "enum": [
+        "notIdentity",
+        "identityByDefault",
+        "identityAlways"
+      ]
+    },
+    "IsGenerated": {
+      "description": "Is this column a generated column.",
+      "type": "string",
+      "enum": [
+        "notGenerated",
+        "stored"
+      ]
+    },
+    "UniquenessConstraints": {
+      "description": "A mapping from the name of a unique constraint to its value.",
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/UniquenessConstraint"
+      }
+    },
+    "UniquenessConstraint": {
+      "description": "The set of columns that make up a uniqueness constraint.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "ForeignRelations": {
+      "description": "A mapping from the name of a foreign key constraint to its value.",
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/ForeignRelation"
+      }
+    },
+    "ForeignRelation": {
+      "description": "A foreign key constraint.",
+      "type": "object",
+      "required": [
+        "column_mapping",
+        "foreign_table"
+      ],
+      "properties": {
+        "foreign_schema": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "foreign_table": {
+          "type": "string"
+        },
+        "column_mapping": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "CompositeTypes": {
+      "description": "Map of all known composite types.",
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/CompositeType"
+      }
+    },
+    "CompositeType": {
+      "description": "Information about a composite type. These are very similar to tables, but with the crucial difference that composite types do not support constraints (such as NOT NULL).",
+      "type": "object",
+      "required": [
+        "fields",
+        "type_name"
+      ],
+      "properties": {
+        "type_name": {
+          "type": "string"
+        },
+        "schema_name": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "fields": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/FieldInfo"
+          }
+        },
+        "description": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "FieldInfo": {
+      "description": "Information about a composite type field.",
+      "type": "object",
+      "required": [
+        "field_name",
+        "type"
+      ],
+      "properties": {
+        "field_name": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/Type"
+        },
+        "description": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "NativeOperations": {
+      "description": "Metadata information of native queries.",
+      "type": "object",
+      "required": [
+        "mutations",
+        "queries"
+      ],
+      "properties": {
+        "queries": {
+          "$ref": "#/definitions/NativeQueries"
+        },
+        "mutations": {
+          "$ref": "#/definitions/NativeMutations"
+        }
+      }
+    },
+    "NativeQueries": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/NativeQueryInfo"
+      }
+    },
+    "NativeQueryInfo": {
+      "description": "Information about a Native Query",
+      "type": "object",
+      "required": [
+        "arguments",
+        "columns",
+        "sql"
+      ],
+      "properties": {
+        "sql": {
+          "description": "SQL expression to use for the Native Query. We can interpolate values using `{{variable_name}}` syntax, such as `SELECT * FROM authors WHERE name = {{author_name}}`",
+          "allOf": [
+            {
+              "$ref": "#/definitions/NativeQuerySqlEither"
+            }
+          ]
+        },
+        "columns": {
+          "description": "Columns returned by the Native Query",
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/ReadOnlyColumnInfo"
+          }
+        },
+        "arguments": {
+          "description": "Names and types of arguments that can be passed to this Native Query",
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/ReadOnlyColumnInfo"
+          }
+        },
+        "description": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "NativeQuerySqlEither": {
+      "description": "This type contains information that still needs to be resolved. After deserializing, we expect the value to be \"external\", and after a subsequent step where we read from files, they should all be converted to NativeQuerySql.",
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "NativeQuerySql"
+          ],
+          "properties": {
+            "NativeQuerySql": {
+              "$ref": "#/definitions/NativeQuerySql"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "NativeQuerySqlExternal"
+          ],
+          "properties": {
+            "NativeQuerySqlExternal": {
+              "$ref": "#/definitions/NativeQuerySqlExternal"
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "NativeQuerySql": {
+      "description": "A Native Query SQL after file resolution. This is the underlying type of the `NativeQuerySqlEither` variant with the same name that is expected in the metadata when translating requests. A subsequent phase after de-serializing Should convert NativeQuerySqlExternal values to values of this type.",
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "FromFile"
+          ],
+          "properties": {
+            "FromFile": {
+              "type": "object",
+              "required": [
+                "file",
+                "sql"
+              ],
+              "properties": {
+                "file": {
+                  "type": "string"
+                },
+                "sql": {
+                  "$ref": "#/definitions/NativeQueryParts"
+                }
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "Inline"
+          ],
+          "properties": {
+            "Inline": {
+              "type": "object",
+              "required": [
+                "sql"
+              ],
+              "properties": {
+                "sql": {
+                  "$ref": "#/definitions/NativeQueryParts"
+                }
+              }
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "NativeQueryParts": {
+      "description": "A Native Query SQL parts after parsing.",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/NativeQueryPart"
+      }
+    },
+    "NativeQueryPart": {
+      "description": "A part of a Native Query text, either raw text or a parameter.",
+      "oneOf": [
+        {
+          "description": "A raw text part",
+          "type": "object",
+          "required": [
+            "Text"
+          ],
+          "properties": {
+            "Text": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "description": "A parameter",
+          "type": "object",
+          "required": [
+            "Parameter"
+          ],
+          "properties": {
+            "Parameter": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "NativeQuerySqlExternal": {
+      "description": "Native Query SQL location.",
+      "oneOf": [
+        {
+          "description": "Refer to an external Native Query SQL file.",
+          "type": "object",
+          "required": [
+            "File"
+          ],
+          "properties": {
+            "File": {
+              "type": "object",
+              "required": [
+                "file"
+              ],
+              "properties": {
+                "file": {
+                  "description": "Relative path to a sql file.",
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "description": "Inline Native Query SQL string.",
+          "type": "object",
+          "required": [
+            "Inline"
+          ],
+          "properties": {
+            "Inline": {
+              "type": "object",
+              "required": [
+                "inline"
+              ],
+              "properties": {
+                "inline": {
+                  "description": "An inline Native Query SQL string.",
+                  "allOf": [
+                    {
+                      "$ref": "#/definitions/NativeQueryParts"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "InlineUntagged"
+          ],
+          "properties": {
+            "InlineUntagged": {
+              "$ref": "#/definitions/NativeQueryParts"
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "ReadOnlyColumnInfo": {
+      "description": "Information about a native query column.",
+      "type": "object",
+      "required": [
+        "name",
+        "nullable",
+        "type"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/Type"
+        },
+        "nullable": {
+          "$ref": "#/definitions/Nullable"
+        },
+        "description": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "NativeMutations": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/NativeQueryInfo"
+      }
+    },
+    "ScalarTypes": {
+      "description": "Map of all known/occurring scalar types.",
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/ScalarType"
+      }
+    },
+    "ScalarType": {
+      "description": "Information about a scalar type. A scalar type is completely characterized by its name and the operations you can do on it.",
+      "type": "object",
+      "required": [
+        "aggregateFunctions",
+        "comparisonOperators",
+        "typeName"
+      ],
+      "properties": {
+        "typeName": {
+          "type": "string"
+        },
+        "schemaName": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "description": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "aggregateFunctions": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/AggregateFunction"
+          }
+        },
+        "comparisonOperators": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/ComparisonOperator"
+          }
+        },
+        "typeRepresentation": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/TypeRepresentation"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "AggregateFunction": {
+      "type": "object",
+      "required": [
+        "returnType"
+      ],
+      "properties": {
+        "returnType": {
+          "type": "string"
+        }
+      }
+    },
+    "ComparisonOperator": {
+      "description": "Represents a postgres binary comparison operator",
+      "type": "object",
+      "required": [
+        "argumentType",
+        "isInfix",
+        "operatorKind",
+        "operatorName"
+      ],
+      "properties": {
+        "operatorName": {
+          "type": "string"
+        },
+        "operatorKind": {
+          "$ref": "#/definitions/OperatorKind"
+        },
+        "argumentType": {
+          "type": "string"
+        },
+        "isInfix": {
+          "type": "boolean"
+        }
+      }
+    },
+    "OperatorKind": {
+      "description": "Is it a built-in operator, or a custom operator.",
+      "type": "string",
+      "enum": [
+        "equal",
+        "in",
+        "custom"
+      ]
+    },
+    "TypeRepresentation": {
+      "description": "Type representation of a scalar type.",
+      "oneOf": [
+        {
+          "description": "JSON booleans",
+          "type": "string",
+          "enum": [
+            "boolean"
+          ]
+        },
+        {
+          "description": "Any JSON string",
+          "type": "string",
+          "enum": [
+            "string"
+          ]
+        },
+        {
+          "description": "float4",
+          "type": "string",
+          "enum": [
+            "float32"
+          ]
+        },
+        {
+          "description": "float8",
+          "type": "string",
+          "enum": [
+            "float64"
+          ]
+        },
+        {
+          "description": "int2",
+          "type": "string",
+          "enum": [
+            "int16"
+          ]
+        },
+        {
+          "description": "int4",
+          "type": "string",
+          "enum": [
+            "int32"
+          ]
+        },
+        {
+          "description": "int8 as integer",
+          "type": "string",
+          "enum": [
+            "int64"
+          ]
+        },
+        {
+          "description": "int8 as string",
+          "type": "string",
+          "enum": [
+            "int64AsString"
+          ]
+        },
+        {
+          "description": "numeric",
+          "type": "string",
+          "enum": [
+            "bigDecimal"
+          ]
+        },
+        {
+          "description": "numeric as string",
+          "type": "string",
+          "enum": [
+            "bigDecimalAsString"
+          ]
+        },
+        {
+          "description": "timestamp",
+          "type": "string",
+          "enum": [
+            "timestamp"
+          ]
+        },
+        {
+          "description": "timestamp with timezone",
+          "type": "string",
+          "enum": [
+            "timestamptz"
+          ]
+        },
+        {
+          "description": "time",
+          "type": "string",
+          "enum": [
+            "time"
+          ]
+        },
+        {
+          "description": "time with timezone",
+          "type": "string",
+          "enum": [
+            "timetz"
+          ]
+        },
+        {
+          "description": "date",
+          "type": "string",
+          "enum": [
+            "date"
+          ]
+        },
+        {
+          "description": "uuid",
+          "type": "string",
+          "enum": [
+            "uUID"
+          ]
+        },
+        {
+          "description": "geography",
+          "type": "string",
+          "enum": [
+            "geography"
+          ]
+        },
+        {
+          "description": "geometry",
+          "type": "string",
+          "enum": [
+            "geometry"
+          ]
+        },
+        {
+          "description": "An arbitrary json.",
+          "type": "string",
+          "enum": [
+            "json"
+          ]
+        },
+        {
+          "description": "One of the specified string values",
+          "type": "object",
+          "required": [
+            "enum"
+          ],
+          "properties": {
+            "enum": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    }
+  }
+}

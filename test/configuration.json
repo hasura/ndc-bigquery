@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "connection_uri": {
+    "variable": "CONNECTION_URI"
+  },
+  "metadata": {
+    "tables": {},
+    "composite_types": {},
+    "native_operations": {
+      "queries": {},
+      "mutations": {}
+    },
+    "scalar_types": {}
+  }
+}

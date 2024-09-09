@@ -6,10 +6,10 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, BTreeSet};
 
-// /// The scalar types supported by the Engine.
-// #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize, JsonSchema)]
-// #[serde(rename_all = "camelCase")]
-// pub struct ScalarType(pub String);
+/// The scalar types supported by the Engine.
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct ScalarTypeTypeName(pub String);
 
 /// The type of values that a column, field, or argument may take.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
@@ -35,7 +35,7 @@ impl ScalarTypes {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct ScalarType {
-    pub type_name: String,
+    pub type_name: ScalarTypeName,
     pub schema_name: Option<String>, // TODO(PY): see what happens when option is removed
     pub description: Option<String>,
     pub aggregate_functions: BTreeMap<models::AggregateFunctionName, AggregateFunction>,
@@ -92,7 +92,6 @@ pub struct FieldInfo {
 /// Represents a postgres binary comparison operator
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
-
 pub struct ComparisonOperator {
     pub operator_name: String,
     pub operator_kind: OperatorKind,
