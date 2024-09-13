@@ -72,6 +72,8 @@ pub fn translate(
         select_set,
     );
 
+    dbg!(json_select.clone());
+
     // normalize ast
     let json_select = sql::rewrites::constant_folding::normalize_select(json_select);
 

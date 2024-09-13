@@ -257,19 +257,56 @@ pub fn select_rowset(
     // with: With,
     select_set: SelectSet,
 ) -> Select {
+    dbg!(output_table_alias.clone());
+    dbg!(output_column_alias.clone());
+    dbg!(row_table_alias.clone());
     match select_set {
         SelectSet::Rows(row_select) => {
             let mut json_items = BTreeMap::new();
 
             json_items.insert(
                 "rows".to_string(),
-                (Expression::FunctionCall {
-                    function: Function::ArrayAgg,
-                    args: vec![Expression::TableReference(TableReference::AliasedTable(
-                        row_table_alias.clone(),
-                    ))],
-                }),
+                Expression::FunctionCall {
+                    function: Function::Coalesce,
+                    args: vec![
+                        Expression::FunctionCall {
+                            function: Function::ArrayAgg,
+                            args: vec![Expression::TableReference(TableReference::AliasedTable(
+                                row_table_alias.clone(),
+                            ))],
+                        },
+                        Expression::ArrayConstructor(vec![])
+                    ],
+                },
+                // (Expression::FunctionCall {
+                //     function: Function::ArrayAgg,
+                //     args: vec![Expression::TableReference(TableReference::AliasedTable(
+                //         row_table_alias.clone(),
+                //     ))],
+                // }),
             );
+
+            // json_items.insert(
+            //     "rows".to_string(),
+            //     Expression::FunctionCall {
+            //         function: Function::Coalesce,
+            //         args: vec![
+            //             Expression::FunctionCall {
+            //             function: Function::JsonAgg,
+            //             args: vec![Expression::RowToJson(TableReference::AliasedTable(
+            //                 row_table_alias.clone(),
+            //             ))],
+            //         },
+            //             Expression::ArrayConstructor(vec![])
+            //         ],
+            //     }
+            //     // Expression::FunctionCall {
+            //     //     function: Function::ArrayAgg,
+            //     //     args: vec![Expression::TableReference(TableReference::AliasedTable(
+            //     //         row_table_alias.clone(),
+            //     //     ))],
+            //     // },
+            // );
 
             let row = vec![(
                 output_column_alias,
@@ -313,7 +350,58 @@ pub fn select_rowset(
             });
             final_select
         }
-        _ => todo!("no select rowset for rows + aggregates"),
+        // _ => todo!("no select rowset for rows + aggregates"),
+        SelectSet::RowsAndAggregates(row_select, aggregate_select) => {
+            let mut json_items = BTreeMap::new();
+
+            json_items.insert(
+                "rows".to_string(),
+                Expression::FunctionCall {
+                    function: Function::ArrayAgg,
+                    args: vec![Expression::TableReference(TableReference::AliasedTable(
+                        row_table_alias.clone(),
+                    ))],
+                },
+            );
+
+            json_items.insert(
+                "aggregates".to_string(),
+                (Expression::TableReference(TableReference::AliasedTable(
+                    aggregate_table_alias.clone(),
+                ))),
+            );
+
+            let row = vec![(
+                output_column_alias,
+                (Expression::JsonBuildObject(json_items)),
+            )];
+
+            let mut final_select = simple_select(row);
+
+            let select_star = star_select(From::Select {
+                alias: row_inner_table_alias_.clone(),
+                select: Box::new(row_select),
+            });
+
+            let select_star2 = star_select(From::Select {
+                alias: aggregate_table_alias.clone(),
+                select: Box::new(aggregate_select),
+            });
+
+            final_select.from = Some(From::Select {
+                alias: row_table_alias,
+                select: Box::new(select_star),
+            });
+
+            final_select.joins = vec![Join::CrossJoin(CrossJoin {
+                select: Box::new(select_star2),
+                alias: aggregate_table_alias,
+            })];
+
+            dbg!(final_select.clone());
+
+            final_select
+        }
     }
 }
 // pub fn select_rowset(

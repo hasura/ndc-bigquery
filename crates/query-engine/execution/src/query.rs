@@ -6,7 +6,7 @@ use bytes::{BufMut, Bytes, BytesMut};
 use gcp_bigquery_client::model::query_request::QueryRequest;
 use gcp_bigquery_client::model::{query_parameter, query_parameter_type, query_parameter_value};
 use query_engine_sql::sql::string::Param;
-use serde_json;
+use serde_json::{self, to_string, Value};
 use sqlformat;
 use sqlx;
 use sqlx::Row;
@@ -88,10 +88,28 @@ pub async fn execute(
                 .unwrap();
 
             while rs.next_row() {
+                dbg!("result set of row: ", &rs);
                 let this_row = rs.get_string(0).unwrap().unwrap(); // we should only have one row called 'universe'
+                dbg!("this row: ", &this_row);
+                let foo: Value = serde_json::from_str(&this_row).unwrap();
+                dbg!("foo: ", &foo);
+                let bar = Value::Array(vec![foo]);
+                dbg!("bar: ", &bar);
+                let baz = to_string(&bar).unwrap();
+                dbg!("baz: ", &baz);
+                // let bar: u8 = this_row.as_bytes()[0];
+                // dbg!("bar: ", &bar);
+                // let foo = vec![this_row];
                                                                    // let json_value = serde_json::from_str(&this_row).unwrap();
-                let b: Bytes = Bytes::from(this_row);
+                let b: Bytes = Bytes::from(baz);
+                // let b: Bytes = Bytes::from(to_string(&foo).unwrap());
+                dbg!("b: ", &b);
                 buffer.put(b);
+                // let this_row = rs.get_json_value(0).unwrap(); // we should only have one row called 'universe'
+                //                                                    // let json_value = serde_json::from_str(&this_row).unwrap();
+                // let json_string = serde_json::to_string(&this_row).unwrap();
+                // let b: Bytes = Bytes::from(json_string);
+                // buffer.put(b);
                 // inner_rows.push(json_value);
             }
             // let b: Bytes = Bytes::from(serde_json::to_string(&inner_rows).unwrap());

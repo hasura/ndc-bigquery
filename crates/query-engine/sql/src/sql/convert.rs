@@ -531,9 +531,39 @@ impl Expression {
                 sql.append_syntax(".");
                 nested_field.to_sql(sql);
             }
+            // Expression::JsonQuery(target, path) => {
+            //     sql.append_syntax("JSON_QUERY");
+            //     sql.append_syntax("(");
+            //     target.to_sql(sql);
+            //     sql.append_syntax(", ");
+            //     path.to_sql(sql);
+            //     sql.append_syntax(")")
+            // }
+            // Expression::JsonValue(target, path) => {
+            //     sql.append_syntax("JSON_VALUE");
+            //     sql.append_syntax("(");
+            //     target.to_sql(sql);
+            //     sql.append_syntax(", ");
+            //     path.to_sql(sql);
+            //     sql.append_syntax(")")
+            // }
         }
     }
 }
+
+// impl JsonPath {
+//     pub fn to_sql(&self, sql: &mut SQL) {
+//         sql.append_syntax("'$");
+//         for ColumnAlias {
+//             name: path_item, ..
+//         } in self.elements.iter()
+//         {
+//             sql.append_syntax(".");
+//             sql.append_syntax(path_item);
+//         }
+//         sql.append_syntax("'");
+//     }
+// }
 
 impl UnaryOperator {
     pub fn to_sql(&self, sql: &mut SQL) {
