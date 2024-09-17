@@ -16,6 +16,8 @@ use query_engine_execution::metrics;
 pub struct State {
     pub metrics: metrics::Metrics,
     pub bigquery_client: gcp_bigquery_client::Client,
+    pub project_id: String,
+    pub dataset_id: String,
 }
 
 /// Create a connection pool and wrap it inside a connector State.
@@ -41,10 +43,15 @@ pub async fn create_state(
         gcp_bigquery_client::Client::from_service_account_key(service_account_key, false)
             .await
             .unwrap();
+    
+    let project_id = std::env::var("HASURA_BIGQUERY_PROJECT_ID").unwrap();
+    let dataset_id = std::env::var("HASURA_BIGQUERY_DATASET_ID").unwrap();
 
     Ok(State {
         metrics,
         bigquery_client,
+        project_id,
+        dataset_id,
     })
 }
 

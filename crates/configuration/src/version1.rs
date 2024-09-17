@@ -2,7 +2,7 @@
 
 use crate::environment::Environment;
 use crate::error::WriteParsedConfigurationError;
-use crate::values::{self, ConnectionUri, PoolSettings, Secret};
+use crate::values::{self, ConnectionUri, PoolSettings, ProjectId, Secret, DatasetId};
 
 use super::error::ParseConfigurationError;
 use gcp_bigquery_client::model::job_configuration_query::JobConfigurationQuery;
@@ -33,7 +33,9 @@ use query_engine_metadata::metadata::{
 
 const CURRENT_VERSION: u32 = 1;
 pub const CONFIGURATION_FILENAME: &str = "configuration.json";
-pub const DEFAULT_CONNECTION_URI_VARIABLE: &str = "HASURA_BIGQUERY_SERVICE_KEY";
+pub const DEFAULT_SERVICE_KEY_VARIABLE: &str = "HASURA_BIGQUERY_SERVICE_KEY";
+pub const DEFAULT_PROJECT_ID_VARIABLE: &str = "HASURA_BIGQUERY_PROJECT_ID";
+pub const DEFAULT_DATASET_ID_VARIABLE: &str = "HASURA_BIGQUERY_DATASET_ID";
 const CONFIGURATION_QUERY: &str = include_str!("config2.sql");
 const CONFIGURATION_JSONSCHEMA_FILENAME: &str = "schema.json";
 
@@ -73,6 +75,8 @@ pub struct ParsedConfiguration {
     pub version: u32,
     // Connection string for a Postgres-compatible database
     pub service_key: ConnectionUri,
+    pub project_id: ProjectId,
+    pub dataset_id: DatasetId,
     #[serde(skip_serializing_if = "PoolSettings::is_default")]
     #[serde(default)]
     pub pool_settings: PoolSettings,
@@ -181,7 +185,13 @@ impl ParsedConfiguration {
         Self {
             version: CURRENT_VERSION,
             service_key: ConnectionUri(Secret::FromEnvironment {
-                variable: DEFAULT_CONNECTION_URI_VARIABLE.into(),
+                variable: DEFAULT_SERVICE_KEY_VARIABLE.into(),
+            }),
+            project_id: ProjectId(Secret::FromEnvironment {
+                variable: DEFAULT_PROJECT_ID_VARIABLE.into(),
+            }),
+            dataset_id: DatasetId(Secret::FromEnvironment {
+                variable: DEFAULT_DATASET_ID_VARIABLE.into(),
             }),
             pool_settings: PoolSettings::default(),
             metadata: metadata::Metadata::default(),
@@ -367,17 +377,31 @@ pub async fn configure(
     args: &ParsedConfiguration,
     environment: impl Environment,
 ) -> anyhow::Result<ParsedConfiguration> {
-    let uri = match &args.service_key {
+    let service_key = match &args.service_key {
         ConnectionUri(Secret::Plain(value)) => Cow::Borrowed(value),
         ConnectionUri(Secret::FromEnvironment { variable }) => {
             Cow::Owned(environment.read(variable)?)
         }
     };
 
-    let service_account_key = yup_oauth2::parse_service_account_key(uri.as_str()).unwrap();
+    let project_id_ = match &args.project_id {
+        ProjectId(Secret::Plain(value)) => Cow::Borrowed(value),
+        ProjectId(Secret::FromEnvironment { variable }) => {
+            Cow::Owned(environment.read(variable)?)
+        }
+    };
 
-    let project_id = "hasura-development";
-    let dataset_id = "chinook_sample";
+    let dataset_id_ = match &args.dataset_id {
+        DatasetId(Secret::Plain(value)) => Cow::Borrowed(value),
+        DatasetId(Secret::FromEnvironment { variable }) => {
+            Cow::Owned(environment.read(variable)?)
+        }
+    };
+
+    let service_account_key = yup_oauth2::parse_service_account_key(service_key.as_str()).unwrap();
+
+    let project_id = project_id_.as_str();
+    let dataset_id = dataset_id_.as_str();
 
     let schema_name = format!("{}.{}", project_id, dataset_id);
     let database_name = schema_name.clone();
@@ -477,6 +501,8 @@ pub async fn configure(
     Ok(ParsedConfiguration {
         version: 1,
         service_key: args.service_key.clone(),
+        project_id: args.project_id.clone(),
+        dataset_id: args.dataset_id.clone(),
         pool_settings: args.pool_settings.clone(),
         metadata: metadata::Metadata {
             tables: tables_info,

@@ -18,7 +18,7 @@ pub async fn create_router_from_deployment(deployment_path: &str) -> axum::Route
     let _ = env_logger::builder().is_test(true).try_init();
 
     let environment = HashMap::from([(
-        ndc_bigquery_configuration::version1::DEFAULT_CONNECTION_URI_VARIABLE.into(),
+        ndc_bigquery_configuration::version1::DEFAULT_SERVICE_KEY_VARIABLE.into(),
         POSTGRESQL_CONNECTION_STRING.to_string(),
     )]);
 

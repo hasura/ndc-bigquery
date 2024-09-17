@@ -21,6 +21,7 @@ use query_engine_sql::sql;
 pub async fn execute(
     bigquery_client: &gcp_bigquery_client::Client,
     metrics: &metrics::Metrics,
+    project_id: &String,
     plan: sql::execution_plan::ExecutionPlan<sql::execution_plan::Query>,
 ) -> Result<Bytes, Error> {
     // let query_timer = metrics.time_query_execution();
@@ -41,7 +42,7 @@ pub async fn execute(
         None => {
             // TODO: need to parse this from service account key or allow user to provide it
             // TODO(PY)
-            let project_id = "hasura-development";
+            // let project_id = "hasura-development";
 
             // let mut inner_rows = vec![];
 
@@ -83,7 +84,7 @@ pub async fn execute(
             // Query
             let mut rs = bigquery_client
                 .job()
-                .query(project_id, query_request)
+                .query(project_id.as_str(), query_request)
                 .await
                 .unwrap();
 

@@ -8,7 +8,7 @@ use std::{collections::HashMap, fs};
 
 use similar_asserts::assert_eq;
 
-use ndc_bigquery_configuration::{configuration, values::Secret, version1, ConnectionUri};
+use ndc_bigquery_configuration::{configuration, values::Secret, version1::{self, DEFAULT_SERVICE_KEY_VARIABLE}, ConnectionUri};
 
 use tests_common::deployment::helpers::get_path_from_project_root;
 
@@ -32,11 +32,11 @@ async fn test_configure() {
         .expect("Unable to deserialize as RawConfiguration");
 
     let environment = HashMap::from([(
-        version1::DEFAULT_CONNECTION_URI_VARIABLE.into(),
+        version1::DEFAULT_SERVICE_KEY_VARIABLE.into(),
         POSTGRESQL_CONNECTION_STRING.into(),
     )]);
 
-    args.service_key = ConnectionUri(Secret::Plain((POSTGRESQL_CONNECTION_STRING.to_string())));
+    args.service_key = ConnectionUri(Secret::Plain(DEFAULT_SERVICE_KEY_VARIABLE.to_string()));
 
     let actual = version1::configure(&args, environment)
         .await

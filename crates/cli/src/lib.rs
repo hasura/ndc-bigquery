@@ -110,11 +110,23 @@ async fn initialize(with_metadata: bool, context: Context<impl Environment>) -> 
                     ),
                 },
             ),
-            supported_environment_variables: vec![metadata::EnvironmentVariableDefinition {
-                name: "HASURA_BIGQUERY_SERVICE_KEY".to_string(),
-                description: "The BigQuery service key".to_string(),
-                default_value: None,
-            }],
+            supported_environment_variables: vec![
+                metadata::EnvironmentVariableDefinition {
+                    name: "HASURA_BIGQUERY_SERVICE_KEY".to_string(),
+                    description: "The BigQuery service key".to_string(),
+                    default_value: None,
+                },
+                metadata::EnvironmentVariableDefinition {
+                    name: "HASURA_BIGQUERY_PROJECT_ID".to_string(),
+                    description: "The BigQuery project ID/name".to_string(),
+                    default_value: None,
+                },
+                metadata::EnvironmentVariableDefinition {
+                    name: "HASURA_BIGQUERY_DATASET_ID".to_string(),
+                    description: "The BigQuery dataset ID/name".to_string(),
+                    default_value: None,
+                }
+            ],
             commands: metadata::Commands {
                 update: Some("hasura-ndc-bigquery update".to_string()),
                 watch: None,
