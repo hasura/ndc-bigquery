@@ -2,8 +2,6 @@
 
 use std::collections::BTreeMap;
 
-use serde_json::Number;
-
 /// An EXPLAIN clause
 #[derive(Debug, Clone, PartialEq)]
 pub enum Explain<'a> {

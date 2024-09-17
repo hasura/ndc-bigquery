@@ -3,36 +3,14 @@
 //! [Native Data Connector Specification](https://hasura.github.io/ndc-spec/specification/schema/index.html)
 //! for further details.
 
-use std::collections::{BTreeMap, BTreeSet};
+use std::collections::BTreeMap;
 
-use ndc_bigquery_configuration::ParsedConfiguration;
 use ndc_sdk::connector;
 use ndc_sdk::models;
 use query_engine_metadata::metadata;
 use query_engine_metadata::metadata::OperatorKind;
-use query_engine_metadata::metadata::ScalarTypes;
-use serde::de::IntoDeserializer;
 
 use ndc_bigquery_configuration::configuration;
-
-// /// Collect all the types that can occur in the metadata. This is a bit circumstantial. A better
-// /// approach is likely to record scalar type names directly in the metadata via configuration.sql.
-// fn occurring_scalar_types(
-//     config: &ParsedConfiguration,
-// ) -> metadata::ScalarTypes {
-//     let column_types = config
-//         .metadata
-//         .tables
-//         .0
-//         .values()
-//         .flat_map(|v| v.columns.values().map(|c| c.r#type.clone()));
-
-//     let aggregate_types = config.aggregate_functions.0.keys().cloned();
-
-//     column_types
-//         .chain(aggregate_types)
-//         .collect::<metadata::ScalarTypes>()
-// }
 
 /// Get the connector's schema.
 ///
@@ -41,11 +19,6 @@ use ndc_bigquery_configuration::configuration;
 pub async fn get_schema(
     configuration: &configuration::Configuration,
 ) -> Result<models::SchemaResponse, connector::ErrorResponse> {
-    // let RawConfiguration {
-    //     metadata,
-    //     aggregate_functions,
-    //     ..
-    // } = config;
     let metadata = &configuration.metadata;
     let scalar_types: BTreeMap<models::ScalarTypeName, models::ScalarType> = metadata
         .scalar_types
@@ -93,7 +66,6 @@ pub async fn get_schema(
                         )
                     })
                     .collect(),
-                // update_operators: BTreeMap::new(),
             };
             (scalar_type_name.clone(), result)
         })

@@ -13,7 +13,7 @@ use query_engine_sql::sql;
 pub struct Env<'request> {
     pub(crate) metadata: &'request metadata::Metadata,
     relationships: BTreeMap<models::RelationshipName, models::Relationship>,
-    pub(crate) mutations_version: Option<metadata::mutations::MutationsVersion>,
+    // pub(crate) mutations_version: Option<metadata::mutations::MutationsVersion>,
     variables_table: Option<sql::ast::TableReference>,
 }
 
@@ -157,7 +157,7 @@ impl<'request> Env<'request> {
         let temp_env = Env {
             metadata: &temp_metadata,
             relationships: BTreeMap::new(),
-            mutations_version: None,
+            // mutations_version: None,
             variables_table: None,
         };
         f(temp_env)
@@ -167,13 +167,13 @@ impl<'request> Env<'request> {
     pub fn new(
         metadata: &'request metadata::Metadata,
         relationships: BTreeMap<models::RelationshipName, models::Relationship>,
-        mutations_version: Option<metadata::mutations::MutationsVersion>,
+        // mutations_version: Option<metadata::mutations::MutationsVersion>,
         variables_table: Option<sql::ast::TableReference>,
     ) -> Self {
         Env {
             metadata,
             relationships,
-            mutations_version,
+            // mutations_version,
             variables_table,
         }
     }

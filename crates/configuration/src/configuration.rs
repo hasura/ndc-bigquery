@@ -1,16 +1,8 @@
 //! Configuration for the connector.
 
-use std::path::Path;
-
 use query_engine_metadata::metadata;
 
-use crate::environment::Environment;
-use crate::error::{
-    MakeRuntimeConfigurationError, MultiError, ParseConfigurationError,
-    WriteParsedConfigurationError,
-};
 use crate::values::PoolSettings;
-use schemars::{gen::SchemaSettings, schema::RootSchema};
 
 /// The 'Configuration' type collects all the information necessary to serve queries at runtime.
 ///

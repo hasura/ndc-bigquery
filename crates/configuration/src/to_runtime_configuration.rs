@@ -326,42 +326,42 @@ fn convert_operator_kind(
     }
 }
 
-fn convert_composite_types(
-    composite_types: metadata::CompositeTypes,
-) -> query_engine_metadata::metadata::CompositeTypes {
-    query_engine_metadata::metadata::CompositeTypes(
-        composite_types
-            .0
-            .into_iter()
-            .map(|(k, composite_type)| (k, convert_composite_type(composite_type)))
-            .collect(),
-    )
-}
+// fn convert_composite_types(
+//     composite_types: metadata::CompositeTypes,
+// ) -> query_engine_metadata::metadata::CompositeTypes {
+//     query_engine_metadata::metadata::CompositeTypes(
+//         composite_types
+//             .0
+//             .into_iter()
+//             .map(|(k, composite_type)| (k, convert_composite_type(composite_type)))
+//             .collect(),
+//     )
+// }
 
-fn convert_composite_type(
-    composite_type: metadata::CompositeType,
-) -> query_engine_metadata::metadata::CompositeType {
-    query_engine_metadata::metadata::CompositeType {
-        type_name: composite_type.type_name,
-        schema_name: (composite_type.schema_name),
-        fields: composite_type
-            .fields
-            .into_iter()
-            .map(|(k, field)| (k, convert_composite_type_field_info(field)))
-            .collect(),
-        description: composite_type.description,
-    }
-}
+// fn convert_composite_type(
+//     composite_type: metadata::CompositeType,
+// ) -> query_engine_metadata::metadata::CompositeType {
+//     query_engine_metadata::metadata::CompositeType {
+//         type_name: composite_type.type_name,
+//         schema_name: (composite_type.schema_name),
+//         fields: composite_type
+//             .fields
+//             .into_iter()
+//             .map(|(k, field)| (k, convert_composite_type_field_info(field)))
+//             .collect(),
+//         description: composite_type.description,
+//     }
+// }
 
-fn convert_composite_type_field_info(
-    field: metadata::FieldInfo,
-) -> query_engine_metadata::metadata::FieldInfo {
-    query_engine_metadata::metadata::FieldInfo {
-        field_name: field.field_name,
-        r#type: convert_type(field.r#type),
-        description: field.description,
-    }
-}
+// fn convert_composite_type_field_info(
+//     field: metadata::FieldInfo,
+// ) -> query_engine_metadata::metadata::FieldInfo {
+//     query_engine_metadata::metadata::FieldInfo {
+//         field_name: field.field_name,
+//         r#type: convert_type(field.r#type),
+//         description: field.description,
+//     }
+// }
 
 pub fn convert_tables(tables: metadata::TablesInfo) -> query_engine_metadata::metadata::TablesInfo {
     query_engine_metadata::metadata::TablesInfo(

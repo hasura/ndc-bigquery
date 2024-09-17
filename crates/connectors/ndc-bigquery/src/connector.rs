@@ -16,11 +16,8 @@ use ndc_sdk::models;
 use ndc_bigquery_configuration as configuration;
 // use super::configuration;
 use ndc_bigquery_configuration::environment::Environment;
-// use super::configuration::environment::Environment;
-use super::configuration as conf;
 
 use super::capabilities;
-use super::health;
 // use super::mutation;
 use super::query;
 use super::schema;
@@ -86,25 +83,11 @@ impl Connector for BigQuery {
     /// This function implements the [query/explain endpoint](https://hasura.github.io/ndc-spec/specification/explain.html)
     /// from the NDC specification.
     async fn query_explain(
-        configuration: &Self::Configuration,
-        state: &Self::State,
-        request: models::QueryRequest,
+        _configuration: &Self::Configuration,
+        _state: &Self::State,
+        _request: models::QueryRequest,
     ) -> Result<JsonResponse<models::ExplainResponse>> {
         todo!("query explain is currently not implemented")
-        // query::explain(configuration, state, request)
-        //     .await
-        //     .map_err(|err| {
-        //         tracing::error!(
-        //             meta.signal_type = "log",
-        //             event.domain = "ndc",
-        //             event.name = "Explain error",
-        //             name = "Explain error",
-        //             body = %err,
-        //             error = true,
-        //         );
-        //         err
-        //     })
-        //     .map(Into::into)
     }
 
     /// Explain a mutation by creating an execution plan
@@ -112,25 +95,11 @@ impl Connector for BigQuery {
     /// This function implements the [mutation/explain endpoint](https://hasura.github.io/ndc-spec/specification/explain.html)
     /// from the NDC specification.
     async fn mutation_explain(
-        configuration: &Self::Configuration,
-        state: &Self::State,
-        request: models::MutationRequest,
+        _configuration: &Self::Configuration,
+        _state: &Self::State,
+        _request: models::MutationRequest,
     ) -> Result<JsonResponse<models::ExplainResponse>> {
         todo!("mutation explain is currently not implemented")
-        // mutation::explain(configuration, state, request)
-        //     .await
-        //     .map_err(|err| {
-        //         tracing::error!(
-        //             meta.signal_type = "log",
-        //             event.domain = "ndc",
-        //             event.name = "Explain error",
-        //             name = "Explain error",
-        //             body = %err,
-        //             error = true,
-        //         );
-        //         err
-        //     })
-        //     .map(Into::into)
     }
 
     /// Execute a mutation
@@ -138,24 +107,11 @@ impl Connector for BigQuery {
     /// This function implements the [mutation endpoint](https://hasura.github.io/ndc-spec/specification/mutations/index.html)
     /// from the NDC specification.
     async fn mutation(
-        configuration: &Self::Configuration,
-        state: &Self::State,
-        request: models::MutationRequest,
+        _configuration: &Self::Configuration,
+        _state: &Self::State,
+        _request: models::MutationRequest,
     ) -> Result<JsonResponse<models::MutationResponse>> {
         todo!("mutation is currently not implemented")
-        // mutation::mutation(configuration, state, request)
-        //     .await
-        //     .map_err(|err| {
-        //         tracing::error!(
-        //             meta.signal_type = "log",
-        //             event.domain = "ndc",
-        //             event.name = "Mutation error",
-        //             name = "Mutation error",
-        //             body = %err,
-        //             error = true,
-        //         );
-        //         err
-        //     })
     }
 
     /// Execute a query

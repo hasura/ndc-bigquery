@@ -6,7 +6,7 @@ use thiserror::Error;
 use tracing::{info_span, Instrument};
 
 // use ndc_bigquery_configuration::PoolSettings;
-use ndc_bigquery_configuration::{version1, ConfigurationError};
+use ndc_bigquery_configuration::ConfigurationError;
 // use super::configuration::{Configuration, ConfigurationError};
 // use query_engine_execution::database_info::{self, DatabaseInfo, DatabaseVersion};
 use query_engine_execution::metrics;

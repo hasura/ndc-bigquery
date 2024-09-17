@@ -5,12 +5,10 @@
 
 use tracing::{info_span, Instrument};
 
-mod explain;
 // pub use explain::explain;
 use ndc_sdk::connector;
 use ndc_sdk::json_response::JsonResponse;
 use ndc_sdk::models;
-use query_engine_execution::query;
 use query_engine_sql::sql;
 use query_engine_translation::translation;
 

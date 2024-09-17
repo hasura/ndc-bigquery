@@ -2,34 +2,23 @@
 
 use crate::environment::Environment;
 use crate::error::WriteParsedConfigurationError;
-use crate::values::{self, ConnectionUri, DatasetId, PoolSettings, ProjectId, Secret};
+use crate::values::{ConnectionUri, DatasetId, PoolSettings, ProjectId, Secret};
 
 use super::error::ParseConfigurationError;
-use gcp_bigquery_client::model::job_configuration_query::JobConfigurationQuery;
-use gcp_bigquery_client::model::query_parameter::QueryParameter;
-use gcp_bigquery_client::model::query_parameter_type::QueryParameterType;
-use gcp_bigquery_client::model::query_parameter_value::QueryParameterValue;
 use gcp_bigquery_client::model::query_request::QueryRequest;
-use gcp_bigquery_client::project;
 use ndc_models::{AggregateFunctionName, ComparisonOperatorName, ScalarTypeName, TypeName};
-use schemars::{schema, JsonSchema};
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
-use sqlx::postgres::PgConnection;
-use sqlx::{Connection, Executor, Row};
 use std::borrow::Cow;
 use std::collections::BTreeMap;
-use std::fmt::format;
 use std::path::Path;
 use thiserror::Error;
 use tokio::fs;
-use tracing::{info_span, Instrument};
 
 //TODO(PY): temp, needs to be removed from the crate
 // use ndc_sdk::connector;
 
-use query_engine_metadata::metadata::{
-    self, database, CompositeTypes, ScalarTypeTypeName, ScalarTypes, TablesInfo,
-};
+use query_engine_metadata::metadata::{self, database, TablesInfo};
 
 const CURRENT_VERSION: u32 = 1;
 pub const CONFIGURATION_FILENAME: &str = "configuration.json";
@@ -56,15 +45,6 @@ const EXACT_NUMERICS: [&str; 9] = [
 const APPROX_NUMERICS: [&str; 3] = ["float", "real", "float64"];
 const NOT_COUNTABLE: [&str; 3] = ["image", "ntext", "text"];
 const NOT_APPROX_COUNTABLE: [&str; 4] = ["image", "sql_variant", "ntext", "text"];
-
-// const TYPES_QUERY: &str =
-//     format!("select data_type from {}.INFORMATION_SCHEMA.COLUMN_FIELD_PATHS");
-
-// const DATA: &str = "chinook_sample";
-
-const TYPES_QUERY1: &str =
-    "select data_type from @dataset_id.INFORMATION_SCHEMA.COLUMN_FIELD_PATHS";
-const TYPES_QUERY2: &str = "select data_type from @dataset.INFORMATION_SCHEMA.COLUMN_FIELD_PATHS";
 
 /// Initial configuration, just enough to connect to a database and elaborate a full
 /// 'Configuration'.
@@ -121,22 +101,6 @@ pub struct Configuration {
 pub enum SingleOrList<T> {
     Single(T),
     List(Vec<T>),
-}
-
-impl<T: Clone> SingleOrList<T> {
-    fn is_empty(&self) -> bool {
-        match self {
-            SingleOrList::Single(_) => false,
-            SingleOrList::List(l) => l.is_empty(),
-        }
-    }
-
-    fn to_vec(&self) -> Vec<T> {
-        match self {
-            SingleOrList::Single(s) => vec![s.clone()],
-            SingleOrList::List(l) => l.clone(),
-        }
-    }
 }
 
 // #[derive(Debug, Clone, PartialEq, Deserialize, Serialize, JsonSchema)]
@@ -672,20 +636,6 @@ struct TypeItem {
     name: ScalarTypeName,
 }
 
-// we lookup all types in sys.types, then use our hardcoded ideas about each one to attach
-// aggregate functions
-fn get_aggregate_functions(type_names: &Vec<TypeItem>) -> database::AggregateFunctions {
-    let mut aggregate_functions = BTreeMap::new();
-
-    for type_name in type_names {
-        aggregate_functions.insert(
-            type_name.name.clone(),
-            get_aggregate_functions_for_type(&type_name.name),
-        );
-    }
-    database::AggregateFunctions(aggregate_functions)
-}
-
 // we hard code these, essentially
 // we look up available types in `sys.types` but hard code their behaviour by looking them up below
 // taken from https://learn.microsoft.com/en-us/sql/t-sql/functions/aggregate-functions-transact-sql?view=sql-server-ver16
@@ -857,21 +807,6 @@ fn get_scalar_types(type_names: &Vec<TypeItem>, schema_name: String) -> database
     }
 
     database::ScalarTypes(scalar_types)
-}
-
-// we lookup all types in sys.types, then use our hardcoded ideas about each one to attach
-// comparison operators
-fn get_comparison_operators(type_names: &Vec<TypeItem>) -> database::ComparisonOperators {
-    let mut comparison_operators = BTreeMap::new();
-
-    for type_name in type_names {
-        comparison_operators.insert(
-            type_name.name.clone(),
-            get_comparison_operators_for_type(&type_name.name),
-        );
-    }
-
-    database::ComparisonOperators(comparison_operators)
 }
 
 // we hard code these, essentially

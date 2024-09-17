@@ -252,7 +252,7 @@ pub fn select_rowset(
     (output_table_alias, output_column_alias): (TableAlias, ColumnAlias),
     (row_table_alias, row_inner_table_alias_): (TableAlias, TableAlias),
     (aggregate_table_alias, _aggregate_inner_table_alias): (TableAlias, TableAlias),
-    variables: Option<(From, TableReference)>,
+    _variables: Option<(From, TableReference)>,
     // output_agg_table_alias: &TableAlias,
     // with: With,
     select_set: SelectSet,
@@ -279,35 +279,7 @@ pub fn select_rowset(
                         Expression::ArrayConstructor(vec![]),
                     ],
                 },
-                // (Expression::FunctionCall {
-                //     function: Function::ArrayAgg,
-                //     args: vec![Expression::TableReference(TableReference::AliasedTable(
-                //         row_table_alias.clone(),
-                //     ))],
-                // }),
             );
-
-            // json_items.insert(
-            //     "rows".to_string(),
-            //     Expression::FunctionCall {
-            //         function: Function::Coalesce,
-            //         args: vec![
-            //             Expression::FunctionCall {
-            //             function: Function::JsonAgg,
-            //             args: vec![Expression::RowToJson(TableReference::AliasedTable(
-            //                 row_table_alias.clone(),
-            //             ))],
-            //         },
-            //             Expression::ArrayConstructor(vec![])
-            //         ],
-            //     }
-            //     // Expression::FunctionCall {
-            //     //     function: Function::ArrayAgg,
-            //     //     args: vec![Expression::TableReference(TableReference::AliasedTable(
-            //     //         row_table_alias.clone(),
-            //     //     ))],
-            //     // },
-            // );
 
             let row = vec![(
                 output_column_alias,
@@ -352,16 +324,6 @@ pub fn select_rowset(
                     dbg!(final_select.clone());
                 }
             };
-
-            // let select_star = star_select(From::Select {
-            //     alias: row_inner_table_alias_.clone(),
-            //     select: Box::new(row_select),
-            // });
-            // dbg!(select_from.clone());
-            // final_select.from = Some(From::Select {
-            //     alias: row_table_alias,
-            //     select: Box::new(select_from),
-            // });
             final_select
         }
         SelectSet::Aggregates(aggregate_select) => {
@@ -369,9 +331,9 @@ pub fn select_rowset(
 
             json_items.insert(
                 "aggregates".to_string(),
-                (Expression::TableReference(TableReference::AliasedTable(
+                Expression::TableReference(TableReference::AliasedTable(
                     aggregate_table_alias.clone(),
-                ))),
+                )),
             );
 
             let row = vec![(
@@ -413,9 +375,6 @@ pub fn select_rowset(
                     // ASSUMPTION (PY): This is a hack to get a single object for aggreagtes since cross join results in same aggregates for all rows
                     Expression::SafeOffSet { offset: 0 },
                 ]),
-                // (Expression::TableReference(TableReference::AliasedTable(
-                //     aggregate_table_alias.clone(),
-                // ))),
             );
 
             let row = vec![(

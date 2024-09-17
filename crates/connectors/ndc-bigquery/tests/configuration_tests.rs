@@ -9,7 +9,6 @@ use std::{collections::HashMap, fs};
 use similar_asserts::assert_eq;
 
 use ndc_bigquery_configuration::{
-    configuration,
     values::Secret,
     version1::{self, DEFAULT_SERVICE_KEY_VARIABLE},
     ConnectionUri,
@@ -19,7 +18,7 @@ use tests_common::deployment::helpers::get_path_from_project_root;
 
 const POSTGRESQL_CONNECTION_STRING: &str = "postgresql://postgres:password@localhost:64002";
 const CHINOOK_DEPLOYMENT_PATH: &str = "static/chinook-deployment.json";
-const CONFIGURATION_QUERY: &str = include_str!("../src/configuration.sql");
+const _CONFIGURATION_QUERY: &str = include_str!("../src/config2.sql");
 
 #[tokio::test]
 #[ignore]

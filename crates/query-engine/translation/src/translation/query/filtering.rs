@@ -636,9 +636,9 @@ pub fn translate_exists_in_collection(
             })
         }
         models::ExistsInCollection::NestedCollection {
-            column_name,
-            arguments,
-            field_path,
+            column_name: _,
+            arguments: _,
+            field_path: _,
         } => todo!("Filter by nested collection is not implemented yet"),
     }
 }
