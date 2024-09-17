@@ -635,6 +635,7 @@ pub fn translate_exists_in_collection(
                 select: Box::new(select),
             })
         }
+        models::ExistsInCollection::NestedCollection { column_name, arguments, field_path } => todo!("Filter by nested collection is not implemented yet"),
     }
 }
 

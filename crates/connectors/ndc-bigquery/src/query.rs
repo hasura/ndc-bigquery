@@ -29,7 +29,7 @@ pub async fn query(
     configuration: &configuration::Configuration,
     state: &state::State,
     query_request: models::QueryRequest,
-) -> Result<JsonResponse<models::QueryResponse>, connector::QueryError> {
+) -> Result<JsonResponse<models::QueryResponse>, connector::ErrorResponse> {
     // let timer = state.query_metrics.time_query_total();
 
     // See https://docs.rs/tracing/0.1.29/tracing/span/struct.Span.html#in-asynchronous-code
@@ -42,7 +42,7 @@ pub async fn query(
         let plan = async {
             plan_query(configuration, state, query_request).map_err(|err| {
                 record::translation_error(&err, &state.metrics);
-                convert::translation_error_to_query_error(&err)
+                convert::translation_error_to_response(&err)
             })
         }
         .instrument(info_span!("Plan query"))
@@ -51,7 +51,7 @@ pub async fn query(
         let result = async {
             execute_query(state, plan).await.map_err(|err| {
                 record::execution_error(&err, &state.metrics);
-                convert::execution_error_to_query_error(err)
+                convert::execution_error_to_response(err)
             })
         }
         .instrument(info_span!("Execute query"))

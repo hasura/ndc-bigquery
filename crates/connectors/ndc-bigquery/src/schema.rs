@@ -40,7 +40,7 @@ use ndc_bigquery_configuration::configuration;
 /// from the NDC specification.
 pub async fn get_schema(
     configuration: &configuration::Configuration,
-) -> Result<models::SchemaResponse, connector::SchemaError> {
+) -> Result<models::SchemaResponse, connector::ErrorResponse> {
     // let RawConfiguration {
     //     metadata,
     //     aggregate_functions,

@@ -9,7 +9,7 @@ use async_trait::async_trait;
 use tracing::{info_span, Instrument};
 
 use ndc_sdk::connector;
-use ndc_sdk::connector::{Connector, ConnectorSetup};
+use ndc_sdk::connector::{Connector, ConnectorSetup, Result};
 use ndc_sdk::json_response::JsonResponse;
 use ndc_sdk::models;
 
@@ -45,31 +45,8 @@ impl Connector for BigQuery {
     fn fetch_metrics(
         _configuration: &Arc<ndc_bigquery_configuration::Configuration>,
         _state: &Self::State,
-    ) -> Result<(), connector::FetchMetricsError> {
+    ) -> Result<()> {
         Ok(())
-    }
-
-    /// Check the health of the connector.
-    ///
-    /// For example, this function should check that the connector
-    /// is able to reach its data source over the network.
-    async fn health_check(
-        _configuration: &Self::Configuration,
-        state: &Self::State,
-    ) -> Result<(), connector::HealthError> {
-        health::health_check(&state.bigquery_client)
-            .await
-            .map_err(|err| {
-                tracing::error!(
-                    meta.signal_type = "log",
-                    event.domain = "ndc",
-                    event.name = "Health check error",
-                    name = "Health check error",
-                    body = %err,
-                    error = true,
-                );
-                err
-            })
     }
 
     /// Get the connector's capabilities.
@@ -86,7 +63,7 @@ impl Connector for BigQuery {
     /// from the NDC specification.
     async fn get_schema(
         configuration: &Self::Configuration,
-    ) -> Result<JsonResponse<models::SchemaResponse>, connector::SchemaError> {
+    ) -> Result<JsonResponse<models::SchemaResponse>> {
         schema::get_schema(configuration)
             .await
             .map_err(|err| {
@@ -112,7 +89,7 @@ impl Connector for BigQuery {
         configuration: &Self::Configuration,
         state: &Self::State,
         request: models::QueryRequest,
-    ) -> Result<JsonResponse<models::ExplainResponse>, connector::ExplainError> {
+    ) -> Result<JsonResponse<models::ExplainResponse>> {
         todo!("query explain is currently not implemented")
         // query::explain(configuration, state, request)
         //     .await
@@ -138,7 +115,7 @@ impl Connector for BigQuery {
         configuration: &Self::Configuration,
         state: &Self::State,
         request: models::MutationRequest,
-    ) -> Result<JsonResponse<models::ExplainResponse>, connector::ExplainError> {
+    ) -> Result<JsonResponse<models::ExplainResponse>> {
         todo!("mutation explain is currently not implemented")
         // mutation::explain(configuration, state, request)
         //     .await
@@ -164,7 +141,7 @@ impl Connector for BigQuery {
         configuration: &Self::Configuration,
         state: &Self::State,
         request: models::MutationRequest,
-    ) -> Result<JsonResponse<models::MutationResponse>, connector::MutationError> {
+    ) -> Result<JsonResponse<models::MutationResponse>> {
         todo!("mutation is currently not implemented")
         // mutation::mutation(configuration, state, request)
         //     .await
@@ -189,7 +166,7 @@ impl Connector for BigQuery {
         configuration: &Self::Configuration,
         state: &Self::State,
         query_request: models::QueryRequest,
-    ) -> Result<JsonResponse<models::QueryResponse>, connector::QueryError> {
+    ) -> Result<JsonResponse<models::QueryResponse>>  {
         query::query(configuration, state, query_request)
             .await
             .map_err(|err| {
@@ -225,7 +202,7 @@ impl<Env: Environment + Send + Sync> ConnectorSetup for BigQuerySetup<Env> {
     async fn parse_configuration(
         &self,
         configuration_dir: impl AsRef<Path> + Send,
-    ) -> Result<<Self::Connector as Connector>::Configuration, connector::ParseError> {
+    ) -> Result<<Self::Connector as Connector>::Configuration> {
         // Note that we don't log validation errors, because they are part of the normal business
         // operation of configuration validation, i.e. they don't represent an error condition that
         // signifies that anything has gone wrong with the ndc process or infrastructure.
@@ -243,7 +220,8 @@ impl<Env: Environment + Send + Sync> ConnectorSetup for BigQuerySetup<Env> {
                     line,
                     column,
                     message,
-                }),
+                })
+                .into(),
                 configuration::error::ParseConfigurationError::EmptyConnectionUri { file_path } => {
                     connector::ParseError::ValidateError(connector::InvalidNodes(vec![
                         connector::InvalidNode {
@@ -252,16 +230,17 @@ impl<Env: Environment + Send + Sync> ConnectorSetup for BigQuerySetup<Env> {
                             message: "database connection URI must be specified".to_string(),
                         },
                     ]))
+                    .into()
                 }
                 configuration::error::ParseConfigurationError::IoError(inner) => {
-                    connector::ParseError::IoError(inner)
+                    connector::ParseError::IoError(inner).into()
                 }
                 configuration::error::ParseConfigurationError::IoErrorButStringified(inner) => {
-                    connector::ParseError::Other(inner.into())
+                    inner.into()
                 }
                 configuration::error::ParseConfigurationError::DidNotFindExpectedVersionTag(_)
                 | configuration::error::ParseConfigurationError::UnableToParseAnyVersions(_) => {
-                    connector::ParseError::Other(Box::new(error))
+                    connector::ErrorResponse::from_error(error)
                 }
             })?;
 
@@ -296,7 +275,7 @@ impl<Env: Environment + Send + Sync> ConnectorSetup for BigQuerySetup<Env> {
         &self,
         _configuration: &<Self::Connector as Connector>::Configuration,
         metrics: &mut prometheus::Registry,
-    ) -> Result<<Self::Connector as Connector>::State, connector::InitializationError> {
+    ) -> Result<<Self::Connector as Connector>::State> {
         state::create_state(
             // &configuration.connection_uri,
             // &configuration.pool_settings,
@@ -306,7 +285,7 @@ impl<Env: Environment + Send + Sync> ConnectorSetup for BigQuerySetup<Env> {
         .instrument(info_span!("Initialise state"))
         .await
         .map(Arc::new)
-        .map_err(|err| connector::InitializationError::Other(err.into()))
+        .map_err(|err| connector::ErrorResponse::from_error(err))
         .map_err(|err| {
             tracing::error!(
                 meta.signal_type = "log",
