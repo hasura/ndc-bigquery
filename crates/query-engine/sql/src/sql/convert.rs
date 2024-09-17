@@ -469,7 +469,7 @@ impl Expression {
                 }
                 sql.append_syntax(")");
             }
-            Expression::JoinExpressions( expressions) => {
+            Expression::JoinExpressions(expressions) => {
                 for (index, expression) in expressions.iter().enumerate() {
                     expression.to_sql(sql);
                     if index < (expressions.len() - 1) {
@@ -541,23 +541,22 @@ impl Expression {
                 sql.append_syntax(")");
                 sql.append_syntax(".");
                 nested_field.to_sql(sql);
-            }
-            // Expression::JsonQuery(target, path) => {
-            //     sql.append_syntax("JSON_QUERY");
-            //     sql.append_syntax("(");
-            //     target.to_sql(sql);
-            //     sql.append_syntax(", ");
-            //     path.to_sql(sql);
-            //     sql.append_syntax(")")
-            // }
-            // Expression::JsonValue(target, path) => {
-            //     sql.append_syntax("JSON_VALUE");
-            //     sql.append_syntax("(");
-            //     target.to_sql(sql);
-            //     sql.append_syntax(", ");
-            //     path.to_sql(sql);
-            //     sql.append_syntax(")")
-            // }
+            } // Expression::JsonQuery(target, path) => {
+              //     sql.append_syntax("JSON_QUERY");
+              //     sql.append_syntax("(");
+              //     target.to_sql(sql);
+              //     sql.append_syntax(", ");
+              //     path.to_sql(sql);
+              //     sql.append_syntax(")")
+              // }
+              // Expression::JsonValue(target, path) => {
+              //     sql.append_syntax("JSON_VALUE");
+              //     sql.append_syntax("(");
+              //     target.to_sql(sql);
+              //     sql.append_syntax(", ");
+              //     path.to_sql(sql);
+              //     sql.append_syntax(")")
+              // }
         }
     }
 }
@@ -615,7 +614,9 @@ impl Function {
             Function::ArrayAgg => sql.append_syntax("ARRAY_AGG"),
             Function::Unnest => sql.append_syntax("unnest"),
             Function::Unknown(name) => sql.append_syntax(name),
-            Function::SafeOffSet(index) => sql.append_syntax(format!("[SAFE_OFFSET({index})]").as_str()),
+            Function::SafeOffSet(index) => {
+                sql.append_syntax(format!("[SAFE_OFFSET({index})]").as_str())
+            }
         }
     }
 }

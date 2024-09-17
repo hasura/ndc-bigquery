@@ -75,7 +75,7 @@ pub async fn execute(
                             }
                         }
                         Param::Variable(_var) => todo!("Variables not implemented yet"), // error that `Err(Error::Query(QueryError::VariableNotFound(var.to_string())))`
-                        Param::Value(_value) => todo!("Values not implemented yet"), // todo(PY)
+                        Param::Value(_value) => todo!("Values not implemented yet"),     // todo(PY)
                     })
                     .collect(),
             );
@@ -101,7 +101,7 @@ pub async fn execute(
                 // let bar: u8 = this_row.as_bytes()[0];
                 // dbg!("bar: ", &bar);
                 // let foo = vec![this_row];
-                                                                   // let json_value = serde_json::from_str(&this_row).unwrap();
+                // let json_value = serde_json::from_str(&this_row).unwrap();
                 let b: Bytes = Bytes::from(baz);
                 // let b: Bytes = Bytes::from(to_string(&foo).unwrap());
                 dbg!("b: ", &b);

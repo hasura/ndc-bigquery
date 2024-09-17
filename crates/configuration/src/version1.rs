@@ -2,7 +2,7 @@
 
 use crate::environment::Environment;
 use crate::error::WriteParsedConfigurationError;
-use crate::values::{self, ConnectionUri, PoolSettings, ProjectId, Secret, DatasetId};
+use crate::values::{self, ConnectionUri, DatasetId, PoolSettings, ProjectId, Secret};
 
 use super::error::ParseConfigurationError;
 use gcp_bigquery_client::model::job_configuration_query::JobConfigurationQuery;
@@ -64,8 +64,7 @@ const NOT_APPROX_COUNTABLE: [&str; 4] = ["image", "sql_variant", "ntext", "text"
 
 const TYPES_QUERY1: &str =
     "select data_type from @dataset_id.INFORMATION_SCHEMA.COLUMN_FIELD_PATHS";
-const TYPES_QUERY2: &str =
-    "select data_type from @dataset.INFORMATION_SCHEMA.COLUMN_FIELD_PATHS";
+const TYPES_QUERY2: &str = "select data_type from @dataset.INFORMATION_SCHEMA.COLUMN_FIELD_PATHS";
 
 /// Initial configuration, just enough to connect to a database and elaborate a full
 /// 'Configuration'.
@@ -386,16 +385,12 @@ pub async fn configure(
 
     let project_id_ = match &args.project_id {
         ProjectId(Secret::Plain(value)) => Cow::Borrowed(value),
-        ProjectId(Secret::FromEnvironment { variable }) => {
-            Cow::Owned(environment.read(variable)?)
-        }
+        ProjectId(Secret::FromEnvironment { variable }) => Cow::Owned(environment.read(variable)?),
     };
 
     let dataset_id_ = match &args.dataset_id {
         DatasetId(Secret::Plain(value)) => Cow::Borrowed(value),
-        DatasetId(Secret::FromEnvironment { variable }) => {
-            Cow::Owned(environment.read(variable)?)
-        }
+        DatasetId(Secret::FromEnvironment { variable }) => Cow::Owned(environment.read(variable)?),
     };
 
     let service_account_key = yup_oauth2::parse_service_account_key(service_key.as_str()).unwrap();
@@ -411,10 +406,13 @@ pub async fn configure(
         gcp_bigquery_client::Client::from_service_account_key(service_account_key, false)
             .await
             .unwrap();
-    
+
     // get scalar_types
 
-    let types_query = format!("select data_type from {}.{}.INFORMATION_SCHEMA.COLUMN_FIELD_PATHS", project_id, dataset_id);
+    let types_query = format!(
+        "select data_type from {}.{}.INFORMATION_SCHEMA.COLUMN_FIELD_PATHS",
+        project_id, dataset_id
+    );
 
     let types_row = bigquery_client
         .job()
@@ -453,7 +451,8 @@ pub async fn configure(
 
     let config_query_string = CONFIGURATION_QUERY.to_string();
 
-    let config_query_string_with_database_name: String = config_query_string.replace("hasura_database_name", database_name.as_str()); //TODO(PY): what is a safe name to provide as a variable name?
+    let config_query_string_with_database_name: String =
+        config_query_string.replace("hasura_database_name", database_name.as_str()); //TODO(PY): what is a safe name to provide as a variable name?
 
     let tables_query_request = QueryRequest::new(config_query_string_with_database_name);
 
@@ -840,7 +839,7 @@ fn get_scalar_types(type_names: &Vec<TypeItem>, schema_name: String) -> database
             "timestamp with time zone" => "timestamp with time zone",
             "timestamp without time zone" => "timestamp without time zone",
             "uuid" => "uuid",
-            _ => "any"
+            _ => "any",
         };
         let type_name_scalar = ScalarTypeName::new(type_name.into());
         scalar_types.insert(

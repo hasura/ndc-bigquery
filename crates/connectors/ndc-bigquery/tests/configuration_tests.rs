@@ -8,7 +8,12 @@ use std::{collections::HashMap, fs};
 
 use similar_asserts::assert_eq;
 
-use ndc_bigquery_configuration::{configuration, values::Secret, version1::{self, DEFAULT_SERVICE_KEY_VARIABLE}, ConnectionUri};
+use ndc_bigquery_configuration::{
+    configuration,
+    values::Secret,
+    version1::{self, DEFAULT_SERVICE_KEY_VARIABLE},
+    ConnectionUri,
+};
 
 use tests_common::deployment::helpers::get_path_from_project_root;
 

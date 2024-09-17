@@ -43,7 +43,7 @@ pub async fn create_state(
         gcp_bigquery_client::Client::from_service_account_key(service_account_key, false)
             .await
             .unwrap();
-    
+
     let project_id = std::env::var("HASURA_BIGQUERY_PROJECT_ID").unwrap();
     let dataset_id = std::env::var("HASURA_BIGQUERY_DATASET_ID").unwrap();
 

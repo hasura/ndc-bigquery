@@ -166,7 +166,7 @@ impl Connector for BigQuery {
         configuration: &Self::Configuration,
         state: &Self::State,
         query_request: models::QueryRequest,
-    ) -> Result<JsonResponse<models::QueryResponse>>  {
+    ) -> Result<JsonResponse<models::QueryResponse>> {
         query::query(configuration, state, query_request)
             .await
             .map_err(|err| {

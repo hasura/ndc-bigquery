@@ -276,7 +276,7 @@ pub fn select_rowset(
                                 row_table_alias.clone(),
                             ))],
                         },
-                        Expression::ArrayConstructor(vec![])
+                        Expression::ArrayConstructor(vec![]),
                     ],
                 },
                 // (Expression::FunctionCall {
@@ -330,9 +330,11 @@ pub fn select_rowset(
                         select: Box::new(star_select),
                     });
                 }
-                ReturnsFields::NoFieldsWereRequested => {   
+                ReturnsFields::NoFieldsWereRequested => {
                     let row1 = vec![(
-                        ColumnAlias{ name: row_table_alias.to_string() },
+                        ColumnAlias {
+                            name: row_table_alias.to_string(),
+                        },
                         (Expression::JsonBuildObject(BTreeMap::new())),
                     )];
                     let mut sel = simple_select(row1);
@@ -401,18 +403,16 @@ pub fn select_rowset(
 
             json_items.insert(
                 "aggregates".to_string(),
-                Expression::JoinExpressions (
-                    vec![
-                        Expression::FunctionCall {
-                            function: Function::ArrayAgg,
-                            args: vec![Expression::TableReference(TableReference::AliasedTable(
-                                aggregate_table_alias.clone(),
-                            ))],
-                        },
-                        // ASSUMPTION (PY): This is a hack to get a single object for aggreagtes since cross join results in same aggregates for all rows
-                        Expression::SafeOffSet { offset: 0 }
-                        ],
-                    ),
+                Expression::JoinExpressions(vec![
+                    Expression::FunctionCall {
+                        function: Function::ArrayAgg,
+                        args: vec![Expression::TableReference(TableReference::AliasedTable(
+                            aggregate_table_alias.clone(),
+                        ))],
+                    },
+                    // ASSUMPTION (PY): This is a hack to get a single object for aggreagtes since cross join results in same aggregates for all rows
+                    Expression::SafeOffSet { offset: 0 },
+                ]),
                 // (Expression::TableReference(TableReference::AliasedTable(
                 //     aggregate_table_alias.clone(),
                 // ))),

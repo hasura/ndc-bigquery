@@ -316,12 +316,10 @@ pub fn normalize_expr(expr: Expression) -> Expression {
         | Expression::TableReference(_)
         | Expression::Value(_)
         | Expression::Count(_) => expr,
-        Expression::JoinExpressions ( expressions ) => {
+        Expression::JoinExpressions(expressions) => {
             Expression::JoinExpressions(expressions.into_iter().map(normalize_expr).collect())
-        },
-        Expression::SafeOffSet { offset } => {
-            Expression::SafeOffSet { offset: offset }
         }
+        Expression::SafeOffSet { offset } => Expression::SafeOffSet { offset: offset },
     }
 }
 

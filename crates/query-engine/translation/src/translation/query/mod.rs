@@ -52,7 +52,6 @@ pub fn translate(
         (
             state.make_table_alias("rows".to_string()),
             state.make_table_alias("rows_inner".to_string()),
-            
         ),
         (
             state.make_table_alias("aggregates".to_string()),

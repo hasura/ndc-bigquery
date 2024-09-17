@@ -125,7 +125,7 @@ async fn initialize(with_metadata: bool, context: Context<impl Environment>) -> 
                     name: "HASURA_BIGQUERY_DATASET_ID".to_string(),
                     description: "The BigQuery dataset ID/name".to_string(),
                     default_value: None,
-                }
+                },
             ],
             commands: metadata::Commands {
                 update: Some("hasura-ndc-bigquery update".to_string()),
