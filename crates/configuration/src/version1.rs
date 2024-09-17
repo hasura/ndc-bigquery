@@ -37,7 +37,7 @@ pub const DEFAULT_CONNECTION_URI_VARIABLE: &str = "HASURA_BIGQUERY_SERVICE_KEY";
 const CONFIGURATION_QUERY: &str = include_str!("config2.sql");
 const CONFIGURATION_JSONSCHEMA_FILENAME: &str = "schema.json";
 
-const CHARACTER_STRINGS: [&str; 4] = ["char", "text", "varchar", "string"];
+const CHARACTER_STRINGS: [&str; 3] = ["character", "text", "string"];
 const UNICODE_CHARACTER_STRINGS: [&str; 3] = ["nchar", "ntext", "nvarchar"];
 const CANNOT_COMPARE: [&str; 3] = ["text", "ntext", "image"];
 const EXACT_NUMERICS: [&str; 9] = [
@@ -51,7 +51,7 @@ const EXACT_NUMERICS: [&str; 9] = [
     "smallmoney",
     "tinyint",
 ];
-const APPROX_NUMERICS: [&str; 2] = ["float", "real"];
+const APPROX_NUMERICS: [&str; 3] = ["float", "real", "float64"];
 const NOT_COUNTABLE: [&str; 3] = ["image", "ntext", "text"];
 const NOT_APPROX_COUNTABLE: [&str; 4] = ["image", "sql_variant", "ntext", "text"];
 
@@ -682,7 +682,7 @@ fn get_aggregate_functions_for_type(
         aggregate_functions.insert(
             AggregateFunctionName::new("COUNT".into()),
             database::AggregateFunction {
-                return_type: TypeName::new("int".to_string().into()),
+                return_type: TypeName::new("bigint".to_string().into()),
             },
         );
     }
@@ -691,57 +691,58 @@ fn get_aggregate_functions_for_type(
         && (EXACT_NUMERICS.contains(&type_name.as_str())
             || APPROX_NUMERICS.contains(&type_name.as_str())
             || CHARACTER_STRINGS.contains(&type_name.as_str())
+            || type_name.as_str() == "date"
             || type_name.as_str() == "datetime"
-            || type_name.as_str() == "uniqueidentifier")
+            || type_name.as_str() == "uuid")
     {
         aggregate_functions.insert(
             AggregateFunctionName::new("MIN".into()),
             database::AggregateFunction {
-                return_type: TypeName::new(type_name.to_string().into()),
+                return_type: TypeName::new(type_name.as_str().to_string().into()),
             },
         );
         aggregate_functions.insert(
             AggregateFunctionName::new("MAX".into()),
             database::AggregateFunction {
-                return_type: TypeName::new(type_name.to_string().into()),
+                return_type: TypeName::new(type_name.as_str().to_string().into()),
             },
         );
     }
 
-    if type_name.as_str() != "bit"
-        && (EXACT_NUMERICS.contains(&type_name.as_str())
-            || APPROX_NUMERICS.contains(&type_name.as_str()))
-    {
-        aggregate_functions.insert(
-            AggregateFunctionName::new("STDEV".into()),
-            database::AggregateFunction {
-                return_type: TypeName::new("float".to_string().into()),
-            },
-        );
-        aggregate_functions.insert(
-            AggregateFunctionName::new("STDEVP".into()),
-            database::AggregateFunction {
-                return_type: TypeName::new("float".to_string().into()),
-            },
-        );
-        aggregate_functions.insert(
-            AggregateFunctionName::new("VAR".into()),
-            database::AggregateFunction {
-                return_type: TypeName::new("float".to_string().into()),
-            },
-        );
-        aggregate_functions.insert(
-            AggregateFunctionName::new("VARP".into()),
-            database::AggregateFunction {
-                return_type: TypeName::new("float".to_string().into()),
-            },
-        );
-    }
+    // if type_name.as_str() != "bit"
+    //     && (EXACT_NUMERICS.contains(&type_name.as_str())
+    //         || APPROX_NUMERICS.contains(&type_name.as_str()))
+    // {
+    //     aggregate_functions.insert(
+    //         AggregateFunctionName::new("STDEV".into()),
+    //         database::AggregateFunction {
+    //             return_type: TypeName::new("float".to_string().into()),
+    //         },
+    //     );
+    //     aggregate_functions.insert(
+    //         AggregateFunctionName::new("STDEVP".into()),
+    //         database::AggregateFunction {
+    //             return_type: TypeName::new("float".to_string().into()),
+    //         },
+    //     );
+    //     aggregate_functions.insert(
+    //         AggregateFunctionName::new("VAR".into()),
+    //         database::AggregateFunction {
+    //             return_type: TypeName::new("float".to_string().into()),
+    //         },
+    //     );
+    //     aggregate_functions.insert(
+    //         AggregateFunctionName::new("VARP".into()),
+    //         database::AggregateFunction {
+    //             return_type: TypeName::new("float".to_string().into()),
+    //         },
+    //     );
+    // }
 
     if let Some(precise_return_type) = match type_name.as_str() {
-        "tinyint" => Some("int"),
-        "smallint" => Some("int"),
-        "int" => Some("int"),
+        "tinyint" => Some("smallint"),
+        "smallint" => Some("smallint"),
+        "int" => Some("integer"),
         "bigint" => Some("bigint"),
         "decimal" => Some("decimal"),
         "money" => Some("money"),
@@ -749,8 +750,8 @@ fn get_aggregate_functions_for_type(
         "float" => Some("float"),
         "real" => Some("float"),
         "int64" => Some("bigint"),
-        "int32" => Some("int"),
-        "int16" => Some("int"),
+        "int32" => Some("integer"),
+        "int16" => Some("smallint"),
         _ => None,
     } {
         aggregate_functions.insert(
@@ -767,12 +768,12 @@ fn get_aggregate_functions_for_type(
         );
     };
 
-    aggregate_functions.insert(
-        AggregateFunctionName::new("COUNT_BIG".into()),
-        database::AggregateFunction {
-            return_type: TypeName::new("bigint".to_string().into()),
-        },
-    );
+    // aggregate_functions.insert(
+    //     AggregateFunctionName::new("COUNT_BIG".into()),
+    //     database::AggregateFunction {
+    //         return_type: TypeName::new("bigint".to_string().into()),
+    //     },
+    // );
 
     aggregate_functions
 }
@@ -787,14 +788,42 @@ fn get_scalar_types(type_names: &Vec<TypeItem>, schema_name: String) -> database
         Some(schema_name)
     };
 
-    for type_name in type_names {
+    for type_item in type_names {
+        let type_name = match type_item.name.as_str().to_lowercase().as_str() {
+            "boolean" => "boolean",
+            "int" => "integer",
+            "int16" => "smallint",
+            "smallint" => "smallint",
+            "int32" => "integer",
+            "integer" => "integer",
+            "int64" => "bigint",
+            "bigint" => "bigint",
+            "numeric" => "numeric",
+            "float64" => "float",
+            "float" => "float",
+            "real" => "real",
+            "double precision" => "double precision",
+            "text" => "text",
+            "string" => "string",
+            "character" => "character",
+            "json" => "json",
+            "jsonb" => "jsonb",
+            "date" => "date",
+            "time with time zone" => "time with time zone",
+            "time without time zone" => "time without time zone",
+            "timestamp with time zone" => "timestamp with time zone",
+            "timestamp without time zone" => "timestamp without time zone",
+            "uuid" => "uuid",
+            _ => "any"
+        };
+        let type_name_scalar = ScalarTypeName::new(type_name.into());
         scalar_types.insert(
-            type_name.name.clone(),
+            type_name_scalar.clone(),
             database::ScalarType {
-                type_name: type_name.name.clone(),
+                type_name: type_name_scalar.clone(),
                 schema_name: schema.clone(),
-                comparison_operators: get_comparison_operators_for_type(&type_name.name),
-                aggregate_functions: get_aggregate_functions_for_type(&type_name.name),
+                comparison_operators: get_comparison_operators_for_type(&type_name_scalar),
+                aggregate_functions: get_aggregate_functions_for_type(&type_name_scalar),
                 description: None,
                 type_representation: None,
             },

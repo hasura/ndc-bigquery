@@ -6,7 +6,34 @@ WITH column_data AS (
     c.column_name,
     TO_JSON_STRING(STRUCT(
       c.column_name AS name,
-      JSON_OBJECT('ScalarType', c.data_type) AS type,
+      JSON_OBJECT('ScalarType', 
+        case LOWER(c.data_type)
+                  when 'boolean' then 'boolean'
+                  when 'int16' then 'smallint'
+                  when 'smallint' then 'smallint'
+                  when 'int32' then 'integer'
+                  when 'integer' then 'integer'
+                  when 'int64' then 'bigint'
+                  when 'bigint' then 'bigint'
+                  when 'numeric' then 'numeric'
+                  when 'float64' then 'float'
+                  when 'float' then 'float'
+                  when 'real' then 'real'
+                  when 'double precision' then 'double precision'
+                  when 'text' then 'text'
+                  when 'string' then 'string'
+                  when 'character' then 'character'
+                  when 'json' then 'json'
+                  when 'jsonb' then 'jsonb'
+                  when 'date' then 'date'
+                  when 'time with time zone' then 'time with time zone'
+                  when 'time without time zone' then 'time without time zone'
+                  when 'timestamp with time zone' then 'timestamp with time zone'
+                  when 'timestamp without time zone' then 'timestamp without time zone'
+                  when 'uuid' then 'uuid'
+                  else 'any'
+                end
+        ) AS type,
       CASE WHEN c.is_nullable = 'YES' THEN 'nullable' ELSE 'nonNullable' END AS nullable
     )) AS column_info
   FROM hasura_database_name.INFORMATION_SCHEMA.TABLES AS t

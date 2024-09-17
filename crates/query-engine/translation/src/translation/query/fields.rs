@@ -134,6 +134,28 @@ pub(crate) fn translate_fields(
         .joins
         .extend(translate_nested_field_joins(nested_field_joins));
 
+    // let select_final = match returns_field {
+    //     ReturnsFields::FieldsWereRequested => {
+    //         (select)
+    //     }
+    //     ReturnsFields::NoFieldsWereRequested => {
+    //         // If fields were requested, we need to return the fields as they are.
+    //         // This is the default behavior.
+    //         let select_1 = sql::ast::SelectList::Select1;
+    //         let select = sql::ast::Select {
+    //             with: sql::helpers::empty_with(),
+    //             select_list: select_1,
+    //             from: Some(from),
+    //             joins: vec![],
+    //             where_: sql::ast::Where(sql::helpers::empty_where()),
+    //             group_by:sql::helpers::empty_group_by(),
+    //             order_by: sql::helpers::empty_order_by(),
+    //             limit: sql::helpers::empty_limit(),
+    //         };
+    //         select
+    //     }
+    // };
+
     Ok(select)
 }
 

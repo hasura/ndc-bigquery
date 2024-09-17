@@ -2,6 +2,8 @@
 
 use std::collections::BTreeMap;
 
+use serde_json::Number;
+
 /// An EXPLAIN clause
 #[derive(Debug, Clone, PartialEq)]
 pub enum Explain<'a> {
@@ -300,6 +302,10 @@ pub enum Expression {
         expression: Box<Expression>,
         nested_field: NestedField,
     },
+    JoinExpressions(Vec<Expression>),
+    SafeOffSet {
+        offset: i32,
+    },
     // JsonQuery(Box<Expression>, JsonPath), // JSON_QUERY([album].[json], '$.title') for multiple
     // // values
     // JsonValue(Box<Expression>, JsonPath), // JSON_VALUE([album].[json], '$.title') for single values
@@ -340,6 +346,7 @@ pub enum Function {
     ArrayAgg,
     Unnest,
     Unknown(String),
+    SafeOffSet(String),
 }
 
 /// COUNT clause
@@ -437,4 +444,11 @@ pub struct TableAlias {
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ColumnAlias {
     pub name: String,
+}
+
+#[derive(Debug, Clone)]
+/// Whether this rows query returns fields or not.
+pub enum ReturnsFields {
+    FieldsWereRequested,
+    NoFieldsWereRequested,
 }

@@ -469,6 +469,17 @@ impl Expression {
                 }
                 sql.append_syntax(")");
             }
+            Expression::JoinExpressions( expressions) => {
+                for (index, expression) in expressions.iter().enumerate() {
+                    expression.to_sql(sql);
+                    if index < (expressions.len() - 1) {
+                        sql.append_syntax("")
+                    }
+                }
+            }
+            Expression::SafeOffSet { offset } => {
+                sql.append_syntax(format!("[SAFE_OFFSET({offset})]").as_str());
+            }
             Expression::Exists { select } => {
                 sql.append_syntax("EXISTS ");
                 sql.append_syntax("(");
@@ -604,6 +615,7 @@ impl Function {
             Function::ArrayAgg => sql.append_syntax("ARRAY_AGG"),
             Function::Unnest => sql.append_syntax("unnest"),
             Function::Unknown(name) => sql.append_syntax(name),
+            Function::SafeOffSet(index) => sql.append_syntax(format!("[SAFE_OFFSET({index})]").as_str()),
         }
     }
 }
@@ -736,8 +748,13 @@ impl TableName {
 
 impl TableAlias {
     pub fn to_sql(&self, sql: &mut SQL) {
-        let name = format!("{}_{}", self.name, self.unique_index);
+        let name = self.to_string();
         sql.append_identifier(&name);
+    }
+
+    pub fn to_string(&self) -> String {
+        let name = format!("{}_{}", self.name, self.unique_index);
+        name
     }
 }
 

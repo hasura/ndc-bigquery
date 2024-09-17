@@ -36,7 +36,7 @@ pub fn translate_joins(
             })?;
 
             // process inner query and get the SELECTs for the 'rows' and 'aggregates' fields.
-            let select_set = root::translate_query(
+            let (returns_field, select_set) = root::translate_query(
                 env,
                 state,
                 &root::MakeFrom::Collection {
@@ -67,7 +67,9 @@ pub fn translate_joins(
                     state.make_table_alias("aggregates".to_string()),
                     state.make_table_alias("aggregates_inner".to_string()),
                 ),
+                None,
                 select_set,
+                returns_field,
             );
 
             Ok(sql::ast::Join::LeftOuterJoin(sql::ast::LeftOuterJoin {

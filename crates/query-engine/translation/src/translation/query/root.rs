@@ -5,6 +5,7 @@ use std::collections::BTreeMap;
 use indexmap::IndexMap;
 
 use ndc_models as models;
+use query_engine_sql::sql::ast::ReturnsFields;
 
 use super::aggregates;
 use super::fields;
@@ -25,29 +26,41 @@ pub fn translate_query(
     make_from: &MakeFrom,
     join_predicate: &Option<JoinPredicate<'_, '_>>,
     query_request: &models::Query,
-) -> Result<sql::helpers::SelectSet, Error> {
+) -> Result<(ReturnsFields, sql::helpers::SelectSet), Error> {
     // translate rows selection.
-    let row_select = translate_rows_select(env, state, make_from, join_predicate, query_request)?;
+    let (returns_field, row_select) = translate_rows_select(env, state, make_from, join_predicate, query_request)?;
 
     // translate aggregate selection.
     let aggregate_select =
         translate_aggregate_select(env, state, make_from, join_predicate, query_request)?;
 
     // Create a structure describing the selection set - only rows, only aggregates, or both.
-    let select_set = match (row_select, aggregate_select) {
+    let select_set = match ((&returns_field, row_select), aggregate_select) {
         // Both.
         ((ReturnsFields::FieldsWereRequested, rows), Some(aggregates)) => {
-            sql::helpers::SelectSet::RowsAndAggregates(rows, aggregates)
+            (ReturnsFields::FieldsWereRequested, sql::helpers::SelectSet::RowsAndAggregates(rows, aggregates))
         }
         // Only aggregates.
         ((ReturnsFields::NoFieldsWereRequested, _), Some(aggregates)) => {
-            sql::helpers::SelectSet::Aggregates(aggregates)
+            (ReturnsFields::NoFieldsWereRequested, sql::helpers::SelectSet::Aggregates(aggregates))
         }
         // Only rows or Neither (This is valid. Returns empty objects).
         (
-            (ReturnsFields::FieldsWereRequested | ReturnsFields::NoFieldsWereRequested, rows),
+            (_, rows),
             None,
-        ) => sql::helpers::SelectSet::Rows(rows),
+        ) => (returns_field, sql::helpers::SelectSet::Rows(rows))
+        // no fields selected.
+        // (
+        //     (ReturnsFields::NoFieldsWereRequested, rows), 
+        //     None
+        // ) => {
+        //     (ReturnsFields::NoFieldsWereRequested, sql::helpers::SelectSet::Rows(rows))
+        // }
+        // (ReturnsFields::NoFieldsWereRequested, None) => {
+        //     return Err(Error::QueryError(
+        //         "No fields or aggregates were requested in the query.".to_string(),
+        //     ));
+        // }
     };
 
     Ok(select_set)
@@ -99,12 +112,6 @@ fn translate_aggregate_select(
     }
 }
 
-/// Whether this rows query returns fields or not.
-pub enum ReturnsFields {
-    FieldsWereRequested,
-    NoFieldsWereRequested,
-}
-
 /// Translate rows part of query to sql ast.
 fn translate_rows_select(
     env: &Env,
@@ -130,15 +137,45 @@ fn translate_rows_select(
         ReturnsFields::FieldsWereRequested
     };
 
-    // translate fields to columns or relationships.
-    let mut fields_select = fields::translate_fields(
-        env,
-        state,
-        fields,
-        &current_table,
-        from_clause,
-        &mut join_relationship_fields,
-    )?;
+    let mut fields_select = match returns_fields {
+        ReturnsFields::FieldsWereRequested => {
+            let fields_select =  fields::translate_fields(
+                env,
+                state,
+                fields,
+                &current_table,
+                from_clause,
+                &mut join_relationship_fields,
+            )?;
+            fields_select
+        }
+        ReturnsFields::NoFieldsWereRequested => {
+            let select_1 = sql::ast::SelectList::Select1;
+            let select = sql::ast::Select {
+                with: sql::helpers::empty_with(),
+                select_list: select_1,
+                from: Some(from_clause),
+                joins: vec![],
+                where_: sql::ast::Where(sql::helpers::empty_where()),
+                group_by:sql::helpers::empty_group_by(),
+                order_by: sql::helpers::empty_order_by(),
+                limit: sql::helpers::empty_limit(),
+            };
+            select
+        }
+        
+    };
+
+    // // translate fields to columns or relationships.
+    // let mut fields_select = fields::translate_fields(
+    //     env,
+    //     state,
+    //     fields,
+    //     &current_table,
+    //     from_clause,
+    //     &mut join_relationship_fields,
+    //     returns_fields.clone(),
+    // )?;
 
     // Translate the common part of the query - where, order by, limit, etc.
     translate_query_part(

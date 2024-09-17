@@ -73,7 +73,7 @@ pub async fn execute(
                                 parameter_value: Some(value),
                             }
                         }
-                        Param::Variable(_var) => todo!("Variables not implemented yet"),
+                        Param::Variable(_var) => todo!("Variables not implemented yet"), // error that `Err(Error::Query(QueryError::VariableNotFound(var.to_string())))`
                         Param::Value(_value) => todo!("Values not implemented yet"), // todo(PY)
                     })
                     .collect(),
