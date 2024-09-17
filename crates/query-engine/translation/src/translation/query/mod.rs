@@ -57,7 +57,7 @@ pub fn translate(
             state.make_table_alias("aggregates".to_string()),
             state.make_table_alias("aggregates_inner".to_string()),
         ),
-        variables_from,
+        &variables_from,
         // &state.make_table_alias("universe_agg".to_string()),
         // native queries if there are any
         // sql::ast::With {
@@ -70,7 +70,7 @@ pub fn translate(
         //     },
         // },
         select_set,
-        returns_field,
+        &returns_field,
     );
 
     dbg!(json_select.clone());

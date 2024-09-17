@@ -640,8 +640,7 @@ impl Value {
             Value::EmptyJsonArray => sql.append_syntax("'[]'"),
             Value::Int8(i) => sql.append_syntax(format!("{i}").as_str()),
             Value::Float8(n) => sql.append_syntax(format!("{n}").as_str()),
-            Value::Character(s) => sql.append_param(Param::String(s.clone())),
-            Value::String(s) => sql.append_param(Param::String(s.clone())),
+            Value::Character(s) | Value::String(s) => sql.append_param(Param::String(s.clone())),
             Value::Variable(v) => sql.append_param(Param::Variable(v.clone())),
             Value::Bool(true) => sql.append_syntax("true"),
             Value::Bool(false) => sql.append_syntax("false"),
@@ -749,13 +748,12 @@ impl TableName {
 
 impl TableAlias {
     pub fn to_sql(&self, sql: &mut SQL) {
-        let name = self.to_string();
+        let name = self.to_aliased_string();
         sql.append_identifier(&name);
     }
 
-    pub fn to_string(&self) -> String {
-        let name = format!("{}_{}", self.name, self.unique_index);
-        name
+    pub fn to_aliased_string(&self) -> String {
+        format!("{}_{}", self.name, self.unique_index)
     }
 }
 

@@ -67,9 +67,9 @@ pub fn translate_joins(
                     state.make_table_alias("aggregates".to_string()),
                     state.make_table_alias("aggregates_inner".to_string()),
                 ),
-                None,
+                &None,
                 select_set,
-                returns_field,
+                &returns_field,
             );
 
             Ok(sql::ast::Join::LeftOuterJoin(sql::ast::LeftOuterJoin {

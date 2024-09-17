@@ -161,10 +161,10 @@ impl Join {
     /// Get the select expression and table alias regardless of the join type.
     pub fn get_select_and_alias(self) -> (Box<Select>, TableAlias) {
         match self {
-            Join::LeftOuterJoin(LeftOuterJoin { select, alias, .. }) => (select, alias),
-            Join::InnerJoin(InnerJoin { select, alias }) => (select, alias),
-            Join::CrossJoin(CrossJoin { select, alias }) => (select, alias),
-            Join::FullOuterJoin(FullOuterJoin { select, alias }) => (select, alias),
+            Join::LeftOuterJoin(LeftOuterJoin { select, alias, .. })
+            | Join::InnerJoin(InnerJoin { select, alias })
+            | Join::CrossJoin(CrossJoin { select, alias })
+            | Join::FullOuterJoin(FullOuterJoin { select, alias }) => (select, alias),
         }
     }
 }

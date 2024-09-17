@@ -252,11 +252,11 @@ pub fn select_rowset(
     (output_table_alias, output_column_alias): (TableAlias, ColumnAlias),
     (row_table_alias, row_inner_table_alias_): (TableAlias, TableAlias),
     (aggregate_table_alias, _aggregate_inner_table_alias): (TableAlias, TableAlias),
-    _variables: Option<(From, TableReference)>,
+    _variables: &Option<(From, TableReference)>,
     // output_agg_table_alias: &TableAlias,
     // with: With,
     select_set: SelectSet,
-    returns_field: ReturnsFields,
+    returns_field: &ReturnsFields,
 ) -> Select {
     dbg!(output_table_alias);
     dbg!(output_column_alias.clone());
@@ -305,13 +305,13 @@ pub fn select_rowset(
                 ReturnsFields::NoFieldsWereRequested => {
                     let row1 = vec![(
                         ColumnAlias {
-                            name: row_table_alias.to_string(),
+                            name: row_table_alias.to_aliased_string(),
                         },
                         (Expression::JsonBuildObject(BTreeMap::new())),
                     )];
                     let mut sel = simple_select(row1);
                     dbg!("-------------------------------------------");
-                    dbg!(row_table_alias.to_string());
+                    dbg!(row_table_alias.to_aliased_string());
                     dbg!("-------------------------------------------");
                     sel.from = Some(From::Select {
                         alias: row_inner_table_alias_.clone(),
