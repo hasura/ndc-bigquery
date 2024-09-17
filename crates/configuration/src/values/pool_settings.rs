@@ -1,7 +1,7 @@
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-/// Settings for the PostgreSQL connection pool
+/// Settings for the BigQuery connection pool
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
 pub struct PoolSettings {
     /// maximum number of pool connections
