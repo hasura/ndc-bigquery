@@ -711,18 +711,10 @@ fn get_aggregate_functions_for_type(
     // }
 
     if let Some(precise_return_type) = match type_name.as_str() {
-        "tinyint" => Some("smallint"),
-        "smallint" => Some("smallint"),
-        "int" => Some("integer"),
-        "bigint" => Some("bigint"),
-        "decimal" => Some("decimal"),
-        "money" => Some("money"),
-        "smallmoney" => Some("money"),
-        "float" => Some("float"),
-        "real" => Some("float"),
-        "int64" => Some("bigint"),
-        "int32" => Some("integer"),
-        "int16" => Some("smallint"),
+        "tinyint" | "smallint" | "int16" => Some("smallint"),
+        "int" | "int32" => Some("integer"),
+        "bigint" | "int64" => Some("bigint"),
+        "float" | "real" => Some("float"),
         _ => None,
     } {
         aggregate_functions.insert(
@@ -762,16 +754,11 @@ fn get_scalar_types(type_names: &Vec<TypeItem>, schema_name: String) -> database
     for type_item in type_names {
         let type_name = match type_item.name.as_str().to_lowercase().as_str() {
             "boolean" => "boolean",
-            "int" => "integer",
-            "int16" => "smallint",
-            "smallint" => "smallint",
-            "int32" => "integer",
-            "integer" => "integer",
-            "int64" => "bigint",
-            "bigint" => "bigint",
+            "int16" | "smallint" => "smallint",
+            "int" | "int32" | "integer" => "integer",
+            "int64" | "bigint" => "bigint",
             "numeric" => "numeric",
-            "float64" => "float",
-            "float" => "float",
+            "float64" | "float" => "float",
             "real" => "real",
             "double precision" => "double precision",
             "text" => "text",
