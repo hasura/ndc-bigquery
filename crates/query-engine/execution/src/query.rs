@@ -14,7 +14,7 @@ use query_engine_sql::sql;
 pub async fn execute(
     bigquery_client: &gcp_bigquery_client::Client,
     _metrics: &metrics::Metrics,
-    project_id: &String,
+    project_id: &str,
     plan: sql::execution_plan::ExecutionPlan<sql::execution_plan::Query>,
 ) -> Result<Bytes, Error> {
     let mut buffer = BytesMut::new();
@@ -67,7 +67,7 @@ pub async fn execute(
             // Query
             let mut rs = bigquery_client
                 .job()
-                .query(project_id.as_str(), query_request)
+                .query(project_id, query_request)
                 .await
                 .unwrap();
 
@@ -75,18 +75,13 @@ pub async fn execute(
                 dbg!("result set of row: ", &rs);
                 let this_row = rs.get_string(0).unwrap().unwrap(); // we should only have one row called 'universe'
                 dbg!("this row: ", &this_row);
-                let foo: Value = serde_json::from_str(&this_row).unwrap();
-                dbg!("foo: ", &foo);
-                let bar = Value::Array(vec![foo]);
-                dbg!("bar: ", &bar);
-                let baz = to_string(&bar).unwrap();
-                dbg!("baz: ", &baz);
-                // let bar: u8 = this_row.as_bytes()[0];
-                // dbg!("bar: ", &bar);
-                // let foo = vec![this_row];
-                // let json_value = serde_json::from_str(&this_row).unwrap();
-                let b: Bytes = Bytes::from(baz);
-                // let b: Bytes = Bytes::from(to_string(&foo).unwrap());
+                let row_value: Value = serde_json::from_str(&this_row).unwrap();
+                dbg!("row_value: ", &row_value);
+                let row_value_array = Value::Array(vec![row_value]);
+                dbg!("row_value_array: ", &row_value_array);
+                let final_row = to_string(&row_value_array).unwrap();
+                dbg!("final_row: ", &final_row);
+                let b: Bytes = Bytes::from(final_row);
                 dbg!("b: ", &b);
                 buffer.put(b);
                 // let this_row = rs.get_json_value(0).unwrap(); // we should only have one row called 'universe'

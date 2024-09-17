@@ -127,7 +127,7 @@ pub struct HasuraRegionName(pub String);
 impl std::fmt::Display for HasuraRegionName {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         let HasuraRegionName(region) = self;
-        write!(f, "{}", region)
+        write!(f, "{region}")
     }
 }
 
@@ -139,7 +139,7 @@ pub struct RegionName(pub String);
 impl std::fmt::Display for RegionName {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         let RegionName(region) = self;
-        write!(f, "{}", region)
+        write!(f, "{region}")
     }
 }
 
@@ -362,7 +362,7 @@ pub async fn configure(
     let project_id = project_id_.as_str();
     let dataset_id = dataset_id_.as_str();
 
-    let schema_name = format!("{}.{}", project_id, dataset_id);
+    let schema_name = format!("{project_id}.{dataset_id}");
     let database_name = schema_name.clone();
 
     // Init BigQuery client
@@ -374,8 +374,7 @@ pub async fn configure(
     // get scalar_types
 
     let types_query = format!(
-        "select data_type from {}.{}.INFORMATION_SCHEMA.COLUMN_FIELD_PATHS",
-        project_id, dataset_id
+        "select data_type from {project_id}.{dataset_id}.INFORMATION_SCHEMA.COLUMN_FIELD_PATHS"
     );
 
     let types_row = bigquery_client
@@ -391,13 +390,13 @@ pub async fn configure(
         .rows
         .as_ref()
         .unwrap()
-        .into_iter()
+        .iter()
         .map(|row| TypeItem {
             name: serde_json::from_value(
                 row.columns
                     .as_ref()
                     .unwrap()
-                    .into_iter()
+                    .iter()
                     .next()
                     .unwrap()
                     .value
@@ -439,13 +438,10 @@ pub async fn configure(
                             // tables_info.merge(table_info_map);
                             Ok(table_info_map)
                         } else {
-                            Err(format!(
-                                "Failed to deserialize TablesInfo from JSON: {}",
-                                str
-                            ))
+                            Err(format!("Failed to deserialize TablesInfo from JSON: {str}"))
                         }
                     } else {
-                        Err(format!("Expected a string value, found: {:?}", value))
+                        Err(format!("Expected a string value, found: {value:?}"))
                     }
                 } else {
                     Err("Missing value in columns".to_string())

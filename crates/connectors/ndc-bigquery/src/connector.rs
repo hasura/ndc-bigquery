@@ -241,7 +241,7 @@ impl<Env: Environment + Send + Sync> ConnectorSetup for BigQuerySetup<Env> {
         .instrument(info_span!("Initialise state"))
         .await
         .map(Arc::new)
-        .map_err(|err| connector::ErrorResponse::from_error(err))
+        .map_err(connector::ErrorResponse::from_error)
         .map_err(|err| {
             tracing::error!(
                 meta.signal_type = "log",

@@ -260,7 +260,7 @@ pub fn normalize_expr(expr: Expression) -> Expression {
         Expression::JoinExpressions(expressions) => {
             Expression::JoinExpressions(expressions.into_iter().map(normalize_expr).collect())
         }
-        Expression::SafeOffSet { offset } => Expression::SafeOffSet { offset: offset },
+        Expression::SafeOffSet { offset } => Expression::SafeOffSet { offset },
     }
 }
 

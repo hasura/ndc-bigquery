@@ -258,7 +258,7 @@ pub fn select_rowset(
     select_set: SelectSet,
     returns_field: ReturnsFields,
 ) -> Select {
-    dbg!(output_table_alias.clone());
+    dbg!(output_table_alias);
     dbg!(output_column_alias.clone());
     dbg!(row_table_alias.clone());
     match select_set {
@@ -294,7 +294,7 @@ pub fn select_rowset(
             match returns_field {
                 ReturnsFields::FieldsWereRequested => {
                     let star_select = star_select(From::Select {
-                        alias: row_inner_table_alias_.clone(),
+                        alias: row_inner_table_alias_,
                         select: Box::new(row_select),
                     });
                     final_select.from = Some(From::Select {
@@ -385,7 +385,7 @@ pub fn select_rowset(
             let mut final_select = simple_select(row);
 
             let select_star = star_select(From::Select {
-                alias: row_inner_table_alias_.clone(),
+                alias: row_inner_table_alias_,
                 select: Box::new(row_select),
             });
 

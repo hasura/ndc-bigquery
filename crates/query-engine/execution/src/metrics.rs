@@ -86,18 +86,18 @@ impl Metrics {
             pool_max_connections,
             pool_min_connections,
             pool_acquire_timeout,
-            pool_idle_timeout,
             pool_max_lifetime,
+            pool_idle_timeout,
             error_metrics,
         })
     }
 
     pub fn record_successful_query(&self) {
-        self.query_total.inc()
+        self.query_total.inc();
     }
 
     pub fn record_successful_explain(&self) {
-        self.explain_total.inc()
+        self.explain_total.inc();
     }
 
     pub fn time_query_plan(&self) -> Timer {

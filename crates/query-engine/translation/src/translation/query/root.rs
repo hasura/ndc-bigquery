@@ -137,20 +137,18 @@ fn translate_rows_select(
     };
 
     let mut fields_select = match returns_fields {
-        ReturnsFields::FieldsWereRequested => {
-            let fields_select = fields::translate_fields(
-                env,
-                state,
-                fields,
-                &current_table,
-                from_clause,
-                &mut join_relationship_fields,
-            )?;
-            fields_select
-        }
+        ReturnsFields::FieldsWereRequested => fields::translate_fields(
+            env,
+            state,
+            fields,
+            &current_table,
+            from_clause,
+            &mut join_relationship_fields,
+        )?,
         ReturnsFields::NoFieldsWereRequested => {
             let select_1 = sql::ast::SelectList::Select1;
-            let select = sql::ast::Select {
+
+            sql::ast::Select {
                 with: sql::helpers::empty_with(),
                 select_list: select_1,
                 from: Some(from_clause),
@@ -159,8 +157,7 @@ fn translate_rows_select(
                 group_by: sql::helpers::empty_group_by(),
                 order_by: sql::helpers::empty_order_by(),
                 limit: sql::helpers::empty_limit(),
-            };
-            select
+            }
         }
     };
 
