@@ -1,8 +1,9 @@
 //! Internal Configuration and state for our connector.
 
+use crate::connection_settings;
 use crate::environment::Environment;
 use crate::error::WriteParsedConfigurationError;
-use crate::values::{ConnectionUri, DatasetId, PoolSettings, ProjectId, Secret};
+use crate::values::{DatasetId, PoolSettings, ProjectId, Secret, ServiceKey};
 
 use super::error::ParseConfigurationError;
 use gcp_bigquery_client::model::query_request::QueryRequest;
@@ -51,10 +52,7 @@ const NOT_APPROX_COUNTABLE: [&str; 4] = ["image", "sql_variant", "ntext", "text"
 pub struct ParsedConfiguration {
     // Which version of the configuration format are we using
     pub version: u32,
-    // Connection string for a Postgres-compatible database
-    pub service_key: ConnectionUri,
-    pub project_id: ProjectId,
-    pub dataset_id: DatasetId,
+    pub connection_settings: connection_settings::DatabaseConnectionSettings,
     #[serde(skip_serializing_if = "PoolSettings::is_default")]
     #[serde(default)]
     pub pool_settings: PoolSettings,
@@ -80,15 +78,7 @@ impl ParsedConfiguration {
     pub fn empty() -> Self {
         Self {
             version: CURRENT_VERSION,
-            service_key: ConnectionUri(Secret::FromEnvironment {
-                variable: DEFAULT_SERVICE_KEY_VARIABLE.into(),
-            }),
-            project_id: ProjectId(Secret::FromEnvironment {
-                variable: DEFAULT_PROJECT_ID_VARIABLE.into(),
-            }),
-            dataset_id: DatasetId(Secret::FromEnvironment {
-                variable: DEFAULT_DATASET_ID_VARIABLE.into(),
-            }),
+            connection_settings: connection_settings::DatabaseConnectionSettings::empty(),
             pool_settings: PoolSettings::default(),
             metadata: metadata::Metadata::default(),
             // aggregate_functions: metadata::AggregateFunctions::default(),
@@ -101,19 +91,17 @@ pub async fn configure(
     args: &ParsedConfiguration,
     environment: impl Environment,
 ) -> anyhow::Result<ParsedConfiguration> {
-    let service_key = match &args.service_key {
-        ConnectionUri(Secret::Plain(value)) => Cow::Borrowed(value),
-        ConnectionUri(Secret::FromEnvironment { variable }) => {
-            Cow::Owned(environment.read(variable)?)
-        }
+    let service_key = match &args.connection_settings.service_key {
+        ServiceKey(Secret::Plain(value)) => Cow::Borrowed(value),
+        ServiceKey(Secret::FromEnvironment { variable }) => Cow::Owned(environment.read(variable)?),
     };
 
-    let project_id_ = match &args.project_id {
+    let project_id_ = match &args.connection_settings.project_id {
         ProjectId(Secret::Plain(value)) => Cow::Borrowed(value),
         ProjectId(Secret::FromEnvironment { variable }) => Cow::Owned(environment.read(variable)?),
     };
 
-    let dataset_id_ = match &args.dataset_id {
+    let dataset_id_ = match &args.connection_settings.dataset_id {
         DatasetId(Secret::Plain(value)) => Cow::Borrowed(value),
         DatasetId(Secret::FromEnvironment { variable }) => Cow::Owned(environment.read(variable)?),
     };
@@ -220,9 +208,11 @@ pub async fn configure(
 
     Ok(ParsedConfiguration {
         version: 1,
-        service_key: args.service_key.clone(),
-        project_id: args.project_id.clone(),
-        dataset_id: args.dataset_id.clone(),
+        connection_settings: connection_settings::DatabaseConnectionSettings {
+            service_key: args.connection_settings.service_key.clone(),
+            project_id: args.connection_settings.project_id.clone(),
+            dataset_id: args.connection_settings.dataset_id.clone(),
+        },
         pool_settings: args.pool_settings.clone(),
         metadata: metadata::Metadata {
             tables: tables_info,

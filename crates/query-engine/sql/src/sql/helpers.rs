@@ -4,6 +4,7 @@ use super::ast::*;
 use std::collections::BTreeMap;
 
 /// Used as input to helpers to construct SELECTs which return 'rows' and/or 'aggregates' results.
+#[derive(Debug, Clone, PartialEq)]
 pub enum SelectSet {
     Rows(Select),
     Aggregates(Select),

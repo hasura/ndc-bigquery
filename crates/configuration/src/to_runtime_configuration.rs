@@ -6,7 +6,7 @@ use std::collections::BTreeMap;
 use super::version1::ParsedConfiguration;
 use crate::environment::Environment;
 use crate::error::MakeRuntimeConfigurationError;
-use crate::values::{ConnectionUri, Secret};
+use crate::values::{Secret, ServiceKey};
 use query_engine_metadata::{self, metadata};
 // use crate::VersionTag;
 
@@ -16,9 +16,9 @@ pub fn make_runtime_configuration(
     parsed_config: ParsedConfiguration,
     environment: impl Environment,
 ) -> Result<crate::Configuration, MakeRuntimeConfigurationError> {
-    let connection_uri = match parsed_config.service_key {
-        ConnectionUri(Secret::Plain(uri)) => Ok(uri),
-        ConnectionUri(Secret::FromEnvironment { variable }) => {
+    let connection_uri = match parsed_config.connection_settings.service_key {
+        ServiceKey(Secret::Plain(uri)) => Ok(uri),
+        ServiceKey(Secret::FromEnvironment { variable }) => {
             environment.read(&variable).map_err(|error| {
                 MakeRuntimeConfigurationError::MissingEnvironmentVariable {
                     file_path: super::version1::CONFIGURATION_FILENAME.into(),

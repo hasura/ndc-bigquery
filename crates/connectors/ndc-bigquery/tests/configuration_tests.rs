@@ -11,7 +11,7 @@ use similar_asserts::assert_eq;
 use ndc_bigquery_configuration::{
     values::Secret,
     version1::{self, DEFAULT_SERVICE_KEY_VARIABLE},
-    ConnectionUri,
+    ServiceKey,
 };
 
 use tests_common::deployment::helpers::get_path_from_project_root;
@@ -40,7 +40,8 @@ async fn test_configure() {
         POSTGRESQL_CONNECTION_STRING.into(),
     )]);
 
-    args.service_key = ConnectionUri(Secret::Plain(DEFAULT_SERVICE_KEY_VARIABLE.to_string()));
+    args.connection_settings.service_key =
+        ServiceKey(Secret::Plain(DEFAULT_SERVICE_KEY_VARIABLE.to_string()));
 
     let actual = version1::configure(&args, environment)
         .await

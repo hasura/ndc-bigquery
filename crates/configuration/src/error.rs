@@ -16,8 +16,14 @@ pub enum ParseConfigurationError {
         column: usize,
         message: String,
     },
-    #[error("empty connection URI")]
-    EmptyConnectionUri { file_path: std::path::PathBuf },
+    #[error("empty service account key")]
+    EmptyServiceKey { file_path: std::path::PathBuf },
+
+    #[error("empty project ID")]
+    EmptyProjectId { file_path: std::path::PathBuf },
+
+    #[error("empty dataset ID")]
+    EmptyDatasetId { file_path: std::path::PathBuf },
 
     #[error("I/O error: {0}")]
     IoErrorButStringified(String),

@@ -82,10 +82,17 @@ fn type_to_ast_scalar_type_name(
                 None => Ok(sql::ast::ScalarTypeName::Unqualified(
                     scalar_type.type_name.to_string(),
                 )),
-                Some(schema_name) => Ok(sql::ast::ScalarTypeName::Qualified {
-                    schema_name: sql::ast::SchemaName(schema_name),
-                    type_name: scalar_type.type_name.to_string(),
-                }),
+                Some(_schema_name) =>
+                // FIXME(PY): How to use Qualified types. In cast it gives something like Cast(@param1 as hasura-development.chinook_sample.string) when using _in operator for strings
+                // Ok(sql::ast::ScalarTypeName::Qualified {
+                //     schema_name: sql::ast::SchemaName(schema_name),
+                //     type_name: scalar_type.type_name.to_string(),
+                // }),
+                {
+                    Ok(sql::ast::ScalarTypeName::Unqualified(
+                        scalar_type.type_name.to_string(),
+                    ))
+                }
             }
         }
         query_engine_metadata::metadata::Type::CompositeType(t) => {

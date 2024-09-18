@@ -42,6 +42,8 @@ pub fn translate(
         &query_request.query,
     )?;
 
+    dbg!(&select_set);
+
     // form a single JSON item shaped `{ rows: [], aggregates: {} }`
     // that matches the models::RowSet type
     let json_select = sql::helpers::select_rowset(

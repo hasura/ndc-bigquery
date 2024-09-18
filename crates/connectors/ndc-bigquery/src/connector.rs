@@ -178,12 +178,32 @@ impl<Env: Environment + Send + Sync> ConnectorSetup for BigQuerySetup<Env> {
                     message,
                 })
                 .into(),
-                configuration::error::ParseConfigurationError::EmptyConnectionUri { file_path } => {
+                configuration::error::ParseConfigurationError::EmptyServiceKey { file_path } => {
                     connector::ParseError::ValidateError(connector::InvalidNodes(vec![
                         connector::InvalidNode {
                             file_path,
-                            node_path: vec![connector::KeyOrIndex::Key("connectionUri".into())],
-                            message: "database connection URI must be specified".to_string(),
+                            node_path: vec![connector::KeyOrIndex::Key("serviceKey".into())],
+                            message: "Service account key must be specified".to_string(),
+                        },
+                    ]))
+                    .into()
+                }
+                configuration::error::ParseConfigurationError::EmptyProjectId { file_path } => {
+                    connector::ParseError::ValidateError(connector::InvalidNodes(vec![
+                        connector::InvalidNode {
+                            file_path,
+                            node_path: vec![connector::KeyOrIndex::Key("projectId".into())],
+                            message: "BigQuery project ID must be specified".to_string(),
+                        },
+                    ]))
+                    .into()
+                }
+                configuration::error::ParseConfigurationError::EmptyDatasetId { file_path } => {
+                    connector::ParseError::ValidateError(connector::InvalidNodes(vec![
+                        connector::InvalidNode {
+                            file_path,
+                            node_path: vec![connector::KeyOrIndex::Key("datasetId".into())],
+                            message: "BigQuery dataset ID must be specified".to_string(),
                         },
                     ]))
                     .into()
