@@ -6,1664 +6,1004 @@ expression: result
   "scalar_types": {
     "bigint": {
       "aggregate_functions": {
-        "bit_and": {
+        "APPROX_COUNT_DISTINCT": {
           "result_type": {
-            "type": "named",
-            "name": "bigint"
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "bigint"
+            }
           }
         },
-        "bit_or": {
+        "AVG": {
           "result_type": {
-            "type": "named",
-            "name": "bigint"
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "bigint"
+            }
           }
         },
-        "bit_xor": {
+        "COUNT": {
           "result_type": {
-            "type": "named",
-            "name": "bigint"
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "bigint"
+            }
           }
         },
-        "count": {
+        "MAX": {
           "result_type": {
-            "type": "named",
-            "name": "bigint"
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "bigint"
+            }
           }
         },
-        "dense_rank": {
+        "MIN": {
           "result_type": {
-            "type": "named",
-            "name": "bigint"
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "bigint"
+            }
           }
         },
-        "max": {
+        "SUM": {
           "result_type": {
-            "type": "named",
-            "name": "bigint"
-          }
-        },
-        "min": {
-          "result_type": {
-            "type": "named",
-            "name": "bigint"
-          }
-        },
-        "rank": {
-          "result_type": {
-            "type": "named",
-            "name": "bigint"
-          }
-        },
-        "sum": {
-          "result_type": {
-            "type": "named",
-            "name": "bigint"
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "bigint"
+            }
           }
         }
       },
       "comparison_operators": {
         "_eq": {
-          "argument_type": {
-            "type": "named",
-            "name": "bigint"
-          }
+          "type": "equal"
         },
         "_gt": {
+          "type": "custom",
           "argument_type": {
             "type": "named",
             "name": "bigint"
           }
         },
         "_gte": {
+          "type": "custom",
           "argument_type": {
             "type": "named",
             "name": "bigint"
           }
         },
+        "_in": {
+          "type": "in"
+        },
         "_lt": {
+          "type": "custom",
           "argument_type": {
             "type": "named",
             "name": "bigint"
           }
         },
         "_lte": {
+          "type": "custom",
           "argument_type": {
             "type": "named",
             "name": "bigint"
           }
         },
         "_neq": {
+          "type": "custom",
           "argument_type": {
             "type": "named",
             "name": "bigint"
           }
         }
-      },
-      "update_operators": {}
-    },
-    "boolean": {
-      "aggregate_functions": {
-        "bool_and": {
-          "result_type": {
-            "type": "named",
-            "name": "boolean"
-          }
-        },
-        "bool_or": {
-          "result_type": {
-            "type": "named",
-            "name": "boolean"
-          }
-        },
-        "every": {
-          "result_type": {
-            "type": "named",
-            "name": "boolean"
-          }
-        }
-      },
-      "comparison_operators": {
-        "_eq": {
-          "argument_type": {
-            "type": "named",
-            "name": "boolean"
-          }
-        },
-        "_gt": {
-          "argument_type": {
-            "type": "named",
-            "name": "boolean"
-          }
-        },
-        "_gte": {
-          "argument_type": {
-            "type": "named",
-            "name": "boolean"
-          }
-        },
-        "_lt": {
-          "argument_type": {
-            "type": "named",
-            "name": "boolean"
-          }
-        },
-        "_lte": {
-          "argument_type": {
-            "type": "named",
-            "name": "boolean"
-          }
-        },
-        "_neq": {
-          "argument_type": {
-            "type": "named",
-            "name": "boolean"
-          }
-        }
-      },
-      "update_operators": {}
-    },
-    "character": {
-      "aggregate_functions": {
-        "max": {
-          "result_type": {
-            "type": "named",
-            "name": "character"
-          }
-        },
-        "min": {
-          "result_type": {
-            "type": "named",
-            "name": "character"
-          }
-        }
-      },
-      "comparison_operators": {
-        "_eq": {
-          "argument_type": {
-            "type": "named",
-            "name": "character"
-          }
-        },
-        "_gt": {
-          "argument_type": {
-            "type": "named",
-            "name": "character"
-          }
-        },
-        "_gte": {
-          "argument_type": {
-            "type": "named",
-            "name": "character"
-          }
-        },
-        "_lt": {
-          "argument_type": {
-            "type": "named",
-            "name": "character"
-          }
-        },
-        "_lte": {
-          "argument_type": {
-            "type": "named",
-            "name": "character"
-          }
-        },
-        "_neq": {
-          "argument_type": {
-            "type": "named",
-            "name": "character"
-          }
-        }
-      },
-      "update_operators": {}
+      }
     },
     "date": {
       "aggregate_functions": {
-        "max": {
+        "APPROX_COUNT_DISTINCT": {
           "result_type": {
-            "type": "named",
-            "name": "date"
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "bigint"
+            }
           }
         },
-        "min": {
+        "COUNT": {
           "result_type": {
-            "type": "named",
-            "name": "date"
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "bigint"
+            }
+          }
+        },
+        "MAX": {
+          "result_type": {
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "date"
+            }
+          }
+        },
+        "MIN": {
+          "result_type": {
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "date"
+            }
           }
         }
       },
       "comparison_operators": {
         "_eq": {
-          "argument_type": {
-            "type": "named",
-            "name": "date"
-          }
+          "type": "equal"
         },
         "_gt": {
+          "type": "custom",
           "argument_type": {
             "type": "named",
             "name": "date"
           }
         },
         "_gte": {
+          "type": "custom",
           "argument_type": {
             "type": "named",
             "name": "date"
           }
         },
+        "_in": {
+          "type": "in"
+        },
         "_lt": {
+          "type": "custom",
           "argument_type": {
             "type": "named",
             "name": "date"
           }
         },
         "_lte": {
+          "type": "custom",
           "argument_type": {
             "type": "named",
             "name": "date"
           }
         },
         "_neq": {
+          "type": "custom",
           "argument_type": {
             "type": "named",
             "name": "date"
           }
         }
-      },
-      "update_operators": {}
+      }
     },
-    "double precision": {
+    "float": {
       "aggregate_functions": {
-        "avg": {
+        "APPROX_COUNT_DISTINCT": {
           "result_type": {
-            "type": "named",
-            "name": "double precision"
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "bigint"
+            }
           }
         },
-        "cume_dist": {
+        "AVG": {
           "result_type": {
-            "type": "named",
-            "name": "double precision"
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "float"
+            }
           }
         },
-        "max": {
+        "COUNT": {
           "result_type": {
-            "type": "named",
-            "name": "double precision"
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "bigint"
+            }
           }
         },
-        "min": {
+        "MAX": {
           "result_type": {
-            "type": "named",
-            "name": "double precision"
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "float"
+            }
           }
         },
-        "percent_rank": {
+        "MIN": {
           "result_type": {
-            "type": "named",
-            "name": "double precision"
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "float"
+            }
           }
         },
-        "stddev": {
+        "SUM": {
           "result_type": {
-            "type": "named",
-            "name": "double precision"
-          }
-        },
-        "stddev_pop": {
-          "result_type": {
-            "type": "named",
-            "name": "double precision"
-          }
-        },
-        "stddev_samp": {
-          "result_type": {
-            "type": "named",
-            "name": "double precision"
-          }
-        },
-        "sum": {
-          "result_type": {
-            "type": "named",
-            "name": "double precision"
-          }
-        },
-        "var_pop": {
-          "result_type": {
-            "type": "named",
-            "name": "double precision"
-          }
-        },
-        "var_samp": {
-          "result_type": {
-            "type": "named",
-            "name": "double precision"
-          }
-        },
-        "variance": {
-          "result_type": {
-            "type": "named",
-            "name": "double precision"
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "float"
+            }
           }
         }
       },
       "comparison_operators": {
         "_eq": {
-          "argument_type": {
-            "type": "named",
-            "name": "double precision"
-          }
+          "type": "equal"
         },
         "_gt": {
+          "type": "custom",
           "argument_type": {
             "type": "named",
-            "name": "double precision"
+            "name": "float"
           }
         },
         "_gte": {
+          "type": "custom",
           "argument_type": {
             "type": "named",
-            "name": "double precision"
+            "name": "float"
           }
         },
+        "_in": {
+          "type": "in"
+        },
         "_lt": {
+          "type": "custom",
           "argument_type": {
             "type": "named",
-            "name": "double precision"
+            "name": "float"
           }
         },
         "_lte": {
+          "type": "custom",
           "argument_type": {
             "type": "named",
-            "name": "double precision"
+            "name": "float"
           }
         },
         "_neq": {
+          "type": "custom",
           "argument_type": {
             "type": "named",
-            "name": "double precision"
+            "name": "float"
           }
         }
-      },
-      "update_operators": {}
-    },
-    "integer": {
-      "aggregate_functions": {
-        "bit_and": {
-          "result_type": {
-            "type": "named",
-            "name": "integer"
-          }
-        },
-        "bit_or": {
-          "result_type": {
-            "type": "named",
-            "name": "integer"
-          }
-        },
-        "bit_xor": {
-          "result_type": {
-            "type": "named",
-            "name": "integer"
-          }
-        },
-        "max": {
-          "result_type": {
-            "type": "named",
-            "name": "integer"
-          }
-        },
-        "min": {
-          "result_type": {
-            "type": "named",
-            "name": "integer"
-          }
-        },
-        "ntile": {
-          "result_type": {
-            "type": "named",
-            "name": "integer"
-          }
-        }
-      },
-      "comparison_operators": {
-        "_eq": {
-          "argument_type": {
-            "type": "named",
-            "name": "integer"
-          }
-        },
-        "_gt": {
-          "argument_type": {
-            "type": "named",
-            "name": "integer"
-          }
-        },
-        "_gte": {
-          "argument_type": {
-            "type": "named",
-            "name": "integer"
-          }
-        },
-        "_lt": {
-          "argument_type": {
-            "type": "named",
-            "name": "integer"
-          }
-        },
-        "_lte": {
-          "argument_type": {
-            "type": "named",
-            "name": "integer"
-          }
-        },
-        "_neq": {
-          "argument_type": {
-            "type": "named",
-            "name": "integer"
-          }
-        }
-      },
-      "update_operators": {}
-    },
-    "json": {
-      "aggregate_functions": {
-        "json_agg": {
-          "result_type": {
-            "type": "named",
-            "name": "json"
-          }
-        }
-      },
-      "comparison_operators": {
-        "_eq": {
-          "argument_type": {
-            "type": "named",
-            "name": "json"
-          }
-        },
-        "_gt": {
-          "argument_type": {
-            "type": "named",
-            "name": "json"
-          }
-        },
-        "_gte": {
-          "argument_type": {
-            "type": "named",
-            "name": "json"
-          }
-        },
-        "_lt": {
-          "argument_type": {
-            "type": "named",
-            "name": "json"
-          }
-        },
-        "_lte": {
-          "argument_type": {
-            "type": "named",
-            "name": "json"
-          }
-        },
-        "_neq": {
-          "argument_type": {
-            "type": "named",
-            "name": "json"
-          }
-        }
-      },
-      "update_operators": {}
-    },
-    "jsonb": {
-      "aggregate_functions": {
-        "jsonb_agg": {
-          "result_type": {
-            "type": "named",
-            "name": "jsonb"
-          }
-        }
-      },
-      "comparison_operators": {
-        "_eq": {
-          "argument_type": {
-            "type": "named",
-            "name": "jsonb"
-          }
-        },
-        "_gt": {
-          "argument_type": {
-            "type": "named",
-            "name": "jsonb"
-          }
-        },
-        "_gte": {
-          "argument_type": {
-            "type": "named",
-            "name": "jsonb"
-          }
-        },
-        "_lt": {
-          "argument_type": {
-            "type": "named",
-            "name": "jsonb"
-          }
-        },
-        "_lte": {
-          "argument_type": {
-            "type": "named",
-            "name": "jsonb"
-          }
-        },
-        "_neq": {
-          "argument_type": {
-            "type": "named",
-            "name": "jsonb"
-          }
-        }
-      },
-      "update_operators": {}
-    },
-    "numeric": {
-      "aggregate_functions": {
-        "avg": {
-          "result_type": {
-            "type": "named",
-            "name": "numeric"
-          }
-        },
-        "max": {
-          "result_type": {
-            "type": "named",
-            "name": "numeric"
-          }
-        },
-        "min": {
-          "result_type": {
-            "type": "named",
-            "name": "numeric"
-          }
-        },
-        "stddev": {
-          "result_type": {
-            "type": "named",
-            "name": "numeric"
-          }
-        },
-        "stddev_pop": {
-          "result_type": {
-            "type": "named",
-            "name": "numeric"
-          }
-        },
-        "stddev_samp": {
-          "result_type": {
-            "type": "named",
-            "name": "numeric"
-          }
-        },
-        "sum": {
-          "result_type": {
-            "type": "named",
-            "name": "numeric"
-          }
-        },
-        "var_pop": {
-          "result_type": {
-            "type": "named",
-            "name": "numeric"
-          }
-        },
-        "var_samp": {
-          "result_type": {
-            "type": "named",
-            "name": "numeric"
-          }
-        },
-        "variance": {
-          "result_type": {
-            "type": "named",
-            "name": "numeric"
-          }
-        }
-      },
-      "comparison_operators": {
-        "_eq": {
-          "argument_type": {
-            "type": "named",
-            "name": "numeric"
-          }
-        },
-        "_gt": {
-          "argument_type": {
-            "type": "named",
-            "name": "numeric"
-          }
-        },
-        "_gte": {
-          "argument_type": {
-            "type": "named",
-            "name": "numeric"
-          }
-        },
-        "_lt": {
-          "argument_type": {
-            "type": "named",
-            "name": "numeric"
-          }
-        },
-        "_lte": {
-          "argument_type": {
-            "type": "named",
-            "name": "numeric"
-          }
-        },
-        "_neq": {
-          "argument_type": {
-            "type": "named",
-            "name": "numeric"
-          }
-        }
-      },
-      "update_operators": {}
-    },
-    "real": {
-      "aggregate_functions": {
-        "max": {
-          "result_type": {
-            "type": "named",
-            "name": "real"
-          }
-        },
-        "min": {
-          "result_type": {
-            "type": "named",
-            "name": "real"
-          }
-        },
-        "sum": {
-          "result_type": {
-            "type": "named",
-            "name": "real"
-          }
-        }
-      },
-      "comparison_operators": {
-        "_eq": {
-          "argument_type": {
-            "type": "named",
-            "name": "real"
-          }
-        },
-        "_gt": {
-          "argument_type": {
-            "type": "named",
-            "name": "real"
-          }
-        },
-        "_gte": {
-          "argument_type": {
-            "type": "named",
-            "name": "real"
-          }
-        },
-        "_lt": {
-          "argument_type": {
-            "type": "named",
-            "name": "real"
-          }
-        },
-        "_lte": {
-          "argument_type": {
-            "type": "named",
-            "name": "real"
-          }
-        },
-        "_neq": {
-          "argument_type": {
-            "type": "named",
-            "name": "real"
-          }
-        }
-      },
-      "update_operators": {}
-    },
-    "smallint": {
-      "aggregate_functions": {
-        "bit_and": {
-          "result_type": {
-            "type": "named",
-            "name": "smallint"
-          }
-        },
-        "bit_or": {
-          "result_type": {
-            "type": "named",
-            "name": "smallint"
-          }
-        },
-        "bit_xor": {
-          "result_type": {
-            "type": "named",
-            "name": "smallint"
-          }
-        },
-        "max": {
-          "result_type": {
-            "type": "named",
-            "name": "smallint"
-          }
-        },
-        "min": {
-          "result_type": {
-            "type": "named",
-            "name": "smallint"
-          }
-        }
-      },
-      "comparison_operators": {
-        "_eq": {
-          "argument_type": {
-            "type": "named",
-            "name": "smallint"
-          }
-        },
-        "_gt": {
-          "argument_type": {
-            "type": "named",
-            "name": "smallint"
-          }
-        },
-        "_gte": {
-          "argument_type": {
-            "type": "named",
-            "name": "smallint"
-          }
-        },
-        "_lt": {
-          "argument_type": {
-            "type": "named",
-            "name": "smallint"
-          }
-        },
-        "_lte": {
-          "argument_type": {
-            "type": "named",
-            "name": "smallint"
-          }
-        },
-        "_neq": {
-          "argument_type": {
-            "type": "named",
-            "name": "smallint"
-          }
-        }
-      },
-      "update_operators": {}
+      }
     },
     "string": {
-      "aggregate_functions": {},
-      "comparison_operators": {
-        "_eq": {
-          "argument_type": {
-            "type": "named",
-            "name": "string"
+      "aggregate_functions": {
+        "APPROX_COUNT_DISTINCT": {
+          "result_type": {
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "bigint"
+            }
           }
         },
+        "COUNT": {
+          "result_type": {
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "bigint"
+            }
+          }
+        },
+        "MAX": {
+          "result_type": {
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "string"
+            }
+          }
+        },
+        "MIN": {
+          "result_type": {
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "string"
+            }
+          }
+        }
+      },
+      "comparison_operators": {
+        "_eq": {
+          "type": "equal"
+        },
         "_gt": {
+          "type": "custom",
           "argument_type": {
             "type": "named",
             "name": "string"
           }
         },
         "_gte": {
+          "type": "custom",
           "argument_type": {
             "type": "named",
             "name": "string"
           }
         },
-        "_ilike": {
-          "argument_type": {
-            "type": "named",
-            "name": "string"
-          }
-        },
-        "_iregex": {
-          "argument_type": {
-            "type": "named",
-            "name": "string"
-          }
+        "_in": {
+          "type": "in"
         },
         "_like": {
+          "type": "custom",
           "argument_type": {
             "type": "named",
             "name": "string"
           }
         },
         "_lt": {
+          "type": "custom",
           "argument_type": {
             "type": "named",
             "name": "string"
           }
         },
         "_lte": {
+          "type": "custom",
           "argument_type": {
             "type": "named",
             "name": "string"
           }
         },
         "_neq": {
-          "argument_type": {
-            "type": "named",
-            "name": "string"
-          }
-        },
-        "_nilike": {
-          "argument_type": {
-            "type": "named",
-            "name": "string"
-          }
-        },
-        "_niregex": {
+          "type": "custom",
           "argument_type": {
             "type": "named",
             "name": "string"
           }
         },
         "_nlike": {
-          "argument_type": {
-            "type": "named",
-            "name": "string"
-          }
-        },
-        "_nregex": {
-          "argument_type": {
-            "type": "named",
-            "name": "string"
-          }
-        },
-        "_nsimilar": {
-          "argument_type": {
-            "type": "named",
-            "name": "string"
-          }
-        },
-        "_regex": {
-          "argument_type": {
-            "type": "named",
-            "name": "string"
-          }
-        },
-        "_similar": {
+          "type": "custom",
           "argument_type": {
             "type": "named",
             "name": "string"
           }
         }
-      },
-      "update_operators": {}
-    },
-    "text": {
-      "aggregate_functions": {
-        "max": {
-          "result_type": {
-            "type": "named",
-            "name": "text"
-          }
-        },
-        "min": {
-          "result_type": {
-            "type": "named",
-            "name": "text"
-          }
-        }
-      },
-      "comparison_operators": {
-        "_eq": {
-          "argument_type": {
-            "type": "named",
-            "name": "text"
-          }
-        },
-        "_gt": {
-          "argument_type": {
-            "type": "named",
-            "name": "text"
-          }
-        },
-        "_gte": {
-          "argument_type": {
-            "type": "named",
-            "name": "text"
-          }
-        },
-        "_ilike": {
-          "argument_type": {
-            "type": "named",
-            "name": "text"
-          }
-        },
-        "_iregex": {
-          "argument_type": {
-            "type": "named",
-            "name": "text"
-          }
-        },
-        "_like": {
-          "argument_type": {
-            "type": "named",
-            "name": "text"
-          }
-        },
-        "_lt": {
-          "argument_type": {
-            "type": "named",
-            "name": "text"
-          }
-        },
-        "_lte": {
-          "argument_type": {
-            "type": "named",
-            "name": "text"
-          }
-        },
-        "_neq": {
-          "argument_type": {
-            "type": "named",
-            "name": "text"
-          }
-        },
-        "_nilike": {
-          "argument_type": {
-            "type": "named",
-            "name": "text"
-          }
-        },
-        "_niregex": {
-          "argument_type": {
-            "type": "named",
-            "name": "text"
-          }
-        },
-        "_nlike": {
-          "argument_type": {
-            "type": "named",
-            "name": "text"
-          }
-        },
-        "_nregex": {
-          "argument_type": {
-            "type": "named",
-            "name": "text"
-          }
-        },
-        "_nsimilar": {
-          "argument_type": {
-            "type": "named",
-            "name": "text"
-          }
-        },
-        "_regex": {
-          "argument_type": {
-            "type": "named",
-            "name": "text"
-          }
-        },
-        "_similar": {
-          "argument_type": {
-            "type": "named",
-            "name": "text"
-          }
-        }
-      },
-      "update_operators": {}
-    },
-    "time with time zone": {
-      "aggregate_functions": {
-        "max": {
-          "result_type": {
-            "type": "named",
-            "name": "time with time zone"
-          }
-        },
-        "min": {
-          "result_type": {
-            "type": "named",
-            "name": "time with time zone"
-          }
-        }
-      },
-      "comparison_operators": {
-        "_eq": {
-          "argument_type": {
-            "type": "named",
-            "name": "time with time zone"
-          }
-        },
-        "_gt": {
-          "argument_type": {
-            "type": "named",
-            "name": "time with time zone"
-          }
-        },
-        "_gte": {
-          "argument_type": {
-            "type": "named",
-            "name": "time with time zone"
-          }
-        },
-        "_lt": {
-          "argument_type": {
-            "type": "named",
-            "name": "time with time zone"
-          }
-        },
-        "_lte": {
-          "argument_type": {
-            "type": "named",
-            "name": "time with time zone"
-          }
-        },
-        "_neq": {
-          "argument_type": {
-            "type": "named",
-            "name": "time with time zone"
-          }
-        }
-      },
-      "update_operators": {}
-    },
-    "time without time zone": {
-      "aggregate_functions": {
-        "max": {
-          "result_type": {
-            "type": "named",
-            "name": "time without time zone"
-          }
-        },
-        "min": {
-          "result_type": {
-            "type": "named",
-            "name": "time without time zone"
-          }
-        }
-      },
-      "comparison_operators": {
-        "_eq": {
-          "argument_type": {
-            "type": "named",
-            "name": "time without time zone"
-          }
-        },
-        "_gt": {
-          "argument_type": {
-            "type": "named",
-            "name": "time without time zone"
-          }
-        },
-        "_gte": {
-          "argument_type": {
-            "type": "named",
-            "name": "time without time zone"
-          }
-        },
-        "_lt": {
-          "argument_type": {
-            "type": "named",
-            "name": "time without time zone"
-          }
-        },
-        "_lte": {
-          "argument_type": {
-            "type": "named",
-            "name": "time without time zone"
-          }
-        },
-        "_neq": {
-          "argument_type": {
-            "type": "named",
-            "name": "time without time zone"
-          }
-        }
-      },
-      "update_operators": {}
-    },
-    "timestamp with time zone": {
-      "aggregate_functions": {
-        "max": {
-          "result_type": {
-            "type": "named",
-            "name": "timestamp with time zone"
-          }
-        },
-        "min": {
-          "result_type": {
-            "type": "named",
-            "name": "timestamp with time zone"
-          }
-        }
-      },
-      "comparison_operators": {
-        "_eq": {
-          "argument_type": {
-            "type": "named",
-            "name": "timestamp with time zone"
-          }
-        },
-        "_gt": {
-          "argument_type": {
-            "type": "named",
-            "name": "timestamp with time zone"
-          }
-        },
-        "_gte": {
-          "argument_type": {
-            "type": "named",
-            "name": "timestamp with time zone"
-          }
-        },
-        "_lt": {
-          "argument_type": {
-            "type": "named",
-            "name": "timestamp with time zone"
-          }
-        },
-        "_lte": {
-          "argument_type": {
-            "type": "named",
-            "name": "timestamp with time zone"
-          }
-        },
-        "_neq": {
-          "argument_type": {
-            "type": "named",
-            "name": "timestamp with time zone"
-          }
-        }
-      },
-      "update_operators": {}
-    },
-    "timestamp without time zone": {
-      "aggregate_functions": {
-        "max": {
-          "result_type": {
-            "type": "named",
-            "name": "timestamp without time zone"
-          }
-        },
-        "min": {
-          "result_type": {
-            "type": "named",
-            "name": "timestamp without time zone"
-          }
-        }
-      },
-      "comparison_operators": {
-        "_eq": {
-          "argument_type": {
-            "type": "named",
-            "name": "timestamp without time zone"
-          }
-        },
-        "_gt": {
-          "argument_type": {
-            "type": "named",
-            "name": "timestamp without time zone"
-          }
-        },
-        "_gte": {
-          "argument_type": {
-            "type": "named",
-            "name": "timestamp without time zone"
-          }
-        },
-        "_lt": {
-          "argument_type": {
-            "type": "named",
-            "name": "timestamp without time zone"
-          }
-        },
-        "_lte": {
-          "argument_type": {
-            "type": "named",
-            "name": "timestamp without time zone"
-          }
-        },
-        "_neq": {
-          "argument_type": {
-            "type": "named",
-            "name": "timestamp without time zone"
-          }
-        }
-      },
-      "update_operators": {}
+      }
     }
   },
   "object_types": {
-    "Album": {
+    "albums": {
       "fields": {
         "AlbumId": {
           "type": {
-            "type": "named",
-            "name": "integer"
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "bigint"
+            }
           }
         },
         "ArtistId": {
           "type": {
-            "type": "named",
-            "name": "integer"
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "bigint"
+            }
           }
         },
         "Title": {
           "type": {
-            "type": "named",
-            "name": "string"
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "string"
+            }
           }
         }
       }
     },
-    "Artist": {
+    "artists": {
       "fields": {
         "ArtistId": {
           "type": {
-            "type": "named",
-            "name": "integer"
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "bigint"
+            }
           }
         },
         "Name": {
           "type": {
-            "type": "named",
-            "name": "string"
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "string"
+            }
           }
         }
       }
     },
-    "Customer": {
+    "customers": {
       "fields": {
         "Address": {
           "type": {
-            "type": "named",
-            "name": "string"
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "string"
+            }
           }
         },
         "City": {
           "type": {
-            "type": "named",
-            "name": "string"
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "string"
+            }
           }
         },
         "Company": {
           "type": {
-            "type": "named",
-            "name": "string"
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "string"
+            }
           }
         },
         "Country": {
           "type": {
-            "type": "named",
-            "name": "string"
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "string"
+            }
           }
         },
         "CustomerId": {
           "type": {
-            "type": "named",
-            "name": "integer"
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "bigint"
+            }
           }
         },
         "Email": {
           "type": {
-            "type": "named",
-            "name": "string"
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "string"
+            }
           }
         },
         "Fax": {
           "type": {
-            "type": "named",
-            "name": "string"
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "string"
+            }
           }
         },
         "FirstName": {
           "type": {
-            "type": "named",
-            "name": "string"
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "string"
+            }
           }
         },
         "LastName": {
           "type": {
-            "type": "named",
-            "name": "string"
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "string"
+            }
           }
         },
         "Phone": {
           "type": {
-            "type": "named",
-            "name": "string"
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "string"
+            }
           }
         },
         "PostalCode": {
           "type": {
-            "type": "named",
-            "name": "string"
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "string"
+            }
           }
         },
         "State": {
           "type": {
-            "type": "named",
-            "name": "string"
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "string"
+            }
           }
         },
         "SupportRepId": {
           "type": {
-            "type": "named",
-            "name": "integer"
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "bigint"
+            }
           }
         }
       }
     },
-    "Employee": {
+    "employees": {
       "fields": {
         "Address": {
           "type": {
-            "type": "named",
-            "name": "string"
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "string"
+            }
           }
         },
         "BirthDate": {
           "type": {
-            "type": "named",
-            "name": "timestamp without time zone"
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "date"
+            }
           }
         },
         "City": {
           "type": {
-            "type": "named",
-            "name": "string"
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "string"
+            }
           }
         },
         "Country": {
           "type": {
-            "type": "named",
-            "name": "string"
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "string"
+            }
           }
         },
         "Email": {
           "type": {
-            "type": "named",
-            "name": "string"
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "string"
+            }
           }
         },
         "EmployeeId": {
           "type": {
-            "type": "named",
-            "name": "integer"
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "bigint"
+            }
           }
         },
         "Fax": {
           "type": {
-            "type": "named",
-            "name": "string"
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "string"
+            }
           }
         },
         "FirstName": {
           "type": {
-            "type": "named",
-            "name": "string"
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "string"
+            }
           }
         },
         "HireDate": {
           "type": {
-            "type": "named",
-            "name": "timestamp without time zone"
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "date"
+            }
           }
         },
         "LastName": {
           "type": {
-            "type": "named",
-            "name": "string"
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "string"
+            }
           }
         },
         "Phone": {
           "type": {
-            "type": "named",
-            "name": "string"
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "string"
+            }
           }
         },
         "PostalCode": {
           "type": {
-            "type": "named",
-            "name": "string"
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "string"
+            }
           }
         },
         "ReportsTo": {
           "type": {
-            "type": "named",
-            "name": "integer"
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "bigint"
+            }
           }
         },
         "State": {
           "type": {
-            "type": "named",
-            "name": "string"
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "string"
+            }
           }
         },
         "Title": {
           "type": {
-            "type": "named",
-            "name": "string"
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "string"
+            }
           }
         }
       }
     },
-    "Genre": {
+    "genres": {
       "fields": {
         "GenreId": {
           "type": {
-            "type": "named",
-            "name": "integer"
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "bigint"
+            }
           }
         },
         "Name": {
           "type": {
-            "type": "named",
-            "name": "string"
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "string"
+            }
           }
         }
       }
     },
-    "Invoice": {
-      "fields": {
-        "BillingAddress": {
-          "type": {
-            "type": "named",
-            "name": "string"
-          }
-        },
-        "BillingCity": {
-          "type": {
-            "type": "named",
-            "name": "string"
-          }
-        },
-        "BillingCountry": {
-          "type": {
-            "type": "named",
-            "name": "string"
-          }
-        },
-        "BillingPostalCode": {
-          "type": {
-            "type": "named",
-            "name": "string"
-          }
-        },
-        "BillingState": {
-          "type": {
-            "type": "named",
-            "name": "string"
-          }
-        },
-        "CustomerId": {
-          "type": {
-            "type": "named",
-            "name": "integer"
-          }
-        },
-        "InvoiceDate": {
-          "type": {
-            "type": "named",
-            "name": "timestamp without time zone"
-          }
-        },
-        "InvoiceId": {
-          "type": {
-            "type": "named",
-            "name": "integer"
-          }
-        },
-        "Total": {
-          "type": {
-            "type": "named",
-            "name": "numeric"
-          }
-        }
-      }
-    },
-    "InvoiceLine": {
+    "invoice_items": {
       "fields": {
         "InvoiceId": {
           "type": {
-            "type": "named",
-            "name": "integer"
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "bigint"
+            }
           }
         },
         "InvoiceLineId": {
           "type": {
-            "type": "named",
-            "name": "integer"
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "bigint"
+            }
           }
         },
         "Quantity": {
           "type": {
-            "type": "named",
-            "name": "integer"
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "bigint"
+            }
           }
         },
         "TrackId": {
           "type": {
-            "type": "named",
-            "name": "integer"
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "bigint"
+            }
           }
         },
         "UnitPrice": {
           "type": {
-            "type": "named",
-            "name": "numeric"
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "float"
+            }
           }
         }
       }
     },
-    "MediaType": {
+    "invoices": {
+      "fields": {
+        "BillingAddress": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "string"
+            }
+          }
+        },
+        "BillingCity": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "string"
+            }
+          }
+        },
+        "BillingCountry": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "string"
+            }
+          }
+        },
+        "BillingPostalCode": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "string"
+            }
+          }
+        },
+        "BillingState": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "string"
+            }
+          }
+        },
+        "CustomerId": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "bigint"
+            }
+          }
+        },
+        "InvoiceDate": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "date"
+            }
+          }
+        },
+        "InvoiceId": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "bigint"
+            }
+          }
+        },
+        "Total": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "float"
+            }
+          }
+        }
+      }
+    },
+    "media_types": {
       "fields": {
         "MediaTypeId": {
           "type": {
-            "type": "named",
-            "name": "integer"
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "bigint"
+            }
           }
         },
         "Name": {
           "type": {
-            "type": "named",
-            "name": "string"
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "string"
+            }
           }
         }
       }
     },
-    "Playlist": {
-      "fields": {
-        "Name": {
-          "type": {
-            "type": "named",
-            "name": "string"
-          }
-        },
-        "PlaylistId": {
-          "type": {
-            "type": "named",
-            "name": "integer"
-          }
-        }
-      }
-    },
-    "PlaylistTrack": {
+    "playlist_track": {
       "fields": {
         "PlaylistId": {
           "type": {
-            "type": "named",
-            "name": "integer"
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "bigint"
+            }
           }
         },
         "TrackId": {
           "type": {
-            "type": "named",
-            "name": "integer"
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "bigint"
+            }
           }
         }
       }
     },
-    "Track": {
+    "playlists": {
+      "fields": {
+        "Name": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "string"
+            }
+          }
+        },
+        "PlaylistId": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "bigint"
+            }
+          }
+        }
+      }
+    },
+    "tracks": {
       "fields": {
         "AlbumId": {
           "type": {
-            "type": "named",
-            "name": "integer"
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "bigint"
+            }
           }
         },
         "Bytes": {
           "type": {
-            "type": "named",
-            "name": "integer"
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "bigint"
+            }
           }
         },
         "Composer": {
           "type": {
-            "type": "named",
-            "name": "string"
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "string"
+            }
           }
         },
         "GenreId": {
           "type": {
-            "type": "named",
-            "name": "integer"
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "bigint"
+            }
           }
         },
         "MediaTypeId": {
           "type": {
-            "type": "named",
-            "name": "integer"
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "bigint"
+            }
           }
         },
         "Milliseconds": {
           "type": {
-            "type": "named",
-            "name": "integer"
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "bigint"
+            }
           }
         },
         "Name": {
           "type": {
-            "type": "named",
-            "name": "string"
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "string"
+            }
           }
         },
         "TrackId": {
           "type": {
-            "type": "named",
-            "name": "integer"
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "bigint"
+            }
           }
         },
         "UnitPrice": {
           "type": {
-            "type": "named",
-            "name": "numeric"
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "float"
+            }
           }
         }
       }
@@ -1671,232 +1011,81 @@ expression: result
   },
   "collections": [
     {
-      "name": "Album",
+      "name": "albums",
       "arguments": {},
-      "type": "Album",
-      "deletable": false,
-      "uniqueness_constraints": {
-        "PK_Album": {
-          "unique_columns": [
-            "AlbumId"
-          ]
-        }
-      },
-      "foreign_keys": {
-        "FK_AlbumArtistId": {
-          "column_mapping": {
-            "ArtistId": "ArtistId"
-          },
-          "foreign_collection": "Artist"
-        }
-      }
-    },
-    {
-      "name": "Artist",
-      "arguments": {},
-      "type": "Artist",
-      "deletable": false,
-      "uniqueness_constraints": {
-        "PK_Artist": {
-          "unique_columns": [
-            "ArtistId"
-          ]
-        }
-      },
+      "type": "albums",
+      "uniqueness_constraints": {},
       "foreign_keys": {}
     },
     {
-      "name": "Customer",
+      "name": "artists",
       "arguments": {},
-      "type": "Customer",
-      "deletable": false,
-      "uniqueness_constraints": {
-        "PK_Customer": {
-          "unique_columns": [
-            "CustomerId"
-          ]
-        }
-      },
-      "foreign_keys": {
-        "FK_CustomerSupportRepId": {
-          "column_mapping": {
-            "SupportRepId": "EmployeeId"
-          },
-          "foreign_collection": "Employee"
-        }
-      }
-    },
-    {
-      "name": "Employee",
-      "arguments": {},
-      "type": "Employee",
-      "deletable": false,
-      "uniqueness_constraints": {
-        "PK_Employee": {
-          "unique_columns": [
-            "EmployeeId"
-          ]
-        }
-      },
-      "foreign_keys": {
-        "FK_EmployeeReportsTo": {
-          "column_mapping": {
-            "ReportsTo": "EmployeeId"
-          },
-          "foreign_collection": "Employee"
-        }
-      }
-    },
-    {
-      "name": "Genre",
-      "arguments": {},
-      "type": "Genre",
-      "deletable": false,
-      "uniqueness_constraints": {
-        "PK_Genre": {
-          "unique_columns": [
-            "GenreId"
-          ]
-        }
-      },
+      "type": "artists",
+      "uniqueness_constraints": {},
       "foreign_keys": {}
     },
     {
-      "name": "Invoice",
+      "name": "customers",
       "arguments": {},
-      "type": "Invoice",
-      "deletable": false,
-      "uniqueness_constraints": {
-        "PK_Invoice": {
-          "unique_columns": [
-            "InvoiceId"
-          ]
-        }
-      },
-      "foreign_keys": {
-        "FK_InvoiceCustomerId": {
-          "column_mapping": {
-            "CustomerId": "CustomerId"
-          },
-          "foreign_collection": "Customer"
-        }
-      }
-    },
-    {
-      "name": "InvoiceLine",
-      "arguments": {},
-      "type": "InvoiceLine",
-      "deletable": false,
-      "uniqueness_constraints": {
-        "PK_InvoiceLine": {
-          "unique_columns": [
-            "InvoiceLineId"
-          ]
-        }
-      },
-      "foreign_keys": {
-        "FK_InvoiceLineInvoiceId": {
-          "column_mapping": {
-            "InvoiceId": "InvoiceId"
-          },
-          "foreign_collection": "Invoice"
-        },
-        "FK_InvoiceLineTrackId": {
-          "column_mapping": {
-            "TrackId": "TrackId"
-          },
-          "foreign_collection": "Track"
-        }
-      }
-    },
-    {
-      "name": "MediaType",
-      "arguments": {},
-      "type": "MediaType",
-      "deletable": false,
-      "uniqueness_constraints": {
-        "PK_MediaType": {
-          "unique_columns": [
-            "MediaTypeId"
-          ]
-        }
-      },
+      "type": "customers",
+      "uniqueness_constraints": {},
       "foreign_keys": {}
     },
     {
-      "name": "Playlist",
+      "name": "employees",
       "arguments": {},
-      "type": "Playlist",
-      "deletable": false,
-      "uniqueness_constraints": {
-        "PK_Playlist": {
-          "unique_columns": [
-            "PlaylistId"
-          ]
-        }
-      },
+      "type": "employees",
+      "uniqueness_constraints": {},
       "foreign_keys": {}
     },
     {
-      "name": "PlaylistTrack",
+      "name": "genres",
       "arguments": {},
-      "type": "PlaylistTrack",
-      "deletable": false,
-      "uniqueness_constraints": {
-        "PK_PlaylistTrack": {
-          "unique_columns": [
-            "PlaylistId",
-            "TrackId"
-          ]
-        }
-      },
-      "foreign_keys": {
-        "FK_PlaylistTrackPlaylistId": {
-          "column_mapping": {
-            "PlaylistId": "PlaylistId"
-          },
-          "foreign_collection": "Playlist"
-        },
-        "FK_PlaylistTrackTrackId": {
-          "column_mapping": {
-            "TrackId": "TrackId"
-          },
-          "foreign_collection": "Track"
-        }
-      }
+      "type": "genres",
+      "uniqueness_constraints": {},
+      "foreign_keys": {}
     },
     {
-      "name": "Track",
+      "name": "invoice_items",
       "arguments": {},
-      "type": "Track",
-      "deletable": false,
-      "uniqueness_constraints": {
-        "PK_Track": {
-          "unique_columns": [
-            "TrackId"
-          ]
-        }
-      },
-      "foreign_keys": {
-        "FK_TrackAlbumId": {
-          "column_mapping": {
-            "AlbumId": "AlbumId"
-          },
-          "foreign_collection": "Album"
-        },
-        "FK_TrackGenreId": {
-          "column_mapping": {
-            "GenreId": "GenreId"
-          },
-          "foreign_collection": "Genre"
-        },
-        "FK_TrackMediaTypeId": {
-          "column_mapping": {
-            "MediaTypeId": "MediaTypeId"
-          },
-          "foreign_collection": "MediaType"
-        }
-      }
+      "type": "invoice_items",
+      "uniqueness_constraints": {},
+      "foreign_keys": {}
+    },
+    {
+      "name": "invoices",
+      "arguments": {},
+      "type": "invoices",
+      "uniqueness_constraints": {},
+      "foreign_keys": {}
+    },
+    {
+      "name": "media_types",
+      "arguments": {},
+      "type": "media_types",
+      "uniqueness_constraints": {},
+      "foreign_keys": {}
+    },
+    {
+      "name": "playlist_track",
+      "arguments": {},
+      "type": "playlist_track",
+      "uniqueness_constraints": {},
+      "foreign_keys": {}
+    },
+    {
+      "name": "playlists",
+      "arguments": {},
+      "type": "playlists",
+      "uniqueness_constraints": {},
+      "foreign_keys": {}
+    },
+    {
+      "name": "tracks",
+      "arguments": {},
+      "type": "tracks",
+      "uniqueness_constraints": {},
+      "foreign_keys": {}
     }
   ],
   "functions": [],
