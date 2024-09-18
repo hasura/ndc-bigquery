@@ -14,7 +14,7 @@ pub use version1::{
     // single_connection_uri, // for tests only
     // validate_raw_configuration,
     // Configuration,
-    ConfigurationError,
+    // ConfigurationError,
     // PoolSettings,
     ParsedConfiguration,
 };

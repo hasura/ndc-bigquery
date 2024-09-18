@@ -12,7 +12,6 @@ use serde::{Deserialize, Serialize};
 use std::borrow::Cow;
 use std::collections::BTreeMap;
 use std::path::Path;
-use thiserror::Error;
 use tokio::fs;
 
 //TODO(PY): temp, needs to be removed from the crate
@@ -77,72 +76,6 @@ pub enum Version {
     This,
 }
 
-/// User configuration, elaborated from a 'RawConfiguration'.
-#[derive(Debug, Clone, PartialEq, Deserialize, Serialize, JsonSchema)]
-pub struct Configuration {
-    pub config: ParsedConfiguration,
-    #[serde(default)]
-    #[serde(skip_serializing_if = "Vec::is_empty")]
-    pub write_regions: Vec<RegionName>,
-    #[serde(default)]
-    #[serde(skip_serializing_if = "Vec::is_empty")]
-    pub read_regions: Vec<RegionName>,
-    #[serde(default)]
-    #[serde(skip_serializing_if = "BTreeMap::is_empty")]
-    /// Routing table which relates the regions the NDC may be deployed in with the regions that
-    /// the database is deployed, in order of preference.
-    pub region_routing: BTreeMap<HasuraRegionName, Vec<RegionName>>,
-}
-
-/// Type that accept both a single value and a list of values. Allows for a simpler format when a
-/// single value is the common case.
-#[derive(Debug, Clone, PartialEq, Deserialize, Serialize, JsonSchema)]
-#[serde(untagged)]
-pub enum SingleOrList<T> {
-    Single(T),
-    List(Vec<T>),
-}
-
-// #[derive(Debug, Clone, PartialEq, Deserialize, Serialize, JsonSchema)]
-// #[serde(untagged)]
-// pub enum ConnectionUris {
-//     SingleRegion(SingleOrList<String>),
-//     MultiRegion(MultipleRegionsConnectionUris),
-// }
-
-// pub fn single_connection_uri(connection_uri: String) -> ConnectionUris {
-//     ConnectionUris::SingleRegion(SingleOrList::Single(connection_uri))
-// }
-
-#[derive(Debug, Clone, PartialEq, Deserialize, Serialize, JsonSchema)]
-pub struct MultipleRegionsConnectionUris {
-    pub writes: BTreeMap<RegionName, SingleOrList<String>>,
-    pub reads: BTreeMap<RegionName, SingleOrList<String>>,
-}
-
-/// Name of a region that the ndc may be deployed into.
-#[derive(Debug, Clone, PartialOrd, PartialEq, Eq, Ord, Deserialize, Serialize, JsonSchema)]
-pub struct HasuraRegionName(pub String);
-
-impl std::fmt::Display for HasuraRegionName {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        let HasuraRegionName(region) = self;
-        write!(f, "{region}")
-    }
-}
-
-/// Name of a region that database servers may live in. These regions are distinct from the regions
-/// the ndc can live in, and they need not be related a priori.
-#[derive(Debug, Clone, PartialOrd, PartialEq, Eq, Ord, Deserialize, Serialize, JsonSchema)]
-pub struct RegionName(pub String);
-
-impl std::fmt::Display for RegionName {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        let RegionName(region) = self;
-        write!(f, "{region}")
-    }
-}
-
 impl ParsedConfiguration {
     pub fn empty() -> Self {
         Self {
@@ -162,178 +95,6 @@ impl ParsedConfiguration {
         }
     }
 }
-
-// /// Settings for the PostgreSQL connection pool
-// #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
-// pub struct PoolSettings {
-//     /// maximum number of pool connections
-//     #[serde(default = "max_connection_default")]
-//     pub max_connections: u32,
-//     /// timeout for acquiring a connection from the pool (seconds)
-//     #[serde(default = "pool_timeout_default")]
-//     pub pool_timeout: u64,
-//     /// idle timeout for releasing a connection from the pool (seconds)
-//     #[serde(default = "idle_timeout_default")]
-//     pub idle_timeout: Option<u64>,
-//     /// maximum lifetime for an individual connection (seconds)
-//     #[serde(default = "connection_lifetime_default")]
-//     pub connection_lifetime: Option<u64>,
-// }
-
-// impl PoolSettings {
-//     fn is_default(&self) -> bool {
-//         *self == PoolSettings::default()
-//     }
-// }
-
-// /// <https://hasura.io/docs/latest/api-reference/syntax-defs/#pgpoolsettings>
-// impl Default for PoolSettings {
-//     fn default() -> PoolSettings {
-//         PoolSettings {
-//             max_connections: 50,
-//             pool_timeout: 600,
-//             idle_timeout: Some(180),
-//             connection_lifetime: Some(600),
-//         }
-//     }
-// }
-
-// // for serde default //
-// fn max_connection_default() -> u32 {
-//     PoolSettings::default().max_connections
-// }
-// fn pool_timeout_default() -> u64 {
-//     PoolSettings::default().pool_timeout
-// }
-// fn idle_timeout_default() -> Option<u64> {
-//     PoolSettings::default().idle_timeout
-// }
-// fn connection_lifetime_default() -> Option<u64> {
-//     PoolSettings::default().connection_lifetime
-// }
-
-// TODO(PY): fix validate_raw_configuration----------------
-/// Validate the user configuration.
-// pub async fn validate_raw_configuration(
-//     rawconfiguration: &ParsedConfiguration,
-// ) -> Result<Configuration, ParseConfigurationError> {
-//     if rawconfiguration.version != 1 {
-//         return Err(connector::ValidateError::ValidateError(vec![
-//             connector::InvalidRange {
-//                 path: vec![connector::KeyOrIndex::Key("version".into())],
-//                 message: format!(
-//                     "invalid configuration version, expected 1, got {0}",
-//                     rawconfiguration.version
-//                 ),
-//             },
-//         ]));
-//     }
-
-//     match &rawconfiguration.connection_uris {
-//         ConnectionUris::SingleRegion(urls) if urls.is_empty() => {
-//             Err(connector::ParseError::ValidateError(vec![
-//                 connector::InvalidRange {
-//                     path: vec![connector::KeyOrIndex::Key("connection_uris".into())],
-//                     message: "At least one database url must be specified".to_string(),
-//                 },
-//             ]))
-//         }
-//         ConnectionUris::MultiRegion(MultipleRegionsConnectionUris { reads, writes }) => {
-//             let reads_empty_err = if reads.is_empty() {
-//                 vec![connector::InvalidRange {
-//                     path: vec![
-//                         connector::KeyOrIndex::Key("connection_uris".into()),
-//                         connector::KeyOrIndex::Key("reads".into()),
-//                     ],
-//                     message: "At least one 'reads' region must be specified".to_string(),
-//                 }]
-//             } else {
-//                 vec![]
-//             };
-//             let reads_errs = reads
-//                 .iter()
-//                 .flat_map(|(RegionName(region), urls)| {
-//                     if urls.is_empty() {
-//                         vec![connector::InvalidRange {
-//                             path: vec![
-//                                 connector::KeyOrIndex::Key("connection_uris".into()),
-//                                 connector::KeyOrIndex::Key("reads".into()),
-//                                 connector::KeyOrIndex::Key(region.into()),
-//                             ],
-//                             message: "At least one database url must be specified".to_string(),
-//                         }]
-//                     } else {
-//                         vec![]
-//                     }
-//                 })
-//                 .collect::<Vec<connector::InvalidRange>>();
-//             let writes_errs = writes
-//                 .iter()
-//                 .flat_map(|(RegionName(region), urls)| {
-//                     if urls.is_empty() {
-//                         vec![connector::InvalidRange {
-//                             path: vec![
-//                                 connector::KeyOrIndex::Key("connection_uris".into()),
-//                                 connector::KeyOrIndex::Key("writes".into()),
-//                                 connector::KeyOrIndex::Key(region.into()),
-//                             ],
-//                             message: "At least one database url must be specified".to_string(),
-//                         }]
-//                     } else {
-//                         vec![]
-//                     }
-//                 })
-//                 .collect::<Vec<connector::InvalidRange>>();
-
-//             let mut errs = vec![];
-
-//             errs.extend(reads_empty_err);
-//             errs.extend(reads_errs);
-//             errs.extend(writes_errs);
-
-//             if !errs.is_empty() {
-//                 Err(connector::ValidateError::ValidateError(errs))
-//             } else {
-//                 Ok(())
-//             }
-//         }
-//         _ => Ok(()),
-//     }?;
-
-//     // Collect the regions that have been specified, to enable geo-localised deployments.
-//     let (write_regions, read_regions) = match &rawconfiguration.connection_uris {
-//         ConnectionUris::MultiRegion(MultipleRegionsConnectionUris { writes, reads }) => (
-//             writes.keys().cloned().collect::<Vec<_>>(),
-//             reads.keys().cloned().collect::<Vec<_>>(),
-//         ),
-//         ConnectionUris::SingleRegion(_) => (vec![], vec![]),
-//     };
-
-//     // region routing is provided by the metadata build service before the
-//     // agent is deployed, so we don't need to try and calculate it here.
-//     let region_routing = BTreeMap::new();
-
-//     Ok(Configuration {
-//         config: rawconfiguration.clone(),
-//         write_regions,
-//         read_regions,
-//         region_routing,
-//     })
-// }
-
-// /// Select the first available connection uri. Suitable for when hasura regions are not yet mapped
-// /// to application regions.
-// pub fn select_first_connection_url(urls: &ConnectionUris) -> String {
-//     match &urls {
-//         ConnectionUris::SingleRegion(urls) => urls.to_vec()[0].clone(),
-//         ConnectionUris::MultiRegion(MultipleRegionsConnectionUris { reads, .. }) => reads
-//             .first_key_value()
-//             .expect("No regions are defined (Guarded by validate_raw_configuration)")
-//             .1
-//             .to_vec()[0]
-//             .clone(),
-//     }
-// }
 
 /// Construct the deployment configuration by introspecting the database.
 pub async fn configure(
@@ -490,43 +251,13 @@ pub async fn parse_configuration(
                 ))
             })?;
 
-    let mut parsed_config: ParsedConfiguration = serde_json::from_str(&configuration_file_contents)
+    let parsed_config: ParsedConfiguration = serde_json::from_str(&configuration_file_contents)
         .map_err(|error| ParseConfigurationError::ParseError {
             file_path: configuration_file.clone(),
             line: error.line(),
             column: error.column(),
             message: error.to_string(),
         })?;
-
-    // look for native query sql file references and read from disk.
-    for native_query_sql in parsed_config
-        .metadata
-        .native_operations
-        .queries
-        .0
-        .values_mut()
-    {
-        native_query_sql.sql = metadata::NativeQuerySqlEither::NativeQuerySql(
-            native_query_sql
-                .sql
-                .from_external(configuration_dir.as_ref())
-                .map_err(ParseConfigurationError::IoErrorButStringified)?,
-        );
-    }
-    for native_query_sql in parsed_config
-        .metadata
-        .native_operations
-        .mutations
-        .0
-        .values_mut()
-    {
-        native_query_sql.sql = metadata::NativeQuerySqlEither::NativeQuerySql(
-            native_query_sql
-                .sql
-                .from_external(configuration_dir.as_ref())
-                .map_err(ParseConfigurationError::IoErrorButStringified)?,
-        );
-    }
 
     Ok(parsed_config)
 }
@@ -548,56 +279,6 @@ pub async fn write_parsed_configuration(
     )
     .await?;
 
-    // look for native query sql file references and write them to disk.
-    for native_query_sql in parsed_config.metadata.native_operations.queries.0.values() {
-        if let metadata::NativeQuerySqlEither::NativeQuerySql(
-            metadata::NativeQuerySql::FromFile { file, sql },
-        ) = &native_query_sql.sql
-        {
-            if file.is_absolute() || file.starts_with("..") {
-                Err(
-                    WriteParsedConfigurationError::WritingOutsideDestinationDir {
-                        dir: out_dir.as_ref().to_owned(),
-                        file: file.clone(),
-                    },
-                )?;
-            };
-
-            let native_query_file = out_dir.as_ref().to_owned().join(file);
-            if let Some(native_query_sql_dir) = native_query_file.parent() {
-                fs::create_dir_all(native_query_sql_dir).await?;
-            };
-            fs::write(native_query_file, String::from(sql.clone())).await?;
-        };
-    }
-    for native_query_sql in parsed_config
-        .metadata
-        .native_operations
-        .mutations
-        .0
-        .values()
-    {
-        if let metadata::NativeQuerySqlEither::NativeQuerySql(
-            metadata::NativeQuerySql::FromFile { file, sql },
-        ) = &native_query_sql.sql
-        {
-            if file.is_absolute() || file.starts_with("..") {
-                Err(
-                    WriteParsedConfigurationError::WritingOutsideDestinationDir {
-                        dir: out_dir.as_ref().to_owned(),
-                        file: file.clone(),
-                    },
-                )?;
-            };
-
-            let native_query_file = out_dir.as_ref().to_owned().join(file);
-            if let Some(native_query_sql_dir) = native_query_file.parent() {
-                fs::create_dir_all(native_query_sql_dir).await?;
-            };
-            fs::write(native_query_file, String::from(sql.clone())).await?;
-        };
-    }
-
     // create the jsonschema file
     let configuration_jsonschema_file_path = out_dir
         .as_ref()
@@ -614,17 +295,6 @@ pub async fn write_parsed_configuration(
     .await?;
 
     Ok(())
-}
-
-/// Configuration interpretation errors.
-#[derive(Debug, Error)]
-pub enum ConfigurationError {
-    #[error("error mapping hasura region to application region: {0}")]
-    UnableToMapHasuraRegion(HasuraRegionName),
-    #[error("error mapping application region to connection uris: {0}")]
-    UnableToMapApplicationRegion(RegionName),
-    #[error("DDN_REGION is not set, but is required for multi-region configuration")]
-    DdnRegionIsNotSet,
 }
 
 #[derive(Deserialize, Debug)]
@@ -680,36 +350,6 @@ fn get_aggregate_functions_for_type(
         );
     }
 
-    // if type_name.as_str() != "bit"
-    //     && (EXACT_NUMERICS.contains(&type_name.as_str())
-    //         || APPROX_NUMERICS.contains(&type_name.as_str()))
-    // {
-    //     aggregate_functions.insert(
-    //         AggregateFunctionName::new("STDEV".into()),
-    //         database::AggregateFunction {
-    //             return_type: TypeName::new("float".to_string().into()),
-    //         },
-    //     );
-    //     aggregate_functions.insert(
-    //         AggregateFunctionName::new("STDEVP".into()),
-    //         database::AggregateFunction {
-    //             return_type: TypeName::new("float".to_string().into()),
-    //         },
-    //     );
-    //     aggregate_functions.insert(
-    //         AggregateFunctionName::new("VAR".into()),
-    //         database::AggregateFunction {
-    //             return_type: TypeName::new("float".to_string().into()),
-    //         },
-    //     );
-    //     aggregate_functions.insert(
-    //         AggregateFunctionName::new("VARP".into()),
-    //         database::AggregateFunction {
-    //             return_type: TypeName::new("float".to_string().into()),
-    //         },
-    //     );
-    // }
-
     if let Some(precise_return_type) = match type_name.as_str() {
         "tinyint" | "smallint" | "int16" => Some("smallint"),
         "int" | "int32" => Some("integer"),
@@ -730,13 +370,6 @@ fn get_aggregate_functions_for_type(
             },
         );
     };
-
-    // aggregate_functions.insert(
-    //     AggregateFunctionName::new("COUNT_BIG".into()),
-    //     database::AggregateFunction {
-    //         return_type: TypeName::new("bigint".to_string().into()),
-    //     },
-    // );
 
     aggregate_functions
 }
@@ -897,45 +530,3 @@ fn get_comparison_operators_for_type(
     }
     comparison_operators
 }
-
-// /// Filter predicate for comparison operators. Preserves only comparison operators that are
-// /// relevant to any of the given scalar types.
-// ///
-// /// This function is public to enable use in later versions that retain the same metadata types.
-// fn filter_comparison_operators(
-//     scalar_types: &BTreeSet<models::ScalarTypeName>,
-//     comparison_operators: metadata::ComparisonOperators,
-// ) -> metadata::ComparisonOperators {
-//     metadata::ComparisonOperators(
-//         comparison_operators
-//             .0
-//             .into_iter()
-//             .filter(|(typ, _)| scalar_types.contains(typ))
-//             .map(|(typ, ops)| {
-//                 (
-//                     typ,
-//                     ops.into_iter()
-//                         .filter(|(_, op)| scalar_types.contains(&op.argument_type))
-//                         .collect(),
-//                 )
-//             })
-//             .collect(),
-//     )
-// }
-
-// /// Filter predicate for aggregation functions. Preserves only aggregation functions that are
-// /// relevant to any of the given scalar types.
-// ///
-// /// This function is public to enable use in later versions that retain the same metadata types.
-// fn filter_aggregate_functions(
-//     scalar_types: &BTreeSet<models::ScalarTypeName>,
-//     aggregate_functions: metadata::AggregateFunctions,
-// ) -> metadata::AggregateFunctions {
-//     metadata::AggregateFunctions(
-//         aggregate_functions
-//             .0
-//             .into_iter()
-//             .filter(|(typ, _)| scalar_types.contains(typ))
-//             .collect(),
-//     )
-// }

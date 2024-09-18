@@ -58,8 +58,8 @@ async fn get_rawconfiguration_schema() {
     insta::assert_json_snapshot!(schema);
 }
 
-#[tokio::test]
-async fn get_configuration_schema() {
-    let schema = schemars::schema_for!(version1::Configuration);
-    insta::assert_json_snapshot!(schema);
-}
+// #[tokio::test]
+// async fn get_configuration_schema() {
+//     let schema = schemars::schema_for!(version1::Configuration);
+//     insta::assert_json_snapshot!(schema);
+// }
