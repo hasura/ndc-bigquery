@@ -1,969 +1,807 @@
 {
   "version": 1,
-  "connection_uri": "postgresql://postgres:password@localhost:64002",
+  "connection_settings": {
+    "serviceKey": {
+      "variable": "HASURA_BIGQUERY_SERVICE_KEY"
+    },
+    "projectId": {
+      "variable": "HASURA_BIGQUERY_PROJECT_ID"
+    },
+    "datasetId": {
+      "variable": "HASURA_BIGQUERY_DATASET_ID"
+    }
+  },
   "metadata": {
     "tables": {
-      "test_table": {
-        "schemaName": "hasura-development.chinook_sample",
-        "tableName": "test_table",
-        "columns": {
-          "id": {
-            "name": "id",
-            "type": {
-              "ScalarType": "integer"
-            },
-            "nullable": "nonNullable"
-          },
-          "album_id": {
-            "name": "album_id",
-            "type": {
-              "ScalarType": "integer"
-            },
-            "nullable": "nonNullable"
-          }
-        },
-        "uniquenessConstraints": {},
-        "foreignRelations": {
-          "test_table.fk$1": {
-            "foreign_table": "test_table_2",
-            "column_mapping": {
-              "album_id": "id"
-            }
-          }
-        }
-      },
-      "test_table_2": {
-        "schemaName": "hasura-development.chinook_sample",
-        "tableName": "test_table_2",
-        "columns": {
-          "id": {
-            "name": "id",
-            "type": {
-              "ScalarType": "int4"
-            },
-            "nullable": "nonNullable"
-          },
-          "album_id": {
-            "name": "album_id",
-            "type": {
-              "ScalarType": "int4"
-            },
-            "nullable": "nonNullable"
-          }
-        },
-        "uniquenessConstraints": {},
-        "foreignRelations": {}
-      },
-      "Album": {
+      "albums": {
         "schemaName": "hasura-development.chinook_sample",
         "tableName": "albums",
         "columns": {
           "AlbumId": {
             "name": "AlbumId",
             "type": {
-              "ScalarType": "int4"
+              "ScalarType": "bigint"
             },
-            "nullable": "nonNullable"
+            "nullable": "nullable",
+            "description": null
           },
           "ArtistId": {
             "name": "ArtistId",
             "type": {
-              "ScalarType": "int4"
+              "ScalarType": "bigint"
             },
-            "nullable": "nonNullable"
+            "nullable": "nullable",
+            "description": null
           },
           "Title": {
             "name": "Title",
             "type": {
-              "ScalarType": "varchar"
+              "ScalarType": "string"
             },
-            "nullable": "nonNullable"
+            "nullable": "nullable",
+            "description": null
           }
         },
-        "uniquenessConstraints": {
-          "PK_Album": ["AlbumId"]
-        },
-        "foreignRelations": {
-          "FK_AlbumArtistId": {
-            "foreign_table": "Artist",
-            "column_mapping": {
-              "ArtistId": "ArtistId"
-            }
-          }
-        }
+        "uniquenessConstraints": {},
+        "foreignRelations": {},
+        "description": null
       },
-      "Artist": {
+      "artists": {
         "schemaName": "hasura-development.chinook_sample",
         "tableName": "artists",
         "columns": {
           "ArtistId": {
             "name": "ArtistId",
             "type": {
-              "ScalarType": "int4"
+              "ScalarType": "bigint"
             },
-            "nullable": "nonNullable"
+            "nullable": "nullable",
+            "description": null
           },
           "Name": {
             "name": "Name",
             "type": {
-              "ScalarType": "varchar"
+              "ScalarType": "string"
             },
-            "nullable": "nullable"
+            "nullable": "nullable",
+            "description": null
           }
         },
-        "uniquenessConstraints": {
-          "PK_Artist": ["ArtistId"]
-        },
-        "foreignRelations": {}
+        "uniquenessConstraints": {},
+        "foreignRelations": {},
+        "description": null
       },
-      "Customer": {
+      "customers": {
         "schemaName": "hasura-development.chinook_sample",
-        "tableName": "Customer",
+        "tableName": "customers",
         "columns": {
           "Address": {
             "name": "Address",
             "type": {
-              "ScalarType": "varchar"
+              "ScalarType": "string"
             },
-            "nullable": "nullable"
+            "nullable": "nullable",
+            "description": null
           },
           "City": {
             "name": "City",
             "type": {
-              "ScalarType": "varchar"
+              "ScalarType": "string"
             },
-            "nullable": "nullable"
+            "nullable": "nullable",
+            "description": null
           },
           "Company": {
             "name": "Company",
             "type": {
-              "ScalarType": "varchar"
+              "ScalarType": "string"
             },
-            "nullable": "nullable"
+            "nullable": "nullable",
+            "description": null
           },
           "Country": {
             "name": "Country",
             "type": {
-              "ScalarType": "varchar"
+              "ScalarType": "string"
             },
-            "nullable": "nullable"
+            "nullable": "nullable",
+            "description": null
           },
           "CustomerId": {
             "name": "CustomerId",
             "type": {
-              "ScalarType": "int4"
+              "ScalarType": "bigint"
             },
-            "nullable": "nonNullable"
+            "nullable": "nullable",
+            "description": null
           },
           "Email": {
             "name": "Email",
             "type": {
-              "ScalarType": "varchar"
+              "ScalarType": "string"
             },
-            "nullable": "nonNullable"
+            "nullable": "nullable",
+            "description": null
           },
           "Fax": {
             "name": "Fax",
             "type": {
-              "ScalarType": "varchar"
+              "ScalarType": "string"
             },
-            "nullable": "nullable"
+            "nullable": "nullable",
+            "description": null
           },
           "FirstName": {
             "name": "FirstName",
             "type": {
-              "ScalarType": "varchar"
+              "ScalarType": "string"
             },
-            "nullable": "nonNullable"
+            "nullable": "nullable",
+            "description": null
           },
           "LastName": {
             "name": "LastName",
             "type": {
-              "ScalarType": "varchar"
+              "ScalarType": "string"
             },
-            "nullable": "nonNullable"
+            "nullable": "nullable",
+            "description": null
           },
           "Phone": {
             "name": "Phone",
             "type": {
-              "ScalarType": "varchar"
+              "ScalarType": "string"
             },
-            "nullable": "nullable"
+            "nullable": "nullable",
+            "description": null
           },
           "PostalCode": {
             "name": "PostalCode",
             "type": {
-              "ScalarType": "varchar"
+              "ScalarType": "string"
             },
-            "nullable": "nullable"
+            "nullable": "nullable",
+            "description": null
           },
           "State": {
             "name": "State",
             "type": {
-              "ScalarType": "varchar"
+              "ScalarType": "string"
             },
-            "nullable": "nullable"
+            "nullable": "nullable",
+            "description": null
           },
           "SupportRepId": {
             "name": "SupportRepId",
             "type": {
-              "ScalarType": "int4"
+              "ScalarType": "bigint"
             },
-            "nullable": "nullable"
+            "nullable": "nullable",
+            "description": null
           }
         },
-        "uniquenessConstraints": {
-          "PK_Customer": ["CustomerId"]
-        },
-        "foreignRelations": {
-          "FK_CustomerSupportRepId": {
-            "foreign_table": "Employee",
-            "column_mapping": {
-              "SupportRepId": "EmployeeId"
-            }
-          }
-        }
+        "uniquenessConstraints": {},
+        "foreignRelations": {},
+        "description": null
       },
-      "Employee": {
+      "employees": {
         "schemaName": "hasura-development.chinook_sample",
         "tableName": "employees",
         "columns": {
           "Address": {
             "name": "Address",
             "type": {
-              "ScalarType": "varchar"
+              "ScalarType": "string"
             },
-            "nullable": "nullable"
+            "nullable": "nullable",
+            "description": null
           },
           "BirthDate": {
             "name": "BirthDate",
             "type": {
-              "ScalarType": "timestamp"
+              "ScalarType": "date"
             },
-            "nullable": "nullable"
+            "nullable": "nullable",
+            "description": null
           },
           "City": {
             "name": "City",
             "type": {
-              "ScalarType": "varchar"
+              "ScalarType": "string"
             },
-            "nullable": "nullable"
+            "nullable": "nullable",
+            "description": null
           },
           "Country": {
             "name": "Country",
             "type": {
-              "ScalarType": "varchar"
+              "ScalarType": "string"
             },
-            "nullable": "nullable"
+            "nullable": "nullable",
+            "description": null
           },
           "Email": {
             "name": "Email",
             "type": {
-              "ScalarType": "varchar"
+              "ScalarType": "string"
             },
-            "nullable": "nullable"
+            "nullable": "nullable",
+            "description": null
           },
           "EmployeeId": {
             "name": "EmployeeId",
             "type": {
-              "ScalarType": "int4"
+              "ScalarType": "bigint"
             },
-            "nullable": "nonNullable"
+            "nullable": "nullable",
+            "description": null
           },
           "Fax": {
             "name": "Fax",
             "type": {
-              "ScalarType": "varchar"
+              "ScalarType": "string"
             },
-            "nullable": "nullable"
+            "nullable": "nullable",
+            "description": null
           },
           "FirstName": {
             "name": "FirstName",
             "type": {
-              "ScalarType": "varchar"
+              "ScalarType": "string"
             },
-            "nullable": "nonNullable"
+            "nullable": "nullable",
+            "description": null
           },
           "HireDate": {
             "name": "HireDate",
             "type": {
-              "ScalarType": "timestamp"
+              "ScalarType": "date"
             },
-            "nullable": "nullable"
+            "nullable": "nullable",
+            "description": null
           },
           "LastName": {
             "name": "LastName",
             "type": {
-              "ScalarType": "varchar"
+              "ScalarType": "string"
             },
-            "nullable": "nonNullable"
+            "nullable": "nullable",
+            "description": null
           },
           "Phone": {
             "name": "Phone",
             "type": {
-              "ScalarType": "varchar"
+              "ScalarType": "string"
             },
-            "nullable": "nullable"
+            "nullable": "nullable",
+            "description": null
           },
           "PostalCode": {
             "name": "PostalCode",
             "type": {
-              "ScalarType": "varchar"
+              "ScalarType": "string"
             },
-            "nullable": "nullable"
+            "nullable": "nullable",
+            "description": null
           },
           "ReportsTo": {
             "name": "ReportsTo",
             "type": {
-              "ScalarType": "int4"
+              "ScalarType": "bigint"
             },
-            "nullable": "nullable"
+            "nullable": "nullable",
+            "description": null
           },
           "State": {
             "name": "State",
             "type": {
-              "ScalarType": "varchar"
+              "ScalarType": "string"
             },
-            "nullable": "nullable"
+            "nullable": "nullable",
+            "description": null
           },
           "Title": {
             "name": "Title",
             "type": {
-              "ScalarType": "varchar"
+              "ScalarType": "string"
             },
-            "nullable": "nullable"
+            "nullable": "nullable",
+            "description": null
           }
         },
-        "uniquenessConstraints": {
-          "PK_Employee": ["EmployeeId"]
-        },
-        "foreignRelations": {
-          "FK_EmployeeReportsTo": {
-            "foreign_table": "Employee",
-            "column_mapping": {
-              "ReportsTo": "EmployeeId"
-            }
-          }
-        }
+        "uniquenessConstraints": {},
+        "foreignRelations": {},
+        "description": null
       },
-      "Genre": {
+      "genres": {
         "schemaName": "hasura-development.chinook_sample",
         "tableName": "genres",
         "columns": {
           "GenreId": {
             "name": "GenreId",
             "type": {
-              "ScalarType": "int4"
+              "ScalarType": "bigint"
             },
-            "nullable": "nonNullable"
+            "nullable": "nullable",
+            "description": null
           },
           "Name": {
             "name": "Name",
             "type": {
-              "ScalarType": "varchar"
+              "ScalarType": "string"
             },
-            "nullable": "nullable"
+            "nullable": "nullable",
+            "description": null
           }
         },
-        "uniquenessConstraints": {
-          "PK_Genre": ["GenreId"]
-        },
-        "foreignRelations": {}
+        "uniquenessConstraints": {},
+        "foreignRelations": {},
+        "description": null
       },
-      "Invoice": {
-        "schemaName": "hasura-development.chinook_sample",
-        "tableName": "invoices",
-        "columns": {
-          "BillingAddress": {
-            "name": "BillingAddress",
-            "type": {
-              "ScalarType": "varchar"
-            },
-            "nullable": "nullable"
-          },
-          "BillingCity": {
-            "name": "BillingCity",
-            "type": {
-              "ScalarType": "varchar"
-            },
-            "nullable": "nullable"
-          },
-          "BillingCountry": {
-            "name": "BillingCountry",
-            "type": {
-              "ScalarType": "varchar"
-            },
-            "nullable": "nullable"
-          },
-          "BillingPostalCode": {
-            "name": "BillingPostalCode",
-            "type": {
-              "ScalarType": "varchar"
-            },
-            "nullable": "nullable"
-          },
-          "BillingState": {
-            "name": "BillingState",
-            "type": {
-              "ScalarType": "varchar"
-            },
-            "nullable": "nullable"
-          },
-          "CustomerId": {
-            "name": "CustomerId",
-            "type": {
-              "ScalarType": "int4"
-            },
-            "nullable": "nonNullable"
-          },
-          "InvoiceDate": {
-            "name": "InvoiceDate",
-            "type": {
-              "ScalarType": "timestamp"
-            },
-            "nullable": "nonNullable"
-          },
-          "InvoiceId": {
-            "name": "InvoiceId",
-            "type": {
-              "ScalarType": "int4"
-            },
-            "nullable": "nonNullable"
-          },
-          "Total": {
-            "name": "Total",
-            "type": {
-              "ScalarType": "numeric"
-            },
-            "nullable": "nonNullable"
-          }
-        },
-        "uniquenessConstraints": {
-          "PK_Invoice": ["InvoiceId"]
-        },
-        "foreignRelations": {
-          "FK_InvoiceCustomerId": {
-            "foreign_table": "Customer",
-            "column_mapping": {
-              "CustomerId": "CustomerId"
-            }
-          }
-        }
-      },
-      "InvoiceLine": {
+      "invoice_items": {
         "schemaName": "hasura-development.chinook_sample",
         "tableName": "invoice_items",
         "columns": {
           "InvoiceId": {
             "name": "InvoiceId",
             "type": {
-              "ScalarType": "int4"
+              "ScalarType": "bigint"
             },
-            "nullable": "nonNullable"
+            "nullable": "nullable",
+            "description": null
           },
           "InvoiceLineId": {
             "name": "InvoiceLineId",
             "type": {
-              "ScalarType": "int4"
+              "ScalarType": "bigint"
             },
-            "nullable": "nonNullable"
+            "nullable": "nullable",
+            "description": null
           },
           "Quantity": {
             "name": "Quantity",
             "type": {
-              "ScalarType": "int4"
+              "ScalarType": "bigint"
             },
-            "nullable": "nonNullable"
+            "nullable": "nullable",
+            "description": null
           },
           "TrackId": {
             "name": "TrackId",
             "type": {
-              "ScalarType": "int4"
+              "ScalarType": "bigint"
             },
-            "nullable": "nonNullable"
+            "nullable": "nullable",
+            "description": null
           },
           "UnitPrice": {
             "name": "UnitPrice",
             "type": {
-              "ScalarType": "numeric"
+              "ScalarType": "float"
             },
-            "nullable": "nonNullable"
+            "nullable": "nullable",
+            "description": null
           }
         },
-        "uniquenessConstraints": {
-          "PK_InvoiceLine": ["InvoiceLineId"]
-        },
-        "foreignRelations": {
-          "FK_InvoiceLineInvoiceId": {
-            "foreign_table": "Invoice",
-            "column_mapping": {
-              "InvoiceId": "InvoiceId"
-            }
-          },
-          "FK_InvoiceLineTrackId": {
-            "foreign_table": "Track",
-            "column_mapping": {
-              "TrackId": "TrackId"
-            }
-          }
-        }
+        "uniquenessConstraints": {},
+        "foreignRelations": {},
+        "description": null
       },
-      "MediaType": {
+      "invoices": {
+        "schemaName": "hasura-development.chinook_sample",
+        "tableName": "invoices",
+        "columns": {
+          "BillingAddress": {
+            "name": "BillingAddress",
+            "type": {
+              "ScalarType": "string"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "BillingCity": {
+            "name": "BillingCity",
+            "type": {
+              "ScalarType": "string"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "BillingCountry": {
+            "name": "BillingCountry",
+            "type": {
+              "ScalarType": "string"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "BillingPostalCode": {
+            "name": "BillingPostalCode",
+            "type": {
+              "ScalarType": "string"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "BillingState": {
+            "name": "BillingState",
+            "type": {
+              "ScalarType": "string"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "CustomerId": {
+            "name": "CustomerId",
+            "type": {
+              "ScalarType": "bigint"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "InvoiceDate": {
+            "name": "InvoiceDate",
+            "type": {
+              "ScalarType": "date"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "InvoiceId": {
+            "name": "InvoiceId",
+            "type": {
+              "ScalarType": "bigint"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "Total": {
+            "name": "Total",
+            "type": {
+              "ScalarType": "float"
+            },
+            "nullable": "nullable",
+            "description": null
+          }
+        },
+        "uniquenessConstraints": {},
+        "foreignRelations": {},
+        "description": null
+      },
+      "media_types": {
         "schemaName": "hasura-development.chinook_sample",
         "tableName": "media_types",
         "columns": {
           "MediaTypeId": {
             "name": "MediaTypeId",
             "type": {
-              "ScalarType": "int4"
+              "ScalarType": "bigint"
             },
-            "nullable": "nonNullable"
+            "nullable": "nullable",
+            "description": null
           },
           "Name": {
             "name": "Name",
             "type": {
-              "ScalarType": "varchar"
+              "ScalarType": "string"
             },
-            "nullable": "nullable"
+            "nullable": "nullable",
+            "description": null
           }
         },
-        "uniquenessConstraints": {
-          "PK_MediaType": ["MediaTypeId"]
-        },
-        "foreignRelations": {}
+        "uniquenessConstraints": {},
+        "foreignRelations": {},
+        "description": null
       },
-      "Playlist": {
-        "schemaName": "hasura-development.chinook_sample",
-        "tableName": "playlists",
-        "columns": {
-          "Name": {
-            "name": "Name",
-            "type": {
-              "ScalarType": "varchar"
-            },
-            "nullable": "nullable"
-          },
-          "PlaylistId": {
-            "name": "PlaylistId",
-            "type": {
-              "ScalarType": "int4"
-            },
-            "nullable": "nonNullable"
-          }
-        },
-        "uniquenessConstraints": {
-          "PK_Playlist": ["PlaylistId"]
-        },
-        "foreignRelations": {}
-      },
-      "PlaylistTrack": {
+      "playlist_track": {
         "schemaName": "hasura-development.chinook_sample",
         "tableName": "playlist_track",
         "columns": {
           "PlaylistId": {
             "name": "PlaylistId",
             "type": {
-              "ScalarType": "int4"
+              "ScalarType": "bigint"
             },
-            "nullable": "nonNullable"
+            "nullable": "nullable",
+            "description": null
           },
           "TrackId": {
             "name": "TrackId",
             "type": {
-              "ScalarType": "int4"
+              "ScalarType": "bigint"
             },
-            "nullable": "nonNullable"
+            "nullable": "nullable",
+            "description": null
+          }
+        },
+        "uniquenessConstraints": {},
+        "foreignRelations": {},
+        "description": null
+      },
+      "playlists": {
+        "schemaName": "hasura-development.chinook_sample",
+        "tableName": "playlists",
+        "columns": {
+          "Name": {
+            "name": "Name",
+            "type": {
+              "ScalarType": "string"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "PlaylistId": {
+            "name": "PlaylistId",
+            "type": {
+              "ScalarType": "bigint"
+            },
+            "nullable": "nullable",
+            "description": null
+          }
+        },
+        "uniquenessConstraints": {},
+        "foreignRelations": {},
+        "description": null
+      },
+      "test_table": {
+        "schemaName": "hasura-development.chinook_sample",
+        "tableName": "test_table",
+        "columns": {
+          "album_id": {
+            "name": "album_id",
+            "type": {
+              "ScalarType": "bigint"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "id": {
+            "name": "id",
+            "type": {
+              "ScalarType": "bigint"
+            },
+            "nullable": "nullable",
+            "description": null
           }
         },
         "uniquenessConstraints": {
-          "PK_PlaylistTrack": ["PlaylistId", "TrackId"]
+          "test_table.pk$": [
+            "id"
+          ]
         },
-        "foreignRelations": {
-          "FK_PlaylistTrackPlaylistId": {
-            "foreign_table": "Playlist",
-            "column_mapping": {
-              "PlaylistId": "PlaylistId"
-            }
-          },
-          "FK_PlaylistTrackTrackId": {
-            "foreign_table": "Track",
-            "column_mapping": {
-              "TrackId": "TrackId"
-            }
-          }
-        }
+        "foreignRelations": {},
+        "description": null
       },
-      "Track": {
+      "test_table_2": {
+        "schemaName": "hasura-development.chinook_sample",
+        "tableName": "test_table_2",
+        "columns": {
+          "album_id": {
+            "name": "album_id",
+            "type": {
+              "ScalarType": "bigint"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "id": {
+            "name": "id",
+            "type": {
+              "ScalarType": "bigint"
+            },
+            "nullable": "nullable",
+            "description": null
+          }
+        },
+        "uniquenessConstraints": {
+          "test_table_2.pk$": [
+            "id"
+          ]
+        },
+        "foreignRelations": {},
+        "description": null
+      },
+      "test_table_3": {
+        "schemaName": "hasura-development.chinook_sample",
+        "tableName": "test_table_3",
+        "columns": {
+          "album_id3": {
+            "name": "album_id3",
+            "type": {
+              "ScalarType": "bigint"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "id": {
+            "name": "id",
+            "type": {
+              "ScalarType": "bigint"
+            },
+            "nullable": "nullable",
+            "description": null
+          }
+        },
+        "uniquenessConstraints": {
+          "test_table_3.pk$": [
+            "id"
+          ]
+        },
+        "foreignRelations": {},
+        "description": null
+      },
+      "tracks": {
         "schemaName": "hasura-development.chinook_sample",
         "tableName": "tracks",
         "columns": {
           "AlbumId": {
             "name": "AlbumId",
             "type": {
-              "ScalarType": "int4"
+              "ScalarType": "bigint"
             },
-            "nullable": "nullable"
+            "nullable": "nullable",
+            "description": null
           },
           "Bytes": {
             "name": "Bytes",
             "type": {
-              "ScalarType": "int4"
+              "ScalarType": "bigint"
             },
-            "nullable": "nullable"
+            "nullable": "nullable",
+            "description": null
           },
           "Composer": {
             "name": "Composer",
             "type": {
-              "ScalarType": "varchar"
+              "ScalarType": "string"
             },
-            "nullable": "nullable"
+            "nullable": "nullable",
+            "description": null
           },
           "GenreId": {
             "name": "GenreId",
             "type": {
-              "ScalarType": "int4"
+              "ScalarType": "bigint"
             },
-            "nullable": "nullable"
+            "nullable": "nullable",
+            "description": null
           },
           "MediaTypeId": {
             "name": "MediaTypeId",
             "type": {
-              "ScalarType": "int4"
+              "ScalarType": "bigint"
             },
-            "nullable": "nonNullable"
+            "nullable": "nullable",
+            "description": null
           },
           "Milliseconds": {
             "name": "Milliseconds",
             "type": {
-              "ScalarType": "int4"
+              "ScalarType": "bigint"
             },
-            "nullable": "nonNullable"
+            "nullable": "nullable",
+            "description": null
           },
           "Name": {
             "name": "Name",
             "type": {
-              "ScalarType": "varchar"
+              "ScalarType": "string"
             },
-            "nullable": "nonNullable"
+            "nullable": "nullable",
+            "description": null
           },
           "TrackId": {
             "name": "TrackId",
             "type": {
-              "ScalarType": "int4"
+              "ScalarType": "bigint"
             },
-            "nullable": "nonNullable"
+            "nullable": "nullable",
+            "description": null
           },
           "UnitPrice": {
             "name": "UnitPrice",
             "type": {
-              "ScalarType": "numeric"
+              "ScalarType": "float"
             },
-            "nullable": "nonNullable"
+            "nullable": "nullable",
+            "description": null
           }
         },
-        "uniquenessConstraints": {
-          "PK_Track": ["TrackId"]
-        },
-        "foreignRelations": {
-          "FK_TrackAlbumId": {
-            "foreign_table": "Album",
-            "column_mapping": {
-              "AlbumId": "AlbumId"
-            }
-          },
-          "FK_TrackGenreId": {
-            "foreign_table": "Genre",
-            "column_mapping": {
-              "GenreId": "GenreId"
-            }
-          },
-          "FK_TrackMediaTypeId": {
-            "foreign_table": "MediaType",
-            "column_mapping": {
-              "MediaTypeId": "MediaTypeId"
-            }
-          }
-        }
+        "uniquenessConstraints": {},
+        "foreignRelations": {},
+        "description": null
       }
     },
     "native_operations": {
       "queries": {},
       "mutations": {}
     },
-    "composite_types": {},
     "scalar_types": {
-      "bool": {
-        "typeName": "bool",
+      "bigint": {
+        "typeName": "bigint",
         "schemaName": "hasura-development.chinook_sample",
         "description": null,
         "aggregateFunctions": {
-          "bool_and": {
-            "returnType": "bool"
+          "APPROX_COUNT_DISTINCT": {
+            "returnType": "bigint"
           },
-          "bool_or": {
-            "returnType": "bool"
+          "AVG": {
+            "returnType": "bigint"
           },
-          "every": {
-            "returnType": "bool"
+          "COUNT": {
+            "returnType": "bigint"
+          },
+          "MAX": {
+            "returnType": "bigint"
+          },
+          "MIN": {
+            "returnType": "bigint"
+          },
+          "SUM": {
+            "returnType": "bigint"
           }
         },
         "comparisonOperators": {
           "_eq": {
             "operatorName": "=",
             "operatorKind": "equal",
-            "argumentType": "bool",
+            "argumentType": "bigint",
             "isInfix": true
           },
           "_gt": {
             "operatorName": ">",
             "operatorKind": "custom",
-            "argumentType": "bool",
+            "argumentType": "bigint",
             "isInfix": true
           },
           "_gte": {
             "operatorName": ">=",
             "operatorKind": "custom",
-            "argumentType": "bool",
+            "argumentType": "bigint",
             "isInfix": true
           },
           "_in": {
             "operatorName": "IN",
             "operatorKind": "in",
-            "argumentType": "bool",
+            "argumentType": "bigint",
             "isInfix": true
           },
           "_lt": {
             "operatorName": "<",
             "operatorKind": "custom",
-            "argumentType": "bool",
+            "argumentType": "bigint",
             "isInfix": true
           },
           "_lte": {
             "operatorName": "<=",
             "operatorKind": "custom",
-            "argumentType": "bool",
-            "isInfix": true
-          },
-          "_neq": {
-            "operatorName": "<>",
-            "operatorKind": "custom",
-            "argumentType": "bool",
-            "isInfix": true
-          }
-        },
-        "typeRepresentation": "boolean"
-      },
-      "card_suit": {
-        "typeName": "card_suit",
-        "schemaName": "public",
-        "description": null,
-        "aggregateFunctions": {
-          "max": {
-            "returnType": "card_suit"
-          },
-          "min": {
-            "returnType": "card_suit"
-          }
-        },
-        "comparisonOperators": {
-          "_eq": {
-            "operatorName": "=",
-            "operatorKind": "equal",
-            "argumentType": "card_suit",
-            "isInfix": true
-          },
-          "_gt": {
-            "operatorName": ">",
-            "operatorKind": "custom",
-            "argumentType": "card_suit",
-            "isInfix": true
-          },
-          "_gte": {
-            "operatorName": ">=",
-            "operatorKind": "custom",
-            "argumentType": "card_suit",
-            "isInfix": true
-          },
-          "_in": {
-            "operatorName": "IN",
-            "operatorKind": "in",
-            "argumentType": "card_suit",
-            "isInfix": true
-          },
-          "_lt": {
-            "operatorName": "<",
-            "operatorKind": "custom",
-            "argumentType": "card_suit",
-            "isInfix": true
-          },
-          "_lte": {
-            "operatorName": "<=",
-            "operatorKind": "custom",
-            "argumentType": "card_suit",
+            "argumentType": "bigint",
             "isInfix": true
           },
           "_neq": {
             "operatorName": "!=",
             "operatorKind": "custom",
-            "argumentType": "card_suit",
+            "argumentType": "bigint",
             "isInfix": true
           }
         },
-        "typeRepresentation": {
-          "enum": ["hearts", "clubs", "diamonds", "spades"]
-        }
-      },
-      "char": {
-        "typeName": "char",
-        "schemaName": "hasura-development.chinook_sample",
-        "description": null,
-        "aggregateFunctions": {
-          "max": {
-            "returnType": "text"
-          },
-          "min": {
-            "returnType": "text"
-          }
-        },
-        "comparisonOperators": {
-          "_eq": {
-            "operatorName": "=",
-            "operatorKind": "equal",
-            "argumentType": "char",
-            "isInfix": true
-          },
-          "_gt": {
-            "operatorName": ">",
-            "operatorKind": "custom",
-            "argumentType": "char",
-            "isInfix": true
-          },
-          "_gte": {
-            "operatorName": ">=",
-            "operatorKind": "custom",
-            "argumentType": "char",
-            "isInfix": true
-          },
-          "_ilike": {
-            "operatorName": "~~*",
-            "operatorKind": "custom",
-            "argumentType": "char",
-            "isInfix": true
-          },
-          "_in": {
-            "operatorName": "IN",
-            "operatorKind": "in",
-            "argumentType": "char",
-            "isInfix": true
-          },
-          "_iregex": {
-            "operatorName": "~*",
-            "operatorKind": "custom",
-            "argumentType": "char",
-            "isInfix": true
-          },
-          "_like": {
-            "operatorName": "~~",
-            "operatorKind": "custom",
-            "argumentType": "char",
-            "isInfix": true
-          },
-          "_lt": {
-            "operatorName": "<",
-            "operatorKind": "custom",
-            "argumentType": "char",
-            "isInfix": true
-          },
-          "_lte": {
-            "operatorName": "<=",
-            "operatorKind": "custom",
-            "argumentType": "char",
-            "isInfix": true
-          },
-          "_neq": {
-            "operatorName": "<>",
-            "operatorKind": "custom",
-            "argumentType": "char",
-            "isInfix": true
-          },
-          "_nilike": {
-            "operatorName": "!~~*",
-            "operatorKind": "custom",
-            "argumentType": "char",
-            "isInfix": true
-          },
-          "_niregex": {
-            "operatorName": "!~*",
-            "operatorKind": "custom",
-            "argumentType": "char",
-            "isInfix": true
-          },
-          "_nlike": {
-            "operatorName": "!~~",
-            "operatorKind": "custom",
-            "argumentType": "char",
-            "isInfix": true
-          },
-          "_nregex": {
-            "operatorName": "!~",
-            "operatorKind": "custom",
-            "argumentType": "char",
-            "isInfix": true
-          },
-          "_regex": {
-            "operatorName": "~",
-            "operatorKind": "custom",
-            "argumentType": "char",
-            "isInfix": true
-          },
-          "st_coveredby": {
-            "operatorName": "st_coveredby",
-            "operatorKind": "custom",
-            "argumentType": "char",
-            "isInfix": false
-          },
-          "st_covers": {
-            "operatorName": "st_covers",
-            "operatorKind": "custom",
-            "argumentType": "char",
-            "isInfix": false
-          },
-          "st_intersects": {
-            "operatorName": "st_intersects",
-            "operatorKind": "custom",
-            "argumentType": "char",
-            "isInfix": false
-          },
-          "st_relatematch": {
-            "operatorName": "st_relatematch",
-            "operatorKind": "custom",
-            "argumentType": "char",
-            "isInfix": false
-          },
-          "starts_with": {
-            "operatorName": "starts_with",
-            "operatorKind": "custom",
-            "argumentType": "char",
-            "isInfix": false
-          },
-          "ts_match_tt": {
-            "operatorName": "ts_match_tt",
-            "operatorKind": "custom",
-            "argumentType": "char",
-            "isInfix": false
-          }
-        },
-        "typeRepresentation": "string"
+        "typeRepresentation": null
       },
       "date": {
         "typeName": "date",
         "schemaName": "hasura-development.chinook_sample",
         "description": null,
         "aggregateFunctions": {
-          "max": {
+          "APPROX_COUNT_DISTINCT": {
+            "returnType": "bigint"
+          },
+          "COUNT": {
+            "returnType": "bigint"
+          },
+          "MAX": {
             "returnType": "date"
           },
-          "min": {
+          "MIN": {
             "returnType": "date"
           }
         },
@@ -1005,1486 +843,159 @@
             "isInfix": true
           },
           "_neq": {
-            "operatorName": "<>",
+            "operatorName": "!=",
             "operatorKind": "custom",
             "argumentType": "date",
-            "isInfix": true
-          }
-        },
-        "typeRepresentation": "date"
-      },
-      "even_number": {
-        "typeName": "even_number",
-        "schemaName": "public",
-        "description": null,
-        "aggregateFunctions": {
-          "avg": {
-            "returnType": "numeric"
-          },
-          "bit_and": {
-            "returnType": "int4"
-          },
-          "bit_or": {
-            "returnType": "int4"
-          },
-          "bit_xor": {
-            "returnType": "int4"
-          },
-          "max": {
-            "returnType": "int4"
-          },
-          "min": {
-            "returnType": "int4"
-          },
-          "stddev": {
-            "returnType": "numeric"
-          },
-          "stddev_pop": {
-            "returnType": "numeric"
-          },
-          "stddev_samp": {
-            "returnType": "numeric"
-          },
-          "sum": {
-            "returnType": "int8"
-          },
-          "var_pop": {
-            "returnType": "numeric"
-          },
-          "var_samp": {
-            "returnType": "numeric"
-          },
-          "variance": {
-            "returnType": "numeric"
-          }
-        },
-        "comparisonOperators": {
-          "_eq": {
-            "operatorName": "=",
-            "operatorKind": "equal",
-            "argumentType": "even_number",
-            "isInfix": true
-          },
-          "_gt": {
-            "operatorName": ">",
-            "operatorKind": "custom",
-            "argumentType": "even_number",
-            "isInfix": true
-          },
-          "_gte": {
-            "operatorName": ">=",
-            "operatorKind": "custom",
-            "argumentType": "even_number",
-            "isInfix": true
-          },
-          "_in": {
-            "operatorName": "IN",
-            "operatorKind": "in",
-            "argumentType": "even_number",
-            "isInfix": true
-          },
-          "_lt": {
-            "operatorName": "<",
-            "operatorKind": "custom",
-            "argumentType": "even_number",
-            "isInfix": true
-          },
-          "_lte": {
-            "operatorName": "<=",
-            "operatorKind": "custom",
-            "argumentType": "even_number",
-            "isInfix": true
-          },
-          "_neq": {
-            "operatorName": "<>",
-            "operatorKind": "custom",
-            "argumentType": "even_number",
-            "isInfix": true
-          }
-        },
-        "typeRepresentation": "int32"
-      },
-      "float4": {
-        "typeName": "float4",
-        "schemaName": "hasura-development.chinook_sample",
-        "description": null,
-        "aggregateFunctions": {
-          "avg": {
-            "returnType": "float8"
-          },
-          "max": {
-            "returnType": "float4"
-          },
-          "min": {
-            "returnType": "float4"
-          },
-          "stddev": {
-            "returnType": "float8"
-          },
-          "stddev_pop": {
-            "returnType": "float8"
-          },
-          "stddev_samp": {
-            "returnType": "float8"
-          },
-          "sum": {
-            "returnType": "float4"
-          },
-          "var_pop": {
-            "returnType": "float8"
-          },
-          "var_samp": {
-            "returnType": "float8"
-          },
-          "variance": {
-            "returnType": "float8"
-          }
-        },
-        "comparisonOperators": {
-          "_eq": {
-            "operatorName": "=",
-            "operatorKind": "equal",
-            "argumentType": "float4",
-            "isInfix": true
-          },
-          "_gt": {
-            "operatorName": ">",
-            "operatorKind": "custom",
-            "argumentType": "float4",
-            "isInfix": true
-          },
-          "_gte": {
-            "operatorName": ">=",
-            "operatorKind": "custom",
-            "argumentType": "float4",
-            "isInfix": true
-          },
-          "_in": {
-            "operatorName": "IN",
-            "operatorKind": "in",
-            "argumentType": "float4",
-            "isInfix": true
-          },
-          "_lt": {
-            "operatorName": "<",
-            "operatorKind": "custom",
-            "argumentType": "float4",
-            "isInfix": true
-          },
-          "_lte": {
-            "operatorName": "<=",
-            "operatorKind": "custom",
-            "argumentType": "float4",
-            "isInfix": true
-          },
-          "_neq": {
-            "operatorName": "<>",
-            "operatorKind": "custom",
-            "argumentType": "float4",
-            "isInfix": true
-          }
-        },
-        "typeRepresentation": "float32"
-      },
-      "float8": {
-        "typeName": "float8",
-        "schemaName": "hasura-development.chinook_sample",
-        "description": null,
-        "aggregateFunctions": {
-          "avg": {
-            "returnType": "float8"
-          },
-          "max": {
-            "returnType": "float8"
-          },
-          "min": {
-            "returnType": "float8"
-          },
-          "stddev": {
-            "returnType": "float8"
-          },
-          "stddev_pop": {
-            "returnType": "float8"
-          },
-          "stddev_samp": {
-            "returnType": "float8"
-          },
-          "sum": {
-            "returnType": "float8"
-          },
-          "var_pop": {
-            "returnType": "float8"
-          },
-          "var_samp": {
-            "returnType": "float8"
-          },
-          "variance": {
-            "returnType": "float8"
-          }
-        },
-        "comparisonOperators": {
-          "_eq": {
-            "operatorName": "=",
-            "operatorKind": "equal",
-            "argumentType": "float8",
-            "isInfix": true
-          },
-          "_gt": {
-            "operatorName": ">",
-            "operatorKind": "custom",
-            "argumentType": "float8",
-            "isInfix": true
-          },
-          "_gte": {
-            "operatorName": ">=",
-            "operatorKind": "custom",
-            "argumentType": "float8",
-            "isInfix": true
-          },
-          "_in": {
-            "operatorName": "IN",
-            "operatorKind": "in",
-            "argumentType": "float8",
-            "isInfix": true
-          },
-          "_lt": {
-            "operatorName": "<",
-            "operatorKind": "custom",
-            "argumentType": "float8",
-            "isInfix": true
-          },
-          "_lte": {
-            "operatorName": "<=",
-            "operatorKind": "custom",
-            "argumentType": "float8",
-            "isInfix": true
-          },
-          "_neq": {
-            "operatorName": "<>",
-            "operatorKind": "custom",
-            "argumentType": "float8",
-            "isInfix": true
-          }
-        },
-        "typeRepresentation": "float64"
-      },
-      "int2": {
-        "typeName": "int2",
-        "schemaName": "hasura-development.chinook_sample",
-        "description": null,
-        "aggregateFunctions": {
-          "avg": {
-            "returnType": "numeric"
-          },
-          "bit_and": {
-            "returnType": "int2"
-          },
-          "bit_or": {
-            "returnType": "int2"
-          },
-          "bit_xor": {
-            "returnType": "int2"
-          },
-          "max": {
-            "returnType": "int2"
-          },
-          "min": {
-            "returnType": "int2"
-          },
-          "stddev": {
-            "returnType": "numeric"
-          },
-          "stddev_pop": {
-            "returnType": "numeric"
-          },
-          "stddev_samp": {
-            "returnType": "numeric"
-          },
-          "sum": {
-            "returnType": "int8"
-          },
-          "var_pop": {
-            "returnType": "numeric"
-          },
-          "var_samp": {
-            "returnType": "numeric"
-          },
-          "variance": {
-            "returnType": "numeric"
-          }
-        },
-        "comparisonOperators": {
-          "_eq": {
-            "operatorName": "=",
-            "operatorKind": "equal",
-            "argumentType": "int2",
-            "isInfix": true
-          },
-          "_gt": {
-            "operatorName": ">",
-            "operatorKind": "custom",
-            "argumentType": "int2",
-            "isInfix": true
-          },
-          "_gte": {
-            "operatorName": ">=",
-            "operatorKind": "custom",
-            "argumentType": "int2",
-            "isInfix": true
-          },
-          "_in": {
-            "operatorName": "IN",
-            "operatorKind": "in",
-            "argumentType": "int2",
-            "isInfix": true
-          },
-          "_lt": {
-            "operatorName": "<",
-            "operatorKind": "custom",
-            "argumentType": "int2",
-            "isInfix": true
-          },
-          "_lte": {
-            "operatorName": "<=",
-            "operatorKind": "custom",
-            "argumentType": "int2",
-            "isInfix": true
-          },
-          "_neq": {
-            "operatorName": "<>",
-            "operatorKind": "custom",
-            "argumentType": "int2",
-            "isInfix": true
-          }
-        },
-        "typeRepresentation": "int16"
-      },
-      "int4": {
-        "typeName": "int4",
-        "schemaName": "hasura-development.chinook_sample",
-        "description": null,
-        "aggregateFunctions": {
-          "avg": {
-            "returnType": "numeric"
-          },
-          "bit_and": {
-            "returnType": "int4"
-          },
-          "bit_or": {
-            "returnType": "int4"
-          },
-          "bit_xor": {
-            "returnType": "int4"
-          },
-          "max": {
-            "returnType": "int4"
-          },
-          "min": {
-            "returnType": "int4"
-          },
-          "stddev": {
-            "returnType": "numeric"
-          },
-          "stddev_pop": {
-            "returnType": "numeric"
-          },
-          "stddev_samp": {
-            "returnType": "numeric"
-          },
-          "sum": {
-            "returnType": "int8"
-          },
-          "var_pop": {
-            "returnType": "numeric"
-          },
-          "var_samp": {
-            "returnType": "numeric"
-          },
-          "variance": {
-            "returnType": "numeric"
-          }
-        },
-        "comparisonOperators": {
-          "_eq": {
-            "operatorName": "=",
-            "operatorKind": "equal",
-            "argumentType": "int4",
-            "isInfix": true
-          },
-          "_gt": {
-            "operatorName": ">",
-            "operatorKind": "custom",
-            "argumentType": "int4",
-            "isInfix": true
-          },
-          "_gte": {
-            "operatorName": ">=",
-            "operatorKind": "custom",
-            "argumentType": "int4",
-            "isInfix": true
-          },
-          "_in": {
-            "operatorName": "IN",
-            "operatorKind": "in",
-            "argumentType": "int4",
-            "isInfix": true
-          },
-          "_lt": {
-            "operatorName": "<",
-            "operatorKind": "custom",
-            "argumentType": "int4",
-            "isInfix": true
-          },
-          "_lte": {
-            "operatorName": "<=",
-            "operatorKind": "custom",
-            "argumentType": "int4",
-            "isInfix": true
-          },
-          "_neq": {
-            "operatorName": "<>",
-            "operatorKind": "custom",
-            "argumentType": "int4",
-            "isInfix": true
-          }
-        },
-        "typeRepresentation": "int32"
-      },
-      "int8": {
-        "typeName": "int8",
-        "schemaName": "hasura-development.chinook_sample",
-        "description": null,
-        "aggregateFunctions": {
-          "avg": {
-            "returnType": "numeric"
-          },
-          "bit_and": {
-            "returnType": "int8"
-          },
-          "bit_or": {
-            "returnType": "int8"
-          },
-          "bit_xor": {
-            "returnType": "int8"
-          },
-          "max": {
-            "returnType": "int8"
-          },
-          "min": {
-            "returnType": "int8"
-          },
-          "stddev": {
-            "returnType": "numeric"
-          },
-          "stddev_pop": {
-            "returnType": "numeric"
-          },
-          "stddev_samp": {
-            "returnType": "numeric"
-          },
-          "sum": {
-            "returnType": "numeric"
-          },
-          "var_pop": {
-            "returnType": "numeric"
-          },
-          "var_samp": {
-            "returnType": "numeric"
-          },
-          "variance": {
-            "returnType": "numeric"
-          }
-        },
-        "comparisonOperators": {
-          "_eq": {
-            "operatorName": "=",
-            "operatorKind": "equal",
-            "argumentType": "int8",
-            "isInfix": true
-          },
-          "_gt": {
-            "operatorName": ">",
-            "operatorKind": "custom",
-            "argumentType": "int8",
-            "isInfix": true
-          },
-          "_gte": {
-            "operatorName": ">=",
-            "operatorKind": "custom",
-            "argumentType": "int8",
-            "isInfix": true
-          },
-          "_in": {
-            "operatorName": "IN",
-            "operatorKind": "in",
-            "argumentType": "int8",
-            "isInfix": true
-          },
-          "_lt": {
-            "operatorName": "<",
-            "operatorKind": "custom",
-            "argumentType": "int8",
-            "isInfix": true
-          },
-          "_lte": {
-            "operatorName": "<=",
-            "operatorKind": "custom",
-            "argumentType": "int8",
-            "isInfix": true
-          },
-          "_neq": {
-            "operatorName": "<>",
-            "operatorKind": "custom",
-            "argumentType": "int8",
-            "isInfix": true
-          }
-        },
-        "typeRepresentation": "int64AsString"
-      },
-      "interval": {
-        "typeName": "interval",
-        "schemaName": "hasura-development.chinook_sample",
-        "description": null,
-        "aggregateFunctions": {
-          "avg": {
-            "returnType": "interval"
-          },
-          "max": {
-            "returnType": "interval"
-          },
-          "min": {
-            "returnType": "interval"
-          },
-          "sum": {
-            "returnType": "interval"
-          }
-        },
-        "comparisonOperators": {
-          "_eq": {
-            "operatorName": "=",
-            "operatorKind": "equal",
-            "argumentType": "interval",
-            "isInfix": true
-          },
-          "_gt": {
-            "operatorName": ">",
-            "operatorKind": "custom",
-            "argumentType": "interval",
-            "isInfix": true
-          },
-          "_gte": {
-            "operatorName": ">=",
-            "operatorKind": "custom",
-            "argumentType": "interval",
-            "isInfix": true
-          },
-          "_in": {
-            "operatorName": "IN",
-            "operatorKind": "in",
-            "argumentType": "interval",
-            "isInfix": true
-          },
-          "_lt": {
-            "operatorName": "<",
-            "operatorKind": "custom",
-            "argumentType": "interval",
-            "isInfix": true
-          },
-          "_lte": {
-            "operatorName": "<=",
-            "operatorKind": "custom",
-            "argumentType": "interval",
-            "isInfix": true
-          },
-          "_neq": {
-            "operatorName": "<>",
-            "operatorKind": "custom",
-            "argumentType": "interval",
             "isInfix": true
           }
         },
         "typeRepresentation": null
       },
-      "numeric": {
-        "typeName": "numeric",
+      "float": {
+        "typeName": "float",
         "schemaName": "hasura-development.chinook_sample",
         "description": null,
         "aggregateFunctions": {
-          "avg": {
-            "returnType": "numeric"
+          "APPROX_COUNT_DISTINCT": {
+            "returnType": "bigint"
           },
-          "max": {
-            "returnType": "numeric"
+          "AVG": {
+            "returnType": "float"
           },
-          "min": {
-            "returnType": "numeric"
+          "COUNT": {
+            "returnType": "bigint"
           },
-          "stddev": {
-            "returnType": "numeric"
+          "MAX": {
+            "returnType": "float"
           },
-          "stddev_pop": {
-            "returnType": "numeric"
+          "MIN": {
+            "returnType": "float"
           },
-          "stddev_samp": {
-            "returnType": "numeric"
-          },
-          "sum": {
-            "returnType": "numeric"
-          },
-          "var_pop": {
-            "returnType": "numeric"
-          },
-          "var_samp": {
-            "returnType": "numeric"
-          },
-          "variance": {
-            "returnType": "numeric"
+          "SUM": {
+            "returnType": "float"
           }
         },
         "comparisonOperators": {
           "_eq": {
             "operatorName": "=",
             "operatorKind": "equal",
-            "argumentType": "numeric",
+            "argumentType": "float",
             "isInfix": true
           },
           "_gt": {
             "operatorName": ">",
             "operatorKind": "custom",
-            "argumentType": "numeric",
+            "argumentType": "float",
             "isInfix": true
           },
           "_gte": {
             "operatorName": ">=",
             "operatorKind": "custom",
-            "argumentType": "numeric",
+            "argumentType": "float",
             "isInfix": true
           },
           "_in": {
             "operatorName": "IN",
             "operatorKind": "in",
-            "argumentType": "numeric",
+            "argumentType": "float",
             "isInfix": true
           },
           "_lt": {
             "operatorName": "<",
             "operatorKind": "custom",
-            "argumentType": "numeric",
+            "argumentType": "float",
             "isInfix": true
           },
           "_lte": {
             "operatorName": "<=",
             "operatorKind": "custom",
-            "argumentType": "numeric",
+            "argumentType": "float",
             "isInfix": true
           },
           "_neq": {
-            "operatorName": "<>",
+            "operatorName": "!=",
             "operatorKind": "custom",
-            "argumentType": "numeric",
+            "argumentType": "float",
             "isInfix": true
           }
         },
-        "typeRepresentation": "bigDecimalAsString"
+        "typeRepresentation": null
       },
-      "text": {
-        "typeName": "text",
+      "string": {
+        "typeName": "string",
         "schemaName": "hasura-development.chinook_sample",
         "description": null,
         "aggregateFunctions": {
-          "max": {
-            "returnType": "text"
+          "APPROX_COUNT_DISTINCT": {
+            "returnType": "bigint"
           },
-          "min": {
-            "returnType": "text"
+          "COUNT": {
+            "returnType": "bigint"
+          },
+          "MAX": {
+            "returnType": "string"
+          },
+          "MIN": {
+            "returnType": "string"
           }
         },
         "comparisonOperators": {
           "_eq": {
             "operatorName": "=",
             "operatorKind": "equal",
-            "argumentType": "text",
+            "argumentType": "string",
             "isInfix": true
           },
           "_gt": {
             "operatorName": ">",
             "operatorKind": "custom",
-            "argumentType": "text",
+            "argumentType": "string",
             "isInfix": true
           },
           "_gte": {
             "operatorName": ">=",
             "operatorKind": "custom",
-            "argumentType": "text",
-            "isInfix": true
-          },
-          "_ilike": {
-            "operatorName": "~~*",
-            "operatorKind": "custom",
-            "argumentType": "text",
+            "argumentType": "string",
             "isInfix": true
           },
           "_in": {
             "operatorName": "IN",
             "operatorKind": "in",
-            "argumentType": "text",
-            "isInfix": true
-          },
-          "_iregex": {
-            "operatorName": "~*",
-            "operatorKind": "custom",
-            "argumentType": "text",
+            "argumentType": "string",
             "isInfix": true
           },
           "_like": {
-            "operatorName": "~~",
+            "operatorName": "LIKE",
             "operatorKind": "custom",
-            "argumentType": "text",
+            "argumentType": "string",
             "isInfix": true
           },
           "_lt": {
             "operatorName": "<",
             "operatorKind": "custom",
-            "argumentType": "text",
+            "argumentType": "string",
             "isInfix": true
           },
           "_lte": {
             "operatorName": "<=",
             "operatorKind": "custom",
-            "argumentType": "text",
+            "argumentType": "string",
             "isInfix": true
           },
           "_neq": {
-            "operatorName": "<>",
+            "operatorName": "!=",
             "operatorKind": "custom",
-            "argumentType": "text",
-            "isInfix": true
-          },
-          "_nilike": {
-            "operatorName": "!~~*",
-            "operatorKind": "custom",
-            "argumentType": "text",
-            "isInfix": true
-          },
-          "_niregex": {
-            "operatorName": "!~*",
-            "operatorKind": "custom",
-            "argumentType": "text",
+            "argumentType": "string",
             "isInfix": true
           },
           "_nlike": {
-            "operatorName": "!~~",
+            "operatorName": "NOT LIKE",
             "operatorKind": "custom",
-            "argumentType": "text",
-            "isInfix": true
-          },
-          "_nregex": {
-            "operatorName": "!~",
-            "operatorKind": "custom",
-            "argumentType": "text",
-            "isInfix": true
-          },
-          "_regex": {
-            "operatorName": "~",
-            "operatorKind": "custom",
-            "argumentType": "text",
-            "isInfix": true
-          },
-          "st_coveredby": {
-            "operatorName": "st_coveredby",
-            "operatorKind": "custom",
-            "argumentType": "text",
-            "isInfix": false
-          },
-          "st_covers": {
-            "operatorName": "st_covers",
-            "operatorKind": "custom",
-            "argumentType": "text",
-            "isInfix": false
-          },
-          "st_intersects": {
-            "operatorName": "st_intersects",
-            "operatorKind": "custom",
-            "argumentType": "text",
-            "isInfix": false
-          },
-          "st_relatematch": {
-            "operatorName": "st_relatematch",
-            "operatorKind": "custom",
-            "argumentType": "text",
-            "isInfix": false
-          },
-          "starts_with": {
-            "operatorName": "starts_with",
-            "operatorKind": "custom",
-            "argumentType": "text",
-            "isInfix": false
-          },
-          "ts_match_tt": {
-            "operatorName": "ts_match_tt",
-            "operatorKind": "custom",
-            "argumentType": "text",
-            "isInfix": false
-          }
-        },
-        "typeRepresentation": "string"
-      },
-      "time": {
-        "typeName": "time",
-        "schemaName": "hasura-development.chinook_sample",
-        "description": null,
-        "aggregateFunctions": {
-          "avg": {
-            "returnType": "interval"
-          },
-          "max": {
-            "returnType": "time"
-          },
-          "min": {
-            "returnType": "time"
-          },
-          "sum": {
-            "returnType": "interval"
-          }
-        },
-        "comparisonOperators": {
-          "_eq": {
-            "operatorName": "=",
-            "operatorKind": "equal",
-            "argumentType": "time",
-            "isInfix": true
-          },
-          "_gt": {
-            "operatorName": ">",
-            "operatorKind": "custom",
-            "argumentType": "time",
-            "isInfix": true
-          },
-          "_gte": {
-            "operatorName": ">=",
-            "operatorKind": "custom",
-            "argumentType": "time",
-            "isInfix": true
-          },
-          "_in": {
-            "operatorName": "IN",
-            "operatorKind": "in",
-            "argumentType": "time",
-            "isInfix": true
-          },
-          "_lt": {
-            "operatorName": "<",
-            "operatorKind": "custom",
-            "argumentType": "time",
-            "isInfix": true
-          },
-          "_lte": {
-            "operatorName": "<=",
-            "operatorKind": "custom",
-            "argumentType": "time",
-            "isInfix": true
-          },
-          "_neq": {
-            "operatorName": "<>",
-            "operatorKind": "custom",
-            "argumentType": "time",
+            "argumentType": "string",
             "isInfix": true
           }
         },
-        "typeRepresentation": "time"
-      },
-      "timestamp": {
-        "typeName": "timestamp",
-        "schemaName": "hasura-development.chinook_sample",
-        "description": null,
-        "aggregateFunctions": {
-          "max": {
-            "returnType": "timestamp"
-          },
-          "min": {
-            "returnType": "timestamp"
-          }
-        },
-        "comparisonOperators": {
-          "_eq": {
-            "operatorName": "=",
-            "operatorKind": "equal",
-            "argumentType": "timestamp",
-            "isInfix": true
-          },
-          "_gt": {
-            "operatorName": ">",
-            "operatorKind": "custom",
-            "argumentType": "timestamp",
-            "isInfix": true
-          },
-          "_gte": {
-            "operatorName": ">=",
-            "operatorKind": "custom",
-            "argumentType": "timestamp",
-            "isInfix": true
-          },
-          "_in": {
-            "operatorName": "IN",
-            "operatorKind": "in",
-            "argumentType": "timestamp",
-            "isInfix": true
-          },
-          "_lt": {
-            "operatorName": "<",
-            "operatorKind": "custom",
-            "argumentType": "timestamp",
-            "isInfix": true
-          },
-          "_lte": {
-            "operatorName": "<=",
-            "operatorKind": "custom",
-            "argumentType": "timestamp",
-            "isInfix": true
-          },
-          "_neq": {
-            "operatorName": "<>",
-            "operatorKind": "custom",
-            "argumentType": "timestamp",
-            "isInfix": true
-          }
-        },
-        "typeRepresentation": "timestamp"
-      },
-      "timestamptz": {
-        "typeName": "timestamptz",
-        "schemaName": "hasura-development.chinook_sample",
-        "description": null,
-        "aggregateFunctions": {
-          "max": {
-            "returnType": "timestamptz"
-          },
-          "min": {
-            "returnType": "timestamptz"
-          }
-        },
-        "comparisonOperators": {
-          "_eq": {
-            "operatorName": "=",
-            "operatorKind": "equal",
-            "argumentType": "timestamptz",
-            "isInfix": true
-          },
-          "_gt": {
-            "operatorName": ">",
-            "operatorKind": "custom",
-            "argumentType": "timestamptz",
-            "isInfix": true
-          },
-          "_gte": {
-            "operatorName": ">=",
-            "operatorKind": "custom",
-            "argumentType": "timestamptz",
-            "isInfix": true
-          },
-          "_in": {
-            "operatorName": "IN",
-            "operatorKind": "in",
-            "argumentType": "timestamptz",
-            "isInfix": true
-          },
-          "_lt": {
-            "operatorName": "<",
-            "operatorKind": "custom",
-            "argumentType": "timestamptz",
-            "isInfix": true
-          },
-          "_lte": {
-            "operatorName": "<=",
-            "operatorKind": "custom",
-            "argumentType": "timestamptz",
-            "isInfix": true
-          },
-          "_neq": {
-            "operatorName": "<>",
-            "operatorKind": "custom",
-            "argumentType": "timestamptz",
-            "isInfix": true
-          }
-        },
-        "typeRepresentation": "timestamptz"
-      },
-      "timetz": {
-        "typeName": "timetz",
-        "schemaName": "hasura-development.chinook_sample",
-        "description": null,
-        "aggregateFunctions": {
-          "max": {
-            "returnType": "timetz"
-          },
-          "min": {
-            "returnType": "timetz"
-          }
-        },
-        "comparisonOperators": {
-          "_eq": {
-            "operatorName": "=",
-            "operatorKind": "equal",
-            "argumentType": "timetz",
-            "isInfix": true
-          },
-          "_gt": {
-            "operatorName": ">",
-            "operatorKind": "custom",
-            "argumentType": "timetz",
-            "isInfix": true
-          },
-          "_gte": {
-            "operatorName": ">=",
-            "operatorKind": "custom",
-            "argumentType": "timetz",
-            "isInfix": true
-          },
-          "_in": {
-            "operatorName": "IN",
-            "operatorKind": "in",
-            "argumentType": "timetz",
-            "isInfix": true
-          },
-          "_lt": {
-            "operatorName": "<",
-            "operatorKind": "custom",
-            "argumentType": "timetz",
-            "isInfix": true
-          },
-          "_lte": {
-            "operatorName": "<=",
-            "operatorKind": "custom",
-            "argumentType": "timetz",
-            "isInfix": true
-          },
-          "_neq": {
-            "operatorName": "<>",
-            "operatorKind": "custom",
-            "argumentType": "timetz",
-            "isInfix": true
-          }
-        },
-        "typeRepresentation": "timetz"
-      },
-      "uuid": {
-        "typeName": "uuid",
-        "schemaName": "hasura-development.chinook_sample",
-        "description": null,
-        "aggregateFunctions": {},
-        "comparisonOperators": {
-          "_eq": {
-            "operatorName": "=",
-            "operatorKind": "equal",
-            "argumentType": "uuid",
-            "isInfix": true
-          },
-          "_gt": {
-            "operatorName": ">",
-            "operatorKind": "custom",
-            "argumentType": "uuid",
-            "isInfix": true
-          },
-          "_gte": {
-            "operatorName": ">=",
-            "operatorKind": "custom",
-            "argumentType": "uuid",
-            "isInfix": true
-          },
-          "_in": {
-            "operatorName": "IN",
-            "operatorKind": "in",
-            "argumentType": "uuid",
-            "isInfix": true
-          },
-          "_lt": {
-            "operatorName": "<",
-            "operatorKind": "custom",
-            "argumentType": "uuid",
-            "isInfix": true
-          },
-          "_lte": {
-            "operatorName": "<=",
-            "operatorKind": "custom",
-            "argumentType": "uuid",
-            "isInfix": true
-          },
-          "_neq": {
-            "operatorName": "<>",
-            "operatorKind": "custom",
-            "argumentType": "uuid",
-            "isInfix": true
-          }
-        },
-        "typeRepresentation": "uUID"
-      },
-      "varchar": {
-        "typeName": "varchar",
-        "schemaName": "hasura-development.chinook_sample",
-        "description": null,
-        "aggregateFunctions": {
-          "max": {
-            "returnType": "text"
-          },
-          "min": {
-            "returnType": "text"
-          }
-        },
-        "comparisonOperators": {
-          "_eq": {
-            "operatorName": "=",
-            "operatorKind": "equal",
-            "argumentType": "varchar",
-            "isInfix": true
-          },
-          "_gt": {
-            "operatorName": ">",
-            "operatorKind": "custom",
-            "argumentType": "varchar",
-            "isInfix": true
-          },
-          "_gte": {
-            "operatorName": ">=",
-            "operatorKind": "custom",
-            "argumentType": "varchar",
-            "isInfix": true
-          },
-          "_ilike": {
-            "operatorName": "~~*",
-            "operatorKind": "custom",
-            "argumentType": "varchar",
-            "isInfix": true
-          },
-          "_in": {
-            "operatorName": "IN",
-            "operatorKind": "in",
-            "argumentType": "varchar",
-            "isInfix": true
-          },
-          "_iregex": {
-            "operatorName": "~*",
-            "operatorKind": "custom",
-            "argumentType": "varchar",
-            "isInfix": true
-          },
-          "_like": {
-            "operatorName": "~~",
-            "operatorKind": "custom",
-            "argumentType": "varchar",
-            "isInfix": true
-          },
-          "_lt": {
-            "operatorName": "<",
-            "operatorKind": "custom",
-            "argumentType": "varchar",
-            "isInfix": true
-          },
-          "_lte": {
-            "operatorName": "<=",
-            "operatorKind": "custom",
-            "argumentType": "varchar",
-            "isInfix": true
-          },
-          "_neq": {
-            "operatorName": "<>",
-            "operatorKind": "custom",
-            "argumentType": "varchar",
-            "isInfix": true
-          },
-          "_nilike": {
-            "operatorName": "!~~*",
-            "operatorKind": "custom",
-            "argumentType": "varchar",
-            "isInfix": true
-          },
-          "_niregex": {
-            "operatorName": "!~*",
-            "operatorKind": "custom",
-            "argumentType": "varchar",
-            "isInfix": true
-          },
-          "_nlike": {
-            "operatorName": "!~~",
-            "operatorKind": "custom",
-            "argumentType": "varchar",
-            "isInfix": true
-          },
-          "_nregex": {
-            "operatorName": "!~",
-            "operatorKind": "custom",
-            "argumentType": "varchar",
-            "isInfix": true
-          },
-          "_regex": {
-            "operatorName": "~",
-            "operatorKind": "custom",
-            "argumentType": "varchar",
-            "isInfix": true
-          },
-          "st_coveredby": {
-            "operatorName": "st_coveredby",
-            "operatorKind": "custom",
-            "argumentType": "varchar",
-            "isInfix": false
-          },
-          "st_covers": {
-            "operatorName": "st_covers",
-            "operatorKind": "custom",
-            "argumentType": "varchar",
-            "isInfix": false
-          },
-          "st_intersects": {
-            "operatorName": "st_intersects",
-            "operatorKind": "custom",
-            "argumentType": "varchar",
-            "isInfix": false
-          },
-          "st_relatematch": {
-            "operatorName": "st_relatematch",
-            "operatorKind": "custom",
-            "argumentType": "varchar",
-            "isInfix": false
-          },
-          "starts_with": {
-            "operatorName": "starts_with",
-            "operatorKind": "custom",
-            "argumentType": "varchar",
-            "isInfix": false
-          },
-          "ts_match_tt": {
-            "operatorName": "ts_match_tt",
-            "operatorKind": "custom",
-            "argumentType": "varchar",
-            "isInfix": false
-          }
-        },
-        "typeRepresentation": "string"
-      }
-    }
-  },
-  "aggregate_functions": {
-    "bigint": {
-      "bit_and": {
-        "return_type": "bigint"
-      },
-      "bit_or": {
-        "return_type": "bigint"
-      },
-      "bit_xor": {
-        "return_type": "bigint"
-      },
-      "count": {
-        "return_type": "bigint"
-      },
-      "dense_rank": {
-        "return_type": "bigint"
-      },
-      "max": {
-        "return_type": "bigint"
-      },
-      "min": {
-        "return_type": "bigint"
-      },
-      "rank": {
-        "return_type": "bigint"
-      },
-      "sum": {
-        "return_type": "bigint"
-      }
-    },
-    "boolean": {
-      "bool_and": {
-        "return_type": "boolean"
-      },
-      "bool_or": {
-        "return_type": "boolean"
-      },
-      "every": {
-        "return_type": "boolean"
-      }
-    },
-    "character": {
-      "max": {
-        "return_type": "character"
-      },
-      "min": {
-        "return_type": "character"
-      }
-    },
-    "date": {
-      "max": {
-        "return_type": "date"
-      },
-      "min": {
-        "return_type": "date"
-      }
-    },
-    "double precision": {
-      "avg": {
-        "return_type": "double precision"
-      },
-      "cume_dist": {
-        "return_type": "double precision"
-      },
-      "max": {
-        "return_type": "double precision"
-      },
-      "min": {
-        "return_type": "double precision"
-      },
-      "percent_rank": {
-        "return_type": "double precision"
-      },
-      "stddev": {
-        "return_type": "double precision"
-      },
-      "stddev_pop": {
-        "return_type": "double precision"
-      },
-      "stddev_samp": {
-        "return_type": "double precision"
-      },
-      "sum": {
-        "return_type": "double precision"
-      },
-      "var_pop": {
-        "return_type": "double precision"
-      },
-      "var_samp": {
-        "return_type": "double precision"
-      },
-      "variance": {
-        "return_type": "double precision"
-      }
-    },
-    "integer": {
-      "bit_and": {
-        "return_type": "integer"
-      },
-      "bit_or": {
-        "return_type": "integer"
-      },
-      "bit_xor": {
-        "return_type": "integer"
-      },
-      "max": {
-        "return_type": "integer"
-      },
-      "min": {
-        "return_type": "integer"
-      },
-      "ntile": {
-        "return_type": "integer"
-      }
-    },
-    "json": {
-      "json_agg": {
-        "return_type": "json"
-      }
-    },
-    "jsonb": {
-      "jsonb_agg": {
-        "return_type": "jsonb"
-      }
-    },
-    "numeric": {
-      "avg": {
-        "return_type": "numeric"
-      },
-      "max": {
-        "return_type": "numeric"
-      },
-      "min": {
-        "return_type": "numeric"
-      },
-      "stddev": {
-        "return_type": "numeric"
-      },
-      "stddev_pop": {
-        "return_type": "numeric"
-      },
-      "stddev_samp": {
-        "return_type": "numeric"
-      },
-      "sum": {
-        "return_type": "numeric"
-      },
-      "var_pop": {
-        "return_type": "numeric"
-      },
-      "var_samp": {
-        "return_type": "numeric"
-      },
-      "variance": {
-        "return_type": "numeric"
-      }
-    },
-    "real": {
-      "max": {
-        "return_type": "real"
-      },
-      "min": {
-        "return_type": "real"
-      },
-      "sum": {
-        "return_type": "real"
-      }
-    },
-    "smallint": {
-      "bit_and": {
-        "return_type": "smallint"
-      },
-      "bit_or": {
-        "return_type": "smallint"
-      },
-      "bit_xor": {
-        "return_type": "smallint"
-      },
-      "max": {
-        "return_type": "smallint"
-      },
-      "min": {
-        "return_type": "smallint"
-      }
-    },
-    "text": {
-      "max": {
-        "return_type": "text"
-      },
-      "min": {
-        "return_type": "text"
-      }
-    },
-    "time with time zone": {
-      "max": {
-        "return_type": "time with time zone"
-      },
-      "min": {
-        "return_type": "time with time zone"
-      }
-    },
-    "time without time zone": {
-      "max": {
-        "return_type": "time without time zone"
-      },
-      "min": {
-        "return_type": "time without time zone"
-      }
-    },
-    "timestamp with time zone": {
-      "max": {
-        "return_type": "timestamp with time zone"
-      },
-      "min": {
-        "return_type": "timestamp with time zone"
-      }
-    },
-    "timestamp without time zone": {
-      "max": {
-        "return_type": "timestamp without time zone"
-      },
-      "min": {
-        "return_type": "timestamp without time zone"
+        "typeRepresentation": null
       }
     }
   }

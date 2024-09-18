@@ -22,7 +22,7 @@ pub struct State {
 
 /// Create a connection pool and wrap it inside a connector State.
 pub async fn create_state(
-    // _configuration: &Configuration,
+    configuration: &ndc_bigquery_configuration::Configuration,
     metrics_registry: &mut prometheus::Registry,
 ) -> Result<State, InitializationError> {
     let metrics = async {
@@ -33,10 +33,13 @@ pub async fn create_state(
     .instrument(info_span!("Setup metrics"))
     .await?;
 
-    let service_account_key_json = std::env::var("HASURA_BIGQUERY_SERVICE_KEY").unwrap();
+    // let service_account_key_json = std::env::var("HASURA_BIGQUERY_SERVICE_KEY").unwrap();
+
+    // dbg!(service_account_key_json);
+    // dbg!("create_state", configuration.service_key.clone());
 
     let service_account_key =
-        yup_oauth2::parse_service_account_key(service_account_key_json).unwrap();
+        yup_oauth2::parse_service_account_key(configuration.service_key.clone()).unwrap();
 
     // Init BigQuery client
     let bigquery_client =
@@ -44,14 +47,14 @@ pub async fn create_state(
             .await
             .unwrap();
 
-    let project_id = std::env::var("HASURA_BIGQUERY_PROJECT_ID").unwrap();
-    let dataset_id = std::env::var("HASURA_BIGQUERY_DATASET_ID").unwrap();
+    // let project_id = std::env::var("HASURA_BIGQUERY_PROJECT_ID").unwrap();
+    // let dataset_id = std::env::var("HASURA_BIGQUERY_DATASET_ID").unwrap();
 
     Ok(State {
         metrics,
         bigquery_client,
-        project_id,
-        dataset_id,
+        project_id: configuration.project_id.clone(),
+        dataset_id: configuration.dataset_id.clone(),
     })
 }
 

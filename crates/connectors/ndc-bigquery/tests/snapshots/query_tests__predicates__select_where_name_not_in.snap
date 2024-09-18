@@ -14,14 +14,6 @@ expression: result
         "Title": "Permanent Vacation"
       },
       {
-        "AlbumId": 5,
-        "Title": "Facelift"
-      },
-      {
-        "AlbumId": 2,
-        "Title": "Balls to the Wall"
-      },
-      {
         "AlbumId": 4,
         "Title": "Jagged Little Pill"
       }

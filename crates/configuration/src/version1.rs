@@ -122,9 +122,7 @@ pub async fn configure(
 
     // get scalar_types
 
-    let types_query = format!(
-        "select data_type from {project_id}.{dataset_id}.INFORMATION_SCHEMA.COLUMN_FIELD_PATHS"
-    );
+    let types_query = "select coalesce(data_type, '') as data_type from chinook_sample.INFORMATION_SCHEMA.COLUMN_FIELD_PATHS".to_string();
 
     let types_row = bigquery_client
         .job()

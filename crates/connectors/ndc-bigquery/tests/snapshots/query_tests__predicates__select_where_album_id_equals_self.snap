@@ -3,5 +3,12 @@ source: crates/connectors/ndc-postgres/tests/query_tests.rs
 expression: result
 ---
 [
-  {}
+  {
+    "rows": [
+      {
+        "AlbumId": 3,
+        "Title": "Permanent Vacation"
+      }
+    ]
+  }
 ]

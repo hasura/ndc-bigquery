@@ -1,5 +1,5 @@
 {
-  "collection": "Album",
+  "collection": "albums",
   "query": {
     "fields": {
       "Title": {
@@ -39,6 +39,18 @@
         "column": "ArtistId",
         "function": "avg"
       }
+    },
+    "order_by": {
+      "elements": [
+        {
+          "order_direction": "asc",
+          "target": {
+            "type": "column",
+            "name": "AlbumId",
+            "path": []
+          }
+        }
+      ]
     }
   },
   "arguments": {},

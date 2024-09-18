@@ -1,5 +1,5 @@
 {
-  "collection": "Album",
+  "collection": "albums",
   "query": {
     "fields": {
       "Name": {
@@ -39,8 +39,8 @@
         "ArtistId": "ArtistId"
       },
       "relationship_type": "object",
-      "source_collection_or_type": "Album",
-      "target_collection": "Artist",
+      "source_collection_or_type": "albums",
+      "target_collection": "artists",
       "arguments": {}
     }
   }

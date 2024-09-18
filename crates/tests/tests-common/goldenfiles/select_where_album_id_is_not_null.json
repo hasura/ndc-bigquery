@@ -1,5 +1,5 @@
 {
-  "collection": "Album",
+  "collection": "albums",
   "query": {
     "fields": {
       "Title": {
@@ -9,7 +9,7 @@
       }
     },
     "limit": 5,
-    "offset": 100,
+    "offset": 1,
     "where": {
       "type": "not",
       "expression": {
@@ -21,6 +21,18 @@
           "path": []
         }
       }
+    },
+    "order_by": {
+      "elements": [
+        {
+          "order_direction": "asc",
+          "target": {
+            "type": "column",
+            "name": "AlbumId",
+            "path": []
+          }
+        }
+      ]
     }
   },
   "arguments": {},

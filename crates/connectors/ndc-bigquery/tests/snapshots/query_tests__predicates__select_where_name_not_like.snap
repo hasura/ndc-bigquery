@@ -6,20 +6,20 @@ expression: result
   {
     "rows": [
       {
-        "AlbumId": 3,
-        "Title": "Permanent Vacation"
-      },
-      {
-        "AlbumId": 5,
-        "Title": "Facelift"
-      },
-      {
         "AlbumId": 2,
         "Title": "Balls to the Wall"
       },
       {
+        "AlbumId": 3,
+        "Title": "Permanent Vacation"
+      },
+      {
         "AlbumId": 4,
         "Title": "Jagged Little Pill"
+      },
+      {
+        "AlbumId": 5,
+        "Title": "Facelift"
       }
     ]
   }

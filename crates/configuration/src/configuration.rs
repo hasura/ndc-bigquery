@@ -19,6 +19,8 @@ use crate::values::PoolSettings;
 pub struct Configuration {
     pub metadata: metadata::Metadata,
     pub pool_settings: PoolSettings,
-    pub connection_uri: String,
+    pub service_key: String,
+    pub project_id: String,
+    pub dataset_id: String,
     // pub mutations_version: Option<metadata::mutations::MutationsVersion>,
 }

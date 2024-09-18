@@ -249,11 +249,11 @@ impl<Env: Environment + Send + Sync> ConnectorSetup for BigQuerySetup<Env> {
     /// connector-specific metrics with the metrics registry.
     async fn try_init_state(
         &self,
-        _configuration: &<Self::Connector as Connector>::Configuration,
+        configuration: &<Self::Connector as Connector>::Configuration,
         metrics: &mut prometheus::Registry,
     ) -> Result<<Self::Connector as Connector>::State> {
         state::create_state(
-            // &configuration.connection_uri,
+            configuration,
             // &configuration.pool_settings,
             metrics,
             // configuration.configuration_version_tag,

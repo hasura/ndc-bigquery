@@ -6,7 +6,7 @@ use std::collections::BTreeMap;
 use super::version1::ParsedConfiguration;
 use crate::environment::Environment;
 use crate::error::MakeRuntimeConfigurationError;
-use crate::values::{Secret, ServiceKey};
+use crate::values::{DatasetId, ProjectId, Secret, ServiceKey};
 use query_engine_metadata::{self, metadata};
 // use crate::VersionTag;
 
@@ -16,9 +16,32 @@ pub fn make_runtime_configuration(
     parsed_config: ParsedConfiguration,
     environment: impl Environment,
 ) -> Result<crate::Configuration, MakeRuntimeConfigurationError> {
-    let connection_uri = match parsed_config.connection_settings.service_key {
-        ServiceKey(Secret::Plain(uri)) => Ok(uri),
+    let service_key = match parsed_config.connection_settings.service_key {
+        ServiceKey(Secret::Plain(key)) => Ok(key),
         ServiceKey(Secret::FromEnvironment { variable }) => {
+            environment.read(&variable).map_err(|error| {
+                MakeRuntimeConfigurationError::MissingEnvironmentVariable {
+                    file_path: super::version1::CONFIGURATION_FILENAME.into(),
+                    message: error.to_string(),
+                }
+            })
+        }
+    }?;
+    // dbg!("make_runtime_configuration", &service_key);
+    let project_id = match parsed_config.connection_settings.project_id {
+        ProjectId(Secret::Plain(key)) => Ok(key),
+        ProjectId(Secret::FromEnvironment { variable }) => {
+            environment.read(&variable).map_err(|error| {
+                MakeRuntimeConfigurationError::MissingEnvironmentVariable {
+                    file_path: super::version1::CONFIGURATION_FILENAME.into(),
+                    message: error.to_string(),
+                }
+            })
+        }
+    }?;
+    let dataset_id = match parsed_config.connection_settings.dataset_id {
+        DatasetId(Secret::Plain(key)) => Ok(key),
+        DatasetId(Secret::FromEnvironment { variable }) => {
             environment.read(&variable).map_err(|error| {
                 MakeRuntimeConfigurationError::MissingEnvironmentVariable {
                     file_path: super::version1::CONFIGURATION_FILENAME.into(),
@@ -30,7 +53,9 @@ pub fn make_runtime_configuration(
     Ok(crate::Configuration {
         metadata: convert_metadata(parsed_config.metadata),
         pool_settings: parsed_config.pool_settings,
-        connection_uri,
+        service_key,
+        project_id,
+        dataset_id,
         // mutations_version: convert_mutations_version(parsed_config.mutations_version),
     })
 }
