@@ -36,8 +36,8 @@ WITH column_data AS (
         ) AS type,
       CASE WHEN c.is_nullable = 'YES' THEN 'nullable' ELSE 'nonNullable' END AS nullable
     )) AS column_info
-  FROM hasura_database_name.INFORMATION_SCHEMA.TABLES AS t
-  JOIN hasura_database_name.INFORMATION_SCHEMA.COLUMNS AS c
+  FROM HASURA_DATABASE_NAME_PLACEHOLDER.INFORMATION_SCHEMA.TABLES AS t
+  JOIN HASURA_DATABASE_NAME_PLACEHOLDER.INFORMATION_SCHEMA.COLUMNS AS c
     ON c.table_catalog = t.table_catalog
     AND c.table_schema = t.table_schema
     AND c.table_name = t.table_name
@@ -67,16 +67,16 @@ relationship_data AS (
         rc.table_name AS foreign_table,
         json_object(fc.column_name, rc.column_name) as column_mapping
     )) AS relationship_info
-  FROM hasura_database_name.INFORMATION_SCHEMA.TABLES AS t
-  JOIN hasura_database_name.INFORMATION_SCHEMA.TABLE_CONSTRAINTS as c
+  FROM HASURA_DATABASE_NAME_PLACEHOLDER.INFORMATION_SCHEMA.TABLES AS t
+  JOIN HASURA_DATABASE_NAME_PLACEHOLDER.INFORMATION_SCHEMA.TABLE_CONSTRAINTS as c
     ON c.table_catalog = t.table_catalog
     AND c.table_schema = t.table_schema
     AND c.table_name = t.table_name
-  JOIN hasura_database_name.INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE as rc
+  JOIN HASURA_DATABASE_NAME_PLACEHOLDER.INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE as rc
     ON c.constraint_catalog = rc.constraint_catalog
     AND c.constraint_schema = rc.constraint_schema
     AND c.constraint_name = rc.constraint_name
-  JOIN hasura_database_name.INFORMATION_SCHEMA.KEY_COLUMN_USAGE as fc ON c.constraint_name = fc.constraint_name
+  JOIN HASURA_DATABASE_NAME_PLACEHOLDER.INFORMATION_SCHEMA.KEY_COLUMN_USAGE as fc ON c.constraint_name = fc.constraint_name
   WHERE t.table_schema = 'chinook_sample' AND c.constraint_type = 'FOREIGN KEY'
   GROUP BY t.table_name, table_catalog, table_schema, constraint_name, rc.table_name, fc.column_name, rc.column_name
 ),
@@ -101,12 +101,12 @@ unique_constraint_data AS (
     t.table_schema,
     c.constraint_name,
     TO_JSON_STRING(JSON_ARRAY(cc.column_name)) AS unique_constraint_info
-  FROM hasura_database_name.INFORMATION_SCHEMA.TABLES AS t
-  JOIN hasura_database_name.INFORMATION_SCHEMA.TABLE_CONSTRAINTS as c
+  FROM HASURA_DATABASE_NAME_PLACEHOLDER.INFORMATION_SCHEMA.TABLES AS t
+  JOIN HASURA_DATABASE_NAME_PLACEHOLDER.INFORMATION_SCHEMA.TABLE_CONSTRAINTS as c
     ON c.table_catalog = t.table_catalog
     AND c.table_schema = t.table_schema
     AND c.table_name = t.table_name
-  JOIN hasura_database_name.INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE as cc
+  JOIN HASURA_DATABASE_NAME_PLACEHOLDER.INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE as cc
     ON c.constraint_name = cc.constraint_name
   WHERE t.table_schema = 'chinook_sample' 
     AND c.constraint_type in ('PRIMARY KEY', 'UNIQUE')

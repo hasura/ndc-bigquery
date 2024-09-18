@@ -7,6 +7,8 @@ use crate::values::{DatasetId, PoolSettings, ProjectId, Secret, ServiceKey};
 
 use super::error::ParseConfigurationError;
 use gcp_bigquery_client::model::query_request::QueryRequest;
+use gcp_bigquery_client::model::table_cell::TableCell;
+use gcp_bigquery_client::model::table_row::TableRow;
 use ndc_models::{AggregateFunctionName, ComparisonOperatorName, ScalarTypeName, TypeName};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
@@ -122,33 +124,41 @@ pub async fn configure(
 
     // get scalar_types
 
-    let types_query = "select coalesce(data_type, '') as data_type from chinook_sample.INFORMATION_SCHEMA.COLUMN_FIELD_PATHS".to_string();
+    let types_query = format!(
+        "select coalesce(data_type, '') as data_type from {project_id}.{dataset_id}.INFORMATION_SCHEMA.COLUMN_FIELD_PATHS"
+    );
 
     let types_row = bigquery_client
         .job()
         .query(project_id, QueryRequest::new(types_query))
         .await
         .unwrap();
+    dbg!(&types_row);
 
     let types_query_response = types_row.query_response().clone();
+    let empty_tablerow = vec![TableRow::default()];
+    let empty_tablecell = &vec![TableCell::default()];
+    let empty_string_value = &serde_json::Value::String(String::new());
+
+    // let types_query = types_query_response.rows.unwrap_or_default();
 
     //TODO(PY): too many unwraps!
     let types = types_query_response
         .rows
         .as_ref()
-        .unwrap()
+        .unwrap_or_else(|| empty_tablerow.as_ref())
         .iter()
         .map(|row| TypeItem {
             name: serde_json::from_value(
                 row.columns
                     .as_ref()
-                    .unwrap()
+                    .unwrap_or(empty_tablecell)
                     .iter()
                     .next()
                     .unwrap()
                     .value
                     .as_ref()
-                    .unwrap()
+                    .unwrap_or(empty_string_value)
                     .to_owned(),
             )
             .unwrap(),
@@ -162,7 +172,7 @@ pub async fn configure(
     let config_query_string = CONFIGURATION_QUERY.to_string();
 
     let config_query_string_with_database_name: String =
-        config_query_string.replace("hasura_database_name", database_name.as_str()); //TODO(PY): what is a safe name to provide as a variable name?
+        config_query_string.replace("HASURA_DATABASE_NAME_PLACEHOLDER", database_name.as_str()); //TODO(PY): what is a safe name to provide as a variable name?
 
     let tables_query_request = QueryRequest::new(config_query_string_with_database_name);
 
