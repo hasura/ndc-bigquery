@@ -6,13 +6,6 @@ use std::path::PathBuf;
 
 /// Run a query against the server, get the result, and compare against the snapshot.
 pub async fn test_translation(testname: &str) -> anyhow::Result<String> {
-    // let tables = serde_json::from_str(
-    //     fs::read_to_string(format!("tests/goldenfiles/{}/tables.json", testname))
-    //         .unwrap()
-    //         .as_str(),
-    // )
-    // .unwrap();
-
     let directory = PathBuf::from("tests/goldenfiles").join(testname);
 
     let parsed_configuration = ndc_bigquery_configuration::parse_configuration(&directory).await?;
@@ -46,14 +39,12 @@ pub async fn test_translation(testname: &str) -> anyhow::Result<String> {
         .enumerate()
         .map(|(i, p)| (i + 1, p))
         .collect();
-    dbg!(&query);
 
     let pretty = sqlformat::format(
         &query.sql,
         &sqlformat::QueryParams::None,
         sqlformat::FormatOptions::default(),
     );
-    dbg!(&pretty);
 
     Ok(format!("{}\n\n{:?}", pretty, params))
 }

@@ -134,7 +134,6 @@ pub async fn configure(
         .query(project_id, QueryRequest::new(types_query))
         .await
         .unwrap();
-    // dbg!(&types_row);
 
     let types_query_response = types_row.query_response().clone();
     let empty_tablerow = vec![TableRow::default()];
@@ -187,7 +186,6 @@ pub async fn configure(
         .unwrap();
 
     let table_rows = tables_result.query_response().clone();
-    // dbg!(&table_rows);
 
     let mut tables_info = TablesInfo::empty();
 

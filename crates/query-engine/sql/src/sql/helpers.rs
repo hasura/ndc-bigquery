@@ -259,9 +259,6 @@ pub fn select_rowset(
     select_set: SelectSet,
     returns_field: &ReturnsFields,
 ) -> Select {
-    dbg!(output_table_alias);
-    dbg!(output_column_alias.clone());
-    dbg!(row_table_alias.clone());
     match select_set {
         SelectSet::Rows(row_select) => {
             let mut json_items = BTreeMap::new();
@@ -290,7 +287,6 @@ pub fn select_rowset(
             //  TableReference::AliasedTable(output_table_alias.clone()))),
 
             let mut final_select = simple_select(row);
-            dbg!(row_select.clone());
 
             match returns_field {
                 ReturnsFields::FieldsWereRequested => {
@@ -311,9 +307,6 @@ pub fn select_rowset(
                         (Expression::JsonBuildObject(BTreeMap::new())),
                     )];
                     let mut sel = simple_select(row1);
-                    dbg!("-------------------------------------------");
-                    dbg!(row_table_alias.to_aliased_string());
-                    dbg!("-------------------------------------------");
                     sel.from = Some(From::Select {
                         alias: row_inner_table_alias_.clone(),
                         select: Box::new(row_select),
@@ -322,7 +315,6 @@ pub fn select_rowset(
                         alias: row_inner_table_alias_,
                         select: Box::new(sel),
                     });
-                    dbg!(final_select.clone());
                 }
             };
             final_select
@@ -404,8 +396,6 @@ pub fn select_rowset(
                 select: Box::new(select_star2),
                 alias: aggregate_table_alias,
             })];
-
-            dbg!(final_select.clone());
 
             final_select
         }

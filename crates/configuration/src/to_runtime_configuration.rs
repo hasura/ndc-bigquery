@@ -27,7 +27,7 @@ pub fn make_runtime_configuration(
             })
         }
     }?;
-    // dbg!("make_runtime_configuration", &service_key);
+
     let project_id = match parsed_config.connection_settings.project_id {
         ProjectId(Secret::Plain(key)) => Ok(key),
         ProjectId(Secret::FromEnvironment { variable }) => {

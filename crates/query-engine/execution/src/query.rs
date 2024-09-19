@@ -62,7 +62,6 @@ pub async fn execute(
                     })
                     .collect(),
             );
-            dbg!(&query_request);
 
             // Query
             let mut rs = bigquery_client
@@ -72,27 +71,13 @@ pub async fn execute(
                 .unwrap();
 
             while rs.next_row() {
-                dbg!("result set of row: ", &rs);
                 let this_row = rs.get_string(0).unwrap().unwrap(); // we should only have one row called 'universe'
-                dbg!("this row: ", &this_row);
                 let row_value: Value = serde_json::from_str(&this_row).unwrap();
-                dbg!("row_value: ", &row_value);
                 let row_value_array = Value::Array(vec![row_value]);
-                dbg!("row_value_array: ", &row_value_array);
                 let final_row = to_string(&row_value_array).unwrap();
-                dbg!("final_row: ", &final_row);
                 let b: Bytes = Bytes::from(final_row);
-                dbg!("b: ", &b);
                 buffer.put(b);
-                // let this_row = rs.get_json_value(0).unwrap(); // we should only have one row called 'universe'
-                //                                                    // let json_value = serde_json::from_str(&this_row).unwrap();
-                // let json_string = serde_json::to_string(&this_row).unwrap();
-                // let b: Bytes = Bytes::from(json_string);
-                // buffer.put(b);
-                // inner_rows.push(json_value);
             }
-            // let b: Bytes = Bytes::from(serde_json::to_string(&inner_rows).unwrap());
-            // inner_rows
         }
         Some(_variable_sets) => {
             todo!("foreach/variables not implemented in query engine / execution")

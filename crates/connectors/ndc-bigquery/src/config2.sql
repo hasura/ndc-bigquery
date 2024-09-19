@@ -6,8 +6,9 @@ WITH column_data AS (
     c.column_name,
     TO_JSON_STRING(STRUCT(
       c.column_name AS name,
-      JSON_OBJECT('ScalarType', 
+      JSON_OBJECT('scalarType', 
         case LOWER(c.data_type)
+                  when 'bool' then 'boolean'
                   when 'boolean' then 'boolean'
                   when 'int16' then 'smallint'
                   when 'smallint' then 'smallint'
@@ -26,10 +27,14 @@ WITH column_data AS (
                   when 'json' then 'json'
                   when 'jsonb' then 'jsonb'
                   when 'date' then 'date'
-                  when 'time with time zone' then 'time with time zone'
-                  when 'time without time zone' then 'time without time zone'
-                  when 'timestamp with time zone' then 'timestamp with time zone'
-                  when 'timestamp without time zone' then 'timestamp without time zone'
+                  when 'timetz' then 'timetz'
+                  when 'time' then 'time'
+                  when 'timestamptz' then 'timestamptz'
+                  when 'timestamp' then 'timestamp'
+                  when 'time with time zone' then 'timetz'
+                  when 'time without time zone' then 'time'
+                  when 'timestamp with time zone' then 'timestamptz'
+                  when 'timestamp without time zone' then 'timestamp'
                   when 'uuid' then 'uuid'
                   else 'any'
                 end
