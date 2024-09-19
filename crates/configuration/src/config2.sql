@@ -6,7 +6,7 @@ WITH column_data AS (
     c.column_name,
     TO_JSON_STRING(STRUCT(
       c.column_name AS name,
-      JSON_OBJECT('ScalarType', 
+      JSON_OBJECT('scalarType', 
         case LOWER(c.data_type)
                   when 'bool' then 'boolean'
                   when 'boolean' then 'boolean'

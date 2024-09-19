@@ -51,6 +51,7 @@ const NOT_APPROX_COUNTABLE: [&str; 4] = ["image", "sql_variant", "ntext", "text"
 /// Initial configuration, just enough to connect to a database and elaborate a full
 /// 'Configuration'.
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
 pub struct ParsedConfiguration {
     // Which version of the configuration format are we using
     pub version: u32,
@@ -238,7 +239,7 @@ pub async fn configure(
 
 /// Parse the configuration format from a directory.
 pub async fn parse_configuration(
-    configuration_dir: impl AsRef<Path>,
+    configuration_dir: impl AsRef<Path> + Send,
 ) -> Result<ParsedConfiguration, ParseConfigurationError> {
     let configuration_file = configuration_dir.as_ref().join(CONFIGURATION_FILENAME);
 

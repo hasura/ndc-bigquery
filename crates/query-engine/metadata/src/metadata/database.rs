@@ -13,6 +13,7 @@ pub struct ScalarTypeTypeName(pub String);
 
 /// The type of values that a column, field, or argument may take.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
 pub enum Type {
     ScalarType(models::ScalarTypeName),
     CompositeType(models::TypeName),

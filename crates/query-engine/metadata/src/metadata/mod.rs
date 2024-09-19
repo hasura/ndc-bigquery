@@ -12,6 +12,7 @@ use serde::{Deserialize, Serialize};
 
 /// Metadata information.
 #[derive(Clone, PartialEq, Eq, Debug, Default, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
 pub struct Metadata {
     pub tables: TablesInfo,
     // pub composite_types: CompositeTypes,

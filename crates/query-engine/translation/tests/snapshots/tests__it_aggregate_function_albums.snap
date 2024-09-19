@@ -3,23 +3,18 @@ source: crates/query-engine/translation/tests/tests.rs
 expression: result
 ---
 SELECT
-  row_to_json("%1_universe") AS "universe"
+  JSON_OBJECT('aggregates', aggregates_6) AS universe
 FROM
   (
     SELECT
-      *
+      max(albums_2.ArtistId) AS max_artist_id
     FROM
       (
         SELECT
-          coalesce(row_to_json("%3_aggregates"), '[]') AS "aggregates"
+          albums_1.*
         FROM
-          (
-            SELECT
-              max("%0_Album"."ArtistId") AS "max_artist_id"
-            FROM
-              "public"."Album" AS "%0_Album"
-          ) AS "%3_aggregates"
-      ) AS "%3_aggregates"
-  ) AS "%1_universe"
+          test_project.test_dataset.albums AS albums_1
+      ) AS albums_2
+  ) AS aggregates_6
 
 []

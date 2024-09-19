@@ -3,7 +3,12 @@ source: crates/query-engine/translation/tests/tests.rs
 expression: result
 ---
 SELECT
-  row_to_json("%1_universe") AS "universe"
+  JSON_OBJECT(
+    'aggregates',
+    ARRAY_AGG(aggregates_6) [SAFE_OFFSET(0)],
+    'rows',
+    ARRAY_AGG(rows_4)
+  ) AS universe
 FROM
   (
     SELECT
@@ -11,28 +16,31 @@ FROM
     FROM
       (
         SELECT
-          coalesce(json_agg(row_to_json("%2_rows")), '[]') AS "rows"
+          albums_0.Title AS Title
+        FROM
+          test_project.test_dataset.albums AS albums_0
+        LIMIT
+          5 OFFSET 3
+      ) AS rows_inner_5
+  ) AS rows_4
+  CROSS JOIN (
+    SELECT
+      *
+    FROM
+      (
+        SELECT
+          COUNT(*) AS how_many_albums
         FROM
           (
             SELECT
-              "%0_Album"."Title" AS "Title"
+              albums_1.*
             FROM
-              "public"."Album" AS "%0_Album"
+              test_project.test_dataset.albums AS albums_1
             LIMIT
               5 OFFSET 3
-          ) AS "%2_rows"
-      ) AS "%2_rows"
-      CROSS JOIN (
-        SELECT
-          coalesce(row_to_json("%3_aggregates"), '[]') AS "aggregates"
-        FROM
-          (
-            SELECT
-              COUNT(*) AS "how_many_albums"
-            FROM
-              "public"."Album" AS "%0_Album"
-          ) AS "%3_aggregates"
-      ) AS "%3_aggregates"
-  ) AS "%1_universe"
+          ) AS albums_2
+      ) AS aggregates_6
+  ) AS aggregates_6
 
 []
+

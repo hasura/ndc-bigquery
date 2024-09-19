@@ -1,13 +1,7 @@
 {
   "collection": "albums",
   "query": {
-    "fields": {
-      "Title": {
-        "type": "column",
-        "column": "Title",
-        "arguments": {}
-      }
-    },
+    "fields": {},
     "limit": 5,
     "offset": 3
   },

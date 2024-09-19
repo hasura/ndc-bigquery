@@ -2240,6 +2240,7 @@ dependencies = [
  "indexmap 2.2.6",
  "insta",
  "multimap",
+ "ndc-bigquery-configuration",
  "ndc-models",
  "ndc-sdk",
  "query-engine-metadata",
@@ -2248,6 +2249,7 @@ dependencies = [
  "serde_json",
  "sqlformat",
  "thiserror",
+ "tokio",
  "tracing",
 ]
 

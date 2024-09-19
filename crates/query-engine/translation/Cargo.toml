@@ -9,6 +9,7 @@ ndc-models = { workspace = true }
 
 query-engine-metadata = { path = "../metadata" }
 query-engine-sql = { path = "../sql" }
+ndc-bigquery-configuration = { path = "../../../crates/configuration" }
 
 enum-iterator = { workspace = true }
 indexmap = { workspace = true }
@@ -18,6 +19,7 @@ serde_json = { workspace = true }
 thiserror = { workspace = true }
 tracing = { workspace = true }
 anyhow = { workspace = true }
+tokio = { workspace = true }
 
 [dev-dependencies]
 insta = { workspace = true, features = ["json"] }

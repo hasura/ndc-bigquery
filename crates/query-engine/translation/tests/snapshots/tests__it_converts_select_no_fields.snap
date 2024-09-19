@@ -7,18 +7,17 @@ SELECT
 FROM
   (
     SELECT
-      *
+      JSON_OBJECT() AS rows_2
     FROM
       (
         SELECT
-          albums_0.Title AS Title
+          1
         FROM
           test_project.test_dataset.albums AS albums_0
-        WHERE
-          NOT (albums_0.AlbumId IS NULL)
         LIMIT
-          5 OFFSET 100
+          5 OFFSET 3
       ) AS rows_inner_3
-  ) AS rows_2
+  ) AS rows_inner_3
 
 []
+
