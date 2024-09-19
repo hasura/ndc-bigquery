@@ -1,22 +1,19 @@
 {
-  description = "PostgreSQL data connector";
+  description = "BiiQuery data connector";
 
   inputs = {
-    nixpkgs.url = github:NixOS/nixpkgs/nixos-unstable;
-    flake-utils.url = github:numtide/flake-utils;
+    nixpkgs.url = "github:NixOS/nixpkgs?branch=nixos-unstable";
+    flake-utils.url = "github:numtide/flake-utils";
 
     crane = {
       url = "github:ipetkov/crane";
       inputs.nixpkgs.follows = "nixpkgs";
-      inputs.rust-overlay.follows = "rust-overlay";
-      inputs.flake-utils.follows = "flake-utils";
     };
 
     rust-overlay = {
       url = "github:oxalica/rust-overlay";
       inputs = {
         nixpkgs.follows = "nixpkgs";
-        flake-utils.follows = "flake-utils";
       };
     };
   };
@@ -29,79 +26,46 @@
           overlays = [ rust-overlay.overlays.default ];
         };
 
-        # Edit ./nix/ndc-agent.nix to adjust library and buildtime
-        # dependencies or other build configuration for postgres-agent
-        crateExpression = import ./nix/ndc-agent.nix;
-
-        # cockroachExpression = import ./nix/cockroach-agent.nix;
-        cargoBuild = import ./nix/cargo-build.nix;
-
-        # create binaries for a given NDC
-        make-binaries = (binary-name: {
-          inherit binary-name;
-          # a binary for whichever is the local computer
-          local-system = cargoBuild {
-            inherit binary-name crateExpression nixpkgs crane rust-overlay localSystem;
-          };
-          # cross compiler an x86_64 linux binary
-          x86_64-linux = cargoBuild {
-            inherit binary-name crateExpression nixpkgs crane rust-overlay localSystem;
-            crossSystem = "x86_64-linux";
-          };
-          # cross compile a aarch64 linux binary
-          aarch64-linux = cargoBuild {
-            inherit binary-name crateExpression nixpkgs crane rust-overlay localSystem;
-            crossSystem = "aarch64-linux";
-          };
-        });
-
-        # given the binaries, return the flake targets that build Docker etc
-        make-packages =
-          (ndc-binaries:
-            let name = ndc-binaries.binary-name; in {
-              # binary compiled on local system
-              "${name}" = ndc-binaries.local-system;
-              # binary compiled for x86_64-linux
-              "${name}-x86_64-linux" = ndc-binaries.x86_64-linux;
-              # binary compiled for aarch64-linux
-              "${name}-aarch64-linux" = ndc-binaries.aarch64-linux;
-              # docker for local system
-              "${name}-docker" = pkgs.callPackage ./nix/docker.nix {
-                ndc-agent = ndc-binaries.local-system;
-                binary-name = name;
-                image-name = "ghcr.io/hasura/${name}";
-                tag = "dev";
-              };
-              # docker for x86_64-linux
-              "${name}-docker-x86_64-linux" = pkgs.callPackage ./nix/docker.nix {
-                ndc-agent = ndc-binaries.x86_64-linux;
-                architecture = "amd64";
-                binary-name = name;
-                image-name = "ghcr.io/hasura/${name}-x86_64";
-              };
-              # docker for aarch64-linux
-              "${name}-docker-aarch64-linux" = pkgs.callPackage ./nix/docker.nix {
-                ndc-agent = ndc-binaries.aarch64-linux;
-                architecture = "arm64";
-                binary-name = name;
-                image-name = "ghcr.io/hasura/${name}-aarch64";
-              };
-            });
-
-        postgres-binaries = make-binaries "ndc-postgres";
-        cockroach-binaries = make-binaries "ndc-cockroach";
-        citus-binaries = make-binaries "ndc-citus";
-
-        inherit (postgres-binaries.local-system) cargoArtifacts rustToolchain craneLib buildArgs;
-
+        rust = import ./nix/rust.nix {
+          inherit nixpkgs rust-overlay crane localSystem;
+        };
       in
       {
-        packages = builtins.foldl' (x: y: x // y) { } [
-          (make-packages postgres-binaries)
-          (make-packages cockroach-binaries)
-          (make-packages citus-binaries)
-        ] // {
-          default = postgres-binaries.local-system;
+        packages = {
+          # a binary for whichever is the local computer
+          default = rust.callPackage ./nix/app.nix { };
+
+          # cross compiler an x86_64 linux binary
+          x86_64-linux = (import ./nix/rust.nix {
+            inherit nixpkgs rust-overlay crane localSystem;
+            crossSystem = "x86_64-linux";
+          }).callPackage ./nix/app.nix
+            { };
+          # cross compile a aarch64 linux binary
+          aarch64-linux = (import ./nix/rust.nix {
+            inherit nixpkgs rust-overlay crane localSystem;
+            crossSystem = "aarch64-linux";
+          }).callPackage ./nix/app.nix
+            { };
+
+          # docker for local system
+          docker = pkgs.callPackage ./nix/docker.nix {
+            package = self.packages.${localSystem}.default;
+            image-name = "ghcr.io/hasura/ndc-bigquery";
+            tag = "dev";
+          };
+          # docker for x86_64-linux
+          docker-x86_64-linux = pkgs.callPackage ./nix/docker.nix {
+            package = self.packages.${localSystem}.x86_64-linux;
+            architecture = "amd64";
+            image-name = "ghcr.io/hasura/ndc-bigquery-x86_64";
+          };
+          # docker for aarch64-linux
+          docker-aarch64-linux = pkgs.callPackage ./nix/docker.nix {
+            package = self.packages.${localSystem}.aarch64-linux;
+            architecture = "arm64";
+            image-name = "ghcr.io/hasura/ndc-bigquery-aarch64";
+          };
 
           publish-docker-image = pkgs.writeShellApplication {
             name = "publish-docker-image";
@@ -110,35 +74,75 @@
           };
         };
 
+        apps = {
+          default = self.apps.${localSystem}.connector;
+
+          connector = {
+            type = "app";
+            program = "${self.packages.${localSystem}.default}/bin/ndc-bigquery";
+          };
+
+          cli = {
+            type = "app";
+            program = "${self.packages.${localSystem}.default}/bin/ndc-bigquery-cli";
+          };
+        };
+
         checks = {
           # Build the crate as part of `nix flake check`
-          ndc-postgres = postgres-binaries.local-system;
+          ndc-bigquery = self.packages.${localSystem}.default;
         };
 
         formatter = pkgs.nixpkgs-fmt;
 
-        devShells.default = pkgs.mkShell {
-          inputsFrom = builtins.attrValues self.checks.${localSystem};
-          nativeBuildInputs = [
-            # runtime
-            pkgs.protobuf
+        devShells = {
+          default = pkgs.mkShell {
+            # include dependencies of the default package
+            inputsFrom = [ self.packages.${localSystem}.default ];
 
-            # development
-            pkgs.cargo-edit
-            pkgs.cargo-flamegraph
-            pkgs.cargo-insta
-            pkgs.cargo-machete
-            pkgs.cargo-watch
-            pkgs.just
-            pkgs.k6
-            pkgs.nixpkgs-fmt
-            pkgs.nodePackages.prettier
-            pkgs.pkg-config
-            pkgs.rnix-lsp
-            pkgs.skopeo
-            pkgs.nodePackages.prettier
-            rustToolchain
-          ];
+            # build-time inputs
+            nativeBuildInputs = [
+              # Development
+              pkgs.just
+              pkgs.nixpkgs-fmt
+              pkgs.nodePackages.prettier
+              pkgs.moreutils
+
+              # Rust
+              pkgs.bacon
+              pkgs.cargo-audit
+              pkgs.cargo-edit
+              pkgs.cargo-expand
+              pkgs.cargo-flamegraph
+              pkgs.cargo-insta
+              pkgs.cargo-machete
+              pkgs.cargo-nextest
+              pkgs.cargo-watch
+              rust.rustToolchain
+
+              # Benchmarks
+              pkgs.k6
+
+              # Deployment
+              pkgs.skopeo
+            ];
+          };
+        } // pkgs.lib.attrsets.optionalAttrs pkgs.hostPlatform.isLinux {
+          # This performance-testing shell will only work on Linux.
+          perf = pkgs.mkShell {
+            inputsFrom = [
+              self.devShells.${localSystem}.default
+            ];
+
+            # build-time inputs
+            nativeBuildInputs = [
+              pkgs.heaptrack
+              pkgs.linuxPackages_latest.perf
+              pkgs.mold-wrapped
+              pkgs.valgrind
+            ];
+          };
         };
-      });
+      }
+    );
 }

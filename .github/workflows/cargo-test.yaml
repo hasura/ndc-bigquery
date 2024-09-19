@@ -59,13 +59,13 @@ jobs:
         with:
           shared-key: "build" # share the cache across jobs
 
-      - uses: hoverkraft-tech/compose-action@v1.5.1
-        with:
-          compose-file: "./docker-compose.yaml"
-          up-flags: "--pull=always --wait"
-          down-flags: "--volumes"
-          services: |
-            bigquery
+      # - uses: hoverkraft-tech/compose-action@v1.5.1
+      #   with:
+      #     compose-file: "./docker-compose.yaml"
+      #     up-flags: "--pull=always --wait"
+      #     down-flags: "--volumes"
+      #     services: |
+      #       bigquery
 
       - name: run tests
         run: |
