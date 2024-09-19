@@ -1,6 +1,6 @@
 on: [push]
 
-name: Postgres NDC component benchmarks
+name: BigQuery NDC component benchmarks
 
 permissions:
   contents: write
