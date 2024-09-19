@@ -250,7 +250,7 @@ pub fn select_rowset_without_variables(
 /// Given a set of rows, a set of aggregate queries and a variables from clause & table reference,
 /// combine them into one Select.
 pub fn select_rowset(
-    (output_table_alias, output_column_alias): (TableAlias, ColumnAlias),
+    (_output_table_alias, output_column_alias): (TableAlias, ColumnAlias),
     (row_table_alias, row_inner_table_alias_): (TableAlias, TableAlias),
     (aggregate_table_alias, _aggregate_inner_table_alias): (TableAlias, TableAlias),
     _variables: &Option<(From, TableReference)>,
