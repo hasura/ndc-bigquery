@@ -8,6 +8,7 @@ WITH column_data AS (
       c.column_name AS name,
       JSON_OBJECT('ScalarType', 
         case LOWER(c.data_type)
+                  when 'bool' then 'boolean'
                   when 'boolean' then 'boolean'
                   when 'int16' then 'smallint'
                   when 'smallint' then 'smallint'
@@ -26,10 +27,14 @@ WITH column_data AS (
                   when 'json' then 'json'
                   when 'jsonb' then 'jsonb'
                   when 'date' then 'date'
-                  when 'time with time zone' then 'time with time zone'
-                  when 'time without time zone' then 'time without time zone'
-                  when 'timestamp with time zone' then 'timestamp with time zone'
-                  when 'timestamp without time zone' then 'timestamp without time zone'
+                  when 'timetz' then 'timetz'
+                  when 'time' then 'time'
+                  when 'timestamptz' then 'timestamptz'
+                  when 'timestamp' then 'timestamp'
+                  when 'time with time zone' then 'timetz'
+                  when 'time without time zone' then 'time'
+                  when 'timestamp with time zone' then 'timestamptz'
+                  when 'timestamp without time zone' then 'timestamp'
                   when 'uuid' then 'uuid'
                   else 'any'
                 end
@@ -41,7 +46,7 @@ WITH column_data AS (
     ON c.table_catalog = t.table_catalog
     AND c.table_schema = t.table_schema
     AND c.table_name = t.table_name
-  WHERE t.table_schema = 'chinook_sample'
+  WHERE t.table_schema = 'HASURA_DATABASE_SCHEMA_PLACEHOLDER'
 ),
 columns_struct AS (
   SELECT
@@ -77,7 +82,7 @@ relationship_data AS (
     AND c.constraint_schema = rc.constraint_schema
     AND c.constraint_name = rc.constraint_name
   JOIN HASURA_DATABASE_NAME_PLACEHOLDER.INFORMATION_SCHEMA.KEY_COLUMN_USAGE as fc ON c.constraint_name = fc.constraint_name
-  WHERE t.table_schema = 'chinook_sample' AND c.constraint_type = 'FOREIGN KEY'
+  WHERE t.table_schema = 'HASURA_DATABASE_SCHEMA_PLACEHOLDER' AND c.constraint_type = 'FOREIGN KEY'
   GROUP BY t.table_name, table_catalog, table_schema, constraint_name, rc.table_name, fc.column_name, rc.column_name
 ),
 relationship_struct AS (
@@ -108,7 +113,7 @@ unique_constraint_data AS (
     AND c.table_name = t.table_name
   JOIN HASURA_DATABASE_NAME_PLACEHOLDER.INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE as cc
     ON c.constraint_name = cc.constraint_name
-  WHERE t.table_schema = 'chinook_sample' 
+  WHERE t.table_schema = 'HASURA_DATABASE_SCHEMA_PLACEHOLDER' 
     AND c.constraint_type in ('PRIMARY KEY', 'UNIQUE')
     AND cc.constraint_catalog = c.constraint_catalog
     AND cc.constraint_schema = c.constraint_schema

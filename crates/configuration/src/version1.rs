@@ -133,7 +133,7 @@ pub async fn configure(
         .query(project_id, QueryRequest::new(types_query))
         .await
         .unwrap();
-    dbg!(&types_row);
+    // dbg!(&types_row);
 
     let types_query_response = types_row.query_response().clone();
     let empty_tablerow = vec![TableRow::default()];
@@ -174,7 +174,10 @@ pub async fn configure(
     let config_query_string_with_database_name: String =
         config_query_string.replace("HASURA_DATABASE_NAME_PLACEHOLDER", database_name.as_str()); //TODO(PY): what is a safe name to provide as a variable name?
 
-    let tables_query_request = QueryRequest::new(config_query_string_with_database_name);
+    let config_query_with_schema_name = config_query_string_with_database_name
+        .replace("HASURA_DATABASE_SCHEMA_PLACEHOLDER", dataset_id);
+
+    let tables_query_request = QueryRequest::new(config_query_with_schema_name);
 
     let tables_result = bigquery_client
         .job()
@@ -183,6 +186,7 @@ pub async fn configure(
         .unwrap();
 
     let table_rows = tables_result.query_response().clone();
+    // dbg!(&table_rows);
 
     let mut tables_info = TablesInfo::empty();
 
@@ -384,7 +388,7 @@ fn get_scalar_types(type_names: &Vec<TypeItem>, schema_name: String) -> database
 
     for type_item in type_names {
         let type_name = match type_item.name.as_str().to_lowercase().as_str() {
-            "boolean" => "boolean",
+            "bool" | "boolean" => "boolean",
             "int16" | "smallint" => "smallint",
             "int" | "int32" | "integer" => "integer",
             "int64" | "bigint" => "bigint",
@@ -398,10 +402,10 @@ fn get_scalar_types(type_names: &Vec<TypeItem>, schema_name: String) -> database
             "json" => "json",
             "jsonb" => "jsonb",
             "date" => "date",
-            "time with time zone" => "time with time zone",
-            "time without time zone" => "time without time zone",
-            "timestamp with time zone" => "timestamp with time zone",
-            "timestamp without time zone" => "timestamp without time zone",
+            "timetz" | "time with time zone" => "timetz",
+            "time" | "time without time zone" => "time",
+            "timestamptz" | "timestamp with time zone" => "timestamptz",
+            "timestamp" | "timestamp without time zone" => "timestamp",
             "uuid" => "uuid",
             _ => "any",
         };
