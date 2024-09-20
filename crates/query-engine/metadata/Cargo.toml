@@ -2,8 +2,16 @@
 name = "query-engine-metadata"
 version.workspace = true
 edition.workspace = true
+license.workspace = true
+
+[lints]
+workspace = true
 
 [dependencies]
-enum-iterator = "1.4.1"
-schemars = { version = "0.8.15", features = ["smol_str"] }
-serde = { version = "1.0.188", features = ["derive"] }
+
+ndc-models = { workspace = true }
+smol_str = { workspace = true }
+enum-iterator = { workspace = true }
+schemars = { workspace = true, features = ["smol_str"] }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }

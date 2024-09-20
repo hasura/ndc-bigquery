@@ -1,0 +1,31 @@
+[package]
+name = "ndc-bigquery-configuration"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+ndc-models = { workspace = true }
+query-engine-metadata = { path = "../query-engine/metadata" }
+query-engine-sql = { path = "../query-engine/sql" }
+
+anyhow = { workspace = true }
+# We only use clap for the derive.
+clap = { workspace = true, features = ["derive", "env"] }
+prometheus = {workspace = true }
+schemars = { workspace = true, features = ["smol_str", "preserve_order"] }
+serde = { workspace = true }
+serde_json = { workspace = true, features = ["raw_value"] }
+smol_str = { workspace = true }
+sqlx = { workspace = true, features = ["json", "postgres", "runtime-tokio-rustls"] }
+thiserror = { workspace = true }
+tokio = { workspace = true, features = ["full"] }
+tracing = { workspace = true }
+yup-oauth2 = { workspace = true }
+gcp-bigquery-client = { workspace = true }
+
+[dev-dependencies]
+jsonschema = { workspace = true }

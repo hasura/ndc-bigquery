@@ -1,0 +1,24 @@
+---
+source: crates/ndc-postgres/tests/query_tests.rs
+expression: result
+---
+[
+  {
+    "aggregates": {
+      "avg_artist_id": 4.5,
+      "how_many_albums": 2,
+      "how_many_artist_ids": 2,
+      "how_many_distinct_artist_ids": 2,
+      "max_artist_id": 5,
+      "min_artist_id": 4
+    },
+    "rows": [
+      {
+        "Title": "Jagged Little Pill"
+      },
+      {
+        "Title": "Facelift"
+      }
+    ]
+  }
+]

@@ -1,0 +1,148 @@
+{
+  "version": 1,
+  "connectionSettings": {
+    "serviceKey": {
+      "variable": "HASURA_BIGQUERY_SERVICE_KEY"
+    },
+    "projectId": {
+      "variable": "HASURA_BIGQUERY_PROJECT_ID"
+    },
+    "datasetId": {
+      "variable": "HASURA_BIGQUERY_DATASET_ID"
+    }
+  },
+  "metadata": {
+    "tables": {
+      "types": {
+        "schemaName": "test_project.test_dataset",
+        "tableName": "types",
+        "columns": {
+          "date": {
+            "name": "date",
+            "type": {
+              "scalarType": "date"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "time": {
+            "name": "time",
+            "type": {
+              "scalarType": "time"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "timestamp": {
+            "name": "timestamp",
+            "type": {
+              "scalarType": "timestamp"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "timestamptz": {
+            "name": "timestamptz",
+            "type": {
+              "scalarType": "timestamptz"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "timetz": {
+            "name": "timetz",
+            "type": {
+              "scalarType": "timetz"
+            },
+            "nullable": "nullable",
+            "description": null
+          }
+        },
+        "uniquenessConstraints": {},
+        "foreignRelations": {},
+        "description": null
+      }
+    },
+    "scalarTypes": {
+      "date": {
+        "typeName": "date",
+        "schemaName": "test_project.test_dataset",
+        "description": null,
+        "aggregateFunctions": {},
+        "comparisonOperators": {
+          "_eq": {
+            "operatorName": "=",
+            "operatorKind": "equal",
+            "argumentType": "date",
+            "isInfix": true
+          }
+        },
+        "typeRepresentation": null
+      },
+      "time": {
+        "typeName": "time",
+        "schemaName": "test_project.test_dataset",
+        "description": null,
+        "aggregateFunctions": {},
+        "comparisonOperators": {
+          "_eq": {
+            "operatorName": "=",
+            "operatorKind": "equal",
+            "argumentType": "time",
+            "isInfix": true
+          }
+        },
+        "typeRepresentation": null
+      },
+      "timestamp": {
+        "typeName": "timestamp",
+        "schemaName": "test_project.test_dataset",
+        "description": null,
+        "aggregateFunctions": {},
+        "comparisonOperators": {
+          "_eq": {
+            "operatorName": "=",
+            "operatorKind": "equal",
+            "argumentType": "timestamp",
+            "isInfix": true
+          }
+        },
+        "typeRepresentation": null
+      },
+      "timestamptz": {
+        "typeName": "timestamptz",
+        "schemaName": "test_project.test_dataset",
+        "description": null,
+        "aggregateFunctions": {},
+        "comparisonOperators": {
+          "_eq": {
+            "operatorName": "=",
+            "operatorKind": "equal",
+            "argumentType": "timestamptz",
+            "isInfix": true
+          }
+        },
+        "typeRepresentation": null
+      },
+      "timetz": {
+        "typeName": "timetz",
+        "schemaName": "test_project.test_dataset",
+        "description": null,
+        "aggregateFunctions": {},
+        "comparisonOperators": {
+          "_eq": {
+            "operatorName": "=",
+            "operatorKind": "equal",
+            "argumentType": "timetz",
+            "isInfix": true
+          }
+        },
+        "typeRepresentation": null
+      }
+    },
+    "nativeOperations": {
+      "queries": {},
+      "mutations": {}
+    }
+  }
+}

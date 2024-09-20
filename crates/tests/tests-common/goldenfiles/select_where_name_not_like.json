@@ -1,5 +1,5 @@
 {
-  "collection": "Album",
+  "collection": "albums",
   "query": {
     "limit": 5,
     "fields": {
@@ -14,7 +14,7 @@
         "arguments": {}
       }
     },
-    "where": {
+    "predicate": {
       "type": "not",
       "expression": {
         "type": "binary_comparison_operator",
@@ -23,15 +23,24 @@
           "name": "Title",
           "path": []
         },
-        "operator": {
-          "type": "other",
-          "name": "_like"
-        },
+        "operator": "_like",
         "value": {
           "type": "scalar",
           "value": "%Rock%"
         }
       }
+    },
+    "order_by": {
+      "elements": [
+        {
+          "order_direction": "asc",
+          "target": {
+            "type": "column",
+            "name": "AlbumId",
+            "path": []
+          }
+        }
+      ]
     }
   },
   "arguments": {},

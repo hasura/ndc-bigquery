@@ -1,21 +1,21 @@
 {
-  "collection": "Album",
+  "collection": "albums",
   "query": {
     "fields": {
-      "title": {
+      "Title": {
         "type": "column",
         "column": "Title",
         "arguments": {}
       }
     },
-    "where": {
+    "predicate": {
       "type": "exists",
       "in_collection": {
         "type": "unrelated",
         "arguments": {},
-        "collection": "Artist"
+        "collection": "artists"
       },
-      "where": {
+      "predicate": {
         "type": "and",
         "expressions": [
           {
@@ -25,12 +25,10 @@
               "name": "Name",
               "path": []
             },
-            "operator": {
-              "type": "equal"
-            },
+            "operator": "_eq",
             "value": {
               "type": "scalar",
-              "value": "Gilberto Gil"
+              "value": "Aerosmith"
             }
           },
           {
@@ -39,9 +37,7 @@
               "type": "root_collection_column",
               "name": "ArtistId"
             },
-            "operator": {
-              "type": "equal"
-            },
+            "operator": "_eq",
             "value": {
               "type": "column",
               "column": {
@@ -53,6 +49,18 @@
           }
         ]
       }
+    },
+    "order_by": {
+      "elements": [
+        {
+          "order_direction": "asc",
+          "target": {
+            "type": "column",
+            "name": "AlbumId",
+            "path": []
+          }
+        }
+      ]
     }
   },
   "arguments": {},

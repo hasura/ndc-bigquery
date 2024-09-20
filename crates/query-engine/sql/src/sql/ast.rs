@@ -25,7 +25,11 @@ pub struct CommonTableExpression {
 /// The 'body' side of a Common Table Expression
 #[derive(Debug, Clone, PartialEq)]
 pub enum CTExpr {
+    Select(Select),
     RawSql(Vec<RawSql>),
+    // Delete(Delete),
+    // Insert(Insert),
+    // Update(Update),
 }
 
 /// Raw SQL written by a user which is opaque to us
@@ -50,11 +54,61 @@ pub struct Select {
     pub limit: Limit,
 }
 
+/// An INSERT clause
+#[derive(Debug, Clone, PartialEq)]
+pub struct Insert {
+    pub schema: SchemaName,
+    pub table: TableName,
+    pub columns: Option<Vec<ColumnName>>,
+    pub from: InsertFrom,
+    pub returning: Returning,
+}
+
+/// Source from which values would be inserted.
+#[derive(Debug, Clone, PartialEq)]
+pub enum InsertFrom {
+    Values(Vec<Vec<MutationValueExpression>>),
+    Select(Select),
+}
+
+/// An expression inside an INSERT VALUES clause or UPDATE SET clause.
+#[derive(Debug, Clone, PartialEq)]
+pub enum MutationValueExpression {
+    Default,
+    Expression(Expression),
+}
+
+/// A DELETE clause
+#[derive(Debug, Clone, PartialEq)]
+pub struct Delete {
+    pub from: From,
+    pub where_: Where,
+    pub returning: Returning,
+}
+
+/// An UPDATE clause
+#[derive(Debug, Clone, PartialEq)]
+pub struct Update {
+    pub schema: SchemaName,
+    pub table: TableName,
+    pub set: BTreeMap<ColumnName, MutationValueExpression>,
+    pub where_: Where,
+    pub returning: Returning,
+}
+
+/// a RETURNING clause
+#[derive(Debug, Clone, PartialEq)]
+pub struct Returning(pub SelectList);
+
 /// A select list
 #[derive(Debug, Clone, PartialEq)]
 pub enum SelectList {
     SelectList(Vec<(ColumnAlias, Expression)>),
     SelectStar,
+    SelectStarFrom(TableReference),
+    Select1,
+    SelectStarComposite(Expression),
+    SelectListComposite(Box<SelectList>, Box<SelectList>),
 }
 
 /// A FROM clause
@@ -70,6 +124,23 @@ pub enum From {
         select: Box<Select>,
         alias: TableAlias,
     },
+    /// Convert a json array of objects to a relation.
+    /// Should probably be of the form `jsonb_to_recordset(cast($1 as json))`
+    JsonbToRecordset {
+        expression: Expression,
+        alias: TableAlias,
+        columns: Vec<(ColumnAlias, ScalarType)>,
+    },
+    JsonbArrayElements {
+        expression: Expression,
+        alias: TableAlias,
+        column: ColumnAlias,
+    },
+    Unnest {
+        expression: Expression,
+        alias: TableAlias,
+        column: ColumnAlias,
+    },
 }
 
 /// A JOIN clause
@@ -81,6 +152,21 @@ pub enum Join {
     InnerJoin(InnerJoin),
     /// CROSS JOIN
     CrossJoin(CrossJoin),
+    /// FULL OUTER JOIN
+    FullOuterJoin(FullOuterJoin),
+}
+
+// todo(PY): lateral joins?
+impl Join {
+    /// Get the select expression and table alias regardless of the join type.
+    pub fn get_select_and_alias(self) -> (Box<Select>, TableAlias) {
+        match self {
+            Join::LeftOuterJoin(LeftOuterJoin { select, alias, .. })
+            | Join::InnerJoin(InnerJoin { select, alias })
+            | Join::CrossJoin(CrossJoin { select, alias })
+            | Join::FullOuterJoin(FullOuterJoin { select, alias }) => (select, alias),
+        }
+    }
 }
 
 /// A CROSS JOIN clause
@@ -101,6 +187,13 @@ pub struct LeftOuterJoin {
 /// An INNER JOIN clause
 #[derive(Debug, Clone, PartialEq)]
 pub struct InnerJoin {
+    pub select: Box<Select>,
+    pub alias: TableAlias,
+}
+
+/// A FULL OUTER JOIN LATERAL clause
+#[derive(Debug, Clone, PartialEq)]
+pub struct FullOuterJoin {
     pub select: Box<Select>,
     pub alias: TableAlias,
 }
@@ -179,12 +272,16 @@ pub enum Expression {
         args: Vec<Expression>,
     },
     /// An EXISTS clause
-    Exists { select: Box<Select> },
+    Exists {
+        select: Box<Select>,
+    },
     /// A json_build_object function call
-    JsonBuildObject(BTreeMap<String, Box<Expression>>),
+    JsonBuildObject(BTreeMap<String, Expression>),
     // SELECT queries can appear in a select list if they return
     // one row. For now we can only do this with 'row_to_json'.
     // Consider changing this if we encounter more ways.
+    /// A row_to_json function call
+    RowToJson(TableReference),
     /// A column reference
     ColumnReference(ColumnReference),
     /// A table reference
@@ -197,7 +294,30 @@ pub enum Expression {
     },
     /// A COUNT clause
     Count(CountType),
+    ArrayConstructor(Vec<Expression>),
+    CorrelatedSubSelect(Box<Select>),
+    NestedFieldSelect {
+        expression: Box<Expression>,
+        nested_field: NestedField,
+    },
+    JoinExpressions(Vec<Expression>),
+    SafeOffSet {
+        offset: i32,
+    },
+    // JsonQuery(Box<Expression>, JsonPath), // JSON_QUERY([album].[json], '$.title') for multiple
+    // // values
+    // JsonValue(Box<Expression>, JsonPath), // JSON_VALUE([album].[json], '$.title') for single values
 }
+
+// // JSON selector path for expressing '$.user.name'
+// #[derive(Debug, Clone, PartialEq, Eq)]
+// pub struct JsonPath {
+//     pub elements: Vec<ColumnAlias>,
+// }
+
+/// Represents the name of a field in a nested object.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct NestedField(pub String);
 
 /// An unary operator
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -205,30 +325,9 @@ pub enum UnaryOperator {
     IsNull,
 }
 
-// We are almost certainly missing operators:
-//   * we should consider at least the list in `Hasura.Backends.Postgres.Translate.BoolExp`
-//   * we have skipped column checks for now, ie, CEQ, CNE, CGT etc
-//   * we have skipped casts for now
-/// A Binary operator
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum BinaryOperator {
-    Equals,
-    NotEquals,
-    LessThan,
-    LessThanOrEqualTo,
-    GreaterThan,
-    GreaterThanOrEqualTo,
-    Like,
-    NotLike,
-    CaseInsensitiveLike,
-    NotCaseInsensitiveLike,
-    Similar,
-    NotSimilar,
-    Regex,
-    NotRegex,
-    CaseInsensitiveRegex,
-    NotCaseInsensitiveRegex,
-}
+/// Represents the name of a binary operator.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct BinaryOperator(pub String);
 
 /// A binary operator when the rhs is an array
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -241,8 +340,11 @@ pub enum BinaryArrayOperator {
 pub enum Function {
     Coalesce,
     JsonAgg,
+    JsonbPopulateRecord,
     ArrayAgg,
+    Unnest,
     Unknown(String),
+    SafeOffSet(String),
 }
 
 /// COUNT clause
@@ -263,13 +365,30 @@ pub enum Value {
     String(String),
     Null,
     Array(Vec<Value>),
+    JsonValue(serde_json::Value),
     EmptyJsonArray,
     Variable(String),
 }
 
 /// Scalar type
 #[derive(Debug, Clone, PartialEq)]
-pub struct ScalarType(pub String);
+
+pub enum ScalarType {
+    BaseType(ScalarTypeName),
+    ArrayType(ScalarTypeName),
+}
+
+/// Scalar type name. This will always be output as a quoted identifier.
+#[derive(Debug, Clone, PartialEq)]
+pub enum ScalarTypeName {
+    /// A type name referencing a schema.
+    Qualified {
+        schema_name: SchemaName,
+        type_name: String,
+    },
+    /// A type name without a schema.
+    Unqualified(String),
+}
 
 /// A database schema name
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -323,4 +442,11 @@ pub struct TableAlias {
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ColumnAlias {
     pub name: String,
+}
+
+#[derive(Debug, Clone)]
+/// Whether this rows query returns fields or not.
+pub enum ReturnsFields {
+    FieldsWereRequested,
+    NoFieldsWereRequested,
 }

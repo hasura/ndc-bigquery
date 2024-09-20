@@ -1,0 +1,65 @@
+{
+  "version": 1,
+  "connectionSettings": {
+    "serviceKey": {
+      "variable": "HASURA_BIGQUERY_SERVICE_KEY"
+    },
+    "projectId": {
+      "variable": "HASURA_BIGQUERY_PROJECT_ID"
+    },
+    "datasetId": {
+      "variable": "HASURA_BIGQUERY_DATASET_ID"
+    }
+  },
+  "metadata": {
+    "tables": {
+      "albums": {
+        "schemaName": "test_project.test_dataset",
+        "tableName": "albums",
+        "columns": {
+          "AlbumId": {
+            "name": "AlbumId",
+            "type": {
+              "scalarType": "interger"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "Title": {
+            "name": "Title",
+            "type": {
+              "scalarType": "varchar"
+            },
+            "nullable": "nullable",
+            "description": null
+          }
+        },
+        "uniquenessConstraints": {},
+        "foreignRelations": {},
+        "description": null
+      }
+    },
+    "scalarTypes": {
+      "interger": {
+        "typeName": "interger",
+        "schemaName": "test_project.test_dataset",
+        "description": null,
+        "aggregateFunctions": {},
+        "comparisonOperators": {},
+        "typeRepresentation": null
+      },
+      "string": {
+        "typeName": "string",
+        "schemaName": "test_project.test_dataset",
+        "description": null,
+        "aggregateFunctions": {},
+        "comparisonOperators": {},
+        "typeRepresentation": null
+      }
+    },
+    "nativeOperations": {
+      "queries": {},
+      "mutations": {}
+    }
+  }
+}

@@ -3,7 +3,7 @@ source: crates/query-engine/translation/tests/tests.rs
 expression: result
 ---
 SELECT
-  JSON_OBJECT('rows', ARRAY_AGG(universe_1)) AS universe
+  JSON_OBJECT('rows', coalesce(ARRAY_AGG(rows_2), ARRAY [])) AS universe
 FROM
   (
     SELECT
@@ -11,12 +11,12 @@ FROM
     FROM
       (
         SELECT
-          Album_0.Title AS Title
+          albums_0.Title AS Title
         FROM
-          public.Album AS Album_0
+          test_project.test_dataset.albums AS albums_0
         LIMIT
           5 OFFSET 3
-      ) AS rows_2
-  ) AS universe_1
+      ) AS rows_inner_3
+  ) AS rows_2
 
 []

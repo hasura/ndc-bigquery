@@ -1,10 +1,10 @@
 on: [push]
 
-name: Postgres NDC build
+name: BigQuery NDC build
 
 jobs:
   build:
-    name: Build Postgres NDC
+    name: Build BigQuery NDC
     runs-on: ubuntu-latest
     env:
       CARGO_NET_GIT_FETCH_WITH_CLI: "true"

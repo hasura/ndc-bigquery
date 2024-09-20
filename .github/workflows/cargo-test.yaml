@@ -1,6 +1,6 @@
 on: [push]
 
-name: Postgres NDC tests
+name: BigQuery NDC tests
 
 jobs:
   test-query-engine:
@@ -36,12 +36,13 @@ jobs:
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.BROKEN_BUILD_SLACK_WEBHOOK_URL }}
 
-  test-postgres-ndc:
-    name: Test ndc-postgres
+  test-bigquery-ndc:
+    name: Test ndc-bigquery
     runs-on: ubuntu-latest
     env:
       CARGO_NET_GIT_FETCH_WITH_CLI: "true"
       RUSTFLAGS: "-D warnings" # fail on warnings
+
     steps:
       - uses: actions/checkout@v4
 
@@ -55,166 +56,28 @@ jobs:
           rustup show
 
       - uses: Swatinem/rust-cache@v2
-
-      - name: start dependencies
-        uses: isbang/compose-action@v1.5.1
         with:
-          compose-file: "./docker-compose.yaml"
-          down-flags: "--volumes"
-          services: |
-            postgres
+          shared-key: "build" # share the cache across jobs
+
+      # - uses: hoverkraft-tech/compose-action@v1.5.1
+      #   with:
+      #     compose-file: "./docker-compose.yaml"
+      #     up-flags: "--pull=always --wait"
+      #     down-flags: "--volumes"
+      #     services: |
+      #       bigquery
 
       - name: run tests
         run: |
-          cargo test --release -p ndc-postgres
+          cargo test --release --workspace
         env:
-          POSTGRESQL_CONNECTION_STRING: postgresql://postgres:password@localhost:64002
+          HASURA_BIGQUERY_SERVICE_KEY: "{\"type\": \"service_account\",\"project_id\": \"hasura-development\",\"private_key_id\": \"222dd3f9e98b6743bb8d74d7a126fe89e6ac221d\",\"private_key\": \"-----BEGIN PRIVATE KEY-----\\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDZuxyxWk6bOxHr\\nht+MPZ7Q+F4D7AzTqCTZOmcldod+KHMlUCKwIOLQabAO8TEPhvcYyzBQ4gCwoN2i\\n7VoQbHmlTpQu1s43K25oIoEIicFTbHcL4MALiFnT44XYl+PxL+e//GibJYGjwqI+\\n3o2Go//o8BOfQEO/PPiQdub8/4VQjXGE0+xLeUjYURiJPu8ojrL2FdIqvzMaDWKq\\n2r6KuukIeWkqmt6fHnrGiseavg3g7pBPjqmRtX6ekY74XbkTQk1kmCKf9MLjZ1UI\\n+8QNp1C4pO4eDbp1Zkqz3uHhzccUvStkSCmppjKfD64Tp+6ExbUnMfq1UJ0GJBDM\\nVPeJF6+PAgMBAAECggEAFFSf88GKeH02CaeQ5S/1ze57HOOkOPlI443MBtgAA9w0\\nEEZgztBrTWmo+mQ0IA6KsSJ78vl/df63Y1jFYaY3X6OsO4lsPQONriSWptzyE9+b\\naB0G4azMMnhazaQ1MRa3jZo8jEwexFNOwg8W6P0UTsRoGKUwDkHbteWcYQBdCu3W\\nFa/CX3Tw0n/DdAVNi8Ai9K0d+Okmcv+ZRopeNuLENR28/VGSXj+Li1V7A0s+nX9E\\nyxuGrDY4WMxSXHkW2yjrDnPUs6dXLFk1HBQPaHrs3i6gGyNXfTNWUJ3nGQwZIqJI\\na1b4TMiGVapq33qCo/3Yi6jQ+I6KnpmWgQ7y5LXhoQKBgQDuA80oWCXQv7MERg91\\nFwammtXrMjoD234u3RGNtnU67yH87kvL+p18EiNlbmy+CWyoc1mOjLtTHvMBfMGh\\nfKt3BSuzrZZArA1GJF6J2Rew5dkJGzwPogLSnXMgrVwknAejKJw97wTJzzIZuuSc\\nb7P57+mFoSdR+eSb44WFcuMyoQKBgQDqLu9LWz+LcljDWDeMQ4kl8gkNZMe5//Qd\\nOpa6mN6T2nfRgxasaLo7WO8TqT4X28eBJKuru4BOeHVx0Y8GvWYyaW0uEEycdXVl\\n6man+YUhZezTjjB/nCeaz7E7LCcUao1JP2Y9xlnpO5jdyi2tYkCqu7vOxmnLArN/\\nl3zuXgrkLwKBgEzCzReF1ixMpt9p+PI6StrQdM01laBI2ZkjktWxUn1/Qebgs3FF\\nkiTBdMjxpABl6bUp/mgK2x8jjBuesJP0MRhhgoagJSUWV/GXKSYr7YgPmL9nGSex\\niFeEj+yp/F2SNKRaJImU3GZ5fB7wN2p8W/7vcNC3+IZnoWLlLdqsAroBAoGAdzZh\\nVoki9gfFq9uym1Kd9JUbipftHIBxcpeqt16un7GtIRiMaEP/2cpSGj4jf92/17wl\\nMA0JKekkUEaPeqzb43nLvJFLjrI0iyciDwx0eyX5w1A03CFP//0OicLWOgxr1AfU\\nMkpQ5uwRy4XqbsL/jGp5Fq/mlxPO8HrbfDSfcr0CgYEAxN/RMCYODz+p9xZ6tbiS\\nfHFrCgvPpYR9hEWhb/DyT4Q/OSzk0TItuSXGc3uicYeIycHIndyWej/a1HGg0IRK\\nqjGbqGvRJIrzhLvLog1oOGADFSE2IJrxV2m9lQG8IUow4QUFcoZaCXZAQEvWeo+D\\nq+4Pe2w4aMZeyqpt/mOSGzQ=\\n-----END PRIVATE KEY-----\\n\",\"client_email\": \"skm-bq-test@hasura-development.iam.gserviceaccount.com\",\"client_id\": \"116460406056940511807\",\"auth_uri\": \"https://accounts.google.com/o/oauth2/auth\",\"token_uri\": \"https://oauth2.googleapis.com/token\",\"auth_provider_x509_cert_url\": \"https://www.googleapis.com/oauth2/v1/certs\",\"client_x509_cert_url\": \"https://www.googleapis.com/robot/v1/metadata/x509/skm-bq-test%40hasura-development.iam.gserviceaccount.com\",\"universe_domain\": \"googleapis.com\"}"
+          HASURA_BIGQUERY_PROJECT_ID: "hasura-development"
+          HASURA_BIGQUERY_DATASET_ID: "chinook_sample"
           RUST_LOG: INFO
 
       # scream into Slack if something goes wrong
-      - name: report status
-        if: github.ref == 'refs/heads/main'
-        uses: ravsamhq/notify-slack-action@v2
-        with:
-          status: ${{ job.status }}
-          notify_when: failure
-          notification_title: "😧 Error on <{repo_url}|{repo}>"
-          message_format: "🐴 *{workflow}* {status_message} for <{repo_url}|{repo}>"
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.BROKEN_BUILD_SLACK_WEBHOOK_URL }}
-
-  test-cockroach-ndc:
-    name: Test ndc-cockroach
-    runs-on: ubuntu-latest
-    env:
-      CARGO_NET_GIT_FETCH_WITH_CLI: "true"
-      RUSTFLAGS: "-D warnings" # fail on warnings
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: install protoc
-        uses: arduino/setup-protoc@v2
-        with:
-          version: "23.3"
-
-      - name: install tools
-        run: |
-          rustup show
-
-      - uses: Swatinem/rust-cache@v2
-
-      - name: start dependencies
-        uses: isbang/compose-action@v1.5.1
-        with:
-          compose-file: "./docker-compose.yaml"
-          down-flags: "--volumes"
-          services: |
-            cockroach
-
-      - name: run tests
-        run: |
-          cargo test --release -p ndc-cockroach
-        env:
-          POSTGRESQL_CONNECTION_STRING: postgresql://postgres:password@localhost:64003
-          RUST_LOG: INFO
-
-      # scream into Slack if something goes wrong
-      - name: report status
-        if: github.ref == 'refs/heads/main'
-        uses: ravsamhq/notify-slack-action@v2
-        with:
-          status: ${{ job.status }}
-          notify_when: failure
-          notification_title: "😧 Error on <{repo_url}|{repo}>"
-          message_format: "🐴 *{workflow}* {status_message} for <{repo_url}|{repo}>"
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.BROKEN_BUILD_SLACK_WEBHOOK_URL }}
-
-  test-citus-ndc:
-    name: Test ndc-citus
-    runs-on: ubuntu-latest
-    env:
-      CARGO_NET_GIT_FETCH_WITH_CLI: "true"
-      RUSTFLAGS: "-D warnings" # fail on warnings
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: install protoc
-        uses: arduino/setup-protoc@v2
-        with:
-          version: "23.3"
-
-      - name: install tools
-        run: |
-          rustup show
-
-      - uses: Swatinem/rust-cache@v2
-
-      - name: start dependencies
-        uses: isbang/compose-action@v1.5.1
-        with:
-          compose-file: "./docker-compose.yaml"
-          down-flags: "--volumes"
-          services: |
-            citus
-
-      - name: run tests
-        run: |
-          cargo test --release -p ndc-citus
-        env:
-          POSTGRESQL_CONNECTION_STRING: postgresql://postgres:password@localhost:64004
-          RUST_LOG: INFO
-
-      # scream into Slack if something goes wrong
-      - name: report status
-        if: github.ref == 'refs/heads/main'
-        uses: ravsamhq/notify-slack-action@v2
-        with:
-          status: ${{ job.status }}
-          notify_when: failure
-          notification_title: "😧 Error on <{repo_url}|{repo}>"
-          message_format: "🐴 *{workflow}* {status_message} for <{repo_url}|{repo}>"
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.BROKEN_BUILD_SLACK_WEBHOOK_URL }}
-
-  test-postgres-ndc-with-aurora:
-    name: Test ndc-postgres on AWS aurora
-    runs-on: ubuntu-latest
-    env:
-      CARGO_NET_GIT_FETCH_WITH_CLI: "true"
-      RUSTFLAGS: "-D warnings" # fail on warnings
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: install protoc
-        uses: arduino/setup-protoc@v2
-        with:
-          version: "23.3"
-
-      - name: setup deployment
-        env:
-          AURORA_CONNECTION_STRING: ${{ secrets.AURORA_CONNECTION_STRING }}
-        run: |
-          # take connection string from env, create deployment file with it
-          cat static/aurora/chinook-deployment-template.json \
-            | jq '.connection_uris[0]=(env | .AURORA_CONNECTION_STRING)' \
-           > static/aurora/chinook-deployment.json
-
-      - name: install tools
-        run: |
-          rustup show
-
-      - uses: Swatinem/rust-cache@v2
-
-      - name: run tests
-        run: |
-          cargo test --release -p other-db-tests --all-features
-        env:
-          RUST_LOG: INFO
-          AURORA_CONNECTION_STRING: ${{ secrets.AURORA_CONNECTION_STRING }}
-
-      # scream into Slack if something goes wrong
-      - name: report status
+      - name: Report Status
         if: github.ref == 'refs/heads/main'
         uses: ravsamhq/notify-slack-action@v2
         with:

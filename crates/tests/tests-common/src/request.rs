@@ -39,14 +39,13 @@ async fn run_against_server<Response: for<'a> serde::Deserialize<'a>>(
     action: &str,
     testname: &str,
 ) -> Response {
-    let path = format!("/{}", action);
+    let path = format!("/{action}");
     let body = match fs::read_to_string(format!(
-        "../../../crates/tests/tests-common/goldenfiles/{}.json",
-        testname
+        "../../../crates/tests/tests-common/goldenfiles/{testname}.json"
     )) {
         Ok(body) => body,
         Err(err) => {
-            println!("Error: {}", err);
+            println!("Error: {err}");
             panic!("error look up");
         }
     };

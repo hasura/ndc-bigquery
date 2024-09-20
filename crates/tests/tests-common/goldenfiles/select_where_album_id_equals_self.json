@@ -1,5 +1,5 @@
 {
-  "collection": "Album",
+  "collection": "albums",
   "query": {
     "fields": {
       "AlbumId": {
@@ -13,7 +13,7 @@
         "arguments": {}
       }
     },
-    "where": {
+    "predicate": {
       "type": "and",
       "expressions": [
         {
@@ -23,9 +23,7 @@
             "name": "AlbumId",
             "path": []
           },
-          "operator": {
-            "type": "equal"
-          },
+          "operator": "_eq",
           "value": {
             "type": "column",
             "column": {
@@ -42,12 +40,22 @@
             "name": "AlbumId",
             "path": []
           },
-          "operator": {
-            "type": "equal"
-          },
+          "operator": "_eq",
           "value": {
             "type": "scalar",
-            "value": 340
+            "value": 3
+          }
+        }
+      ]
+    },
+    "order_by": {
+      "elements": [
+        {
+          "order_direction": "asc",
+          "target": {
+            "type": "column",
+            "name": "AlbumId",
+            "path": []
           }
         }
       ]

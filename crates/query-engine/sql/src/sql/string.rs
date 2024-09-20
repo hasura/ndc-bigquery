@@ -18,6 +18,8 @@ impl Default for SQL {
 pub enum Param {
     /// A literal string
     String(String),
+    /// A JSON value
+    Value(serde_json::Value),
     /// A variable name to look up in the `variables` field in a `QueryRequest`.
     Variable(String),
 }
@@ -26,10 +28,14 @@ pub enum Param {
 #[derive(Debug)]
 pub struct DDL(pub SQL);
 
+/// A statement.
+#[derive(Debug)]
+pub struct Statement(pub SQL);
+
 impl SQL {
     pub fn new() -> SQL {
         SQL {
-            sql: "".to_string(),
+            sql: String::new(),
             params: vec![],
         }
     }
@@ -41,7 +47,7 @@ impl SQL {
     /// inserted surrounded by quotes
     pub fn append_identifier(&mut self, sql: &String) {
         // todo: sanitize
-        self.sql.push_str(format!("{}", sql).as_str());
+        self.sql.push_str(sql.to_string().as_str());
     }
     /// Append a parameter to a parameterized query. Will be represented as $1, $2, and so on,
     /// in the sql query text, and will be inserted to the `params` vector, so we can

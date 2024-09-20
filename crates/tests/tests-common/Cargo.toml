@@ -2,21 +2,32 @@
 name = "tests-common"
 version.workspace = true
 edition.workspace = true
+license.workspace = true
+
+[lints]
+workspace = true
 
 [lib]
 name = "tests_common"
 path = "src/lib.rs"
 
 [dependencies]
-ndc-sdk = { git = "https://github.com/hasura/ndc-hub.git", rev = "e16b85a", package = "ndc-sdk" }
+ndc-bigquery = { path = "../../connectors/ndc-bigquery" }
 
-serde = "1.0.188"
-serde_derive = "^1.0"
-serde_json = { version = "1.0.107", features = ["raw_value"] }
-tracing = "0.1.37"
-axum = "0.6.19"
-axum-test-helper = "0.3.0"
-reqwest = "0.11.20"
-tokio-postgres = "0.7.10"
-sqlx = { version = "0.7.1", features = [ "json", "postgres", "runtime-tokio-rustls" ] }
-uuid = {version = "1.4.1", features = [ "v4", "fast-rng", "macro-diagnostics" ]}
+ndc-sdk = { workspace = true }
+ndc-test = { workspace = true }
+
+anyhow = { workspace = true }
+axum = { workspace = true }
+axum-test-helper = { workspace = true }
+env_logger = { workspace = true }
+hyper = { workspace = true, features = ["tcp"] }
+reqwest = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true, features = ["raw_value"] }
+serde_derive = { workspace = true }
+sqlx = { workspace = true, features = [ "json", "postgres", "runtime-tokio-rustls" ] }
+tokio = { workspace = true, features = ["full"] }
+tokio-postgres = { workspace = true }
+tracing = { workspace = true }
+uuid = { workspace = true, features = [ "v4", "fast-rng", "macro-diagnostics" ] }

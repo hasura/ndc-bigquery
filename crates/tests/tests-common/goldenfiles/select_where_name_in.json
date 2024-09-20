@@ -1,5 +1,5 @@
 {
-  "collection": "Album",
+  "collection": "albums",
   "query": {
     "fields": {
       "AlbumId": {
@@ -13,22 +13,28 @@
         "arguments": {}
       }
     },
-    "where": {
-      "type": "binary_array_comparison_operator",
+    "predicate": {
+      "type": "binary_comparison_operator",
       "column": {
         "type": "column",
         "name": "Title",
         "path": []
       },
-      "operator": "in",
-      "values": [
+      "operator": "_in",
+      "value": {
+        "type": "scalar",
+        "value": ["Facelift", "Balls to the Wall"]
+      }
+    },
+    "order_by": {
+      "elements": [
         {
-          "type": "scalar",
-          "value": "Mozart: Chamber Music"
-        },
-        {
-          "type": "scalar",
-          "value": "Something else"
+          "order_direction": "asc",
+          "target": {
+            "type": "column",
+            "name": "AlbumId",
+            "path": []
+          }
         }
       ]
     }

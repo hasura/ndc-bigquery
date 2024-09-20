@@ -1,0 +1,915 @@
+{
+  "version": 1,
+  "connectionSettings": {
+    "serviceKey": {
+      "variable": "HASURA_BIGQUERY_SERVICE_KEY"
+    },
+    "projectId": {
+      "variable": "HASURA_BIGQUERY_PROJECT_ID"
+    },
+    "datasetId": {
+      "variable": "HASURA_BIGQUERY_DATASET_ID"
+    }
+  },
+  "metadata": {
+    "tables": {
+      "albums": {
+        "schemaName": "hasura-development.chinook_sample",
+        "tableName": "albums",
+        "columns": {
+          "AlbumId": {
+            "name": "AlbumId",
+            "type": {
+              "scalarType": "bigint"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "ArtistId": {
+            "name": "ArtistId",
+            "type": {
+              "scalarType": "bigint"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "Title": {
+            "name": "Title",
+            "type": {
+              "scalarType": "string"
+            },
+            "nullable": "nullable",
+            "description": null
+          }
+        },
+        "uniquenessConstraints": {},
+        "foreignRelations": {},
+        "description": null
+      },
+      "artists": {
+        "schemaName": "hasura-development.chinook_sample",
+        "tableName": "artists",
+        "columns": {
+          "ArtistId": {
+            "name": "ArtistId",
+            "type": {
+              "scalarType": "bigint"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "Name": {
+            "name": "Name",
+            "type": {
+              "scalarType": "string"
+            },
+            "nullable": "nullable",
+            "description": null
+          }
+        },
+        "uniquenessConstraints": {},
+        "foreignRelations": {},
+        "description": null
+      },
+      "customers": {
+        "schemaName": "hasura-development.chinook_sample",
+        "tableName": "customers",
+        "columns": {
+          "Address": {
+            "name": "Address",
+            "type": {
+              "scalarType": "string"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "City": {
+            "name": "City",
+            "type": {
+              "scalarType": "string"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "Company": {
+            "name": "Company",
+            "type": {
+              "scalarType": "string"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "Country": {
+            "name": "Country",
+            "type": {
+              "scalarType": "string"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "CustomerId": {
+            "name": "CustomerId",
+            "type": {
+              "scalarType": "bigint"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "Email": {
+            "name": "Email",
+            "type": {
+              "scalarType": "string"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "Fax": {
+            "name": "Fax",
+            "type": {
+              "scalarType": "string"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "FirstName": {
+            "name": "FirstName",
+            "type": {
+              "scalarType": "string"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "LastName": {
+            "name": "LastName",
+            "type": {
+              "scalarType": "string"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "Phone": {
+            "name": "Phone",
+            "type": {
+              "scalarType": "string"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "PostalCode": {
+            "name": "PostalCode",
+            "type": {
+              "scalarType": "string"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "State": {
+            "name": "State",
+            "type": {
+              "scalarType": "string"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "SupportRepId": {
+            "name": "SupportRepId",
+            "type": {
+              "scalarType": "bigint"
+            },
+            "nullable": "nullable",
+            "description": null
+          }
+        },
+        "uniquenessConstraints": {},
+        "foreignRelations": {},
+        "description": null
+      },
+      "employees": {
+        "schemaName": "hasura-development.chinook_sample",
+        "tableName": "employees",
+        "columns": {
+          "Address": {
+            "name": "Address",
+            "type": {
+              "scalarType": "string"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "BirthDate": {
+            "name": "BirthDate",
+            "type": {
+              "scalarType": "date"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "City": {
+            "name": "City",
+            "type": {
+              "scalarType": "string"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "Country": {
+            "name": "Country",
+            "type": {
+              "scalarType": "string"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "Email": {
+            "name": "Email",
+            "type": {
+              "scalarType": "string"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "EmployeeId": {
+            "name": "EmployeeId",
+            "type": {
+              "scalarType": "bigint"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "Fax": {
+            "name": "Fax",
+            "type": {
+              "scalarType": "string"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "FirstName": {
+            "name": "FirstName",
+            "type": {
+              "scalarType": "string"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "HireDate": {
+            "name": "HireDate",
+            "type": {
+              "scalarType": "date"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "LastName": {
+            "name": "LastName",
+            "type": {
+              "scalarType": "string"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "Phone": {
+            "name": "Phone",
+            "type": {
+              "scalarType": "string"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "PostalCode": {
+            "name": "PostalCode",
+            "type": {
+              "scalarType": "string"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "ReportsTo": {
+            "name": "ReportsTo",
+            "type": {
+              "scalarType": "bigint"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "State": {
+            "name": "State",
+            "type": {
+              "scalarType": "string"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "Title": {
+            "name": "Title",
+            "type": {
+              "scalarType": "string"
+            },
+            "nullable": "nullable",
+            "description": null
+          }
+        },
+        "uniquenessConstraints": {},
+        "foreignRelations": {},
+        "description": null
+      },
+      "genres": {
+        "schemaName": "hasura-development.chinook_sample",
+        "tableName": "genres",
+        "columns": {
+          "GenreId": {
+            "name": "GenreId",
+            "type": {
+              "scalarType": "bigint"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "Name": {
+            "name": "Name",
+            "type": {
+              "scalarType": "string"
+            },
+            "nullable": "nullable",
+            "description": null
+          }
+        },
+        "uniquenessConstraints": {},
+        "foreignRelations": {},
+        "description": null
+      },
+      "invoice_items": {
+        "schemaName": "hasura-development.chinook_sample",
+        "tableName": "invoice_items",
+        "columns": {
+          "InvoiceId": {
+            "name": "InvoiceId",
+            "type": {
+              "scalarType": "bigint"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "InvoiceLineId": {
+            "name": "InvoiceLineId",
+            "type": {
+              "scalarType": "bigint"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "Quantity": {
+            "name": "Quantity",
+            "type": {
+              "scalarType": "bigint"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "TrackId": {
+            "name": "TrackId",
+            "type": {
+              "scalarType": "bigint"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "UnitPrice": {
+            "name": "UnitPrice",
+            "type": {
+              "scalarType": "float"
+            },
+            "nullable": "nullable",
+            "description": null
+          }
+        },
+        "uniquenessConstraints": {},
+        "foreignRelations": {},
+        "description": null
+      },
+      "invoices": {
+        "schemaName": "hasura-development.chinook_sample",
+        "tableName": "invoices",
+        "columns": {
+          "BillingAddress": {
+            "name": "BillingAddress",
+            "type": {
+              "scalarType": "string"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "BillingCity": {
+            "name": "BillingCity",
+            "type": {
+              "scalarType": "string"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "BillingCountry": {
+            "name": "BillingCountry",
+            "type": {
+              "scalarType": "string"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "BillingPostalCode": {
+            "name": "BillingPostalCode",
+            "type": {
+              "scalarType": "string"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "BillingState": {
+            "name": "BillingState",
+            "type": {
+              "scalarType": "string"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "CustomerId": {
+            "name": "CustomerId",
+            "type": {
+              "scalarType": "bigint"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "InvoiceDate": {
+            "name": "InvoiceDate",
+            "type": {
+              "scalarType": "date"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "InvoiceId": {
+            "name": "InvoiceId",
+            "type": {
+              "scalarType": "bigint"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "Total": {
+            "name": "Total",
+            "type": {
+              "scalarType": "float"
+            },
+            "nullable": "nullable",
+            "description": null
+          }
+        },
+        "uniquenessConstraints": {},
+        "foreignRelations": {},
+        "description": null
+      },
+      "media_types": {
+        "schemaName": "hasura-development.chinook_sample",
+        "tableName": "media_types",
+        "columns": {
+          "MediaTypeId": {
+            "name": "MediaTypeId",
+            "type": {
+              "scalarType": "bigint"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "Name": {
+            "name": "Name",
+            "type": {
+              "scalarType": "string"
+            },
+            "nullable": "nullable",
+            "description": null
+          }
+        },
+        "uniquenessConstraints": {},
+        "foreignRelations": {},
+        "description": null
+      },
+      "playlist_track": {
+        "schemaName": "hasura-development.chinook_sample",
+        "tableName": "playlist_track",
+        "columns": {
+          "PlaylistId": {
+            "name": "PlaylistId",
+            "type": {
+              "scalarType": "bigint"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "TrackId": {
+            "name": "TrackId",
+            "type": {
+              "scalarType": "bigint"
+            },
+            "nullable": "nullable",
+            "description": null
+          }
+        },
+        "uniquenessConstraints": {},
+        "foreignRelations": {},
+        "description": null
+      },
+      "playlists": {
+        "schemaName": "hasura-development.chinook_sample",
+        "tableName": "playlists",
+        "columns": {
+          "Name": {
+            "name": "Name",
+            "type": {
+              "scalarType": "string"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "PlaylistId": {
+            "name": "PlaylistId",
+            "type": {
+              "scalarType": "bigint"
+            },
+            "nullable": "nullable",
+            "description": null
+          }
+        },
+        "uniquenessConstraints": {},
+        "foreignRelations": {},
+        "description": null
+      },
+      "tracks": {
+        "schemaName": "hasura-development.chinook_sample",
+        "tableName": "tracks",
+        "columns": {
+          "AlbumId": {
+            "name": "AlbumId",
+            "type": {
+              "scalarType": "bigint"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "Bytes": {
+            "name": "Bytes",
+            "type": {
+              "scalarType": "bigint"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "Composer": {
+            "name": "Composer",
+            "type": {
+              "scalarType": "string"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "GenreId": {
+            "name": "GenreId",
+            "type": {
+              "scalarType": "bigint"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "MediaTypeId": {
+            "name": "MediaTypeId",
+            "type": {
+              "scalarType": "bigint"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "Milliseconds": {
+            "name": "Milliseconds",
+            "type": {
+              "scalarType": "bigint"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "Name": {
+            "name": "Name",
+            "type": {
+              "scalarType": "string"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "TrackId": {
+            "name": "TrackId",
+            "type": {
+              "scalarType": "bigint"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "UnitPrice": {
+            "name": "UnitPrice",
+            "type": {
+              "scalarType": "float"
+            },
+            "nullable": "nullable",
+            "description": null
+          }
+        },
+        "uniquenessConstraints": {},
+        "foreignRelations": {},
+        "description": null
+      }
+    },
+    "nativeOperations": {
+      "queries": {},
+      "mutations": {}
+    },
+    "scalarTypes": {
+      "bigint": {
+        "typeName": "bigint",
+        "schemaName": "hasura-development.chinook_sample",
+        "description": null,
+        "aggregateFunctions": {
+          "APPROX_COUNT_DISTINCT": {
+            "returnType": "bigint"
+          },
+          "AVG": {
+            "returnType": "bigint"
+          },
+          "COUNT": {
+            "returnType": "bigint"
+          },
+          "MAX": {
+            "returnType": "bigint"
+          },
+          "MIN": {
+            "returnType": "bigint"
+          },
+          "SUM": {
+            "returnType": "bigint"
+          }
+        },
+        "comparisonOperators": {
+          "_eq": {
+            "operatorName": "=",
+            "operatorKind": "equal",
+            "argumentType": "bigint",
+            "isInfix": true
+          },
+          "_gt": {
+            "operatorName": ">",
+            "operatorKind": "custom",
+            "argumentType": "bigint",
+            "isInfix": true
+          },
+          "_gte": {
+            "operatorName": ">=",
+            "operatorKind": "custom",
+            "argumentType": "bigint",
+            "isInfix": true
+          },
+          "_in": {
+            "operatorName": "IN",
+            "operatorKind": "in",
+            "argumentType": "bigint",
+            "isInfix": true
+          },
+          "_lt": {
+            "operatorName": "<",
+            "operatorKind": "custom",
+            "argumentType": "bigint",
+            "isInfix": true
+          },
+          "_lte": {
+            "operatorName": "<=",
+            "operatorKind": "custom",
+            "argumentType": "bigint",
+            "isInfix": true
+          },
+          "_neq": {
+            "operatorName": "!=",
+            "operatorKind": "custom",
+            "argumentType": "bigint",
+            "isInfix": true
+          }
+        },
+        "typeRepresentation": null
+      },
+      "date": {
+        "typeName": "date",
+        "schemaName": "hasura-development.chinook_sample",
+        "description": null,
+        "aggregateFunctions": {
+          "APPROX_COUNT_DISTINCT": {
+            "returnType": "bigint"
+          },
+          "COUNT": {
+            "returnType": "bigint"
+          },
+          "MAX": {
+            "returnType": "date"
+          },
+          "MIN": {
+            "returnType": "date"
+          }
+        },
+        "comparisonOperators": {
+          "_eq": {
+            "operatorName": "=",
+            "operatorKind": "equal",
+            "argumentType": "date",
+            "isInfix": true
+          },
+          "_gt": {
+            "operatorName": ">",
+            "operatorKind": "custom",
+            "argumentType": "date",
+            "isInfix": true
+          },
+          "_gte": {
+            "operatorName": ">=",
+            "operatorKind": "custom",
+            "argumentType": "date",
+            "isInfix": true
+          },
+          "_in": {
+            "operatorName": "IN",
+            "operatorKind": "in",
+            "argumentType": "date",
+            "isInfix": true
+          },
+          "_lt": {
+            "operatorName": "<",
+            "operatorKind": "custom",
+            "argumentType": "date",
+            "isInfix": true
+          },
+          "_lte": {
+            "operatorName": "<=",
+            "operatorKind": "custom",
+            "argumentType": "date",
+            "isInfix": true
+          },
+          "_neq": {
+            "operatorName": "!=",
+            "operatorKind": "custom",
+            "argumentType": "date",
+            "isInfix": true
+          }
+        },
+        "typeRepresentation": null
+      },
+      "float": {
+        "typeName": "float",
+        "schemaName": "hasura-development.chinook_sample",
+        "description": null,
+        "aggregateFunctions": {
+          "APPROX_COUNT_DISTINCT": {
+            "returnType": "bigint"
+          },
+          "AVG": {
+            "returnType": "float"
+          },
+          "COUNT": {
+            "returnType": "bigint"
+          },
+          "MAX": {
+            "returnType": "float"
+          },
+          "MIN": {
+            "returnType": "float"
+          },
+          "SUM": {
+            "returnType": "float"
+          }
+        },
+        "comparisonOperators": {
+          "_eq": {
+            "operatorName": "=",
+            "operatorKind": "equal",
+            "argumentType": "float",
+            "isInfix": true
+          },
+          "_gt": {
+            "operatorName": ">",
+            "operatorKind": "custom",
+            "argumentType": "float",
+            "isInfix": true
+          },
+          "_gte": {
+            "operatorName": ">=",
+            "operatorKind": "custom",
+            "argumentType": "float",
+            "isInfix": true
+          },
+          "_in": {
+            "operatorName": "IN",
+            "operatorKind": "in",
+            "argumentType": "float",
+            "isInfix": true
+          },
+          "_lt": {
+            "operatorName": "<",
+            "operatorKind": "custom",
+            "argumentType": "float",
+            "isInfix": true
+          },
+          "_lte": {
+            "operatorName": "<=",
+            "operatorKind": "custom",
+            "argumentType": "float",
+            "isInfix": true
+          },
+          "_neq": {
+            "operatorName": "!=",
+            "operatorKind": "custom",
+            "argumentType": "float",
+            "isInfix": true
+          }
+        },
+        "typeRepresentation": null
+      },
+      "string": {
+        "typeName": "string",
+        "schemaName": "hasura-development.chinook_sample",
+        "description": null,
+        "aggregateFunctions": {
+          "APPROX_COUNT_DISTINCT": {
+            "returnType": "bigint"
+          },
+          "COUNT": {
+            "returnType": "bigint"
+          },
+          "MAX": {
+            "returnType": "string"
+          },
+          "MIN": {
+            "returnType": "string"
+          }
+        },
+        "comparisonOperators": {
+          "_eq": {
+            "operatorName": "=",
+            "operatorKind": "equal",
+            "argumentType": "string",
+            "isInfix": true
+          },
+          "_gt": {
+            "operatorName": ">",
+            "operatorKind": "custom",
+            "argumentType": "string",
+            "isInfix": true
+          },
+          "_gte": {
+            "operatorName": ">=",
+            "operatorKind": "custom",
+            "argumentType": "string",
+            "isInfix": true
+          },
+          "_in": {
+            "operatorName": "IN",
+            "operatorKind": "in",
+            "argumentType": "string",
+            "isInfix": true
+          },
+          "_like": {
+            "operatorName": "LIKE",
+            "operatorKind": "custom",
+            "argumentType": "string",
+            "isInfix": true
+          },
+          "_lt": {
+            "operatorName": "<",
+            "operatorKind": "custom",
+            "argumentType": "string",
+            "isInfix": true
+          },
+          "_lte": {
+            "operatorName": "<=",
+            "operatorKind": "custom",
+            "argumentType": "string",
+            "isInfix": true
+          },
+          "_neq": {
+            "operatorName": "!=",
+            "operatorKind": "custom",
+            "argumentType": "string",
+            "isInfix": true
+          },
+          "_nlike": {
+            "operatorName": "NOT LIKE",
+            "operatorKind": "custom",
+            "argumentType": "string",
+            "isInfix": true
+          }
+        },
+        "typeRepresentation": null
+      }
+    }
+  }
+}

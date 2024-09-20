@@ -1,0 +1,23 @@
+{
+    "collection": "albums",
+    "query": {
+      "fields": {},
+      "limit": 5,
+      "offset": 1,
+      "order_by": {
+        "elements": [
+          {
+            "order_direction": "asc",
+            "target": {
+              "type": "column",
+              "name": "Title",
+              "path": []
+            }
+          }
+        ]
+      }
+    },
+    "arguments": {},
+    "collection_relationships": {}
+  }
+  

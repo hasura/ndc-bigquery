@@ -16,11 +16,12 @@ pub struct Metrics {
     pool_acquire_timeout: Gauge,
     pool_max_lifetime: Gauge,
     pool_idle_timeout: Gauge,
+    pub error_metrics: ErrorMetrics,
 }
 
 impl Metrics {
     /// Set up counters and gauges used to produce Prometheus metrics
-    pub fn initialize(metrics_registry: &mut Registry) -> Result<Self, Error> {
+    pub fn initialize(metrics_registry: &mut Registry) -> Result<Self, prometheus::Error> {
         let query_total = add_int_counter_metric(
             metrics_registry,
             "postgres_ndc_query_total",
@@ -75,6 +76,8 @@ impl Metrics {
             "Get the maximum lifetime of individual connections, in seconds.",
         )?;
 
+        let error_metrics = ErrorMetrics::initialize(metrics_registry)?;
+
         Ok(Self {
             query_total,
             explain_total,
@@ -83,17 +86,18 @@ impl Metrics {
             pool_max_connections,
             pool_min_connections,
             pool_acquire_timeout,
-            pool_idle_timeout,
             pool_max_lifetime,
+            pool_idle_timeout,
+            error_metrics,
         })
     }
 
     pub fn record_successful_query(&self) {
-        self.query_total.inc()
+        self.query_total.inc();
     }
 
     pub fn record_successful_explain(&self) {
-        self.explain_total.inc()
+        self.explain_total.inc();
     }
 
     pub fn time_query_plan(&self) -> Timer {
@@ -138,9 +142,9 @@ fn add_int_counter_metric(
     metrics_registry: &mut Registry,
     metric_name: &str,
     metric_description: &str,
-) -> Result<IntCounter, Error> {
-    let int_counter = IntCounter::with_opts(prometheus::Opts::new(metric_name, metric_description))
-        .map_err(Error)?;
+) -> Result<IntCounter, prometheus::Error> {
+    let int_counter =
+        IntCounter::with_opts(prometheus::Opts::new(metric_name, metric_description))?;
     register_collector(metrics_registry, int_counter)
 }
 
@@ -149,9 +153,8 @@ fn add_int_gauge_metric(
     metrics_registry: &mut Registry,
     metric_name: &str,
     metric_description: &str,
-) -> Result<IntGauge, Error> {
-    let int_gauge = IntGauge::with_opts(prometheus::Opts::new(metric_name, metric_description))
-        .map_err(Error)?;
+) -> Result<IntGauge, prometheus::Error> {
+    let int_gauge = IntGauge::with_opts(prometheus::Opts::new(metric_name, metric_description))?;
     register_collector(metrics_registry, int_gauge)
 }
 
@@ -160,9 +163,8 @@ fn add_gauge_metric(
     metrics_registry: &mut Registry,
     metric_name: &str,
     metric_description: &str,
-) -> Result<Gauge, Error> {
-    let gauge =
-        Gauge::with_opts(prometheus::Opts::new(metric_name, metric_description)).map_err(Error)?;
+) -> Result<Gauge, prometheus::Error> {
+    let gauge = Gauge::with_opts(prometheus::Opts::new(metric_name, metric_description))?;
     register_collector(metrics_registry, gauge)
 }
 
@@ -172,12 +174,11 @@ fn add_histogram_metric(
     metrics_registry: &mut prometheus::Registry,
     metric_name: &str,
     metric_description: &str,
-) -> Result<Histogram, Error> {
+) -> Result<Histogram, prometheus::Error> {
     let histogram = Histogram::with_opts(prometheus::HistogramOpts::new(
         metric_name,
         metric_description,
-    ))
-    .map_err(Error)?;
+    ))?;
     register_collector(metrics_registry, histogram)
 }
 
@@ -185,10 +186,8 @@ fn add_histogram_metric(
 fn register_collector<Collector: prometheus::core::Collector + std::clone::Clone + 'static>(
     metrics_registry: &mut Registry,
     collector: Collector,
-) -> Result<Collector, Error> {
-    metrics_registry
-        .register(Box::new(collector.clone()))
-        .map_err(Error)?;
+) -> Result<Collector, prometheus::Error> {
+    metrics_registry.register(Box::new(collector.clone()))?;
     Ok(collector)
 }
 
@@ -212,15 +211,104 @@ impl Timer {
     }
 }
 
-/// A wrapper around the internal Prometheus error type to avoid exposing more
-/// than we need.
-#[derive(Debug)]
-pub struct Error(prometheus::Error);
+// /// A wrapper around the internal Prometheus error type to avoid exposing more
+// /// than we need.
+// #[derive(Debug)]
+// pub struct Error(prometheus::Error);
 
-impl std::fmt::Display for Error {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        self.0.fmt(f)
-    }
+// impl std::fmt::Display for Error {
+//     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+//         self.0.fmt(f)
+//     }
+// }
+
+// impl std::error::Error for Error {}
+
+/// A collection of metrics indicating errors.
+#[derive(Debug, Clone)]
+pub struct ErrorMetrics {
+    /// the connector received an invalid request.
+    invalid_request_total: IntCounter,
+    /// the connector received a request using capabilities it does not support.
+    unsupported_capability_total: IntCounter,
+    /// the connector could not fulfill a request because it does not support
+    /// certain features (which are not described as capabilities).
+    unsupported_feature_total: IntCounter,
+    /// the connector had an internal error.
+    connector_error_total: IntCounter,
+    /// the database emmited an error.
+    database_error_total: IntCounter,
+    /// we failed to acquire a database connection from the pool
+    connection_acquisition_error_total: IntCounter,
 }
 
-impl std::error::Error for Error {}
+impl ErrorMetrics {
+    /// Set up counters and gauges used to produce Prometheus metrics
+    pub fn initialize(
+        metrics_registry: &mut prometheus::Registry,
+    ) -> Result<Self, prometheus::Error> {
+        let invalid_request_total = add_int_counter_metric(
+            metrics_registry,
+            "ndc_postgres_error_invalid_request_total_count",
+            "Total number of invalid requests encountered.",
+        )?;
+
+        let unsupported_capability_total = add_int_counter_metric(
+            metrics_registry,
+            "ndc_postgres_error_unsupported_capability_total_count",
+            "Total number of invalid requests with unsupported capabilities encountered.",
+        )?;
+
+        let unsupported_feature_total = add_int_counter_metric(
+            metrics_registry,
+            "ndc_postgres_error_unsupported_capabilities_total_count",
+            "Total number of invalid requests with unsupported capabilities encountered.",
+        )?;
+
+        let connector_error_total = add_int_counter_metric(
+            metrics_registry,
+            "ndc_postgres_error_connector_error_total_count",
+            "Total number of requests failed due to an internal conenctor error.",
+        )?;
+
+        let database_error_total = add_int_counter_metric(
+            metrics_registry,
+            "ndc_postgres_error_database_error_total_count",
+            "Total number of requests failed due to a database error.",
+        )?;
+
+        let connection_acquisition_error_total = add_int_counter_metric(
+            metrics_registry,
+            "ndc_postgres_error_connection_acquisition_error_total_count",
+            "Total number of failures to acquire a database connection.",
+        )?;
+
+        Ok(ErrorMetrics {
+            invalid_request_total,
+            unsupported_capability_total,
+            unsupported_feature_total,
+            connector_error_total,
+            database_error_total,
+            connection_acquisition_error_total,
+        })
+    }
+
+    pub fn record_invalid_request(&self) {
+        self.invalid_request_total.inc();
+    }
+    pub fn record_unsupported_capability(&self) {
+        self.unsupported_capability_total.inc();
+    }
+    pub fn record_unsupported_feature(&self) {
+        self.unsupported_feature_total.inc();
+    }
+    pub fn record_connector_error(&self) {
+        self.connector_error_total.inc();
+    }
+    pub fn record_database_error(&self) {
+        self.database_error_total.inc();
+    }
+    pub fn record_connection_acquisition_error(&self) {
+        self.connection_acquisition_error_total.inc();
+    }
+}

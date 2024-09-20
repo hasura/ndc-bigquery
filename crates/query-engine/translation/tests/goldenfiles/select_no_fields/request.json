@@ -1,0 +1,10 @@
+{
+  "collection": "albums",
+  "query": {
+    "fields": {},
+    "limit": 5,
+    "offset": 3
+  },
+  "arguments": {},
+  "collection_relationships": {}
+}

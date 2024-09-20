@@ -2,18 +2,18 @@
 
 use std::collections::BTreeMap;
 
-use ndc_sdk::models;
+use ndc_models as models;
 
-use super::error::Error;
-use super::helpers::{Env, RootAndCurrentTables, State, TableNameAndReference};
 use super::root;
+use crate::translation::error::Error;
+use crate::translation::helpers::{Env, State, TableNameAndReference};
 use query_engine_sql::sql;
 
 pub struct JoinFieldInfo {
     pub table_alias: sql::ast::TableAlias,
     pub column_alias: sql::ast::ColumnAlias,
-    pub relationship_name: String,
-    pub arguments: BTreeMap<String, models::RelationshipArgument>,
+    pub relationship_name: models::RelationshipName,
+    pub arguments: BTreeMap<models::ArgumentName, models::RelationshipArgument>,
     pub query: models::Query,
 }
 
@@ -21,7 +21,7 @@ pub struct JoinFieldInfo {
 pub fn translate_joins(
     env: &Env,
     state: &mut State,
-    root_and_current_tables: &RootAndCurrentTables,
+    current_table: &TableNameAndReference,
     // We got these by processing the fields selection.
     join_fields: Vec<JoinFieldInfo>,
 ) -> Result<Vec<sql::ast::Join>, Error> {
@@ -35,103 +35,47 @@ pub fn translate_joins(
                 relationship_arguments: relationship.arguments.clone(),
             })?;
 
-            // create a from clause and get a reference of inner query.
-            let (target_collection, from_clause) = root::make_from_clause_and_reference(
-                &relationship.target_collection,
-                &arguments,
-                env,
-                state,
-                None,
-            )?;
-
             // process inner query and get the SELECTs for the 'rows' and 'aggregates' fields.
-            let select_set = super::translate_query(
+            let (returns_field, select_set) = root::translate_query(
                 env,
                 state,
-                &target_collection,
-                &from_clause,
-                join_field.query,
+                &root::MakeFrom::Collection {
+                    name: relationship.target_collection.clone(),
+                    arguments,
+                },
+                // We ask to inject the join predicate into the where clause.
+                &Some(root::JoinPredicate {
+                    join_with: current_table,
+                    relationship,
+                }),
+                &join_field.query,
             )?;
-
-            // add join expressions to row / aggregate selects
-            let final_select_set = match select_set {
-                // Only rows
-                sql::helpers::SelectSet::Rows(mut row_select) => {
-                    let sql::ast::Where(row_expr) = row_select.where_;
-
-                    row_select.where_ = sql::ast::Where(translate_column_mapping(
-                        env,
-                        &root_and_current_tables.current_table,
-                        &target_collection.reference,
-                        row_expr,
-                        relationship,
-                    )?);
-
-                    Ok(sql::helpers::SelectSet::Rows(row_select))
-                }
-                // Only aggregates
-                sql::helpers::SelectSet::Aggregates(mut aggregate_select) => {
-                    let sql::ast::Where(aggregate_expr) = aggregate_select.where_;
-
-                    aggregate_select.where_ = sql::ast::Where(translate_column_mapping(
-                        env,
-                        &root_and_current_tables.current_table,
-                        &target_collection.reference,
-                        aggregate_expr,
-                        relationship,
-                    )?);
-
-                    Ok(sql::helpers::SelectSet::Aggregates(aggregate_select))
-                }
-                // Both
-                sql::helpers::SelectSet::RowsAndAggregates(
-                    mut row_select,
-                    mut aggregate_select,
-                ) => {
-                    let sql::ast::Where(row_expr) = row_select.where_;
-
-                    row_select.where_ = sql::ast::Where(translate_column_mapping(
-                        env,
-                        &root_and_current_tables.current_table,
-                        &target_collection.reference,
-                        row_expr,
-                        relationship,
-                    )?);
-
-                    let sql::ast::Where(aggregate_expr) = aggregate_select.where_;
-
-                    aggregate_select.where_ = sql::ast::Where(translate_column_mapping(
-                        env,
-                        &root_and_current_tables.current_table,
-                        &target_collection.reference,
-                        aggregate_expr,
-                        relationship,
-                    )?);
-
-                    // Build (what will be) a RowSet with both fields.
-                    Ok(sql::helpers::SelectSet::RowsAndAggregates(
-                        row_select,
-                        aggregate_select,
-                    ))
-                }
-            }?;
 
             // form a single JSON item shaped `{ rows: [], aggregates: {} }`
             // that matches the models::RowSet type
             let json_select = sql::helpers::select_rowset(
-                join_field.column_alias.clone(),
-                join_field.table_alias.clone(),
-                state.make_table_alias("rows".to_string()),
-                state.make_table_alias("rows_inner".to_string()),
-                state.make_table_alias("aggregates".to_string()),
-                state.make_table_alias("aggregates_inner".to_string()),
-                final_select_set,
+                // sql::helpers::ResultsKind::ObjectResults,
+                (
+                    join_field.table_alias.clone(),
+                    join_field.column_alias.clone(),
+                ),
+                (
+                    state.make_table_alias("rows".to_string()),
+                    state.make_table_alias("rows_inner".to_string()),
+                ),
+                (
+                    state.make_table_alias("aggregates".to_string()),
+                    state.make_table_alias("aggregates_inner".to_string()),
+                ),
+                &None,
+                select_set,
+                &returns_field,
             );
 
             Ok(sql::ast::Join::LeftOuterJoin(sql::ast::LeftOuterJoin {
                 select: Box::new(json_select),
                 alias: join_field.table_alias,
-                on: sql::helpers::true_expr(),
+                on: sql::ast::Expression::Value(sql::ast::Value::Bool(true)), // todo(PY): fixme
             }))
         })
         .collect::<Result<Vec<sql::ast::Join>, Error>>()
@@ -162,7 +106,7 @@ pub fn translate_column_mapping(
                         name: source_column_info.name,
                     },
                 )),
-                operator: sql::ast::BinaryOperator::Equals,
+                operator: sql::ast::BinaryOperator("=".to_string()),
                 right: Box::new(sql::ast::Expression::ColumnReference(
                     sql::ast::ColumnReference::TableColumn {
                         table: target_collection_alias_reference.clone(),
@@ -183,8 +127,8 @@ pub fn translate_column_mapping(
 #[derive(Debug)]
 /// Used in `make_relationship_arguments()` below.
 pub struct MakeRelationshipArguments {
-    pub relationship_arguments: BTreeMap<String, models::RelationshipArgument>,
-    pub caller_arguments: BTreeMap<String, models::RelationshipArgument>,
+    pub relationship_arguments: BTreeMap<models::ArgumentName, models::RelationshipArgument>,
+    pub caller_arguments: BTreeMap<models::ArgumentName, models::RelationshipArgument>,
 }
 
 /// Combine the caller arguments and the relationship arguments into a single map.
@@ -193,20 +137,20 @@ pub struct MakeRelationshipArguments {
 /// and throw an error on the column case. Will be fixed in the future.
 pub fn make_relationship_arguments(
     arguments: MakeRelationshipArguments,
-) -> Result<BTreeMap<String, models::Argument>, Error> {
+) -> Result<BTreeMap<models::ArgumentName, models::Argument>, Error> {
     // these are arguments defined in the relationship definition.
-    let relationship_arguments: BTreeMap<String, models::Argument> = arguments
+    let relationship_arguments: BTreeMap<models::ArgumentName, models::Argument> = arguments
         .relationship_arguments
         .into_iter()
         .map(|(key, argument)| Ok((key, relationship_argument_to_argument(argument)?)))
-        .collect::<Result<BTreeMap<String, models::Argument>, Error>>()?;
+        .collect::<Result<BTreeMap<models::ArgumentName, models::Argument>, Error>>()?;
 
     // these are arguments defined when calling the relationship.
-    let caller_arguments: BTreeMap<String, models::Argument> = arguments
+    let caller_arguments: BTreeMap<models::ArgumentName, models::Argument> = arguments
         .caller_arguments
         .into_iter()
         .map(|(key, argument)| Ok((key, relationship_argument_to_argument(argument)?)))
-        .collect::<Result<BTreeMap<String, models::Argument>, Error>>()?;
+        .collect::<Result<BTreeMap<models::ArgumentName, models::Argument>, Error>>()?;
 
     let mut arguments = relationship_arguments;
 
@@ -231,7 +175,7 @@ fn relationship_argument_to_argument(
     match argument {
         models::RelationshipArgument::Literal { value } => Ok(models::Argument::Literal { value }),
         models::RelationshipArgument::Variable { name } => Ok(models::Argument::Variable { name }),
-        models::RelationshipArgument::Column { .. } => Err(Error::NotSupported(
+        models::RelationshipArgument::Column { .. } => Err(Error::NotImplementedYet(
             "relationship column arguments".to_string(),
         )),
     }

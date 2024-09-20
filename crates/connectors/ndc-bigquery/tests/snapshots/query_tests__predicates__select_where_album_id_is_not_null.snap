@@ -1,0 +1,22 @@
+---
+source: crates/connectors/ndc-postgres/tests/query_tests.rs
+expression: result
+---
+[
+  {
+    "rows": [
+      {
+        "Title": "Balls to the Wall"
+      },
+      {
+        "Title": "Permanent Vacation"
+      },
+      {
+        "Title": "Jagged Little Pill"
+      },
+      {
+        "Title": "Facelift"
+      }
+    ]
+  }
+]

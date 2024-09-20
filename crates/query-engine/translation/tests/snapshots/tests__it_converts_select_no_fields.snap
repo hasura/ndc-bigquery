@@ -1,0 +1,23 @@
+---
+source: crates/query-engine/translation/tests/tests.rs
+expression: result
+---
+SELECT
+  JSON_OBJECT('rows', coalesce(ARRAY_AGG(rows_2), ARRAY [])) AS universe
+FROM
+  (
+    SELECT
+      JSON_OBJECT() AS rows_2
+    FROM
+      (
+        SELECT
+          1
+        FROM
+          test_project.test_dataset.albums AS albums_0
+        LIMIT
+          5 OFFSET 3
+      ) AS rows_inner_3
+  ) AS rows_inner_3
+
+[]
+

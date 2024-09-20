@@ -1,6 +1,6 @@
 on: [push]
 
-name: Postgres NDC component benchmarks
+name: BigQuery NDC component benchmarks
 
 permissions:
   contents: write
@@ -22,7 +22,7 @@ jobs:
 
       - name: Build the Docker image 🔨
         run: |
-          docker load < $(nix build --no-link --print-out-paths '.#ndc-postgres-docker')
+          docker load < $(nix build --no-link --print-out-paths '.#docker')
 
       - name: Start dependencies ▶️
         run: |

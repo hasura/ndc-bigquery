@@ -1,8 +1,13 @@
 {
-  "collection": "Album",
+  "collection": "albums",
   "query": {
-    "fields": { "Title": { "type": "column", "column": "Title" } },
-    "where": {
+    "fields": {
+      "Title": {
+        "type": "column",
+        "column": "Title"
+      }
+    },
+    "predicate": {
       "type": "and",
       "expressions": [
         {
@@ -13,9 +18,16 @@
               "expressions": [
                 {
                   "type": "binary_comparison_operator",
-                  "column": { "type": "column", "name": "Title", "path": [] },
-                  "operator": { "type": "equal" },
-                  "value": { "type": "scalar", "value": "Facelift" }
+                  "column": {
+                    "type": "column",
+                    "name": "Title",
+                    "path": []
+                  },
+                  "operator": "_eq",
+                  "value": {
+                    "type": "scalar",
+                    "value": "Facelift"
+                  }
                 }
               ]
             },
@@ -24,13 +36,32 @@
               "expressions": [
                 {
                   "type": "binary_comparison_operator",
-                  "column": { "type": "column", "name": "Title", "path": [] },
-                  "operator": { "type": "equal" },
-                  "value": { "type": "scalar", "value": "Jagged Little Pill" }
+                  "column": {
+                    "type": "column",
+                    "name": "Title",
+                    "path": []
+                  },
+                  "operator": "_eq",
+                  "value": {
+                    "type": "scalar",
+                    "value": "Jagged Little Pill"
+                  }
                 }
               ]
             }
           ]
+        }
+      ]
+    },
+    "order_by": {
+      "elements": [
+        {
+          "order_direction": "asc",
+          "target": {
+            "type": "column",
+            "name": "AlbumId",
+            "path": []
+          }
         }
       ]
     }
