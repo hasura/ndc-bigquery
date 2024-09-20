@@ -3,6 +3,7 @@
 , lib
 , package
 , image-name
+, pgks
 , architecture ? null
 , tag ? null # defaults to the output hash
 , extraConfig ? { } # see config options at: https://github.com/moby/moby/blob/master/image/spec/v1.2.md#image-json-field-descriptions
@@ -12,7 +13,7 @@ let
   args = {
     name = image-name;
     created = "now";
-    contents = [ package ca-certificates ];
+    contents = [ pkgs.cacert ]
     config = {
       Entrypoint = [
         "/bin/${package.pname}"
