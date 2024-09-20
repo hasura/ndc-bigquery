@@ -1,5 +1,5 @@
 {
-  description = "BiiQuery data connector";
+  description = "BigQuery data connector";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs?branch=nixos-unstable";

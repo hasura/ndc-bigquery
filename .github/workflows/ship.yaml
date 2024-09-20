@@ -75,20 +75,20 @@ jobs:
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
           useDaemon: false # attempt to stop hanging on cleanup
 
-      - id: gcloud-auth
-        name: Authenticate to Google Cloud 🔑
-        uses: google-github-actions/auth@v2
-        with:
-          token_format: access_token
-          service_account: "hasura-ci-docker-writer@hasura-ddn.iam.gserviceaccount.com"
-          workload_identity_provider: "projects/1025009031284/locations/global/workloadIdentityPools/hasura-ddn/providers/github"
+      # - id: gcloud-auth
+        # name: Authenticate to Google Cloud 🔑
+        # uses: google-github-actions/auth@v2
+        # with:
+        #   token_format: access_token
+        #   service_account: "hasura-ci-docker-writer@hasura-ddn.iam.gserviceaccount.com"
+        #   workload_identity_provider: "projects/1025009031284/locations/global/workloadIdentityPools/hasura-ddn/providers/github"
 
-      - name: Login to Google Container Registry 📦
-        uses: "docker/login-action@v3"
-        with:
-          registry: "us-docker.pkg.dev"
-          username: "oauth2accesstoken"
-          password: "${{ steps.gcloud-auth.outputs.access_token }}"
+      # - name: Login to Google Container Registry 📦
+      #   uses: "docker/login-action@v3"
+      #   with:
+      #     registry: "us-docker.pkg.dev"
+      #     username: "oauth2accesstoken"
+      #     password: "${{ steps.gcloud-auth.outputs.access_token }}"
 
       - name: Login to GitHub Container Registry 📦
         uses: docker/login-action@v3
@@ -97,8 +97,8 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Push Docker images to Google Container Registry 🚢
-        run: nix run .#publish-docker-image '${{ github.ref }}' 'us-docker.pkg.dev/hasura-ddn/ddn/ndc-bigquery'
+      # - name: Push Docker images to Google Container Registry 🚢
+      #   run: nix run .#publish-docker-image '${{ github.ref }}' 'us-docker.pkg.dev/hasura-ddn/ddn/ndc-bigquery'
 
       - name: Push Docker images to GitHub Packages 🚢
         run: nix run .#publish-docker-image '${{ github.ref }}' 'ghcr.io/hasura/ndc-bigquery'
