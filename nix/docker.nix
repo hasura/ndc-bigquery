@@ -2,18 +2,18 @@
 { dockerTools
 , lib
 , package
+, ca-certificates
 , image-name
 , architecture ? null
 , tag ? null # defaults to the output hash
 , extraConfig ? { } # see config options at: https://github.com/moby/moby/blob/master/image/spec/v1.2.md#image-json-field-descriptions
 }:
-
 let
   seconds = 1000 * 1000 * 1000; # nanoseconds in 1 second
   args = {
     name = image-name;
     created = "now";
-    contents = [ package ];
+    contents = [ package ca-certificates ];
     config = {
       Entrypoint = [
         "/bin/${package.pname}"
