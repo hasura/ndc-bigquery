@@ -13,7 +13,7 @@ let
   args = {
     name = image-name;
     created = "now";
-    contents = [ pkgs.cacert ]
+    contents = [ pkgs.cacert ];
     config = {
       Entrypoint = [
         "/bin/${package.pname}"
