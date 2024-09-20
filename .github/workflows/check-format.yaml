@@ -1,4 +1,4 @@
-name: Postgres NDC format
+name: BigQuery NDC format
 
 on:
   push:
