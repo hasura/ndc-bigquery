@@ -2,7 +2,6 @@
 { dockerTools
 , lib
 , package
-, ca-certificates
 , image-name
 , architecture ? null
 , tag ? null # defaults to the output hash
