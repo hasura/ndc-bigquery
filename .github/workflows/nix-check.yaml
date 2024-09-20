@@ -19,8 +19,8 @@ jobs:
       - name: Set up the Nix Cache 🔌
         uses: cachix/cachix-action@v15
         with:
-          name: ndc-bigquery
-          # authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+          name: hasura-v3-dev
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
           useDaemon: false # attempt to stop hanging on cleanup
 
       - name: nix flake check
@@ -42,8 +42,8 @@ jobs:
       - name: Set up the Nix Cache 🔌
         uses: cachix/cachix-action@v15
         with:
-          name: ndc-bigquery
-          # authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+          name: hasura-v3-dev
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
           useDaemon: false # attempt to stop hanging on cleanup
 
       - name: nix develop --command true
