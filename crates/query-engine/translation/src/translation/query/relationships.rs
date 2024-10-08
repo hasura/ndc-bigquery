@@ -9,6 +9,8 @@ use crate::translation::error::Error;
 use crate::translation::helpers::{Env, State, TableNameAndReference};
 use query_engine_sql::sql;
 
+/// Information about a join we need to perform.
+#[derive(Debug)]
 pub struct JoinFieldInfo {
     pub table_alias: sql::ast::TableAlias,
     pub column_alias: sql::ast::ColumnAlias,
@@ -25,6 +27,11 @@ pub fn translate_joins(
     // We got these by processing the fields selection.
     join_fields: Vec<JoinFieldInfo>,
 ) -> Result<Vec<sql::ast::Join>, Error> {
+
+    println!("join_fields: {:#?}", join_fields);
+
+
+
     // traverse and build a join.
     join_fields
         .into_iter()

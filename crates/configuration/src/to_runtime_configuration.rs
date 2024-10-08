@@ -172,7 +172,6 @@ fn convert_nullable(nullable: &metadata::Nullable) -> query_engine_metadata::met
 fn convert_type(r#type: metadata::Type) -> query_engine_metadata::metadata::Type {
     match r#type {
         metadata::Type::ScalarType(t) => query_engine_metadata::metadata::Type::ScalarType(t),
-        metadata::Type::CompositeType(t) => query_engine_metadata::metadata::Type::CompositeType(t),
         metadata::Type::ArrayType(t) => {
             query_engine_metadata::metadata::Type::ArrayType(Box::new(convert_type(*t)))
         }
