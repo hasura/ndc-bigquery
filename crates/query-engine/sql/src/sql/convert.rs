@@ -99,18 +99,8 @@ impl SelectList {
                 table_reference.to_sql(sql);
                 sql.append_syntax(".*");
             }
-            SelectList::SelectStarComposite(expr) => {
-                sql.append_syntax("(");
-                expr.to_sql(sql);
-                sql.append_syntax(").*");
-            }
             SelectList::Select1 => {
                 sql.append_syntax("1");
-            }
-            SelectList::SelectListComposite(select_list1, select_list2) => {
-                select_list1.to_sql(sql);
-                sql.append_syntax(", ");
-                select_list2.to_sql(sql);
             }
         }
     }

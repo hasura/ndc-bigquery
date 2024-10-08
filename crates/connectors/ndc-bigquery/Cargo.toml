@@ -47,6 +47,6 @@ axum-test-helper = { workspace = true }
 insta = { workspace = true, features = ["json"] }
 env_logger = { workspace = true }
 hyper = { workspace = true, features = ["tcp"] }
-reqwest = { workspace = true, default-features = false, features = ["rustls-tls"] }
+reqwest = { workspace = true, features = ["rustls-tls"] }
 similar-asserts = { workspace = true }
 url = { workspace = true }

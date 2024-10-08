@@ -35,11 +35,7 @@ pub fn translate_json_value(
                 sql::ast::Expression::Value(sql::ast::Value::JsonValue(value.clone()));
             translate_projected_variable(env, state, r#type, value_expression)
         }
-        (serde_json::Value::Object(_obj), database::Type::CompositeType(_type_name)) => {
-            let value_expression =
-                sql::ast::Expression::Value(sql::ast::Value::JsonValue(value.clone()));
-            translate_projected_variable(env, state, r#type, value_expression)
-        }
+
         // If the type is not congruent with the value constructor we simply pass the json value
         // raw and cast to the specified type. This allows users to consume any json values,
         // treating them either as actual json or as any type that has a cast from json defined.
@@ -95,18 +91,6 @@ fn type_to_ast_scalar_type_name(
                 }
             }
         }
-        query_engine_metadata::metadata::Type::CompositeType(t) => {
-            let type_info = env.lookup_composite_type(t)?;
-            let type_name = type_info.type_name().to_string();
-            Ok(if let Some(schema_name) = type_info.schema_name() {
-                sql::ast::ScalarTypeName::Qualified {
-                    type_name,
-                    schema_name: sql::ast::SchemaName(schema_name.to_string()),
-                }
-            } else {
-                sql::ast::ScalarTypeName::Unqualified(type_name)
-            })
-        }
     }
 }
 
@@ -151,16 +135,6 @@ pub fn translate_projected_variable(
     exp: sql::ast::Expression,
 ) -> Result<sql::ast::Expression, Error> {
     let result = match r#type {
-        database::Type::CompositeType(_type_name) => sql::ast::Expression::FunctionCall {
-            function: sql::ast::Function::JsonbPopulateRecord,
-            args: vec![
-                sql::ast::Expression::Cast {
-                    expression: Box::new(sql::ast::Expression::Value(sql::ast::Value::Null)),
-                    r#type: type_to_ast_scalar_type(env, r#type)?,
-                },
-                exp,
-            ],
-        },
         // We translate projection of array types into the following sql:
         // ```
         // ( SELECT
