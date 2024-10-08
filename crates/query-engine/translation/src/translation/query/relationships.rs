@@ -27,10 +27,7 @@ pub fn translate_joins(
     // We got these by processing the fields selection.
     join_fields: Vec<JoinFieldInfo>,
 ) -> Result<Vec<sql::ast::Join>, Error> {
-
     println!("join_fields: {:#?}", join_fields);
-
-
 
     // traverse and build a join.
     join_fields

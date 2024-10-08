@@ -28,52 +28,48 @@ pub(crate) fn translate_fields(
 
     let columns: Vec<(sql::ast::ColumnAlias, sql::ast::Expression)> = fields
         .into_iter()
-        .map(|(alias, field)|
-
-             {
-            match field {
-                    models::Field::Column {
-                        column,
-                        fields: None,
-                        arguments,
-                    } if arguments.is_empty() => unpack_and_wrap_fields(
-                        env,
-                        current_table,
-                        &column,
-                        sql::helpers::make_column_alias(alias.to_string()),
-                        &fields_info,
-                    ),
-                    models::Field::Column {
-                        column: _,
-                        fields: _,
-                        arguments: _,
-                    } => Err(Error::CapabilityNotSupported(
-                        UnsupportedCapabilities::FieldArguments,
-                    )),
-                    models::Field::Relationship {
-                        query,
-                        relationship,
-                        arguments,
-                    } => {
-                        let table_alias = state.make_relationship_table_alias(alias.as_str());
-                        let column_alias = sql::helpers::make_column_alias(alias.to_string());
-                        let column_name = sql::ast::ColumnReference::AliasedColumn {
-                            table: sql::ast::TableReference::AliasedTable(table_alias.clone()),
-                            column: column_alias.clone(),
-                        };
-                        join_relationship_fields.push(relationships::JoinFieldInfo {
-                            table_alias,
-                            column_alias: column_alias.clone(),
-                            relationship_name: relationship,
-                            arguments,
-                            query: *query,
-                        });
-                        Ok((
-                            column_alias,
-                            sql::ast::Expression::ColumnReference(column_name),
-                        ))
-                    }
-                }
+        .map(|(alias, field)| match field {
+            models::Field::Column {
+                column,
+                fields: None,
+                arguments,
+            } if arguments.is_empty() => unpack_and_wrap_fields(
+                env,
+                current_table,
+                &column,
+                sql::helpers::make_column_alias(alias.to_string()),
+                &fields_info,
+            ),
+            models::Field::Column {
+                column: _,
+                fields: _,
+                arguments: _,
+            } => Err(Error::CapabilityNotSupported(
+                UnsupportedCapabilities::FieldArguments,
+            )),
+            models::Field::Relationship {
+                query,
+                relationship,
+                arguments,
+            } => {
+                let table_alias = state.make_relationship_table_alias(alias.as_str());
+                let column_alias = sql::helpers::make_column_alias(alias.to_string());
+                let column_name = sql::ast::ColumnReference::AliasedColumn {
+                    table: sql::ast::TableReference::AliasedTable(table_alias.clone()),
+                    column: column_alias.clone(),
+                };
+                join_relationship_fields.push(relationships::JoinFieldInfo {
+                    table_alias,
+                    column_alias: column_alias.clone(),
+                    relationship_name: relationship,
+                    arguments,
+                    query: *query,
+                });
+                Ok((
+                    column_alias,
+                    sql::ast::Expression::ColumnReference(column_name),
+                ))
+            }
         })
         .collect::<Result<Vec<_>, Error>>()?;
 
@@ -106,7 +102,6 @@ pub(crate) fn translate_fields(
     Ok(select)
 }
 
-
 #[allow(clippy::too_many_arguments)]
 /// In order to return the expected type representation for each column,
 /// we need to wrap columns in type representation cast, and unpack composite types
@@ -118,7 +113,6 @@ fn unpack_and_wrap_fields(
     column: &models::FieldName,
     alias: sql::ast::ColumnAlias,
     fields_info: &FieldsInfo<'_>,
-
 ) -> Result<(sql::ast::ColumnAlias, sql::ast::Expression), Error> {
     let column_info = fields_info.lookup_column(column)?;
 

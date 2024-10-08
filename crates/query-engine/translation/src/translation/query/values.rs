@@ -91,7 +91,6 @@ fn type_to_ast_scalar_type_name(
                 }
             }
         }
-
     }
 }
 
@@ -136,7 +135,6 @@ pub fn translate_projected_variable(
     exp: sql::ast::Expression,
 ) -> Result<sql::ast::Expression, Error> {
     let result = match r#type {
-
         // We translate projection of array types into the following sql:
         // ```
         // ( SELECT

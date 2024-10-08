@@ -102,7 +102,6 @@ impl SelectList {
             SelectList::Select1 => {
                 sql.append_syntax("1");
             }
-
         }
     }
 }

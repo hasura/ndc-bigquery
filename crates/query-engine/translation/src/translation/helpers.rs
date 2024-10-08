@@ -100,7 +100,7 @@ pub enum FieldsInfo<'env> {
     NativeQuery {
         name: &'env models::CollectionName,
         info: &'env metadata::NativeQueryInfo,
-    }
+    },
 }
 
 impl<'a> From<&'a CollectionInfo<'a>> for FieldsInfo<'a> {
@@ -346,7 +346,6 @@ impl FieldsInfo<'_> {
                 .ok_or_else(|| {
                     Error::ColumnNotFoundInCollection(column_name.clone(), name.as_str().into())
                 }),
-
         }
     }
 }

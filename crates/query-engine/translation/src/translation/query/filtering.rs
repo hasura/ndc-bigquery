@@ -712,7 +712,6 @@ fn get_column_scalar_type_name(
         database::Type::ArrayType(_) => Err(Error::NonScalarTypeUsedInOperator {
             r#type: typ.clone(),
         }),
-
     }
 }
 
