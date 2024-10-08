@@ -143,6 +143,7 @@ fn translate_rows_select(
             fields,
             &current_table,
             from_clause,
+
             &mut join_relationship_fields,
         )?,
         ReturnsFields::NoFieldsWereRequested => {
@@ -160,17 +161,6 @@ fn translate_rows_select(
             }
         }
     };
-
-    // // translate fields to columns or relationships.
-    // let mut fields_select = fields::translate_fields(
-    //     env,
-    //     state,
-    //     fields,
-    //     &current_table,
-    //     from_clause,
-    //     &mut join_relationship_fields,
-    //     returns_fields.clone(),
-    // )?;
 
     // Translate the common part of the query - where, order by, limit, etc.
     translate_query_part(

@@ -13,8 +13,6 @@ use query_engine_metadata::metadata::{Type, TypeRepresentation};
 use query_engine_sql::sql;
 
 /// Translate the field-selection of a query to SQL.
-/// Because field selection may be nested this function is mutually recursive with
-/// 'translate_nested_field'.
 pub(crate) fn translate_fields(
     env: &Env,
     state: &mut State,
@@ -51,7 +49,7 @@ pub(crate) fn translate_fields(
                 query,
                 relationship,
                 arguments,
-            } => {
+            } if arguments.is_empty() => {
                 let table_alias = state.make_relationship_table_alias(alias.as_str());
                 let column_alias = sql::helpers::make_column_alias(alias.to_string());
                 let column_name = sql::ast::ColumnReference::AliasedColumn {
@@ -70,34 +68,20 @@ pub(crate) fn translate_fields(
                     sql::ast::Expression::ColumnReference(column_name),
                 ))
             }
+            models::Field::Relationship {
+                query: _,
+                relationship: _,
+                arguments: _,
+            } => Err(Error::CapabilityNotSupported(
+                UnsupportedCapabilities::FieldArguments,
+            )),
+
         })
         .collect::<Result<Vec<_>, Error>>()?;
 
     let mut select = sql::helpers::simple_select(columns);
 
     select.from = Some(from);
-
-    // let select_final = match returns_field {
-    //     ReturnsFields::FieldsWereRequested => {
-    //         (select)
-    //     }
-    //     ReturnsFields::NoFieldsWereRequested => {
-    //         // If fields were requested, we need to return the fields as they are.
-    //         // This is the default behavior.
-    //         let select_1 = sql::ast::SelectList::Select1;
-    //         let select = sql::ast::Select {
-    //             with: sql::helpers::empty_with(),
-    //             select_list: select_1,
-    //             from: Some(from),
-    //             joins: vec![],
-    //             where_: sql::ast::Where(sql::helpers::empty_where()),
-    //             group_by:sql::helpers::empty_group_by(),
-    //             order_by: sql::helpers::empty_order_by(),
-    //             limit: sql::helpers::empty_limit(),
-    //         };
-    //         select
-    //     }
-    // };
 
     Ok(select)
 }
