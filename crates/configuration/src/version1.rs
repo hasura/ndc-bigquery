@@ -409,6 +409,27 @@ fn get_scalar_types(type_names: &Vec<TypeItem>, schema_name: String) -> database
             _ => "any",
         };
         let type_name_scalar = ScalarTypeName::new(type_name.into());
+        let type_rep = match type_item.name.as_str().to_lowercase().as_str() {
+            "bool" | "boolean" => Some(database::TypeRepresentation::Boolean),
+            "int16" | "smallint" => Some(database::TypeRepresentation::Int16),
+            "int" | "int32" | "integer" => Some(database::TypeRepresentation::Int32),
+            "int64" | "bigint" => Some(database::TypeRepresentation::Int64),
+            "numeric" => Some(database::TypeRepresentation::BigDecimal),
+            "float64" | "float" |"float8" => Some(database::TypeRepresentation::Float64),
+            "real" | "float4" => Some(database::TypeRepresentation::Float32),
+            "double precision" => Some(database::TypeRepresentation::Float64),
+            "text" => Some(database::TypeRepresentation::String),
+            "string" => Some(database::TypeRepresentation::String),
+            "character" => Some(database::TypeRepresentation::String),
+            "json" | "jsonb" => Some(database::TypeRepresentation::Json),
+            "date" => Some(database::TypeRepresentation::Date),
+            "timetz" | "time with time zone" => Some(database::TypeRepresentation::Timetz),
+            "time" | "time without time zone" => Some(database::TypeRepresentation::Time),
+            "timestamptz" | "timestamp with time zone" => Some(database::TypeRepresentation::Timestamptz),
+            "timestamp" | "timestamp without time zone" => Some(database::TypeRepresentation::Timestamp),
+            "uuid" => Some(database::TypeRepresentation::UUID),
+            _ => None,
+        };
         scalar_types.insert(
             type_name_scalar.clone(),
             database::ScalarType {
@@ -417,7 +438,7 @@ fn get_scalar_types(type_names: &Vec<TypeItem>, schema_name: String) -> database
                 comparison_operators: get_comparison_operators_for_type(&type_name_scalar),
                 aggregate_functions: get_aggregate_functions_for_type(&type_name_scalar),
                 description: None,
-                type_representation: None,
+                type_representation: (type_rep),
             },
             // get_comparison_operators_for_type(&type_name.name),
         );
