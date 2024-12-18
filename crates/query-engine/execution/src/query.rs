@@ -1,6 +1,6 @@
 //! Execute an execution plan against the database.
 
-use crate::error::Error;
+use crate::error::{Error, QueryError};
 use crate::metrics;
 use bytes::{BufMut, Bytes, BytesMut};
 use gcp_bigquery_client::model::query_request::QueryRequest;
@@ -68,7 +68,7 @@ pub async fn execute(
                 .job()
                 .query(project_id, query_request)
                 .await
-                .unwrap();
+                .map_err(|e| Error::Query(QueryError::DBError(e)))?;
 
             while rs.next_row() {
                 let this_row = rs.get_string(0).unwrap().unwrap(); // we should only have one row called 'universe'

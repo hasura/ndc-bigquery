@@ -27,7 +27,7 @@ pub const CONFIGURATION_FILENAME: &str = "configuration.json";
 pub const DEFAULT_SERVICE_KEY_VARIABLE: &str = "HASURA_BIGQUERY_SERVICE_KEY";
 pub const DEFAULT_PROJECT_ID_VARIABLE: &str = "HASURA_BIGQUERY_PROJECT_ID";
 pub const DEFAULT_DATASET_ID_VARIABLE: &str = "HASURA_BIGQUERY_DATASET_ID";
-const CONFIGURATION_QUERY: &str = include_str!("config2.sql");
+const CONFIGURATION_QUERY: &str = include_str!("configuration.sql");
 const CONFIGURATION_JSONSCHEMA_FILENAME: &str = "schema.json";
 
 const CHARACTER_STRINGS: [&str; 3] = ["character", "text", "string"];
@@ -166,8 +166,6 @@ pub async fn configure(
         .collect::<Vec<_>>();
 
     let scalar_types = get_scalar_types(&types, schema_name);
-
-    // get tables_info
 
     let config_query_string = CONFIGURATION_QUERY.to_string();
 
@@ -315,7 +313,7 @@ fn get_aggregate_functions_for_type(
         aggregate_functions.insert(
             AggregateFunctionName::new("APPROX_COUNT_DISTINCT".into()),
             database::AggregateFunction {
-                return_type: TypeName::new("bigint".to_string().into()),
+                return_type: TypeName::new("int64".to_string().into()),
             },
         );
     }
@@ -324,7 +322,7 @@ fn get_aggregate_functions_for_type(
         aggregate_functions.insert(
             AggregateFunctionName::new("COUNT".into()),
             database::AggregateFunction {
-                return_type: TypeName::new("bigint".to_string().into()),
+                return_type: TypeName::new("int64".to_string().into()),
             },
         );
     }
@@ -334,8 +332,7 @@ fn get_aggregate_functions_for_type(
             || APPROX_NUMERICS.contains(&type_name.as_str())
             || CHARACTER_STRINGS.contains(&type_name.as_str())
             || type_name.as_str() == "date"
-            || type_name.as_str() == "datetime"
-            || type_name.as_str() == "uuid")
+            || type_name.as_str() == "datetime")
     {
         aggregate_functions.insert(
             AggregateFunctionName::new("MIN".into()),
@@ -352,10 +349,10 @@ fn get_aggregate_functions_for_type(
     }
 
     if let Some(precise_return_type) = match type_name.as_str() {
-        "tinyint" | "smallint" | "int16" => Some("smallint"),
-        "int" | "int32" => Some("integer"),
-        "bigint" | "int64" => Some("bigint"),
-        "float" | "real" => Some("float"),
+        "tinyint" | "smallint" | "int16" => Some("int64"),
+        "int" | "int32" => Some("int64"),
+        "bigint" | "int64" => Some("int64"),
+        "float" | "real" => Some("float64"),
         _ => None,
     } {
         aggregate_functions.insert(
@@ -387,25 +384,21 @@ fn get_scalar_types(type_names: &Vec<TypeItem>, schema_name: String) -> database
 
     for type_item in type_names {
         let type_name = match type_item.name.as_str().to_lowercase().as_str() {
-            "bool" | "boolean" => "boolean",
-            "int16" | "smallint" => "smallint",
-            "int" | "int32" | "integer" => "integer",
-            "int64" | "bigint" => "bigint",
-            "numeric" => "numeric",
-            "float64" | "float" => "float",
-            "real" => "real",
-            "double precision" => "double precision",
-            "text" => "text",
             "string" => "string",
-            "character" => "character",
-            "json" => "json",
-            "jsonb" => "jsonb",
+            "bytes" => "bytes",
+            "int64" => "int64",
+            "float64" => "float64",
+            "bool" => "boolean",
+            "numeric" => "numeric",
+            "bignumeric" => "bignumeric",
+            "geography" => "geography",
             "date" => "date",
-            "timetz" | "time with time zone" => "timetz",
-            "time" | "time without time zone" => "time",
-            "timestamptz" | "timestamp with time zone" => "timestamptz",
-            "timestamp" | "timestamp without time zone" => "timestamp",
-            "uuid" => "uuid",
+            "datetime" => "datetime",
+            "time" => "time",
+            "timestamp" => "timestamp",
+            "json" => "json",
+            t if t.starts_with("array<") => "array",
+            t if t.starts_with("struct<") => "struct",
             _ => "any",
         };
         let type_name_scalar = ScalarTypeName::new(type_name.into());
@@ -417,9 +410,8 @@ fn get_scalar_types(type_names: &Vec<TypeItem>, schema_name: String) -> database
                 comparison_operators: get_comparison_operators_for_type(&type_name_scalar),
                 aggregate_functions: get_aggregate_functions_for_type(&type_name_scalar),
                 description: None,
-                type_representation: None,
+                type_representation: get_type_representation(&type_name_scalar),
             },
-            // get_comparison_operators_for_type(&type_name.name),
         );
     }
 
@@ -530,4 +522,25 @@ fn get_comparison_operators_for_type(
         );
     }
     comparison_operators
+}
+
+fn get_type_representation(type_name: &ndc_models::ScalarTypeName) -> Option<database::TypeRepresentation> {
+    match type_name.as_str() {
+        "boolean" => Some(database::TypeRepresentation::Boolean),
+        "bytes" => Some(database::TypeRepresentation::Bytes),
+        "string" => Some(database::TypeRepresentation::String),
+        "int64" => Some(database::TypeRepresentation::Int64),
+        "float64" => Some(database::TypeRepresentation::Float64),
+        "numeric" => Some(database::TypeRepresentation::Numeric),    
+        "bignumeric" => Some(database::TypeRepresentation::BigNumeric),
+        "timestamp" => Some(database::TypeRepresentation::Timestamp),
+        "time" => Some(database::TypeRepresentation::Time),
+        "date" => Some(database::TypeRepresentation::Date),
+        "datetime" => Some(database::TypeRepresentation::Datetime),
+        "geography" => Some(database::TypeRepresentation::Geography),
+        "struct" => Some(database::TypeRepresentation::Struct(BTreeMap::new())),
+        "array" => Some(database::TypeRepresentation::Array(Box::new(database::TypeRepresentation::String))),
+        "json" => Some(database::TypeRepresentation::Json),
+        _ => None,
+    }
 }

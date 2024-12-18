@@ -265,61 +265,52 @@ fn convert_type_representation(
         metadata::TypeRepresentation::Boolean => {
             query_engine_metadata::metadata::TypeRepresentation::Boolean
         }
+        metadata::TypeRepresentation::Bytes => {
+            query_engine_metadata::metadata::TypeRepresentation::Bytes
+        }
         metadata::TypeRepresentation::String => {
             query_engine_metadata::metadata::TypeRepresentation::String
-        }
-        metadata::TypeRepresentation::Float32 => {
-            query_engine_metadata::metadata::TypeRepresentation::Float32
-        }
-        metadata::TypeRepresentation::Float64 => {
-            query_engine_metadata::metadata::TypeRepresentation::Float64
-        }
-        metadata::TypeRepresentation::Int16 => {
-            query_engine_metadata::metadata::TypeRepresentation::Int16
-        }
-        metadata::TypeRepresentation::Int32 => {
-            query_engine_metadata::metadata::TypeRepresentation::Int32
         }
         metadata::TypeRepresentation::Int64 => {
             query_engine_metadata::metadata::TypeRepresentation::Int64
         }
-        metadata::TypeRepresentation::Int64AsString => {
-            query_engine_metadata::metadata::TypeRepresentation::Int64AsString
+        metadata::TypeRepresentation::Float64 => {
+            query_engine_metadata::metadata::TypeRepresentation::Float64
         }
-        metadata::TypeRepresentation::BigDecimal => {
-            query_engine_metadata::metadata::TypeRepresentation::BigDecimal
+        metadata::TypeRepresentation::Numeric => {
+            query_engine_metadata::metadata::TypeRepresentation::Numeric
         }
-        metadata::TypeRepresentation::BigDecimalAsString => {
-            query_engine_metadata::metadata::TypeRepresentation::BigDecimalAsString
+        metadata::TypeRepresentation::BigNumeric => {
+            query_engine_metadata::metadata::TypeRepresentation::BigNumeric
         }
         metadata::TypeRepresentation::Timestamp => {
             query_engine_metadata::metadata::TypeRepresentation::Timestamp
         }
-        metadata::TypeRepresentation::Timestamptz => {
-            query_engine_metadata::metadata::TypeRepresentation::Timestamptz
-        }
         metadata::TypeRepresentation::Time => {
             query_engine_metadata::metadata::TypeRepresentation::Time
-        }
-        metadata::TypeRepresentation::Timetz => {
-            query_engine_metadata::metadata::TypeRepresentation::Timetz
         }
         metadata::TypeRepresentation::Date => {
             query_engine_metadata::metadata::TypeRepresentation::Date
         }
-        metadata::TypeRepresentation::UUID => {
-            query_engine_metadata::metadata::TypeRepresentation::UUID
+        metadata::TypeRepresentation::Datetime => {
+            query_engine_metadata::metadata::TypeRepresentation::Datetime
+        }
+        metadata::TypeRepresentation::Array(inner) => {
+            query_engine_metadata::metadata::TypeRepresentation::Array(Box::new(
+                convert_type_representation(*inner),
+            ))
         }
         metadata::TypeRepresentation::Geography => {
             query_engine_metadata::metadata::TypeRepresentation::Geography
         }
-        metadata::TypeRepresentation::Geometry => {
-            query_engine_metadata::metadata::TypeRepresentation::Geometry
+        metadata::TypeRepresentation::Struct(fields) => {
+            query_engine_metadata::metadata::TypeRepresentation::Struct(
+                fields
+                    .into_iter()
+                    .map(|(k, v)| (k, Box::new(convert_type_representation(*v))))
+                    .collect(),
+            )
         }
-        // This is deprecated in ndc-spec
-        // TODO(PY): do we want to include number and integer?
-        // metadata::TypeRepresentation::Number
-        // | metadata::TypeRepresentation::Integer
         metadata::TypeRepresentation::Json => {
             query_engine_metadata::metadata::TypeRepresentation::Json
         }

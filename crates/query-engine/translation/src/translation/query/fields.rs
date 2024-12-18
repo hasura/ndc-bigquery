@@ -204,7 +204,7 @@ fn get_type_representation_cast_type(
     match type_representation {
         // In these situations, we expect to cast the expression according
         // to the type representation.
-        TypeRepresentation::Int64AsString | TypeRepresentation::BigDecimalAsString => {
+        TypeRepresentation::Bytes | TypeRepresentation::Numeric | TypeRepresentation::BigNumeric => {
             Some(sql::helpers::text_type_name())
         }
 
@@ -212,21 +212,16 @@ fn get_type_representation_cast_type(
         // the expression, so we don't cast it.
         TypeRepresentation::Boolean
         | TypeRepresentation::String
-        | TypeRepresentation::Float32
-        | TypeRepresentation::Float64
-        | TypeRepresentation::Int16
-        | TypeRepresentation::Int32
         | TypeRepresentation::Int64
-        | TypeRepresentation::BigDecimal
+        | TypeRepresentation::Float64
         | TypeRepresentation::Timestamp
-        | TypeRepresentation::Timestamptz
         | TypeRepresentation::Time
-        | TypeRepresentation::Timetz
         | TypeRepresentation::Date
-        | TypeRepresentation::UUID
+        | TypeRepresentation::Datetime
         | TypeRepresentation::Geography
-        | TypeRepresentation::Geometry
+        | TypeRepresentation::Struct(_)
         | TypeRepresentation::Json
-        | TypeRepresentation::Enum(_) => None,
+        | TypeRepresentation::Enum(_)
+        | TypeRepresentation::Array(_) => None,
     }
 }

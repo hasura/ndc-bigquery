@@ -247,40 +247,32 @@ impl TypeRepresentations {
 pub enum TypeRepresentation {
     /// JSON booleans
     Boolean,
+    /// bytes
+    Bytes,
     /// Any JSON string
     String,
-    /// float4
-    Float32,
-    /// float8
-    Float64,
-    /// int2
-    Int16,
-    /// int4
-    Int32,
-    /// int8 as integer
+    /// int64
     Int64,
-    /// int8 as string
-    Int64AsString,
+    /// float64
+    Float64,
     /// numeric
-    BigDecimal,
-    /// numeric as string
-    BigDecimalAsString,
-    /// timestamp
+    Numeric,
+    /// bignumeric
+    BigNumeric,
+    /// Timestamp
     Timestamp,
-    /// timestamp with timezone
-    Timestamptz,
     /// time
     Time,
-    /// time with timezone
-    Timetz,
     /// date
     Date,
+    /// datetime
+    Datetime,
     /// uuid
-    UUID,
+    Array(Box<TypeRepresentation>),
     /// geography
     Geography,
-    /// geometry
-    Geometry,
+    /// struct
+    Struct(BTreeMap<String, Box<TypeRepresentation>>),
     /// An arbitrary json.
     Json,
     /// One of the specified string values

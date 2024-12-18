@@ -182,33 +182,24 @@ pub async fn get_schema(
 }
 
 /// Map our local type representation to ndc-spec type representation.
-#[allow(clippy::match_same_arms)] // merging arms would require changing the order, making this harder to understand
 fn map_type_representation(
     type_representation: &metadata::TypeRepresentation,
 ) -> models::TypeRepresentation {
     match type_representation {
         metadata::TypeRepresentation::Boolean => models::TypeRepresentation::Boolean,
+        metadata::TypeRepresentation::Bytes => models::TypeRepresentation::Bytes,
         metadata::TypeRepresentation::String => models::TypeRepresentation::String,
-        metadata::TypeRepresentation::Float32 => models::TypeRepresentation::Float32,
+        metadata::TypeRepresentation::Int64 => models::TypeRepresentation::Int64,
         metadata::TypeRepresentation::Float64 => models::TypeRepresentation::Float64,
-        metadata::TypeRepresentation::Int16 => models::TypeRepresentation::Int16,
-        metadata::TypeRepresentation::Int32 => models::TypeRepresentation::Int32,
-        // Int64 returns a number.
-        metadata::TypeRepresentation::Int64 => models::TypeRepresentation::JSON,
-        // Int64AsString returns a string.
-        metadata::TypeRepresentation::Int64AsString => models::TypeRepresentation::Int64,
-        // BigDecimal returns a number.
-        metadata::TypeRepresentation::BigDecimal => models::TypeRepresentation::JSON,
-        // BigDecimalAsString returns a string.
-        metadata::TypeRepresentation::BigDecimalAsString => models::TypeRepresentation::BigDecimal,
-        metadata::TypeRepresentation::Timestamp => models::TypeRepresentation::Timestamp,
-        metadata::TypeRepresentation::Timestamptz => models::TypeRepresentation::TimestampTZ,
+        metadata::TypeRepresentation::Numeric => models::TypeRepresentation::BigDecimal,
+        metadata::TypeRepresentation::BigNumeric => models::TypeRepresentation::BigDecimal,
+        metadata::TypeRepresentation::Timestamp => models::TypeRepresentation::TimestampTZ,
         metadata::TypeRepresentation::Time => models::TypeRepresentation::String,
-        metadata::TypeRepresentation::Timetz => models::TypeRepresentation::String,
         metadata::TypeRepresentation::Date => models::TypeRepresentation::Date,
-        metadata::TypeRepresentation::Geometry => models::TypeRepresentation::Geometry,
+        metadata::TypeRepresentation::Datetime => models::TypeRepresentation::TimestampTZ,
+        metadata::TypeRepresentation::Array(_) => models::TypeRepresentation::JSON,
         metadata::TypeRepresentation::Geography => models::TypeRepresentation::Geography,
-        metadata::TypeRepresentation::UUID => models::TypeRepresentation::UUID,
+        metadata::TypeRepresentation::Struct(_) => models::TypeRepresentation::JSON,
         metadata::TypeRepresentation::Json => models::TypeRepresentation::JSON,
         metadata::TypeRepresentation::Enum(variants) => models::TypeRepresentation::Enum {
             one_of: variants.clone(),
