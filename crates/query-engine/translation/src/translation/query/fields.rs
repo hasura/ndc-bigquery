@@ -204,9 +204,9 @@ fn get_type_representation_cast_type(
     match type_representation {
         // In these situations, we expect to cast the expression according
         // to the type representation.
-        TypeRepresentation::Bytes | TypeRepresentation::Numeric | TypeRepresentation::BigNumeric => {
-            Some(sql::helpers::text_type_name())
-        }
+        TypeRepresentation::Bytes
+        | TypeRepresentation::Numeric
+        | TypeRepresentation::BigNumeric => Some(sql::helpers::text_type_name()),
 
         // In these situations the type representation should be the same as
         // the expression, so we don't cast it.

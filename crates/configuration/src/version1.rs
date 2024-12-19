@@ -524,14 +524,16 @@ fn get_comparison_operators_for_type(
     comparison_operators
 }
 
-fn get_type_representation(type_name: &ndc_models::ScalarTypeName) -> Option<database::TypeRepresentation> {
+fn get_type_representation(
+    type_name: &ndc_models::ScalarTypeName,
+) -> Option<database::TypeRepresentation> {
     match type_name.as_str() {
         "boolean" => Some(database::TypeRepresentation::Boolean),
         "bytes" => Some(database::TypeRepresentation::Bytes),
         "string" => Some(database::TypeRepresentation::String),
         "int64" => Some(database::TypeRepresentation::Int64),
         "float64" => Some(database::TypeRepresentation::Float64),
-        "numeric" => Some(database::TypeRepresentation::Numeric),    
+        "numeric" => Some(database::TypeRepresentation::Numeric),
         "bignumeric" => Some(database::TypeRepresentation::BigNumeric),
         "timestamp" => Some(database::TypeRepresentation::Timestamp),
         "time" => Some(database::TypeRepresentation::Time),
@@ -539,7 +541,9 @@ fn get_type_representation(type_name: &ndc_models::ScalarTypeName) -> Option<dat
         "datetime" => Some(database::TypeRepresentation::Datetime),
         "geography" => Some(database::TypeRepresentation::Geography),
         "struct" => Some(database::TypeRepresentation::Struct(BTreeMap::new())),
-        "array" => Some(database::TypeRepresentation::Array(Box::new(database::TypeRepresentation::String))),
+        "array" => Some(database::TypeRepresentation::Array(Box::new(
+            database::TypeRepresentation::String,
+        ))),
         "json" => Some(database::TypeRepresentation::Json),
         _ => None,
     }
