@@ -5,10 +5,6 @@
 use thiserror::Error;
 use tracing::{info_span, Instrument};
 
-// use ndc_bigquery_configuration::PoolSettings;
-// use ndc_bigquery_configuration::ConfigurationError;
-// use super::configuration::{Configuration, ConfigurationError};
-// use query_engine_execution::database_info::{self, DatabaseInfo, DatabaseVersion};
 use query_engine_execution::metrics;
 
 /// State for our connector.
@@ -33,14 +29,19 @@ pub async fn create_state(
     .instrument(info_span!("Setup metrics"))
     .await?;
 
-    let service_account_key =
-        yup_oauth2::parse_service_account_key(configuration.service_key.clone()).unwrap();
-
-    // Init BigQuery client
-    let bigquery_client =
-        gcp_bigquery_client::Client::from_service_account_key(service_account_key, false)
-            .await
-            .unwrap();
+    let bigquery_client = match &configuration.auth {
+        (true, workload_identity_auth) => {
+            std::env::set_var("BIG_QUERY_AUTH_URL", workload_identity_auth);
+            gcp_bigquery_client::Client::with_workload_identity(false).await.unwrap()
+        }
+        (false, service_key) => {
+            let service_account_key =
+                yup_oauth2::parse_service_account_key(service_key.clone()).unwrap();
+            gcp_bigquery_client::Client::from_service_account_key(service_account_key, false)
+                .await
+                .unwrap()
+        }
+    };
 
     Ok(State {
         metrics,
