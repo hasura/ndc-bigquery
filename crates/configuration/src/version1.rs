@@ -98,30 +98,40 @@ pub async fn configure(
         Some(WorkloadIdentityAuth(Secret::Plain(value))) => {
             let url = Cow::Borrowed(value);
             std::env::set_var("BIG_QUERY_AUTH_URL", url.as_ref());
-            gcp_bigquery_client::Client::with_workload_identity(false).await.unwrap()
-        },
+            gcp_bigquery_client::Client::with_workload_identity(false)
+                .await
+                .unwrap()
+        }
         Some(WorkloadIdentityAuth(Secret::FromEnvironment { variable })) => {
             let url: Cow<'_, String> = Cow::Owned(environment.read(variable)?);
             std::env::set_var("BIG_QUERY_AUTH_URL", url.as_ref());
-            gcp_bigquery_client::Client::with_workload_identity(false).await.unwrap()
-        },
-        None => {
-            match &args.connection_settings.service_key {
-                Some(ServiceKey(Secret::Plain(value))) => {
-                    let service_key = Cow::Borrowed(value);
-                    let service_account_key = yup_oauth2::parse_service_account_key(service_key.as_str()).unwrap();
-                    gcp_bigquery_client::Client::from_service_account_key(service_account_key, false).await.unwrap()
-                },
-                Some(ServiceKey(Secret::FromEnvironment { variable })) => {
-                    let service_key: Cow<'_, String> = Cow::Owned(environment.read(variable)?);
-                    let service_account_key = yup_oauth2::parse_service_account_key(service_key.as_str()).unwrap();
-                    gcp_bigquery_client::Client::from_service_account_key(service_account_key, false).await.unwrap()
-                },
-                None => {
-                    return Err(anyhow::anyhow!("Neither Workload Identity Auth URL or Service key is provided"));
-                },
-            }
+            gcp_bigquery_client::Client::with_workload_identity(false)
+                .await
+                .unwrap()
         }
+        None => match &args.connection_settings.service_key {
+            Some(ServiceKey(Secret::Plain(value))) => {
+                let service_key = Cow::Borrowed(value);
+                let service_account_key =
+                    yup_oauth2::parse_service_account_key(service_key.as_str()).unwrap();
+                gcp_bigquery_client::Client::from_service_account_key(service_account_key, false)
+                    .await
+                    .unwrap()
+            }
+            Some(ServiceKey(Secret::FromEnvironment { variable })) => {
+                let service_key: Cow<'_, String> = Cow::Owned(environment.read(variable)?);
+                let service_account_key =
+                    yup_oauth2::parse_service_account_key(service_key.as_str()).unwrap();
+                gcp_bigquery_client::Client::from_service_account_key(service_account_key, false)
+                    .await
+                    .unwrap()
+            }
+            None => {
+                return Err(anyhow::anyhow!(
+                    "Neither Workload Identity Auth URL or Service key is provided"
+                ));
+            }
+        },
     };
     // let service_key = match &args.connection_settings.service_key {
     //     Some(ServiceKey(Secret::Plain(value))) => Cow::Borrowed(value),
@@ -165,7 +175,7 @@ pub async fn configure(
 
     // std::env::set_var("BIG_QUERY_AUTH_URL", workload_identity_auth.as_ref());
 
-    // if 
+    // if
 
     // let bigquery_client_auth = gcp_bigquery_client::Client::with_workload_identity(true).await.unwrap();
 

@@ -16,9 +16,7 @@ pub fn make_runtime_configuration(
     environment: impl Environment,
 ) -> Result<crate::Configuration, MakeRuntimeConfigurationError> {
     let auth: (bool, String) = match parsed_config.connection_settings.workload_identity_auth {
-        Some(WorkloadIdentityAuth(Secret::Plain(key))) => {
-            Ok((true, key))
-        },
+        Some(WorkloadIdentityAuth(Secret::Plain(key))) => Ok((true, key)),
         Some(WorkloadIdentityAuth(Secret::FromEnvironment { variable })) => {
             let variable_value = environment.read(&variable).map_err(|error| {
                 MakeRuntimeConfigurationError::MissingEnvironmentVariable {
@@ -27,29 +25,25 @@ pub fn make_runtime_configuration(
                 }
             })?;
             Ok((true, variable_value))
-        },
-        None => {
-            match parsed_config.connection_settings.service_key {
-                Some(ServiceKey(Secret::Plain(key))) => {
-                    Ok((false, key))
-                },
-                Some(ServiceKey(Secret::FromEnvironment { variable })) => {
-                    let variable_value = environment.read(&variable).map_err(|error| {
-                        MakeRuntimeConfigurationError::MissingEnvironmentVariable {
-                            file_path: super::version1::CONFIGURATION_FILENAME.into(),
-                            message: error.to_string(),
-                        }
-                    })?;
-                    Ok((false, variable_value))
-                },
-                None => {
-                    return Err(MakeRuntimeConfigurationError::MissingEnvironmentVariable {
-                        file_path: super::version1::CONFIGURATION_FILENAME.into(),
-                        message: "Neither Workload Identity Auth URL or Service key is provided".into(),
-                    });
-                },
-            }
         }
+        None => match parsed_config.connection_settings.service_key {
+            Some(ServiceKey(Secret::Plain(key))) => Ok((false, key)),
+            Some(ServiceKey(Secret::FromEnvironment { variable })) => {
+                let variable_value = environment.read(&variable).map_err(|error| {
+                    MakeRuntimeConfigurationError::MissingEnvironmentVariable {
+                        file_path: super::version1::CONFIGURATION_FILENAME.into(),
+                        message: error.to_string(),
+                    }
+                })?;
+                Ok((false, variable_value))
+            }
+            None => {
+                return Err(MakeRuntimeConfigurationError::MissingEnvironmentVariable {
+                    file_path: super::version1::CONFIGURATION_FILENAME.into(),
+                    message: "Neither Workload Identity Auth URL or Service key is provided".into(),
+                });
+            }
+        },
     }?;
 
     let project_id = match parsed_config.connection_settings.project_id {

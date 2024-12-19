@@ -32,7 +32,9 @@ pub async fn create_state(
     let bigquery_client = match &configuration.auth {
         (true, workload_identity_auth) => {
             std::env::set_var("BIG_QUERY_AUTH_URL", workload_identity_auth);
-            gcp_bigquery_client::Client::with_workload_identity(false).await.unwrap()
+            gcp_bigquery_client::Client::with_workload_identity(false)
+                .await
+                .unwrap()
         }
         (false, service_key) => {
             let service_account_key =
