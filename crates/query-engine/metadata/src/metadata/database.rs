@@ -16,7 +16,6 @@ pub struct ScalarTypeTypeName(pub String);
 #[serde(rename_all = "camelCase")]
 pub enum Type {
     ScalarType(models::ScalarTypeName),
-    CompositeType(models::TypeName),
     ArrayType(Box<Type>),
 }
 
@@ -42,27 +41,6 @@ pub struct ScalarType {
     pub aggregate_functions: BTreeMap<models::AggregateFunctionName, AggregateFunction>,
     pub comparison_operators: BTreeMap<models::ComparisonOperatorName, ComparisonOperator>,
     pub type_representation: Option<TypeRepresentation>,
-}
-
-/// Map of all known composite types.
-#[derive(Debug, Clone, PartialEq, Eq, Default, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
-pub struct CompositeTypes(pub BTreeMap<models::TypeName, CompositeType>);
-
-impl CompositeTypes {
-    pub fn empty() -> Self {
-        CompositeTypes(BTreeMap::new())
-    }
-}
-
-/// Information about a composite type. These are very similar to tables, but with the crucial
-/// difference that composite types do not support constraints (such as NOT NULL).
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
-pub struct CompositeType {
-    pub type_name: String,
-    pub schema_name: Option<String>,
-    pub fields: BTreeMap<models::FieldName, FieldInfo>,
-    pub description: Option<String>,
 }
 
 /// The complete list of supported binary operators for scalar types.

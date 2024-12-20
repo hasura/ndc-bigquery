@@ -79,20 +79,6 @@ pub fn make_column_alias(name: String) -> ColumnAlias {
 
 // SELECTs //
 
-/// Build a simple 'SELECT (exp).*'
-pub fn select_composite(exp: Expression) -> Select {
-    Select {
-        with: empty_with(),
-        select_list: SelectList::SelectStarComposite(exp),
-        from: None,
-        joins: vec![],
-        where_: Where(empty_where()),
-        group_by: empty_group_by(),
-        order_by: empty_order_by(),
-        limit: empty_limit(),
-    }
-}
-
 /// Build a simple select with a select list and the rest are empty.
 pub fn simple_select(select_list: Vec<(ColumnAlias, Expression)>) -> Select {
     Select {
