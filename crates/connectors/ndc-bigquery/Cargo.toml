@@ -41,4 +41,3 @@ insta = { workspace = true, features = ["json"] }
 env_logger = { workspace = true }
 hyper = { workspace = true, features = ["tcp"] }
 reqwest = { workspace = true, features = ["rustls-tls"] }
-url = { workspace = true }
