@@ -13,16 +13,7 @@ pub fn execution_error_to_response(error: query_engine_execution::error::Error) 
             QueryError::NotSupported(_) => {
                 connector::QueryError::new_unsupported_operation(&query_error.to_string()).into()
             }
-            QueryError::DBError(_) => {
-                connector::QueryError::new_unprocessable_content(&query_error.to_string()).into()
-            }
-            QueryError::DBConstraintError(_) | QueryError::MutationConstraintFailed => {
-                connector::MutationError::new_constraint_not_met(&query_error.to_string()).into()
-            }
         },
-        Error::DB(_) => {
-            ErrorResponse::new_internal_with_details(serde_json::Value::String(error.to_string()))
-        }
     }
 }
 

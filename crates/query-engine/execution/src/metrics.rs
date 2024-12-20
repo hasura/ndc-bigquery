@@ -1,8 +1,6 @@
 //! Metrics setup and update for our connector.
 
-use std::time::Duration;
-
-use prometheus::{Gauge, Histogram, HistogramTimer, IntCounter, IntGauge, Registry};
+use prometheus::{Histogram, HistogramTimer, IntCounter, Registry};
 
 /// The collection of all metrics exposed through the `/metrics` endpoint.
 #[derive(Debug, Clone)]
@@ -11,11 +9,6 @@ pub struct Metrics {
     explain_total: IntCounter,
     query_plan_time: Histogram,
     query_execution_time: Histogram,
-    pool_max_connections: IntGauge,
-    pool_min_connections: IntGauge,
-    pool_acquire_timeout: Gauge,
-    pool_max_lifetime: Gauge,
-    pool_idle_timeout: Gauge,
     pub error_metrics: ErrorMetrics,
 }
 
@@ -24,56 +17,26 @@ impl Metrics {
     pub fn initialize(metrics_registry: &mut Registry) -> Result<Self, prometheus::Error> {
         let query_total = add_int_counter_metric(
             metrics_registry,
-            "postgres_ndc_query_total",
+            "bigquery_ndc_query_total",
             "Total successful queries.",
         )?;
 
         let explain_total = add_int_counter_metric(
             metrics_registry,
-            "postgres_ndc_explain_total",
+            "bigquery_ndc_explain_total",
             "Total successful explains.",
         )?;
 
         let query_plan_time = add_histogram_metric(
             metrics_registry,
-            "postgres_ndc_query_plan_time",
+            "bigquery_ndc_query_plan_time",
             "Time taken to plan a query for execution, in seconds.",
         )?;
 
         let query_execution_time = add_histogram_metric(
             metrics_registry,
-            "postgres_ndc_query_execution_time",
+            "bigquery_ndc_query_execution_time",
             "Time taken to execute an already-planned query, in seconds.",
-        )?;
-
-        let pool_max_connections = add_int_gauge_metric(
-            metrics_registry,
-            "postgres_ndc_pool_max_connections",
-            "The maximum number of connections that this pool should maintain.",
-        )?;
-
-        let pool_min_connections = add_int_gauge_metric(
-            metrics_registry,
-            "postgres_ndc_pool_min_connections",
-            "The minimum number of connections that this pool should maintain.",
-        )?;
-
-        let pool_acquire_timeout = add_gauge_metric(
-            metrics_registry,
-            "postgres_ndc_pool_acquire_timeout",
-            "Get the maximum amount of time to spend waiting for a connection, in seconds.",
-        )?;
-
-        let pool_idle_timeout = add_gauge_metric(
-            metrics_registry,
-            "postgres_ndc_pool_idle_timeout",
-            "Get the maximum idle duration for individual connections, in seconds.",
-        )?;
-
-        let pool_max_lifetime = add_gauge_metric(
-            metrics_registry,
-            "postgres_ndc_pool_max_lifetime",
-            "Get the maximum lifetime of individual connections, in seconds.",
         )?;
 
         let error_metrics = ErrorMetrics::initialize(metrics_registry)?;
@@ -83,11 +46,6 @@ impl Metrics {
             explain_total,
             query_plan_time,
             query_execution_time,
-            pool_max_connections,
-            pool_min_connections,
-            pool_acquire_timeout,
-            pool_max_lifetime,
-            pool_idle_timeout,
             error_metrics,
         })
     }
@@ -107,34 +65,6 @@ impl Metrics {
     pub fn time_query_execution(&self) -> Timer {
         Timer(self.query_execution_time.start_timer())
     }
-
-    // Set the metrics populated from the pool options.
-    //
-    // This only needs to be called once, as the options don't change.
-    pub fn set_pool_options_metrics(&self, pool_options: &sqlx::pool::PoolOptions<sqlx::Postgres>) {
-        let max_connections: i64 = pool_options.get_max_connections().into();
-        self.pool_max_connections.set(max_connections);
-
-        let min_connections: i64 = pool_options.get_min_connections().into();
-        self.pool_min_connections.set(min_connections);
-
-        let acquire_timeout: f64 = pool_options.get_acquire_timeout().as_secs_f64();
-        self.pool_acquire_timeout.set(acquire_timeout);
-
-        // if nothing is set, return 0
-        let idle_timeout: f64 = pool_options
-            .get_idle_timeout()
-            .unwrap_or(Duration::ZERO)
-            .as_secs_f64();
-        self.pool_idle_timeout.set(idle_timeout);
-
-        // if nothing is set, return 0
-        let max_lifetime: f64 = pool_options
-            .get_max_lifetime()
-            .unwrap_or(Duration::ZERO)
-            .as_secs_f64();
-        self.pool_max_lifetime.set(max_lifetime);
-    }
 }
 
 /// Create a new int counter metric and register it with the provided Prometheus Registry
@@ -146,26 +76,6 @@ fn add_int_counter_metric(
     let int_counter =
         IntCounter::with_opts(prometheus::Opts::new(metric_name, metric_description))?;
     register_collector(metrics_registry, int_counter)
-}
-
-/// Create a new int gauge metric and register it with the provided Prometheus Registry
-fn add_int_gauge_metric(
-    metrics_registry: &mut Registry,
-    metric_name: &str,
-    metric_description: &str,
-) -> Result<IntGauge, prometheus::Error> {
-    let int_gauge = IntGauge::with_opts(prometheus::Opts::new(metric_name, metric_description))?;
-    register_collector(metrics_registry, int_gauge)
-}
-
-/// Create a new gauge metric and register it with the provided Prometheus Registry
-fn add_gauge_metric(
-    metrics_registry: &mut Registry,
-    metric_name: &str,
-    metric_description: &str,
-) -> Result<Gauge, prometheus::Error> {
-    let gauge = Gauge::with_opts(prometheus::Opts::new(metric_name, metric_description))?;
-    register_collector(metrics_registry, gauge)
 }
 
 /// Create a new histogram metric using the default buckets, and register it with the provided
@@ -249,37 +159,37 @@ impl ErrorMetrics {
     ) -> Result<Self, prometheus::Error> {
         let invalid_request_total = add_int_counter_metric(
             metrics_registry,
-            "ndc_postgres_error_invalid_request_total_count",
+            "ndc_bigquery_error_invalid_request_total_count",
             "Total number of invalid requests encountered.",
         )?;
 
         let unsupported_capability_total = add_int_counter_metric(
             metrics_registry,
-            "ndc_postgres_error_unsupported_capability_total_count",
+            "ndc_bigquery_error_unsupported_capability_total_count",
             "Total number of invalid requests with unsupported capabilities encountered.",
         )?;
 
         let unsupported_feature_total = add_int_counter_metric(
             metrics_registry,
-            "ndc_postgres_error_unsupported_capabilities_total_count",
+            "ndc_bigquery_error_unsupported_capabilities_total_count",
             "Total number of invalid requests with unsupported capabilities encountered.",
         )?;
 
         let connector_error_total = add_int_counter_metric(
             metrics_registry,
-            "ndc_postgres_error_connector_error_total_count",
+            "ndc_bigquery_error_connector_error_total_count",
             "Total number of requests failed due to an internal conenctor error.",
         )?;
 
         let database_error_total = add_int_counter_metric(
             metrics_registry,
-            "ndc_postgres_error_database_error_total_count",
+            "ndc_bigquery_error_database_error_total_count",
             "Total number of requests failed due to a database error.",
         )?;
 
         let connection_acquisition_error_total = add_int_counter_metric(
             metrics_registry,
-            "ndc_postgres_error_connection_acquisition_error_total_count",
+            "ndc_bigquery_error_connection_acquisition_error_total_count",
             "Total number of failures to acquire a database connection.",
         )?;
 

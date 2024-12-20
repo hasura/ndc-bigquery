@@ -8,19 +8,13 @@ pub fn execution_error(error: &query_engine_execution::error::Error, metrics: &m
     tracing::error!("{}", error);
     match error {
         Error::Query(err) => match &err {
-            QueryError::VariableNotFound(_)
-            | QueryError::DBError(_)
-            | QueryError::MutationConstraintFailed
-            | QueryError::DBConstraintError(_) => {
+            QueryError::VariableNotFound(_) => {
                 metrics.error_metrics.record_invalid_request();
             }
             QueryError::NotSupported(_) => {
                 metrics.error_metrics.record_unsupported_feature();
             }
         },
-        Error::DB(_) => {
-            metrics.error_metrics.record_database_error();
-        }
     }
 }
 
