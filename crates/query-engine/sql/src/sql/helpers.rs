@@ -711,7 +711,7 @@ pub fn jsonb_type() -> ScalarType {
 
 /// An unqualified scalar type name representing text.
 pub fn text_type_name() -> ScalarTypeName {
-    ScalarTypeName::Unqualified("text".to_string())
+    ScalarTypeName::Unqualified("string".to_string())
 }
 
 /// Wrap a query that returns a single row in the following:

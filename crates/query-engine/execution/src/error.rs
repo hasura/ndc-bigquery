@@ -12,4 +12,6 @@ pub enum QueryError {
     VariableNotFound(String),
     #[error("{0} are not supported.")]
     NotSupported(String),
+    #[error("{0}")]
+    DBError(gcp_bigquery_client::error::BQError),
 }

@@ -292,7 +292,7 @@ impl<'request> Env<'request> {
     pub fn lookup_type_representation(
         &self,
         scalar_type: &models::ScalarTypeName,
-    ) -> Option<&metadata::TypeRepresentation> {
+    ) -> Option<&metadata::BigQueryType> {
         self.metadata
             .scalar_types
             .0

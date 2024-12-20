@@ -6,6 +6,7 @@ use query_engine_metadata::metadata::database;
 use query_engine_sql::sql;
 use query_engine_sql::sql::ast::{ColumnReference, Expression, Value};
 use query_engine_sql::sql::helpers::simple_select;
+use std::collections::BTreeMap;
 
 /// Convert a JSON value into a SQL value.
 pub fn translate_json_value(
@@ -69,6 +70,12 @@ fn type_to_ast_scalar_type_name(
 ) -> Result<sql::ast::ScalarTypeName, Error> {
     match typ {
         query_engine_metadata::metadata::Type::ArrayType(_) => {
+            Err(Error::NestedArrayTypesNotSupported)
+        }
+        query_engine_metadata::metadata::Type::RangeType(_) => {
+            Err(Error::NestedArrayTypesNotSupported)
+        }
+        query_engine_metadata::metadata::Type::StructType(_) => {
             Err(Error::NestedArrayTypesNotSupported)
         }
         query_engine_metadata::metadata::Type::ScalarType(t) => {
@@ -175,6 +182,74 @@ pub fn translate_projected_variable(
             result_select.from = Some(from_arr);
 
             sql::ast::Expression::CorrelatedSubSelect(Box::new(result_select))
+        }
+        database::Type::RangeType(range_type) => {
+            let start_expr = sql::ast::Expression::FunctionCall {
+                function: sql::ast::Function::Unknown("JSON_EXTRACT_SCALAR".to_string()),
+                args: vec![
+                    exp.clone(),
+                    sql::ast::Expression::Value(sql::ast::Value::String("$.start".to_string())),
+                ],
+            };
+            let end_expr = sql::ast::Expression::FunctionCall {
+                function: sql::ast::Function::Unknown("JSON_EXTRACT_SCALAR".to_string()),
+                args: vec![
+                    exp,
+                    sql::ast::Expression::Value(sql::ast::Value::String("$.end".to_string())),
+                ],
+            };
+
+            let (start_type, end_type) = match range_type {
+                database::TypeRange::Date => ("DATE", "DATE"),
+                database::TypeRange::Datetime => ("DATETIME", "DATETIME"),
+                database::TypeRange::Timestamp => ("TIMESTAMP", "TIMESTAMP"),
+            };
+
+            let start_cast = sql::ast::Expression::Cast {
+                expression: Box::new(start_expr),
+                r#type: sql::ast::ScalarType::BaseType(sql::ast::ScalarTypeName::Unqualified(
+                    start_type.to_string(),
+                )),
+            };
+            let end_cast = sql::ast::Expression::Cast {
+                expression: Box::new(end_expr),
+                r#type: sql::ast::ScalarType::BaseType(sql::ast::ScalarTypeName::Unqualified(
+                    end_type.to_string(),
+                )),
+            };
+
+            sql::ast::Expression::JsonBuildObject(
+                vec![
+                    ("start".to_string(), start_cast),
+                    ("end".to_string(), end_cast),
+                ]
+                .into_iter()
+                .collect(),
+            )
+        }
+        database::Type::StructType(struct_fields) => {
+            let fields: BTreeMap<String, sql::ast::Expression> = struct_fields
+                .iter()
+                .map(|(field_name, field_type)| {
+                    let field_expr = sql::ast::Expression::FunctionCall {
+                        function: sql::ast::Function::Unknown("JSON_EXTRACT_SCALAR".to_string()),
+                        args: vec![
+                            exp.clone(),
+                            sql::ast::Expression::Value(sql::ast::Value::String(format!(
+                                "$.{}",
+                                field_name
+                            ))),
+                        ],
+                    };
+                    let cast_expr = sql::ast::Expression::Cast {
+                        expression: Box::new(field_expr),
+                        r#type: type_to_ast_scalar_type(env, field_type)?,
+                    };
+                    Ok((field_name.clone(), cast_expr))
+                })
+                .collect::<Result<BTreeMap<_, _>, Error>>()?;
+
+            sql::ast::Expression::JsonBuildObject(fields)
         }
         database::Type::ScalarType(_) => sql::ast::Expression::Cast {
             expression: Box::new(sql::ast::Expression::BinaryOperation {

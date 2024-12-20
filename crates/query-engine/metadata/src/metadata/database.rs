@@ -4,6 +4,7 @@ use models::ScalarTypeName;
 use ndc_models as models;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
+use smol_str::SmolStr;
 use std::collections::{BTreeMap, BTreeSet};
 
 /// The scalar types supported by the Engine.
@@ -12,11 +13,21 @@ use std::collections::{BTreeMap, BTreeSet};
 pub struct ScalarTypeTypeName(pub String);
 
 /// The type of values that a column, field, or argument may take.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub enum Type {
     ScalarType(models::ScalarTypeName),
     ArrayType(Box<Type>),
+    RangeType(TypeRange),
+    StructType(BTreeMap<String, Type>),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize, JsonSchema)]
+#[serde(rename_all = "lowercase")]
+pub enum TypeRange {
+    Date,
+    Datetime,
+    Timestamp,
 }
 
 /// Map of all known/occurring scalar types.
@@ -40,7 +51,7 @@ pub struct ScalarType {
     pub description: Option<String>,
     pub aggregate_functions: BTreeMap<models::AggregateFunctionName, AggregateFunction>,
     pub comparison_operators: BTreeMap<models::ComparisonOperatorName, ComparisonOperator>,
-    pub type_representation: Option<TypeRepresentation>,
+    pub type_representation: Option<BigQueryType>,
 }
 
 /// The complete list of supported binary operators for scalar types.
@@ -233,7 +244,7 @@ pub struct AggregateFunction {
 /// Type representation of scalar types, grouped by type.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
-pub struct TypeRepresentations(pub BTreeMap<models::ScalarTypeName, TypeRepresentation>);
+pub struct TypeRepresentations(pub BTreeMap<models::ScalarTypeName, BigQueryType>);
 
 impl TypeRepresentations {
     pub fn empty() -> Self {
@@ -244,45 +255,44 @@ impl TypeRepresentations {
 /// Type representation of a scalar type.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
-pub enum TypeRepresentation {
-    /// JSON booleans
+pub enum BigQueryType {
+    Array(Box<BigQueryType>),
+    BigNumeric,
     Boolean,
-    /// Any JSON string
-    String,
-    /// float4
-    Float32,
-    /// float8
-    Float64,
-    /// int2
-    Int16,
-    /// int4
-    Int32,
-    /// int8 as integer
-    Int64,
-    /// int8 as string
-    Int64AsString,
-    /// numeric
-    BigDecimal,
-    /// numeric as string
-    BigDecimalAsString,
-    /// timestamp
-    Timestamp,
-    /// timestamp with timezone
-    Timestamptz,
-    /// time
-    Time,
-    /// time with timezone
-    Timetz,
-    /// date
+    Bytes,
     Date,
-    /// uuid
-    UUID,
-    /// geography
+    Datetime,
+    Float64,
     Geography,
-    /// geometry
-    Geometry,
-    /// An arbitrary json.
+    Int64,
     Json,
-    /// One of the specified string values
-    Enum(Vec<String>),
+    Numeric,
+    Range(Box<TypeRange>),
+    String,
+    Struct(BTreeMap<String, Box<BigQueryType>>),
+    Time,
+    Timestamp,
+}
+
+impl From<BigQueryType> for models::TypeName {
+    fn from(val: BigQueryType) -> Self {
+        match val {
+            BigQueryType::Array(_) => models::TypeName::new(SmolStr::new("array")),
+            BigQueryType::BigNumeric => models::TypeName::new(SmolStr::new("bignumeric")),
+            BigQueryType::Boolean => models::TypeName::new(SmolStr::new("boolean")),
+            BigQueryType::Bytes => models::TypeName::new(SmolStr::new("bytes")),
+            BigQueryType::Date => models::TypeName::new(SmolStr::new("date")),
+            BigQueryType::Datetime => models::TypeName::new(SmolStr::new("datetime")),
+            BigQueryType::Float64 => models::TypeName::new(SmolStr::new("float64")),
+            BigQueryType::Geography => models::TypeName::new(SmolStr::new("geography")),
+            BigQueryType::Int64 => models::TypeName::new(SmolStr::new("int64")),
+            BigQueryType::Json => models::TypeName::new(SmolStr::new("json")),
+            BigQueryType::Numeric => models::TypeName::new(SmolStr::new("numeric")),
+            BigQueryType::Range(_) => models::TypeName::new(SmolStr::new("range")),
+            BigQueryType::String => models::TypeName::new(SmolStr::new("string")),
+            BigQueryType::Struct(_) => models::TypeName::new(SmolStr::new("struct")),
+            BigQueryType::Time => models::TypeName::new(SmolStr::new("time")),
+            BigQueryType::Timestamp => models::TypeName::new(SmolStr::new("timestamp")),
+        }
+    }
 }

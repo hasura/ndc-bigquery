@@ -12,6 +12,7 @@ use gcp_bigquery_client::model::table_row::TableRow;
 use ndc_models::{AggregateFunctionName, ComparisonOperatorName, ScalarTypeName, TypeName};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
+use smol_str::SmolStr;
 use std::borrow::Cow;
 use std::collections::BTreeMap;
 use std::path::Path;
@@ -27,26 +28,8 @@ pub const CONFIGURATION_FILENAME: &str = "configuration.json";
 pub const DEFAULT_SERVICE_KEY_VARIABLE: &str = "HASURA_BIGQUERY_SERVICE_KEY";
 pub const DEFAULT_PROJECT_ID_VARIABLE: &str = "HASURA_BIGQUERY_PROJECT_ID";
 pub const DEFAULT_DATASET_ID_VARIABLE: &str = "HASURA_BIGQUERY_DATASET_ID";
-const CONFIGURATION_QUERY: &str = include_str!("config2.sql");
+const CONFIGURATION_QUERY: &str = include_str!("configuration.sql");
 const CONFIGURATION_JSONSCHEMA_FILENAME: &str = "schema.json";
-
-const CHARACTER_STRINGS: [&str; 3] = ["character", "text", "string"];
-const UNICODE_CHARACTER_STRINGS: [&str; 3] = ["nchar", "ntext", "nvarchar"];
-const CANNOT_COMPARE: [&str; 3] = ["text", "ntext", "image"];
-const EXACT_NUMERICS: [&str; 9] = [
-    "bigint",
-    "bit",
-    "decimal",
-    "int",
-    "money",
-    "numeric",
-    "smallint",
-    "smallmoney",
-    "tinyint",
-];
-const APPROX_NUMERICS: [&str; 3] = ["float", "real", "float64"];
-const NOT_COUNTABLE: [&str; 3] = ["image", "ntext", "text"];
-const NOT_APPROX_COUNTABLE: [&str; 4] = ["image", "sql_variant", "ntext", "text"];
 
 /// Initial configuration, just enough to connect to a database and elaborate a full
 /// 'Configuration'.
@@ -167,8 +150,6 @@ pub async fn configure(
 
     let scalar_types = get_scalar_types(&types, schema_name);
 
-    // get tables_info
-
     let config_query_string = CONFIGURATION_QUERY.to_string();
 
     let config_query_string_with_database_name: String =
@@ -194,12 +175,9 @@ pub async fn configure(
             if let Some(column) = columns.into_iter().next() {
                 if let Some(value) = column.value {
                     if let serde_json::Value::String(str) = value {
-                        if let Ok(table_info_map) = serde_json::from_str::<TablesInfo>(&str) {
-                            // tables_info.merge(table_info_map);
-                            Ok(table_info_map)
-                        } else {
-                            Err(format!("Failed to deserialize TablesInfo from JSON: {str}"))
-                        }
+                        serde_json::from_str::<TablesInfo>(&str).map_err(|err| {
+                            format!("Failed to deserialize TablesInfo from JSON: {err}")
+                        })
                     } else {
                         Err(format!("Expected a string value, found: {value:?}"))
                     }
@@ -303,74 +281,63 @@ struct TypeItem {
     name: ScalarTypeName,
 }
 
-// we hard code these, essentially
-// we look up available types in `sys.types` but hard code their behaviour by looking them up below
-// taken from https://learn.microsoft.com/en-us/sql/t-sql/functions/aggregate-functions-transact-sql?view=sql-server-ver16
 fn get_aggregate_functions_for_type(
-    type_name: &ndc_models::ScalarTypeName,
+    type_representation: &Option<database::BigQueryType>,
+    type_name: &ScalarTypeName,
 ) -> BTreeMap<AggregateFunctionName, database::AggregateFunction> {
     let mut aggregate_functions = BTreeMap::new();
 
-    if !NOT_APPROX_COUNTABLE.contains(&type_name.as_str()) {
-        aggregate_functions.insert(
-            AggregateFunctionName::new("APPROX_COUNT_DISTINCT".into()),
-            database::AggregateFunction {
-                return_type: TypeName::new("bigint".to_string().into()),
-            },
-        );
-    }
+    match type_representation {
+        Some(type_rep) => {
+            if matches!(
+                type_rep,
+                database::BigQueryType::Int64
+                    | database::BigQueryType::Float64
+                    | database::BigQueryType::Numeric
+                    | database::BigQueryType::BigNumeric
+                    | database::BigQueryType::String
+                    | database::BigQueryType::Date
+                    | database::BigQueryType::Datetime
+                    | database::BigQueryType::Timestamp
+                    | database::BigQueryType::Time
+            ) {
+                aggregate_functions.insert(
+                    AggregateFunctionName::new("MIN".into()),
+                    database::AggregateFunction {
+                        return_type: TypeName::new(type_name.as_str().into()),
+                    },
+                );
+                aggregate_functions.insert(
+                    AggregateFunctionName::new("MAX".into()),
+                    database::AggregateFunction {
+                        return_type: TypeName::new(type_name.as_str().into()),
+                    },
+                );
+            }
 
-    if !NOT_COUNTABLE.contains(&type_name.as_str()) {
-        aggregate_functions.insert(
-            AggregateFunctionName::new("COUNT".into()),
-            database::AggregateFunction {
-                return_type: TypeName::new("bigint".to_string().into()),
-            },
-        );
+            if matches!(
+                type_rep,
+                database::BigQueryType::Int64
+                    | database::BigQueryType::Float64
+                    | database::BigQueryType::Numeric
+                    | database::BigQueryType::BigNumeric
+            ) {
+                aggregate_functions.insert(
+                    AggregateFunctionName::new("AVG".into()),
+                    database::AggregateFunction {
+                        return_type: TypeName::new(type_name.as_str().into()),
+                    },
+                );
+                aggregate_functions.insert(
+                    AggregateFunctionName::new("SUM".into()),
+                    database::AggregateFunction {
+                        return_type: TypeName::new(type_name.as_str().into()),
+                    },
+                );
+            };
+        }
+        None => {}
     }
-
-    if type_name.as_str() != "bit"
-        && (EXACT_NUMERICS.contains(&type_name.as_str())
-            || APPROX_NUMERICS.contains(&type_name.as_str())
-            || CHARACTER_STRINGS.contains(&type_name.as_str())
-            || type_name.as_str() == "date"
-            || type_name.as_str() == "datetime"
-            || type_name.as_str() == "uuid")
-    {
-        aggregate_functions.insert(
-            AggregateFunctionName::new("MIN".into()),
-            database::AggregateFunction {
-                return_type: TypeName::new(type_name.as_str().to_string().into()),
-            },
-        );
-        aggregate_functions.insert(
-            AggregateFunctionName::new("MAX".into()),
-            database::AggregateFunction {
-                return_type: TypeName::new(type_name.as_str().to_string().into()),
-            },
-        );
-    }
-
-    if let Some(precise_return_type) = match type_name.as_str() {
-        "tinyint" | "smallint" | "int16" => Some("smallint"),
-        "int" | "int32" => Some("integer"),
-        "bigint" | "int64" => Some("bigint"),
-        "float" | "real" => Some("float"),
-        _ => None,
-    } {
-        aggregate_functions.insert(
-            AggregateFunctionName::new("AVG".into()),
-            database::AggregateFunction {
-                return_type: TypeName::new(precise_return_type.to_string().into()),
-            },
-        );
-        aggregate_functions.insert(
-            AggregateFunctionName::new("SUM".into()),
-            database::AggregateFunction {
-                return_type: TypeName::new(precise_return_type.to_string().into()),
-            },
-        );
-    };
 
     aggregate_functions
 }
@@ -386,40 +353,26 @@ fn get_scalar_types(type_names: &Vec<TypeItem>, schema_name: String) -> database
     };
 
     for type_item in type_names {
-        let type_name = match type_item.name.as_str().to_lowercase().as_str() {
-            "bool" | "boolean" => "boolean",
-            "int16" | "smallint" => "smallint",
-            "int" | "int32" | "integer" => "integer",
-            "int64" | "bigint" => "bigint",
-            "numeric" => "numeric",
-            "float64" | "float" => "float",
-            "real" => "real",
-            "double precision" => "double precision",
-            "text" => "text",
-            "string" => "string",
-            "character" => "character",
-            "json" => "json",
-            "jsonb" => "jsonb",
-            "date" => "date",
-            "timetz" | "time with time zone" => "timetz",
-            "time" | "time without time zone" => "time",
-            "timestamptz" | "timestamp with time zone" => "timestamptz",
-            "timestamp" | "timestamp without time zone" => "timestamp",
-            "uuid" => "uuid",
-            _ => "any",
+        let type_rep = get_type_representation(type_item);
+        let type_name_str = match type_rep.clone() {
+            Some(typerep) => ndc_models::TypeName::from(typerep),
+            None => TypeName::new(SmolStr::new("any")),
         };
-        let type_name_scalar = ScalarTypeName::new(type_name.into());
+        let scalar_type_name = ScalarTypeName::new(type_name_str);
+
         scalar_types.insert(
-            type_name_scalar.clone(),
+            scalar_type_name.clone(),
             database::ScalarType {
-                type_name: type_name_scalar.clone(),
+                type_name: scalar_type_name.clone(),
                 schema_name: schema.clone(),
-                comparison_operators: get_comparison_operators_for_type(&type_name_scalar),
-                aggregate_functions: get_aggregate_functions_for_type(&type_name_scalar),
+                comparison_operators: get_comparison_operators_for_type(
+                    &type_rep,
+                    &scalar_type_name,
+                ),
+                aggregate_functions: get_aggregate_functions_for_type(&type_rep, &scalar_type_name),
                 description: None,
-                type_representation: None,
+                type_representation: type_rep.clone(),
             },
-            // get_comparison_operators_for_type(&type_name.name),
         );
     }
 
@@ -430,104 +383,178 @@ fn get_scalar_types(type_names: &Vec<TypeItem>, schema_name: String) -> database
 // we look up available types in `sys.types` but hard code their behaviour by looking them up below
 // categories taken from https://learn.microsoft.com/en-us/sql/t-sql/data-types/data-types-transact-sql
 fn get_comparison_operators_for_type(
-    type_name: &ndc_models::ScalarTypeName,
+    type_representation: &Option<database::BigQueryType>,
+    type_name: &ScalarTypeName,
 ) -> BTreeMap<ComparisonOperatorName, database::ComparisonOperator> {
     let mut comparison_operators = BTreeMap::new();
 
-    // in ndc-spec, all things can be `==`
-    comparison_operators.insert(
-        ComparisonOperatorName::new("_eq".into()),
-        database::ComparisonOperator {
-            operator_name: "=".to_string(),
-            argument_type: type_name.clone(),
-            operator_kind: database::OperatorKind::Equal,
-            is_infix: true,
-        },
-    );
+    match type_representation {
+        Some(type_rep) => {
+            if !matches!(
+                type_rep,
+                database::BigQueryType::Array(_)
+                    | database::BigQueryType::Bytes
+                    | database::BigQueryType::Json
+                    | database::BigQueryType::Geography
+                    | database::BigQueryType::Struct(_)
+                    | database::BigQueryType::Range(_)
+            ) {
+                comparison_operators.insert(
+                    ComparisonOperatorName::new("_eq".into()),
+                    database::ComparisonOperator {
+                        operator_name: "=".to_string(),
+                        argument_type: type_name.clone(),
+                        operator_kind: database::OperatorKind::Equal,
+                        is_infix: true,
+                    },
+                );
 
-    comparison_operators.insert(
-        ComparisonOperatorName::new("_in".into()),
-        database::ComparisonOperator {
-            operator_name: "IN".to_string(),
-            argument_type: type_name.clone(),
-            operator_kind: database::OperatorKind::In,
-            is_infix: true,
-        },
-    );
+                comparison_operators.insert(
+                    ComparisonOperatorName::new("_in".into()),
+                    database::ComparisonOperator {
+                        operator_name: "IN".to_string(),
+                        argument_type: type_name.clone(),
+                        operator_kind: database::OperatorKind::In,
+                        is_infix: true,
+                    },
+                );
+            }
 
-    // include LIKE and NOT LIKE for string-ish types
-    if CHARACTER_STRINGS.contains(&type_name.as_str())
-        || UNICODE_CHARACTER_STRINGS.contains(&type_name.as_str())
-    {
-        comparison_operators.insert(
-            ComparisonOperatorName::new("_like".into()),
-            database::ComparisonOperator {
-                operator_name: "LIKE".to_string(),
-                argument_type: type_name.clone(),
-                operator_kind: database::OperatorKind::Custom,
-                is_infix: true,
-            },
-        );
-        comparison_operators.insert(
-            ComparisonOperatorName::new("_nlike".into()),
-            database::ComparisonOperator {
-                operator_name: "NOT LIKE".to_string(),
-                argument_type: type_name.clone(),
-                operator_kind: database::OperatorKind::Custom,
-                is_infix: true,
-            },
-        );
+            if matches!(
+                type_rep,
+                database::BigQueryType::String | database::BigQueryType::Bytes
+            ) {
+                comparison_operators.insert(
+                    ComparisonOperatorName::new("_like".into()),
+                    database::ComparisonOperator {
+                        operator_name: "LIKE".to_string(),
+                        argument_type: type_name.clone(),
+                        operator_kind: database::OperatorKind::Custom,
+                        is_infix: true,
+                    },
+                );
+                comparison_operators.insert(
+                    ComparisonOperatorName::new("_nlike".into()),
+                    database::ComparisonOperator {
+                        operator_name: "NOT LIKE".to_string(),
+                        argument_type: type_name.clone(),
+                        operator_kind: database::OperatorKind::Custom,
+                        is_infix: true,
+                    },
+                );
+            }
+
+            if !matches!(
+                type_rep,
+                database::BigQueryType::Array(_)
+                    | database::BigQueryType::Json
+                    | database::BigQueryType::Bytes
+                    | database::BigQueryType::Geography
+                    | database::BigQueryType::Struct(_)
+                    | database::BigQueryType::Range(_)
+            ) {
+                comparison_operators.insert(
+                    ComparisonOperatorName::new("_neq".into()),
+                    database::ComparisonOperator {
+                        operator_name: "!=".to_string(),
+                        argument_type: type_name.clone(),
+                        operator_kind: database::OperatorKind::Custom,
+                        is_infix: true,
+                    },
+                );
+                comparison_operators.insert(
+                    ComparisonOperatorName::new("_lt".into()),
+                    database::ComparisonOperator {
+                        operator_name: "<".to_string(),
+                        argument_type: type_name.clone(),
+                        operator_kind: database::OperatorKind::Custom,
+                        is_infix: true,
+                    },
+                );
+                comparison_operators.insert(
+                    ComparisonOperatorName::new("_gt".into()),
+                    database::ComparisonOperator {
+                        operator_name: ">".to_string(),
+                        argument_type: type_name.clone(),
+                        operator_kind: database::OperatorKind::Custom,
+                        is_infix: true,
+                    },
+                );
+
+                comparison_operators.insert(
+                    ComparisonOperatorName::new("_gte".into()),
+                    database::ComparisonOperator {
+                        operator_name: ">=".to_string(),
+                        argument_type: type_name.clone(),
+                        operator_kind: database::OperatorKind::Custom,
+                        is_infix: true,
+                    },
+                );
+                comparison_operators.insert(
+                    ComparisonOperatorName::new("_lte".into()),
+                    database::ComparisonOperator {
+                        operator_name: "<=".to_string(),
+                        argument_type: type_name.clone(),
+                        operator_kind: database::OperatorKind::Custom,
+                        is_infix: true,
+                    },
+                );
+            }
+        }
+        None => {}
     }
 
-    // include comparison operators for types that are comparable, according to
-    // https://learn.microsoft.com/en-us/sql/t-sql/language-elements/comparison-operators-transact-sql?view=sql-server-ver16
-    if !CANNOT_COMPARE.contains(&type_name.as_str()) {
-        comparison_operators.insert(
-            ComparisonOperatorName::new("_neq".into()),
-            database::ComparisonOperator {
-                operator_name: "!=".to_string(),
-                argument_type: type_name.clone(),
-                operator_kind: database::OperatorKind::Custom,
-                is_infix: true,
-            },
-        );
-        comparison_operators.insert(
-            ComparisonOperatorName::new("_lt".into()),
-            database::ComparisonOperator {
-                operator_name: "<".to_string(),
-                argument_type: type_name.clone(),
-                operator_kind: database::OperatorKind::Custom,
-                is_infix: true,
-            },
-        );
-        comparison_operators.insert(
-            ComparisonOperatorName::new("_gt".into()),
-            database::ComparisonOperator {
-                operator_name: ">".to_string(),
-                argument_type: type_name.clone(),
-                operator_kind: database::OperatorKind::Custom,
-                is_infix: true,
-            },
-        );
-
-        comparison_operators.insert(
-            ComparisonOperatorName::new("_gte".into()),
-            database::ComparisonOperator {
-                operator_name: ">=".to_string(),
-                argument_type: type_name.clone(),
-                operator_kind: database::OperatorKind::Custom,
-                is_infix: true,
-            },
-        );
-        comparison_operators.insert(
-            ComparisonOperatorName::new("_lte".into()),
-            database::ComparisonOperator {
-                operator_name: "<=".to_string(),
-                argument_type: type_name.clone(),
-                operator_kind: database::OperatorKind::Custom,
-                is_infix: true,
-            },
-        );
-    }
     comparison_operators
+}
+
+fn get_type_representation(type_item: &TypeItem) -> Option<database::BigQueryType> {
+    match type_item.name.as_str().to_lowercase().as_str() {
+        "string" => Some(database::BigQueryType::String),
+        "bytes" => Some(database::BigQueryType::Bytes),
+        "int64" => Some(database::BigQueryType::Int64),
+        "float64" => Some(database::BigQueryType::Float64),
+        "bool" => Some(database::BigQueryType::Boolean),
+        "numeric" => Some(database::BigQueryType::Numeric),
+        "bignumeric" => Some(database::BigQueryType::BigNumeric),
+        "geography" => Some(database::BigQueryType::Geography),
+        "date" => Some(database::BigQueryType::Date),
+        "datetime" => Some(database::BigQueryType::Datetime),
+        "time" => Some(database::BigQueryType::Time),
+        "timestamp" => Some(database::BigQueryType::Timestamp),
+        "json" => Some(database::BigQueryType::Json),
+        t if t.starts_with("range<") => {
+            let inner_type = t.trim_start_matches("range<").trim_end_matches('>');
+            let range_type = match inner_type {
+                "datetime" => database::TypeRange::Datetime,
+                "timestamp" => database::TypeRange::Timestamp,
+                _ => database::TypeRange::Date, // Default to Date for everything else
+            };
+            Some(database::BigQueryType::Range(Box::new(range_type)))
+        }
+        t if t.starts_with("array<") => {
+            let inner_type = t.trim_start_matches("array<").trim_end_matches('>');
+            let inner_repr = get_type_representation(&TypeItem {
+                name: ScalarTypeName::new(inner_type.into()),
+            })
+            .unwrap_or(database::BigQueryType::String);
+            Some(database::BigQueryType::Array(Box::new(inner_repr)))
+        }
+        t if t.starts_with("struct<") => {
+            let fields = t.trim_start_matches("struct<").trim_end_matches('>');
+            let mut struct_fields = BTreeMap::new();
+            for field in fields.split(',') {
+                let parts: Vec<&str> = field.split_whitespace().collect();
+                if parts.len() == 2 {
+                    let field_name = parts[0].to_string();
+                    let field_type = get_type_representation(&TypeItem {
+                        name: ScalarTypeName::new(parts[1].into()),
+                    })
+                    .unwrap_or(database::BigQueryType::String);
+                    struct_fields.insert(field_name, Box::new(field_type));
+                }
+            }
+            Some(database::BigQueryType::Struct(struct_fields))
+        }
+        _ => None,
+    }
 }

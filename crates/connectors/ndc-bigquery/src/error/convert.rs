@@ -13,6 +13,9 @@ pub fn execution_error_to_response(error: query_engine_execution::error::Error) 
             QueryError::NotSupported(_) => {
                 connector::QueryError::new_unsupported_operation(&query_error.to_string()).into()
             }
+            QueryError::DBError(_) => {
+                connector::QueryError::new_unprocessable_content(&query_error.to_string()).into()
+            }
         },
     }
 }

@@ -14,6 +14,9 @@ pub fn execution_error(error: &query_engine_execution::error::Error, metrics: &m
             QueryError::NotSupported(_) => {
                 metrics.error_metrics.record_unsupported_feature();
             }
+            QueryError::DBError(_) => {
+                metrics.error_metrics.record_database_error();
+            }
         },
     }
 }
