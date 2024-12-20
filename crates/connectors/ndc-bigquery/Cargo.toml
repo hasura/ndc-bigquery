@@ -33,15 +33,12 @@ thiserror = { workspace = true }
 yup-oauth2 = { workspace = true }
 
 [dev-dependencies]
-ndc-models = { workspace = true }
 ndc-test = { workspace = true }
 tests-common = { path = "../../tests/tests-common" }
 
 axum = { workspace = true }
-axum-test-helper = { workspace = true }
 insta = { workspace = true, features = ["json"] }
 env_logger = { workspace = true }
 hyper = { workspace = true, features = ["tcp"] }
 reqwest = { workspace = true, features = ["rustls-tls"] }
-similar-asserts = { workspace = true }
 url = { workspace = true }

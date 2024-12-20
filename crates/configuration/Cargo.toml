@@ -19,6 +19,3 @@ thiserror = { workspace = true }
 tokio = { workspace = true, features = ["full"] }
 yup-oauth2 = { workspace = true }
 gcp-bigquery-client = { workspace = true }
-
-[dev-dependencies]
-jsonschema = { workspace = true }
