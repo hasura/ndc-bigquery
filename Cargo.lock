@@ -1195,6 +1195,7 @@ dependencies = [
  "schemars",
  "serde",
  "serde_json",
+ "smol_str",
  "thiserror",
  "tokio",
  "yup-oauth2",

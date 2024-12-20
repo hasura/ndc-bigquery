@@ -15,6 +15,7 @@ anyhow = { workspace = true }
 schemars = { workspace = true, features = ["smol_str", "preserve_order"] }
 serde = { workspace = true }
 serde_json = { workspace = true, features = ["raw_value"] }
+smol_str = { workspace = true }
 thiserror = { workspace = true }
 tokio = { workspace = true, features = ["full"] }
 yup-oauth2 = { workspace = true }
