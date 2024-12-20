@@ -2,7 +2,8 @@
 
 BigQuery NDC.
 
-Forked from `ndc-postgres`.
+> [!IMPORTANT]
+> Breaking change: As of v2, the configuration format has changed. Configs prior to v2 needs deleted a re-initialized
 
 ## Getting started
 
