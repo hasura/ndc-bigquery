@@ -107,8 +107,6 @@ pub enum SelectList {
     SelectStar,
     SelectStarFrom(TableReference),
     Select1,
-    SelectStarComposite(Expression),
-    SelectListComposite(Box<SelectList>, Box<SelectList>),
 }
 
 /// A FROM clause

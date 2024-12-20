@@ -250,6 +250,5 @@ pub fn type_to_type(typ: &metadata::Type) -> models::Type {
         metadata::Type::ScalarType(scalar_type) => models::Type::Named {
             name: scalar_type.as_str().into(),
         },
-        metadata::Type::CompositeType(t) => models::Type::Named { name: t.clone() },
     }
 }
