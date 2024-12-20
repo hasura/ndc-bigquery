@@ -1,6 +1,8 @@
 # Changelog
 
-## [Unreleased]
+## [v1.0.0]
+
+- Updated for stable release
 
 ### Added
 

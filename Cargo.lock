@@ -140,9 +140,9 @@ dependencies = [
 
 [[package]]
 name = "async-trait"
-version = "0.1.81"
+version = "0.1.83"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6e0c28dcc82d7c8ead5cb13beb15405b57b8546e93215673ff8ca0349a028107"
+checksum = "721cae7de5c34fbb2acd27e21e6d2cf7b886dce0c27388d46c4e6c47ea4318dd"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -1308,15 +1308,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "itertools"
-version = "0.11.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b1c173a5686ce8bfa551b3563d0c2170bf24ca44da99c7ca4bfdab5418c3fe57"
-dependencies = [
- "either",
-]
-
-[[package]]
 name = "itoa"
 version = "1.0.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1522,7 +1513,7 @@ dependencies = [
 
 [[package]]
 name = "ndc-bigquery"
-version = "0.1.1"
+version = "1.0.0"
 dependencies = [
  "async-trait",
  "axum",
@@ -1558,7 +1549,7 @@ dependencies = [
 
 [[package]]
 name = "ndc-bigquery-cli"
-version = "0.1.1"
+version = "1.0.0"
 dependencies = [
  "anyhow",
  "build-data",
@@ -1575,7 +1566,7 @@ dependencies = [
 
 [[package]]
 name = "ndc-bigquery-configuration"
-version = "0.1.1"
+version = "1.0.0"
 dependencies = [
  "anyhow",
  "clap",
@@ -2181,7 +2172,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "81bddcdb20abf9501610992b6759a4c888aef7d1a7247ef75e2404275ac24af1"
 dependencies = [
  "anyhow",
- "itertools 0.11.0",
+ "itertools",
  "proc-macro2",
  "quote",
  "syn 2.0.69",
@@ -2195,7 +2186,7 @@ checksum = "106dd99e98437432fed6519dedecfade6a06a73bb7b2a1e019fdd2bee5778d94"
 
 [[package]]
 name = "query-engine-execution"
-version = "0.1.1"
+version = "1.0.0"
 dependencies = [
  "bytes",
  "gcp-bigquery-client",
@@ -2211,7 +2202,7 @@ dependencies = [
 
 [[package]]
 name = "query-engine-metadata"
-version = "0.1.1"
+version = "1.0.0"
 dependencies = [
  "enum-iterator",
  "ndc-models",
@@ -2223,7 +2214,7 @@ dependencies = [
 
 [[package]]
 name = "query-engine-sql"
-version = "0.1.1"
+version = "1.0.0"
 dependencies = [
  "ndc-models",
  "schemars",
@@ -2233,7 +2224,7 @@ dependencies = [
 
 [[package]]
 name = "query-engine-translation"
-version = "0.1.1"
+version = "1.0.0"
 dependencies = [
  "anyhow",
  "enum-iterator",
@@ -2971,11 +2962,10 @@ dependencies = [
 
 [[package]]
 name = "sqlformat"
-version = "0.2.2"
+version = "0.2.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6b7b278788e7be4d0d29c0f39497a0eef3fba6bbc8e70d8bf7fde46edeaa9e85"
+checksum = "7bba3a93db0cc4f7bdece8bb09e77e2e785c20bfebf79eb8340ed80708048790"
 dependencies = [
- "itertools 0.11.0",
  "nom",
  "unicode_categories",
 ]
@@ -3274,7 +3264,7 @@ dependencies = [
 
 [[package]]
 name = "tests-common"
-version = "0.1.1"
+version = "1.0.0"
 dependencies = [
  "anyhow",
  "axum",
@@ -4229,7 +4219,7 @@ dependencies = [
  "http",
  "hyper",
  "hyper-rustls",
- "itertools 0.10.5",
+ "itertools",
  "log",
  "percent-encoding",
  "rustls 0.21.7",
