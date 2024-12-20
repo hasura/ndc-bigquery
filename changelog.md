@@ -4,7 +4,7 @@
 - Basic support for struct and range types
 
 ### Changed
-- Breaking change: `configuration.json` has changed. Configs prior to v2 needs deleted a re-initialized
+- Breaking change: `configuration.json` has changed. Configs prior to v2 need to be deleted and re-initialized
 
 ### Fixed
 - Fixed capabilities to match what the connector is capable of

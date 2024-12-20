@@ -3,7 +3,7 @@
 BigQuery NDC.
 
 > [!IMPORTANT]
-> Breaking change: As of v2, the configuration format has changed. Configs prior to v2 needs deleted a re-initialized
+> Breaking change: As of v2, the configuration format has changed. Configs prior to v2 need to be deleted and re-initialized
 
 ## Getting started
 
