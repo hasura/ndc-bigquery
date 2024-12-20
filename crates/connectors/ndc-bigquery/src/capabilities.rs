@@ -21,7 +21,10 @@ pub fn get_capabilities() -> models::Capabilities {
                 aggregates: None,
             },
         },
-        mutation: None,
+        mutation: models::MutationCapabilities {
+            transactional: None,
+            explain: None
+        },
         relationships: None,
     }
 }
