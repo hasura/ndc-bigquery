@@ -53,8 +53,6 @@ pub async fn create_state(
 /// State initialization error.
 #[derive(Debug, Error)]
 pub enum InitializationError {
-    #[error("unable to initialize connection pool: {0}")]
-    UnableToCreatePool(sqlx::Error),
     #[error("error initializing metrics: {0}")]
     MetricsError(prometheus::Error),
 }

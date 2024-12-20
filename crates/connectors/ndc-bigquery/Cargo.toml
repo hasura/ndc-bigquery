@@ -24,29 +24,20 @@ ndc-bigquery-configuration = { path = "../../configuration" }
 ndc-sdk = { workspace = true }
 
 async-trait = { workspace = true }
-enum-iterator = { workspace = true }
 gcp-bigquery-client = { workspace = true }
 prometheus = { workspace = true }
-schemars = { workspace = true, features = ["smol_str", "preserve_order"] }
-serde = { workspace = true }
-serde_derive = { workspace = true }
 serde_json = { workspace = true, features = ["raw_value"] }
-sqlx = { workspace = true, features = [ "json", "postgres", "runtime-tokio-rustls" ] }
 tokio = { workspace = true, features = ["full"] }
 tracing = { workspace = true }
 thiserror = { workspace = true }
 yup-oauth2 = { workspace = true }
 
 [dev-dependencies]
-ndc-models = { workspace = true }
 ndc-test = { workspace = true }
 tests-common = { path = "../../tests/tests-common" }
 
 axum = { workspace = true }
-axum-test-helper = { workspace = true }
 insta = { workspace = true, features = ["json"] }
 env_logger = { workspace = true }
 hyper = { workspace = true, features = ["tcp"] }
 reqwest = { workspace = true, features = ["rustls-tls"] }
-similar-asserts = { workspace = true }
-url = { workspace = true }
