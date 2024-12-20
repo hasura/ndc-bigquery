@@ -11,7 +11,5 @@ workspace = true
 
 ndc-models = { workspace = true }
 smol_str = { workspace = true }
-enum-iterator = { workspace = true }
 schemars = { workspace = true, features = ["smol_str"] }
 serde = { workspace = true, features = ["derive"] }
-serde_json = { workspace = true }

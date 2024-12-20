@@ -8,15 +8,10 @@ license.workspace = true
 workspace = true
 
 [dependencies]
-ndc-models = { workspace = true }
-
 query-engine-sql = { path = "../sql" }
 
 gcp-bigquery-client = { workspace = true }
 prometheus = { workspace = true }
 serde_json = { workspace = true }
-sqlformat = { workspace = true }
-sqlx = { workspace = true, features = [ "json", "postgres", "runtime-tokio-rustls", "uuid" ] }
 thiserror = { workspace = true }
-tracing = { workspace = true }
 bytes = { workspace = true }

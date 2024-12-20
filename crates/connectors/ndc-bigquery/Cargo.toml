@@ -24,14 +24,9 @@ ndc-bigquery-configuration = { path = "../../configuration" }
 ndc-sdk = { workspace = true }
 
 async-trait = { workspace = true }
-enum-iterator = { workspace = true }
 gcp-bigquery-client = { workspace = true }
 prometheus = { workspace = true }
-schemars = { workspace = true, features = ["smol_str", "preserve_order"] }
-serde = { workspace = true }
-serde_derive = { workspace = true }
 serde_json = { workspace = true, features = ["raw_value"] }
-sqlx = { workspace = true, features = [ "json", "postgres", "runtime-tokio-rustls" ] }
 tokio = { workspace = true, features = ["full"] }
 tracing = { workspace = true }
 thiserror = { workspace = true }
