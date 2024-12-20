@@ -186,24 +186,22 @@ fn map_type_representation(
     type_representation: &metadata::TypeRepresentation,
 ) -> models::TypeRepresentation {
     match type_representation {
+        metadata::TypeRepresentation::Array(_) => models::TypeRepresentation::JSON,
+        metadata::TypeRepresentation::BigNumeric => models::TypeRepresentation::BigDecimal,
         metadata::TypeRepresentation::Boolean => models::TypeRepresentation::Boolean,
         metadata::TypeRepresentation::Bytes => models::TypeRepresentation::Bytes,
-        metadata::TypeRepresentation::String => models::TypeRepresentation::String,
-        metadata::TypeRepresentation::Int64 => models::TypeRepresentation::Int64,
-        metadata::TypeRepresentation::Float64 => models::TypeRepresentation::Float64,
-        metadata::TypeRepresentation::Numeric => models::TypeRepresentation::BigDecimal,
-        metadata::TypeRepresentation::BigNumeric => models::TypeRepresentation::BigDecimal,
-        metadata::TypeRepresentation::Timestamp => models::TypeRepresentation::TimestampTZ,
-        metadata::TypeRepresentation::Time => models::TypeRepresentation::String,
         metadata::TypeRepresentation::Date => models::TypeRepresentation::Date,
         metadata::TypeRepresentation::Datetime => models::TypeRepresentation::TimestampTZ,
-        metadata::TypeRepresentation::Array(_) => models::TypeRepresentation::JSON,
+        metadata::TypeRepresentation::Float64 => models::TypeRepresentation::Float64,
         metadata::TypeRepresentation::Geography => models::TypeRepresentation::Geography,
-        metadata::TypeRepresentation::Struct(_) => models::TypeRepresentation::JSON,
+        metadata::TypeRepresentation::Int64 => models::TypeRepresentation::Int64,
         metadata::TypeRepresentation::Json => models::TypeRepresentation::JSON,
-        metadata::TypeRepresentation::Enum(variants) => models::TypeRepresentation::Enum {
-            one_of: variants.clone(),
-        },
+        metadata::TypeRepresentation::Numeric => models::TypeRepresentation::BigDecimal,
+        metadata::TypeRepresentation::Range(_) => models::TypeRepresentation::JSON,
+        metadata::TypeRepresentation::String => models::TypeRepresentation::String,
+        metadata::TypeRepresentation::Struct(_) => models::TypeRepresentation::JSON,
+        metadata::TypeRepresentation::Time => models::TypeRepresentation::String,
+        metadata::TypeRepresentation::Timestamp => models::TypeRepresentation::TimestampTZ,
     }
 }
 
@@ -236,10 +234,16 @@ pub fn readonly_column_to_type(column: &metadata::ReadOnlyColumnInfo) -> models:
 pub fn type_to_type(typ: &metadata::Type) -> models::Type {
     match typ {
         metadata::Type::ArrayType(typ) => models::Type::Array {
-            element_type: Box::new(type_to_type(typ)),
+                element_type: Box::new(type_to_type(typ)),
+        },
+        metadata::Type::RangeType(_) => models::Type::Named {
+                name: "range".into(),
         },
         metadata::Type::ScalarType(scalar_type) => models::Type::Named {
-            name: scalar_type.as_str().into(),
+                name: scalar_type.as_str().into(),
+        },
+        metadata::Type::StructType(_) => models::Type::Named {
+                name: "struct".into(),
         },
     }
 }

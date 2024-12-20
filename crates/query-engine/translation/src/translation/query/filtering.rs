@@ -709,6 +709,12 @@ fn get_column_scalar_type_name(
                 scalar_type.as_str().into(),
             )),
         },
+        database::Type::StructType(_) => Err(Error::NonScalarTypeUsedInOperator {
+            r#type: typ.clone()
+        }),
+        database::Type::RangeType(_) => Err(Error::NonScalarTypeUsedInOperator {
+            r#type: typ.clone(),
+        }),
         database::Type::ArrayType(_) => Err(Error::NonScalarTypeUsedInOperator {
             r#type: typ.clone(),
         }),

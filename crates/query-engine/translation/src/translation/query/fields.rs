@@ -9,7 +9,7 @@ use crate::translation::error::Error;
 use crate::translation::error::UnsupportedCapabilities;
 use crate::translation::helpers::FieldsInfo;
 use crate::translation::helpers::{Env, State, TableNameAndReference};
-use query_engine_metadata::metadata::{Type, TypeRepresentation};
+use query_engine_metadata::metadata::{Type, TypeRange, TypeRepresentation};
 use query_engine_sql::sql;
 
 /// Translate the field-selection of a query to SQL.
@@ -132,10 +132,154 @@ fn unpack_and_wrap_fields(
                 wrap_in_type_representation(expression, column_type_representation),
             ))
         }
-        Type::ArrayType(ref type_boxed) => match **type_boxed {
+        Type::StructType(fields) => {
+            let object_fields: Vec<(String, sql::ast::Expression)> = fields
+                .into_iter()
+                .map(|(field_name, field_type)| {
+                    let field_expr = sql::ast::Expression::ColumnReference(
+                        sql::ast::ColumnReference::TableColumn {
+                            table: current_table.reference.clone(),
+                            name: sql::ast::ColumnName(format!("{}.{}", column_info.name.0.as_str(), field_name)),
+                        }
+                    );
+                    let field_type_representation = match &field_type {
+                        Type::ScalarType(scalar_type) => env.lookup_type_representation(scalar_type),
+                        _ => None,
+                    };
+                    let field_expr = wrap_in_type_representation(field_expr, field_type_representation);
+
+                    (field_name, field_expr)
+                })
+                .collect();
+
+            let json_object = sql::ast::Expression::FunctionCall {
+                function: sql::ast::Function::Unknown("JSON_OBJECT".to_string()),
+                args: object_fields.into_iter().flat_map(|(k, v)| vec![
+                    sql::ast::Expression::Value(sql::ast::Value::String(k)),
+                    v
+                ]).collect(),
+            };
+
+            Ok((alias, json_object))
+        }
+        Type::RangeType(range_type) => {
+            let column_ref = sql::ast::Expression::ColumnReference(
+                sql::ast::ColumnReference::TableColumn {
+                    table: current_table.reference.clone(),
+                    name: column_info.name.clone(),
+                }
+            );
+
+            let start_expr = sql::ast::Expression::FunctionCall {
+                function: sql::ast::Function::Unknown("RANGE_START".to_string()),
+                args: vec![column_ref.clone()],
+            };
+            let end_expr = sql::ast::Expression::FunctionCall {
+                function: sql::ast::Function::Unknown("RANGE_END".to_string()),
+                args: vec![column_ref],
+            };
+
+            // Determine the appropriate type based on range_type
+            let type_name = match range_type {
+                TypeRange::Date => "DATE",
+                TypeRange::Datetime => "DATETIME",
+                TypeRange::Timestamp => "TIMESTAMP",
+            };
+
+            let json_object = sql::ast::Expression::FunctionCall {
+                function: sql::ast::Function::Unknown("JSON_OBJECT".to_string()),
+                args: vec![
+                    sql::ast::Expression::Value(sql::ast::Value::String("start".to_string())),
+                    sql::ast::Expression::Cast {
+                        expression: Box::new(start_expr),
+                        r#type: sql::ast::ScalarType::BaseType(sql::ast::ScalarTypeName::Unqualified(type_name.to_string())),
+                    },
+                    sql::ast::Expression::Value(sql::ast::Value::String("end".to_string())),
+                    sql::ast::Expression::Cast {
+                        expression: Box::new(end_expr),
+                        r#type: sql::ast::ScalarType::BaseType(sql::ast::ScalarTypeName::Unqualified(type_name.to_string())),
+                    },
+                ],
+            };
+
+            Ok((alias, json_object))
+        }
+        Type::ArrayType(ref type_boxed) => match type_boxed.as_ref() {
             Type::ArrayType(_) => Err(Error::NestedArraysNotSupported {
                 field_name: column.clone(),
             }),
+            Type::StructType(fields) => {
+                let object_fields: Vec<(String, sql::ast::Expression)> = fields
+                    .into_iter()
+                    .map(|(field_name, field_type)| {
+                        let field_expr = sql::ast::Expression::ColumnReference(
+                            sql::ast::ColumnReference::TableColumn {
+                                table: current_table.reference.clone(),
+                                name: sql::ast::ColumnName(format!("{}.{}", column_info.name.0.as_str(), field_name)),
+                            }
+                        );
+                        let field_type_representation = match &field_type {
+                            Type::ScalarType(scalar_type) => env.lookup_type_representation(scalar_type),
+                            _ => None,
+                        };
+                        let field_expr = wrap_in_type_representation(field_expr, field_type_representation);
+
+                        (field_name.clone(), field_expr)
+                    })
+                    .collect();
+
+                let json_object = sql::ast::Expression::FunctionCall {
+                    function: sql::ast::Function::Unknown("JSON_OBJECT".to_string()),
+                    args: object_fields.into_iter().flat_map(|(k, v)| vec![
+                        sql::ast::Expression::Value(sql::ast::Value::String(k)),
+                        v
+                    ]).collect(),
+                };
+
+                Ok((alias, json_object))
+            }
+            Type::RangeType(range_type) => {
+                let column_ref = sql::ast::Expression::ColumnReference(
+                    sql::ast::ColumnReference::TableColumn {
+                        table: current_table.reference.clone(),
+                        name: column_info.name.clone(),
+                    }
+                );
+
+                let start_expr = sql::ast::Expression::FunctionCall {
+                    function: sql::ast::Function::Unknown("RANGE_START".to_string()),
+                    args: vec![column_ref.clone()],
+                };
+                let end_expr = sql::ast::Expression::FunctionCall {
+                    function: sql::ast::Function::Unknown("RANGE_END".to_string()),
+                    args: vec![column_ref],
+                };
+
+                // Determine the appropriate type based on range_type
+                let type_name = match range_type {
+                    TypeRange::Date => "DATE",
+                    TypeRange::Datetime => "DATETIME",
+                    TypeRange::Timestamp => "TIMESTAMP",
+                };
+
+                let json_object = sql::ast::Expression::FunctionCall {
+                    function: sql::ast::Function::Unknown("JSON_OBJECT".to_string()),
+                    args: vec![
+                        sql::ast::Expression::Value(sql::ast::Value::String("start".to_string())),
+                        sql::ast::Expression::Cast {
+                            expression: Box::new(start_expr),
+                            r#type: sql::ast::ScalarType::BaseType(sql::ast::ScalarTypeName::Unqualified(type_name.to_string())),
+                        },
+                        sql::ast::Expression::Value(sql::ast::Value::String("end".to_string())),
+                        sql::ast::Expression::Cast {
+                            expression: Box::new(end_expr),
+                            r#type: sql::ast::ScalarType::BaseType(sql::ast::ScalarTypeName::Unqualified(type_name.to_string())),
+                        },
+                    ],
+                };
+
+                Ok((alias, json_object))
+            }
             Type::ScalarType(ref scalar_type) => {
                 let inner_column_type_representation = env.lookup_type_representation(scalar_type);
                 let (alias, expression) = sql::helpers::make_column(
@@ -205,6 +349,7 @@ fn get_type_representation_cast_type(
         // In these situations, we expect to cast the expression according
         // to the type representation.
         TypeRepresentation::Bytes
+        | TypeRepresentation::Int64
         | TypeRepresentation::Numeric
         | TypeRepresentation::BigNumeric => Some(sql::helpers::text_type_name()),
 
@@ -212,7 +357,6 @@ fn get_type_representation_cast_type(
         // the expression, so we don't cast it.
         TypeRepresentation::Boolean
         | TypeRepresentation::String
-        | TypeRepresentation::Int64
         | TypeRepresentation::Float64
         | TypeRepresentation::Timestamp
         | TypeRepresentation::Time
@@ -221,7 +365,7 @@ fn get_type_representation_cast_type(
         | TypeRepresentation::Geography
         | TypeRepresentation::Struct(_)
         | TypeRepresentation::Json
-        | TypeRepresentation::Enum(_)
+        | TypeRepresentation::Range(_)
         | TypeRepresentation::Array(_) => None,
     }
 }

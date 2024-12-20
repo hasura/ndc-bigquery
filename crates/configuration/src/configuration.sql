@@ -6,26 +6,65 @@ WITH column_data AS (
     c.column_name,
     TO_JSON_STRING(STRUCT(
       c.column_name AS name,
-      JSON_OBJECT('scalarType', 
-        CASE 
-          WHEN LOWER(c.data_type) = 'string' THEN 'string'
-          WHEN LOWER(c.data_type) = 'bytes' THEN 'bytes'
-          WHEN LOWER(c.data_type) = 'int64' THEN 'int64'
-          WHEN LOWER(c.data_type) = 'float64' THEN 'float64'
-          WHEN LOWER(c.data_type) = 'bool' THEN 'boolean'
-          WHEN LOWER(c.data_type) = 'numeric' THEN 'numeric'
-          WHEN LOWER(c.data_type) = 'bignumeric' THEN 'bignumeric'
-          WHEN LOWER(c.data_type) = 'geography' THEN 'geography'
-          WHEN LOWER(c.data_type) = 'date' THEN 'date'
-          WHEN LOWER(c.data_type) = 'datetime' THEN 'datetime'
-          WHEN LOWER(c.data_type) = 'time' THEN 'time'
-          WHEN LOWER(c.data_type) = 'timestamp' THEN 'timestamp'
-          WHEN LOWER(c.data_type) = 'json' THEN 'json'
-          WHEN STARTS_WITH(LOWER(c.data_type), 'array<') THEN 'array'
-          WHEN STARTS_WITH(LOWER(c.data_type), 'struct<') THEN 'struct'
-          ELSE 'any'
-        END
-        ) AS type,
+      CASE 
+        WHEN LOWER(c.data_type) LIKE 'array%' THEN 
+          JSON_OBJECT('arrayType', 
+            JSON_OBJECT('scalarType', TRIM(REPLACE(REPLACE(LOWER(c.data_type), 'array<', ''), '>', '')))
+          )
+        WHEN LOWER(c.data_type) LIKE 'range%' THEN 
+          JSON_OBJECT('rangeType', TRIM(REPLACE(REPLACE(LOWER(c.data_type), 'range<', ''), '>', '')))
+        WHEN LOWER(c.data_type) LIKE 'struct%' THEN 
+          JSON_OBJECT('structType', 
+            (SELECT
+              JSON_OBJECT(
+                ARRAY_AGG(TRIM(SPLIT(TRIM(field), ' ')[OFFSET(0)])),
+                ARRAY_AGG(JSON_OBJECT('scalarType',
+                  LOWER(
+                      IF(
+                        ARRAY_LENGTH(SPLIT(TRIM(field), ' ')) > 1,
+                        case TRIM(SPLIT(TRIM(field), ' ')[OFFSET(1)])
+                          WHEN 'string' THEN 'string'
+                          WHEN 'bytes' THEN 'bytes'
+                          WHEN 'int64' THEN 'int64'
+                          WHEN 'float64' THEN 'float64'
+                          WHEN 'bool' THEN 'boolean'
+                          WHEN 'numeric' THEN 'numeric'
+                          WHEN 'bignumeric' THEN 'bignumeric'
+                          WHEN 'geography' THEN 'geography'
+                          WHEN 'date' THEN 'date'
+                          WHEN 'datetime' THEN 'datetime'
+                          WHEN 'time' THEN 'time'
+                          WHEN 'timestamp' THEN 'timestamp'
+                          WHEN 'json' THEN 'json'
+                          ELSE 'any'
+                        END,
+                        "any"
+                      )
+                    )
+                ))
+              )
+            FROM UNNEST(SPLIT(TRIM(REPLACE(REPLACE(LOWER(c.data_type), 'struct<', ''), '>', '')), ',')) AS field)
+          )
+        ELSE 
+          JSON_OBJECT('scalarType',
+            CASE
+              WHEN LOWER(c.data_type) = 'string' THEN 'string'
+              WHEN LOWER(c.data_type) = 'bytes' THEN 'bytes'
+              WHEN LOWER(c.data_type) = 'int64' THEN 'int64'
+              WHEN LOWER(c.data_type) = 'float64' THEN 'float64'
+              WHEN LOWER(c.data_type) = 'bool' THEN 'boolean'
+              WHEN LOWER(c.data_type) = 'numeric' THEN 'numeric'
+              WHEN LOWER(c.data_type) = 'bignumeric' THEN 'bignumeric'
+              WHEN LOWER(c.data_type) = 'geography' THEN 'geography'
+              WHEN LOWER(c.data_type) = 'date' THEN 'date'
+              WHEN LOWER(c.data_type) = 'datetime' THEN 'datetime'
+              WHEN LOWER(c.data_type) = 'time' THEN 'time'
+              WHEN LOWER(c.data_type) = 'timestamp' THEN 'timestamp'
+              WHEN LOWER(c.data_type) = 'json' THEN 'json'
+              ELSE 'any'
+            END
+          )
+      END AS type,
       CASE WHEN c.is_nullable = 'YES' THEN 'nullable' ELSE 'nonNullable' END AS nullable
     )) AS column_info
   FROM HASURA_DATABASE_NAME_PLACEHOLDER.INFORMATION_SCHEMA.TABLES AS t

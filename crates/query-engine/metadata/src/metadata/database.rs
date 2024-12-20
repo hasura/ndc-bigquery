@@ -4,6 +4,7 @@ use models::ScalarTypeName;
 use ndc_models as models;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
+use smol_str::SmolStr;
 use std::collections::{BTreeMap, BTreeSet};
 
 /// The scalar types supported by the Engine.
@@ -12,11 +13,21 @@ use std::collections::{BTreeMap, BTreeSet};
 pub struct ScalarTypeTypeName(pub String);
 
 /// The type of values that a column, field, or argument may take.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub enum Type {
     ScalarType(models::ScalarTypeName),
     ArrayType(Box<Type>),
+    RangeType(TypeRange),
+    StructType(BTreeMap<String, Type>),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize, JsonSchema)]
+#[serde(rename_all = "lowercase")]
+pub enum TypeRange {
+    Date,
+    Datetime,
+    Timestamp,
 }
 
 /// Map of all known/occurring scalar types.
@@ -41,6 +52,7 @@ pub struct ScalarType {
     pub aggregate_functions: BTreeMap<models::AggregateFunctionName, AggregateFunction>,
     pub comparison_operators: BTreeMap<models::ComparisonOperatorName, ComparisonOperator>,
     pub type_representation: Option<TypeRepresentation>,
+    pub full_type_representation: Option<TypeRepresentation>,
 }
 
 /// The complete list of supported binary operators for scalar types.
@@ -245,36 +257,43 @@ impl TypeRepresentations {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub enum TypeRepresentation {
-    /// JSON booleans
-    Boolean,
-    /// bytes
-    Bytes,
-    /// Any JSON string
-    String,
-    /// int64
-    Int64,
-    /// float64
-    Float64,
-    /// numeric
-    Numeric,
-    /// bignumeric
-    BigNumeric,
-    /// Timestamp
-    Timestamp,
-    /// time
-    Time,
-    /// date
-    Date,
-    /// datetime
-    Datetime,
-    /// uuid
     Array(Box<TypeRepresentation>),
-    /// geography
+    BigNumeric,
+    Boolean,
+    Bytes,
+    Date,
+    Datetime,
+    Float64,
     Geography,
-    /// struct
-    Struct(BTreeMap<String, Box<TypeRepresentation>>),
-    /// An arbitrary json.
+    Int64,
     Json,
-    /// One of the specified string values
-    Enum(Vec<String>),
+    Numeric,
+    Range(Box<TypeRange>),
+    String,
+    Struct(BTreeMap<String, Box<TypeRepresentation>>),
+    Time,
+    Timestamp,
+}
+
+impl Into<models::TypeName> for TypeRepresentation {
+    fn into(self) -> models::TypeName {
+        match self {
+            TypeRepresentation::Array(_) => models::TypeName::new(SmolStr::new("array")),
+            TypeRepresentation::BigNumeric => models::TypeName::new(SmolStr::new("bignumeric")),
+            TypeRepresentation::Boolean => models::TypeName::new(SmolStr::new("boolean")),
+            TypeRepresentation::Bytes => models::TypeName::new(SmolStr::new("bytes")),
+            TypeRepresentation::Date => models::TypeName::new(SmolStr::new("date")),
+            TypeRepresentation::Datetime => models::TypeName::new(SmolStr::new("datetime")),
+            TypeRepresentation::Float64 => models::TypeName::new(SmolStr::new("float64")),
+            TypeRepresentation::Geography => models::TypeName::new(SmolStr::new("geography")),
+            TypeRepresentation::Int64 => models::TypeName::new(SmolStr::new("int64")),
+            TypeRepresentation::Json => models::TypeName::new(SmolStr::new("json")),
+            TypeRepresentation::Numeric => models::TypeName::new(SmolStr::new("numeric")),
+            TypeRepresentation::Range(_) => models::TypeName::new(SmolStr::new("range")),
+            TypeRepresentation::String => models::TypeName::new(SmolStr::new("string")),
+            TypeRepresentation::Struct(_) => models::TypeName::new(SmolStr::new("struct")),
+            TypeRepresentation::Time => models::TypeName::new(SmolStr::new("time")),
+            TypeRepresentation::Timestamp => models::TypeName::new(SmolStr::new("timestamp")),
+        }
+    }
 }
