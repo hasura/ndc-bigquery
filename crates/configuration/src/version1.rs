@@ -175,15 +175,9 @@ pub async fn configure(
             if let Some(column) = columns.into_iter().next() {
                 if let Some(value) = column.value {
                     if let serde_json::Value::String(str) = value {
-                        match serde_json::from_str::<TablesInfo>(&str) {
-                            Ok(table_info_map) => {
-                                // tables_info.merge(table_info_map);
-                                Ok(table_info_map)
-                            }
-                            Err(err) => {
-                                Err(format!("Failed to deserialize TablesInfo from JSON: {err}"))
-                            }
-                        }
+                        serde_json::from_str::<TablesInfo>(&str).map_err(|err| {
+                            format!("Failed to deserialize TablesInfo from JSON: {err}")
+                        })
                     } else {
                         Err(format!("Expected a string value, found: {value:?}"))
                     }
@@ -288,7 +282,7 @@ struct TypeItem {
 }
 
 fn get_aggregate_functions_for_type(
-    type_representation: &Option<database::TypeRepresentation>,
+    type_representation: &Option<database::BigQueryType>,
     type_name: &ScalarTypeName,
 ) -> BTreeMap<AggregateFunctionName, database::AggregateFunction> {
     let mut aggregate_functions = BTreeMap::new();
@@ -297,15 +291,15 @@ fn get_aggregate_functions_for_type(
         Some(type_rep) => {
             if matches!(
                 type_rep,
-                database::TypeRepresentation::Int64
-                    | database::TypeRepresentation::Float64
-                    | database::TypeRepresentation::Numeric
-                    | database::TypeRepresentation::BigNumeric
-                    | database::TypeRepresentation::String
-                    | database::TypeRepresentation::Date
-                    | database::TypeRepresentation::Datetime
-                    | database::TypeRepresentation::Timestamp
-                    | database::TypeRepresentation::Time
+                database::BigQueryType::Int64
+                    | database::BigQueryType::Float64
+                    | database::BigQueryType::Numeric
+                    | database::BigQueryType::BigNumeric
+                    | database::BigQueryType::String
+                    | database::BigQueryType::Date
+                    | database::BigQueryType::Datetime
+                    | database::BigQueryType::Timestamp
+                    | database::BigQueryType::Time
             ) {
                 aggregate_functions.insert(
                     AggregateFunctionName::new("MIN".into()),
@@ -323,10 +317,10 @@ fn get_aggregate_functions_for_type(
 
             if matches!(
                 type_rep,
-                database::TypeRepresentation::Int64
-                    | database::TypeRepresentation::Float64
-                    | database::TypeRepresentation::Numeric
-                    | database::TypeRepresentation::BigNumeric
+                database::BigQueryType::Int64
+                    | database::BigQueryType::Float64
+                    | database::BigQueryType::Numeric
+                    | database::BigQueryType::BigNumeric
             ) {
                 aggregate_functions.insert(
                     AggregateFunctionName::new("AVG".into()),
@@ -378,7 +372,6 @@ fn get_scalar_types(type_names: &Vec<TypeItem>, schema_name: String) -> database
                 aggregate_functions: get_aggregate_functions_for_type(&type_rep, &scalar_type_name),
                 description: None,
                 type_representation: type_rep.clone(),
-                full_type_representation: type_rep.clone(),
             },
         );
     }
@@ -390,7 +383,7 @@ fn get_scalar_types(type_names: &Vec<TypeItem>, schema_name: String) -> database
 // we look up available types in `sys.types` but hard code their behaviour by looking them up below
 // categories taken from https://learn.microsoft.com/en-us/sql/t-sql/data-types/data-types-transact-sql
 fn get_comparison_operators_for_type(
-    type_representation: &Option<database::TypeRepresentation>,
+    type_representation: &Option<database::BigQueryType>,
     type_name: &ScalarTypeName,
 ) -> BTreeMap<ComparisonOperatorName, database::ComparisonOperator> {
     let mut comparison_operators = BTreeMap::new();
@@ -399,11 +392,11 @@ fn get_comparison_operators_for_type(
         Some(type_rep) => {
             if !matches!(
                 type_rep,
-                database::TypeRepresentation::Array(_)
-                    | database::TypeRepresentation::Bytes
-                    | database::TypeRepresentation::Json
-                    | database::TypeRepresentation::Geography
-                    | database::TypeRepresentation::Struct(_)
+                database::BigQueryType::Array(_)
+                    | database::BigQueryType::Bytes
+                    | database::BigQueryType::Json
+                    | database::BigQueryType::Geography
+                    | database::BigQueryType::Struct(_)
             ) {
                 comparison_operators.insert(
                     ComparisonOperatorName::new("_eq".into()),
@@ -428,7 +421,7 @@ fn get_comparison_operators_for_type(
 
             if matches!(
                 type_rep,
-                database::TypeRepresentation::String | database::TypeRepresentation::Bytes
+                database::BigQueryType::String | database::BigQueryType::Bytes
             ) {
                 comparison_operators.insert(
                     ComparisonOperatorName::new("_like".into()),
@@ -452,11 +445,11 @@ fn get_comparison_operators_for_type(
 
             if !matches!(
                 type_rep,
-                database::TypeRepresentation::Array(_)
-                    | database::TypeRepresentation::Json
-                    | database::TypeRepresentation::Bytes
-                    | database::TypeRepresentation::Geography
-                    | database::TypeRepresentation::Struct(_)
+                database::BigQueryType::Array(_)
+                    | database::BigQueryType::Json
+                    | database::BigQueryType::Bytes
+                    | database::BigQueryType::Geography
+                    | database::BigQueryType::Struct(_)
             ) {
                 comparison_operators.insert(
                     ComparisonOperatorName::new("_neq".into()),
@@ -512,21 +505,21 @@ fn get_comparison_operators_for_type(
     comparison_operators
 }
 
-fn get_type_representation(type_item: &TypeItem) -> Option<database::TypeRepresentation> {
+fn get_type_representation(type_item: &TypeItem) -> Option<database::BigQueryType> {
     match type_item.name.as_str().to_lowercase().as_str() {
-        "string" => Some(database::TypeRepresentation::String),
-        "bytes" => Some(database::TypeRepresentation::Bytes),
-        "int64" => Some(database::TypeRepresentation::Int64),
-        "float64" => Some(database::TypeRepresentation::Float64),
-        "bool" => Some(database::TypeRepresentation::Boolean),
-        "numeric" => Some(database::TypeRepresentation::Numeric),
-        "bignumeric" => Some(database::TypeRepresentation::BigNumeric),
-        "geography" => Some(database::TypeRepresentation::Geography),
-        "date" => Some(database::TypeRepresentation::Date),
-        "datetime" => Some(database::TypeRepresentation::Datetime),
-        "time" => Some(database::TypeRepresentation::Time),
-        "timestamp" => Some(database::TypeRepresentation::Timestamp),
-        "json" => Some(database::TypeRepresentation::Json),
+        "string" => Some(database::BigQueryType::String),
+        "bytes" => Some(database::BigQueryType::Bytes),
+        "int64" => Some(database::BigQueryType::Int64),
+        "float64" => Some(database::BigQueryType::Float64),
+        "bool" => Some(database::BigQueryType::Boolean),
+        "numeric" => Some(database::BigQueryType::Numeric),
+        "bignumeric" => Some(database::BigQueryType::BigNumeric),
+        "geography" => Some(database::BigQueryType::Geography),
+        "date" => Some(database::BigQueryType::Date),
+        "datetime" => Some(database::BigQueryType::Datetime),
+        "time" => Some(database::BigQueryType::Time),
+        "timestamp" => Some(database::BigQueryType::Timestamp),
+        "json" => Some(database::BigQueryType::Json),
         t if t.starts_with("range<") => {
             let inner_type = t.trim_start_matches("range<").trim_end_matches('>');
             let range_type = match inner_type {
@@ -535,15 +528,15 @@ fn get_type_representation(type_item: &TypeItem) -> Option<database::TypeReprese
                 "timestamp" => database::TypeRange::Timestamp,
                 _ => database::TypeRange::Date, // Default to Date if unrecognized
             };
-            Some(database::TypeRepresentation::Range(Box::new(range_type)))
+            Some(database::BigQueryType::Range(Box::new(range_type)))
         }
         t if t.starts_with("array<") => {
             let inner_type = t.trim_start_matches("array<").trim_end_matches('>');
             let inner_repr = get_type_representation(&TypeItem {
                 name: ScalarTypeName::new(inner_type.into()),
             })
-            .unwrap_or(database::TypeRepresentation::String);
-            Some(database::TypeRepresentation::Array(Box::new(inner_repr)))
+            .unwrap_or(database::BigQueryType::String);
+            Some(database::BigQueryType::Array(Box::new(inner_repr)))
         }
         t if t.starts_with("struct<") => {
             let fields = t.trim_start_matches("struct<").trim_end_matches('>');
@@ -555,11 +548,11 @@ fn get_type_representation(type_item: &TypeItem) -> Option<database::TypeReprese
                     let field_type = get_type_representation(&TypeItem {
                         name: ScalarTypeName::new(parts[1].into()),
                     })
-                    .unwrap_or(database::TypeRepresentation::String);
+                    .unwrap_or(database::BigQueryType::String);
                     struct_fields.insert(field_name, Box::new(field_type));
                 }
             }
-            Some(database::TypeRepresentation::Struct(struct_fields))
+            Some(database::BigQueryType::Struct(struct_fields))
         }
         _ => None,
     }

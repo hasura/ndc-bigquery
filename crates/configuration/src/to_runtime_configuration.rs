@@ -88,7 +88,6 @@ fn convert_scalar_types(
                         aggregate_functions: scalar_type.aggregate_functions,
                         comparison_operators: scalar_type.comparison_operators,
                         type_representation: scalar_type.type_representation.clone(),
-                        full_type_representation: scalar_type.type_representation,
                     },
                 )
             })
@@ -139,7 +138,7 @@ fn convert_read_only_column_info(
 ) -> query_engine_metadata::metadata::ReadOnlyColumnInfo {
     query_engine_metadata::metadata::ReadOnlyColumnInfo {
         name: read_only_column_info.name,
-        r#type: convert_type(read_only_column_info.r#type),
+        r#type: read_only_column_info.r#type,
         nullable: convert_nullable(&read_only_column_info.nullable),
         description: read_only_column_info.description,
     }
@@ -152,16 +151,16 @@ fn convert_nullable(nullable: &metadata::Nullable) -> query_engine_metadata::met
     }
 }
 
-fn convert_type(r#type: metadata::Type) -> query_engine_metadata::metadata::Type {
-    match r#type {
-        metadata::Type::ArrayType(t) => {
-            query_engine_metadata::metadata::Type::ArrayType(Box::new(convert_type(*t)))
-        }
-        metadata::Type::RangeType(t) => query_engine_metadata::metadata::Type::RangeType(t),
-        metadata::Type::StructType(t) => query_engine_metadata::metadata::Type::StructType(t),
-        metadata::Type::ScalarType(t) => query_engine_metadata::metadata::Type::ScalarType(t),
-    }
-}
+// fn convert_type(r#type: metadata::Type) -> query_engine_metadata::metadata::Type {
+//     match r#type {
+//         metadata::Type::ArrayType(t) => {
+//             query_engine_metadata::metadata::Type::ArrayType(Box::new(convert_type(*t)))
+//         }
+//         metadata::Type::RangeType(t) => query_engine_metadata::metadata::Type::RangeType(t),
+//         metadata::Type::StructType(t) => query_engine_metadata::metadata::Type::StructType(t),
+//         metadata::Type::ScalarType(t) => query_engine_metadata::metadata::Type::ScalarType(t),
+//     }
+// }
 
 fn convert_native_query_sql_either(
     sql: metadata::NativeQuerySqlEither,
@@ -323,7 +322,7 @@ fn convert_column_info(
 ) -> query_engine_metadata::metadata::ColumnInfo {
     query_engine_metadata::metadata::ColumnInfo {
         name: column_info.name,
-        r#type: convert_type(column_info.r#type),
+        r#type: column_info.r#type,
         nullable: convert_nullable(&column_info.nullable),
         has_default: convert_has_default(&column_info.has_default),
         is_identity: convert_is_identity(&column_info.is_identity),

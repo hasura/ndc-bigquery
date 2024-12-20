@@ -183,25 +183,25 @@ pub async fn get_schema(
 
 /// Map our local type representation to ndc-spec type representation.
 fn map_type_representation(
-    type_representation: &metadata::TypeRepresentation,
+    type_representation: &metadata::BigQueryType,
 ) -> models::TypeRepresentation {
     match type_representation {
-        metadata::TypeRepresentation::Array(_) => models::TypeRepresentation::JSON,
-        metadata::TypeRepresentation::BigNumeric => models::TypeRepresentation::BigDecimal,
-        metadata::TypeRepresentation::Boolean => models::TypeRepresentation::Boolean,
-        metadata::TypeRepresentation::Bytes => models::TypeRepresentation::Bytes,
-        metadata::TypeRepresentation::Date => models::TypeRepresentation::Date,
-        metadata::TypeRepresentation::Datetime => models::TypeRepresentation::TimestampTZ,
-        metadata::TypeRepresentation::Float64 => models::TypeRepresentation::Float64,
-        metadata::TypeRepresentation::Geography => models::TypeRepresentation::Geography,
-        metadata::TypeRepresentation::Int64 => models::TypeRepresentation::Int64,
-        metadata::TypeRepresentation::Json => models::TypeRepresentation::JSON,
-        metadata::TypeRepresentation::Numeric => models::TypeRepresentation::BigDecimal,
-        metadata::TypeRepresentation::Range(_) => models::TypeRepresentation::JSON,
-        metadata::TypeRepresentation::String => models::TypeRepresentation::String,
-        metadata::TypeRepresentation::Struct(_) => models::TypeRepresentation::JSON,
-        metadata::TypeRepresentation::Time => models::TypeRepresentation::String,
-        metadata::TypeRepresentation::Timestamp => models::TypeRepresentation::TimestampTZ,
+        metadata::BigQueryType::Array(_) => models::TypeRepresentation::JSON,
+        metadata::BigQueryType::BigNumeric => models::TypeRepresentation::BigDecimal,
+        metadata::BigQueryType::Boolean => models::TypeRepresentation::Boolean,
+        metadata::BigQueryType::Bytes => models::TypeRepresentation::Bytes,
+        metadata::BigQueryType::Date => models::TypeRepresentation::Date,
+        metadata::BigQueryType::Datetime => models::TypeRepresentation::TimestampTZ,
+        metadata::BigQueryType::Float64 => models::TypeRepresentation::Float64,
+        metadata::BigQueryType::Geography => models::TypeRepresentation::Geography,
+        metadata::BigQueryType::Int64 => models::TypeRepresentation::Int64,
+        metadata::BigQueryType::Json => models::TypeRepresentation::JSON,
+        metadata::BigQueryType::Numeric => models::TypeRepresentation::BigDecimal,
+        metadata::BigQueryType::Range(_) => models::TypeRepresentation::JSON,
+        metadata::BigQueryType::String => models::TypeRepresentation::String,
+        metadata::BigQueryType::Struct(_) => models::TypeRepresentation::JSON,
+        metadata::BigQueryType::Time => models::TypeRepresentation::String,
+        metadata::BigQueryType::Timestamp => models::TypeRepresentation::TimestampTZ,
     }
 }
 
