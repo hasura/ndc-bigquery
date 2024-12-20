@@ -207,18 +207,24 @@ pub fn translate_projected_variable(
 
             let start_cast = sql::ast::Expression::Cast {
                 expression: Box::new(start_expr),
-                r#type: sql::ast::ScalarType::BaseType(sql::ast::ScalarTypeName::Unqualified(start_type.to_string())),
+                r#type: sql::ast::ScalarType::BaseType(sql::ast::ScalarTypeName::Unqualified(
+                    start_type.to_string(),
+                )),
             };
             let end_cast = sql::ast::Expression::Cast {
                 expression: Box::new(end_expr),
-                r#type: sql::ast::ScalarType::BaseType(sql::ast::ScalarTypeName::Unqualified(end_type.to_string())),
+                r#type: sql::ast::ScalarType::BaseType(sql::ast::ScalarTypeName::Unqualified(
+                    end_type.to_string(),
+                )),
             };
 
             sql::ast::Expression::JsonBuildObject(
                 vec![
                     ("start".to_string(), start_cast),
                     ("end".to_string(), end_cast),
-                ].into_iter().collect()
+                ]
+                .into_iter()
+                .collect(),
             )
         }
         database::Type::StructType(struct_fields) => {
@@ -229,7 +235,10 @@ pub fn translate_projected_variable(
                         function: sql::ast::Function::Unknown("JSON_EXTRACT_SCALAR".to_string()),
                         args: vec![
                             exp.clone(),
-                            sql::ast::Expression::Value(sql::ast::Value::String(format!("$.{}", field_name))),
+                            sql::ast::Expression::Value(sql::ast::Value::String(format!(
+                                "$.{}",
+                                field_name
+                            ))),
                         ],
                     };
                     let cast_expr = sql::ast::Expression::Cast {

@@ -23,7 +23,7 @@ pub fn get_capabilities() -> models::Capabilities {
         },
         mutation: models::MutationCapabilities {
             transactional: None,
-            explain: None
+            explain: None,
         },
         relationships: None,
     }

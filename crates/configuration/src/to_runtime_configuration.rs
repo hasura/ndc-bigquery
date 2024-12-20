@@ -156,13 +156,9 @@ fn convert_type(r#type: metadata::Type) -> query_engine_metadata::metadata::Type
     match r#type {
         metadata::Type::ArrayType(t) => {
             query_engine_metadata::metadata::Type::ArrayType(Box::new(convert_type(*t)))
-        },
-        metadata::Type::RangeType(t) => {
-            query_engine_metadata::metadata::Type::RangeType(t)
-        },
-        metadata::Type::StructType(t) => {
-            query_engine_metadata::metadata::Type::StructType(t)
-        },
+        }
+        metadata::Type::RangeType(t) => query_engine_metadata::metadata::Type::RangeType(t),
+        metadata::Type::StructType(t) => query_engine_metadata::metadata::Type::StructType(t),
         metadata::Type::ScalarType(t) => query_engine_metadata::metadata::Type::ScalarType(t),
     }
 }

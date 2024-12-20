@@ -139,14 +139,21 @@ fn unpack_and_wrap_fields(
                     let field_expr = sql::ast::Expression::ColumnReference(
                         sql::ast::ColumnReference::TableColumn {
                             table: current_table.reference.clone(),
-                            name: sql::ast::ColumnName(format!("{}.{}", column_info.name.0.as_str(), field_name)),
-                        }
+                            name: sql::ast::ColumnName(format!(
+                                "{}.{}",
+                                column_info.name.0.as_str(),
+                                field_name
+                            )),
+                        },
                     );
                     let field_type_representation = match &field_type {
-                        Type::ScalarType(scalar_type) => env.lookup_type_representation(scalar_type),
+                        Type::ScalarType(scalar_type) => {
+                            env.lookup_type_representation(scalar_type)
+                        }
                         _ => None,
                     };
-                    let field_expr = wrap_in_type_representation(field_expr, field_type_representation);
+                    let field_expr =
+                        wrap_in_type_representation(field_expr, field_type_representation);
 
                     (field_name, field_expr)
                 })
@@ -154,21 +161,22 @@ fn unpack_and_wrap_fields(
 
             let json_object = sql::ast::Expression::FunctionCall {
                 function: sql::ast::Function::Unknown("JSON_OBJECT".to_string()),
-                args: object_fields.into_iter().flat_map(|(k, v)| vec![
-                    sql::ast::Expression::Value(sql::ast::Value::String(k)),
-                    v
-                ]).collect(),
+                args: object_fields
+                    .into_iter()
+                    .flat_map(|(k, v)| {
+                        vec![sql::ast::Expression::Value(sql::ast::Value::String(k)), v]
+                    })
+                    .collect(),
             };
 
             Ok((alias, json_object))
         }
         Type::RangeType(range_type) => {
-            let column_ref = sql::ast::Expression::ColumnReference(
-                sql::ast::ColumnReference::TableColumn {
+            let column_ref =
+                sql::ast::Expression::ColumnReference(sql::ast::ColumnReference::TableColumn {
                     table: current_table.reference.clone(),
                     name: column_info.name.clone(),
-                }
-            );
+                });
 
             let start_expr = sql::ast::Expression::FunctionCall {
                 function: sql::ast::Function::Unknown("RANGE_START".to_string()),
@@ -192,12 +200,16 @@ fn unpack_and_wrap_fields(
                     sql::ast::Expression::Value(sql::ast::Value::String("start".to_string())),
                     sql::ast::Expression::Cast {
                         expression: Box::new(start_expr),
-                        r#type: sql::ast::ScalarType::BaseType(sql::ast::ScalarTypeName::Unqualified(type_name.to_string())),
+                        r#type: sql::ast::ScalarType::BaseType(
+                            sql::ast::ScalarTypeName::Unqualified(type_name.to_string()),
+                        ),
                     },
                     sql::ast::Expression::Value(sql::ast::Value::String("end".to_string())),
                     sql::ast::Expression::Cast {
                         expression: Box::new(end_expr),
-                        r#type: sql::ast::ScalarType::BaseType(sql::ast::ScalarTypeName::Unqualified(type_name.to_string())),
+                        r#type: sql::ast::ScalarType::BaseType(
+                            sql::ast::ScalarTypeName::Unqualified(type_name.to_string()),
+                        ),
                     },
                 ],
             };
@@ -215,14 +227,21 @@ fn unpack_and_wrap_fields(
                         let field_expr = sql::ast::Expression::ColumnReference(
                             sql::ast::ColumnReference::TableColumn {
                                 table: current_table.reference.clone(),
-                                name: sql::ast::ColumnName(format!("{}.{}", column_info.name.0.as_str(), field_name)),
-                            }
+                                name: sql::ast::ColumnName(format!(
+                                    "{}.{}",
+                                    column_info.name.0.as_str(),
+                                    field_name
+                                )),
+                            },
                         );
                         let field_type_representation = match &field_type {
-                            Type::ScalarType(scalar_type) => env.lookup_type_representation(scalar_type),
+                            Type::ScalarType(scalar_type) => {
+                                env.lookup_type_representation(scalar_type)
+                            }
                             _ => None,
                         };
-                        let field_expr = wrap_in_type_representation(field_expr, field_type_representation);
+                        let field_expr =
+                            wrap_in_type_representation(field_expr, field_type_representation);
 
                         (field_name.clone(), field_expr)
                     })
@@ -230,21 +249,22 @@ fn unpack_and_wrap_fields(
 
                 let json_object = sql::ast::Expression::FunctionCall {
                     function: sql::ast::Function::Unknown("JSON_OBJECT".to_string()),
-                    args: object_fields.into_iter().flat_map(|(k, v)| vec![
-                        sql::ast::Expression::Value(sql::ast::Value::String(k)),
-                        v
-                    ]).collect(),
+                    args: object_fields
+                        .into_iter()
+                        .flat_map(|(k, v)| {
+                            vec![sql::ast::Expression::Value(sql::ast::Value::String(k)), v]
+                        })
+                        .collect(),
                 };
 
                 Ok((alias, json_object))
             }
             Type::RangeType(range_type) => {
-                let column_ref = sql::ast::Expression::ColumnReference(
-                    sql::ast::ColumnReference::TableColumn {
+                let column_ref =
+                    sql::ast::Expression::ColumnReference(sql::ast::ColumnReference::TableColumn {
                         table: current_table.reference.clone(),
                         name: column_info.name.clone(),
-                    }
-                );
+                    });
 
                 let start_expr = sql::ast::Expression::FunctionCall {
                     function: sql::ast::Function::Unknown("RANGE_START".to_string()),
@@ -268,12 +288,16 @@ fn unpack_and_wrap_fields(
                         sql::ast::Expression::Value(sql::ast::Value::String("start".to_string())),
                         sql::ast::Expression::Cast {
                             expression: Box::new(start_expr),
-                            r#type: sql::ast::ScalarType::BaseType(sql::ast::ScalarTypeName::Unqualified(type_name.to_string())),
+                            r#type: sql::ast::ScalarType::BaseType(
+                                sql::ast::ScalarTypeName::Unqualified(type_name.to_string()),
+                            ),
                         },
                         sql::ast::Expression::Value(sql::ast::Value::String("end".to_string())),
                         sql::ast::Expression::Cast {
                             expression: Box::new(end_expr),
-                            r#type: sql::ast::ScalarType::BaseType(sql::ast::ScalarTypeName::Unqualified(type_name.to_string())),
+                            r#type: sql::ast::ScalarType::BaseType(
+                                sql::ast::ScalarTypeName::Unqualified(type_name.to_string()),
+                            ),
                         },
                     ],
                 };

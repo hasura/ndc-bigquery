@@ -710,7 +710,7 @@ fn get_column_scalar_type_name(
             )),
         },
         database::Type::StructType(_) => Err(Error::NonScalarTypeUsedInOperator {
-            r#type: typ.clone()
+            r#type: typ.clone(),
         }),
         database::Type::RangeType(_) => Err(Error::NonScalarTypeUsedInOperator {
             r#type: typ.clone(),
