@@ -397,6 +397,7 @@ fn get_comparison_operators_for_type(
                     | database::BigQueryType::Json
                     | database::BigQueryType::Geography
                     | database::BigQueryType::Struct(_)
+                    | database::BigQueryType::Range(_)
             ) {
                 comparison_operators.insert(
                     ComparisonOperatorName::new("_eq".into()),
@@ -450,6 +451,7 @@ fn get_comparison_operators_for_type(
                     | database::BigQueryType::Bytes
                     | database::BigQueryType::Geography
                     | database::BigQueryType::Struct(_)
+                    | database::BigQueryType::Range(_)
             ) {
                 comparison_operators.insert(
                     ComparisonOperatorName::new("_neq".into()),
