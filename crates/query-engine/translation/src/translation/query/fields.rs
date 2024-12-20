@@ -183,7 +183,7 @@ fn uppack_and_wrap_fields_scalar_type(
     alias: sql::ast::ColumnAlias,
 ) -> Result<(sql::ast::ColumnAlias, sql::ast::Expression), Error> {
     let column_info = fields_info.lookup_column(column)?;
-    let column_type_representation = env.lookup_type_representation(&scalar_type);
+    let column_type_representation = env.lookup_type_representation(scalar_type);
     let (final_alias, expression) = sql::helpers::make_column(
         current_table.reference.clone(),
         column_info.name.clone(),

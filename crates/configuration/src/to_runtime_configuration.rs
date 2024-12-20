@@ -87,7 +87,7 @@ fn convert_scalar_types(
                         description: scalar_type.description,
                         aggregate_functions: scalar_type.aggregate_functions,
                         comparison_operators: scalar_type.comparison_operators,
-                        type_representation: scalar_type.type_representation.clone(),
+                        type_representation: scalar_type.type_representation,
                     },
                 )
             })
@@ -150,17 +150,6 @@ fn convert_nullable(nullable: &metadata::Nullable) -> query_engine_metadata::met
         metadata::Nullable::NonNullable => query_engine_metadata::metadata::Nullable::NonNullable,
     }
 }
-
-// fn convert_type(r#type: metadata::Type) -> query_engine_metadata::metadata::Type {
-//     match r#type {
-//         metadata::Type::ArrayType(t) => {
-//             query_engine_metadata::metadata::Type::ArrayType(Box::new(convert_type(*t)))
-//         }
-//         metadata::Type::RangeType(t) => query_engine_metadata::metadata::Type::RangeType(t),
-//         metadata::Type::StructType(t) => query_engine_metadata::metadata::Type::StructType(t),
-//         metadata::Type::ScalarType(t) => query_engine_metadata::metadata::Type::ScalarType(t),
-//     }
-// }
 
 fn convert_native_query_sql_either(
     sql: metadata::NativeQuerySqlEither,

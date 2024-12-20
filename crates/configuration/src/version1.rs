@@ -355,7 +355,7 @@ fn get_scalar_types(type_names: &Vec<TypeItem>, schema_name: String) -> database
     for type_item in type_names {
         let type_rep = get_type_representation(type_item);
         let type_name_str = match type_rep.clone() {
-            Some(typerep) => typerep.into(),
+            Some(typerep) => ndc_models::TypeName::from(typerep),
             None => TypeName::new(SmolStr::new("any")),
         };
         let scalar_type_name = ScalarTypeName::new(type_name_str);
@@ -523,10 +523,9 @@ fn get_type_representation(type_item: &TypeItem) -> Option<database::BigQueryTyp
         t if t.starts_with("range<") => {
             let inner_type = t.trim_start_matches("range<").trim_end_matches('>');
             let range_type = match inner_type {
-                "date" => database::TypeRange::Date,
                 "datetime" => database::TypeRange::Datetime,
                 "timestamp" => database::TypeRange::Timestamp,
-                _ => database::TypeRange::Date, // Default to Date if unrecognized
+                _ => database::TypeRange::Date, // Default to Date for everything else
             };
             Some(database::BigQueryType::Range(Box::new(range_type)))
         }
@@ -542,7 +541,7 @@ fn get_type_representation(type_item: &TypeItem) -> Option<database::BigQueryTyp
             let fields = t.trim_start_matches("struct<").trim_end_matches('>');
             let mut struct_fields = BTreeMap::new();
             for field in fields.split(',') {
-                let parts: Vec<&str> = field.trim().split_whitespace().collect();
+                let parts: Vec<&str> = field.split_whitespace().collect();
                 if parts.len() == 2 {
                     let field_name = parts[0].to_string();
                     let field_type = get_type_representation(&TypeItem {
