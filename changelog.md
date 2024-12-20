@@ -1,7 +1,16 @@
 # Changelog
 
 ### Added
+
+### Changed
+
+### Fixed
+
+## [v2.0.0]
+
+### Added
 - Basic support for struct and range types
+- Proper ndc-spec type representation
 
 ### Changed
 - Breaking change: `configuration.json` has changed. Configs prior to v2 need to be deleted and re-initialized
