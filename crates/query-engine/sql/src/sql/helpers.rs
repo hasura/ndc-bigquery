@@ -67,6 +67,7 @@ pub fn make_column(
     name: ColumnName,
     alias: ColumnAlias,
 ) -> (ColumnAlias, Expression) {
+    let name = ColumnName(format!("{}{}{}", "`", name.0, "`"));
     (
         alias,
         Expression::ColumnReference(ColumnReference::TableColumn { table, name }),
@@ -74,6 +75,7 @@ pub fn make_column(
 }
 /// Create column aliases using this function so we build everything in one place.
 pub fn make_column_alias(name: String) -> ColumnAlias {
+    let name = format!("{}{}{}", "`", name, "`");
     ColumnAlias { name }
 }
 
