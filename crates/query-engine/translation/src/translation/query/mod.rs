@@ -47,7 +47,7 @@ pub fn translate(
     let json_select = sql::helpers::select_rowset(
         (
             state.make_table_alias("universe".to_string()),
-            sql::helpers::make_column_alias("universe".to_string()),
+            sql::helpers::make_column_alias("universe"),
         ),
         (
             state.make_table_alias("rows".to_string()),

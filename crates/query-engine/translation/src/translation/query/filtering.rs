@@ -529,7 +529,7 @@ pub fn translate_exists_in_collection(
                 root::make_from_clause_and_reference(&collection, &arguments, env, state, None)?;
 
             // CockroachDB doesn't like empty selects, so we do "SELECT 1 as 'one' ..."
-            let column_alias = sql::helpers::make_column_alias("one".to_string());
+            let column_alias = sql::helpers::make_column_alias("one");
 
             let select_cols = vec![(
                 column_alias,
@@ -590,7 +590,7 @@ pub fn translate_exists_in_collection(
             )?;
 
             // CockroachDB doesn't like empty selects, so we do "SELECT 1 as 'one' ..."
-            let column_alias = sql::helpers::make_column_alias("one".to_string());
+            let column_alias = sql::helpers::make_column_alias("one");
 
             let select_cols = vec![(
                 column_alias,
@@ -730,13 +730,13 @@ fn make_unnest_subquery(
     let subquery_reference = sql::ast::TableReference::AliasedTable(subquery_alias.clone());
     let subquery_from = sql::ast::From::Unnest {
         expression,
-        column: sql::helpers::make_column_alias("value".to_string()),
+        column: sql::helpers::make_column_alias("value"),
         alias: subquery_alias,
     };
     let mut subquery = sql::helpers::simple_select(vec![sql::helpers::make_column(
         subquery_reference,
-        sql::ast::ColumnName("value".to_string()),
-        sql::helpers::make_column_alias("value".to_string()),
+        &sql::ast::ColumnName("value".to_string()),
+        sql::helpers::make_column_alias("value"),
     )]);
     subquery.from = Some(subquery_from);
     sql::ast::Expression::CorrelatedSubSelect(Box::new(subquery))

@@ -111,7 +111,7 @@ pub fn translate_variable(
 ) -> Result<sql::ast::Expression, Error> {
     let variables_reference = Expression::ColumnReference(ColumnReference::AliasedColumn {
         table: variables_table,
-        column: sql::helpers::make_column_alias(sql::helpers::VARIABLES_FIELD.to_string()),
+        column: sql::helpers::make_column_alias(sql::helpers::VARIABLES_FIELD),
     });
 
     // We use the binop '->' to project (as jsonb) the value of a variable from the data column of
@@ -154,7 +154,7 @@ pub fn translate_projected_variable(
         // ```
         database::Type::ArrayType(type_name) => {
             let array_table = state.make_table_alias("array".to_string());
-            let element_column = sql::helpers::make_column_alias("element".to_string());
+            let element_column = sql::helpers::make_column_alias("element");
 
             let from_arr = sql::ast::From::JsonbArrayElements {
                 expression: exp,

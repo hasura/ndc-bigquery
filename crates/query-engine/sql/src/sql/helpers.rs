@@ -64,7 +64,7 @@ pub fn false_expr() -> Expression {
 /// Generate a column expression refering to a specific table.
 pub fn make_column(
     table: TableReference,
-    name: ColumnName,
+    name: &ColumnName,
     alias: ColumnAlias,
 ) -> (ColumnAlias, Expression) {
     let name = ColumnName(format!("{}{}{}", "`", name.0, "`"));
@@ -74,7 +74,7 @@ pub fn make_column(
     )
 }
 /// Create column aliases using this function so we build everything in one place.
-pub fn make_column_alias(name: String) -> ColumnAlias {
+pub fn make_column_alias(name: &str) -> ColumnAlias {
     let name = format!("{}{}{}", "`", name, "`");
     ColumnAlias { name }
 }
@@ -487,7 +487,7 @@ pub fn select_rowset_with_variables(
         elements: vec![OrderByElement {
             target: Expression::ColumnReference(ColumnReference::AliasedColumn {
                 table: variables_table_reference,
-                column: make_column_alias(VARIABLE_ORDER_FIELD.to_string()),
+                column: make_column_alias(VARIABLE_ORDER_FIELD),
             }),
             direction: OrderByDirection::Asc,
         }],
@@ -759,11 +759,8 @@ pub fn select_row_as_json_with_default(
 pub fn from_variables(alias: TableAlias) -> From {
     let expression = Expression::Value(Value::Variable(VARIABLES_OBJECT_PLACEHOLDER.to_string()));
     let columns: Vec<(ColumnAlias, ScalarType)> = vec![
-        (
-            make_column_alias(VARIABLE_ORDER_FIELD.to_string()),
-            int4_type(),
-        ),
-        (make_column_alias(VARIABLES_FIELD.to_string()), jsonb_type()),
+        (make_column_alias(VARIABLE_ORDER_FIELD), int4_type()),
+        (make_column_alias(VARIABLES_FIELD), jsonb_type()),
     ];
 
     From::JsonbToRecordset {
