@@ -6,6 +6,15 @@
 
 ### Fixed
 
+## [v2.0.1]
+
+### Added
+
+### Changed
+
+### Fixed
+- Fixed the use of keywords as column names
+
 ## [v2.0.0]
 
 ### Added
@@ -37,5 +46,8 @@
 
 <!-- end -->
 
-[Unreleased]: https://github.com/hasura/ndc-bigquery/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/hasura/ndc-bigquery/compare/v3.0.0...HEAD
+[v2.0.1]: https://github.com/hasura/ndc-bigquery/releases/tag/v2.0.1
+[v2.0.0]: https://github.com/hasura/ndc-bigquery/releases/tag/v2.0.0
+[v1.0.0]: https://github.com/hasura/ndc-bigquery/releases/tag/v1.0.0
 [v0.1.1]: https://github.com/hasura/ndc-bigquery/releases/tag/v0.1.1
