@@ -3,7 +3,7 @@ source: crates/query-engine/translation/tests/tests.rs
 expression: result
 ---
 SELECT
-  JSON_OBJECT('rows', coalesce(ARRAY_AGG(rows_2), ARRAY [])) AS universe
+  JSON_OBJECT('rows', coalesce(ARRAY_AGG(rows_2), ARRAY [])) AS `universe`
 FROM
   (
     SELECT
@@ -11,7 +11,7 @@ FROM
     FROM
       (
         SELECT
-          types_0.date AS date
+          types_0.`date` AS `date`
         FROM
           test_project.test_dataset.types AS types_0
         WHERE

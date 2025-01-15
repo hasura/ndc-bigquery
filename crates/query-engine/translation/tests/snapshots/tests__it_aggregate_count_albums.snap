@@ -8,7 +8,7 @@ SELECT
     ARRAY_AGG(aggregates_6) [SAFE_OFFSET(0)],
     'rows',
     ARRAY_AGG(rows_4)
-  ) AS universe
+  ) AS `universe`
 FROM
   (
     SELECT
@@ -16,7 +16,7 @@ FROM
     FROM
       (
         SELECT
-          albums_0.Title AS Title
+          albums_0.`Title` AS `Title`
         FROM
           test_project.test_dataset.albums AS albums_0
         LIMIT
@@ -29,7 +29,7 @@ FROM
     FROM
       (
         SELECT
-          COUNT(*) AS how_many_albums
+          COUNT(*) AS `how_many_albums`
         FROM
           (
             SELECT

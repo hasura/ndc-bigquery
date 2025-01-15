@@ -3,11 +3,11 @@ source: crates/query-engine/translation/tests/tests.rs
 expression: result
 ---
 SELECT
-  JSON_OBJECT('aggregates', aggregates_6) AS universe
+  JSON_OBJECT('aggregates', aggregates_6) AS `universe`
 FROM
   (
     SELECT
-      max(albums_2.ArtistId) AS max_artist_id
+      max(albums_2.`ArtistId`) AS `max_artist_id`
     FROM
       (
         SELECT

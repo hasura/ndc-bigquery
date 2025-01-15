@@ -38,7 +38,7 @@ pub(crate) fn translate_fields(
                 env,
                 current_table,
                 &column,
-                sql::helpers::make_column_alias(alias.to_string()),
+                sql::helpers::make_column_alias(&alias.to_string()),
                 &fields_info,
             ),
             models::Field::Column {
@@ -54,7 +54,7 @@ pub(crate) fn translate_fields(
                 arguments,
             } => {
                 let table_alias = state.make_relationship_table_alias(alias.as_str());
-                let column_alias = sql::helpers::make_column_alias(alias.to_string());
+                let column_alias = sql::helpers::make_column_alias(&alias.to_string());
                 let column_name = sql::ast::ColumnReference::AliasedColumn {
                     table: sql::ast::TableReference::AliasedTable(table_alias.clone()),
                     column: column_alias.clone(),
@@ -184,11 +184,8 @@ fn uppack_and_wrap_fields_scalar_type(
 ) -> Result<(sql::ast::ColumnAlias, sql::ast::Expression), Error> {
     let column_info = fields_info.lookup_column(column)?;
     let column_type_representation = env.lookup_type_representation(scalar_type);
-    let (final_alias, expression) = sql::helpers::make_column(
-        current_table.reference.clone(),
-        column_info.name.clone(),
-        alias,
-    );
+    let (final_alias, expression) =
+        sql::helpers::make_column(current_table.reference.clone(), &column_info.name, alias);
     Ok((
         final_alias,
         wrap_in_type_representation(expression, column_type_representation),

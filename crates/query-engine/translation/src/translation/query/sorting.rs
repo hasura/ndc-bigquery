@@ -582,7 +582,8 @@ fn process_path_element_for_order_by_targets(
                 let selected_column = collection.lookup_column(source_col)?;
                 // we are going to deliberately use the table column name and not an alias we get from
                 // the query request because this is internal to the sorting mechanism.
-                let selected_column_alias = sql::helpers::make_column_alias(selected_column.name.0);
+                let selected_column_alias =
+                    sql::helpers::make_column_alias(&selected_column.name.0);
                 // we use the real name of the column as an alias as well.
                 Ok(OrderByRelationshipColumn {
                     alias: selected_column_alias.clone(),
@@ -662,7 +663,7 @@ fn translate_targets(
                     // we are going to deliberately use the table column name and not an alias we get from
                     // the query request because this is internal to the sorting mechanism.
                     let selected_column_alias =
-                        sql::helpers::make_column_alias(selected_column.name.0);
+                        sql::helpers::make_column_alias(&selected_column.name.0);
 
                     // we use the real name of the column as an alias as well.
                     Ok::<OrderBySelectExpression, Error>(OrderBySelectExpression {
@@ -689,7 +690,7 @@ fn translate_targets(
                 .map(|element| {
                     match &element.element {
                         Aggregate::CountStarAggregate => {
-                            let column_alias = sql::helpers::make_column_alias("count".to_string());
+                            let column_alias = sql::helpers::make_column_alias("count");
                             Ok(OrderBySelectExpression {
                                 index: element.index,
                                 direction: element.direction,
@@ -705,7 +706,7 @@ fn translate_targets(
                             // we are going to deliberately use the table column name and not an alias we get from
                             // the query request because this is internal to the sorting mechanism.
                             let selected_column_alias =
-                                sql::helpers::make_column_alias(selected_column.name.0);
+                                sql::helpers::make_column_alias(&selected_column.name.0);
                             // we use the real name of the column as an alias as well.
                             Ok(OrderBySelectExpression {
                                 index: element.index,

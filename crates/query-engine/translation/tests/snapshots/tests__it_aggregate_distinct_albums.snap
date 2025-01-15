@@ -3,11 +3,11 @@ source: crates/query-engine/translation/tests/tests.rs
 expression: result
 ---
 SELECT
-  JSON_OBJECT('aggregates', aggregates_6) AS universe
+  JSON_OBJECT('aggregates', aggregates_6) AS `universe`
 FROM
   (
     SELECT
-      COUNT(DISTINCT albums_2.ArtistId) AS how_many_distinct_artist_ids
+      COUNT(DISTINCT albums_2.`ArtistId`) AS `how_many_distinct_artist_ids`
     FROM
       (
         SELECT

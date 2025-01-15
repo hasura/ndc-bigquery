@@ -21,7 +21,7 @@ pub fn translate(
                     distinct,
                     field_path: _,
                 } => {
-                    let count_column_alias = sql::helpers::make_column_alias(column.to_string());
+                    let count_column_alias = sql::helpers::make_column_alias(&column.to_string());
                     if *distinct {
                         sql::ast::Expression::Count(sql::ast::CountType::Distinct(
                             sql::ast::ColumnReference::AliasedColumn {
@@ -47,7 +47,7 @@ pub fn translate(
                     args: vec![sql::ast::Expression::ColumnReference(
                         sql::ast::ColumnReference::AliasedColumn {
                             table: table.clone(),
-                            column: sql::helpers::make_column_alias(column.to_string()),
+                            column: sql::helpers::make_column_alias(&column.to_string()),
                         },
                     )],
                 },
@@ -56,7 +56,7 @@ pub fn translate(
                 }
             };
             Ok((
-                sql::helpers::make_column_alias(alias.to_string()),
+                sql::helpers::make_column_alias(&alias.to_string()),
                 expression,
             ))
         })
