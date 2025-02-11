@@ -23,6 +23,10 @@ async fn test_initialize_directory() -> anyhow::Result<()> {
     )
     .await?;
 
+    let configuration_schema_file_path = dir.path().join("schema.json");
+    assert!(configuration_schema_file_path.exists());
+    common::assert_file_ends_with_newline(&configuration_schema_file_path).await?;
+
     let configuration_file_path = dir.path().join("configuration.json");
     assert!(configuration_file_path.exists());
     let contents = fs::read_to_string(configuration_file_path).await?;
@@ -119,6 +123,10 @@ async fn test_initialize_directory_with_metadata() -> anyhow::Result<()> {
     )
     .await?;
 
+    let configuration_schema_file_path = dir.path().join("schema.json");
+    assert!(configuration_schema_file_path.exists());
+    common::assert_file_ends_with_newline(&configuration_schema_file_path).await?;
+
     let configuration_file_path = dir.path().join("configuration.json");
     assert!(configuration_file_path.exists());
     common::assert_file_ends_with_newline(&configuration_file_path).await?;
@@ -151,6 +159,10 @@ async fn test_initialize_directory_with_metadata_and_release_version() -> anyhow
         context,
     )
     .await?;
+
+    let configuration_schema_file_path = dir.path().join("schema.json");
+    assert!(configuration_schema_file_path.exists());
+    common::assert_file_ends_with_newline(&configuration_schema_file_path).await?;
 
     let configuration_file_path = dir.path().join("configuration.json");
     assert!(configuration_file_path.exists());
