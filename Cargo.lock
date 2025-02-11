@@ -1177,9 +1177,12 @@ dependencies = [
  "anyhow",
  "build-data",
  "clap",
+ "insta",
  "ndc-bigquery-configuration",
  "serde",
+ "serde_json",
  "serde_yaml",
+ "tempfile",
  "thiserror",
  "tokio",
 ]
