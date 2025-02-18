@@ -136,12 +136,12 @@ async fn initialize(with_metadata: bool, context: Context<impl Environment>) -> 
             native_toolchain_definition: Some(metadata::NativeToolchainDefinition {
                 commands: vec![
                     ("start".to_string(), metadata::CommandDefinition::ShellScript {
-                        bash: "#!/usr/bin/env bash\nset -eu -o pipefail\nHASURA_CONFIGURATION_DIRECTORY=\"$HASURA_PLUGIN_CONNECTOR_CONTEXT_PATH\" ndc-bigquery serve".to_string(),
-                        powershell: "$ErrorActionPreference = \"Stop\"\n$env:HASURA_CONFIGURATION_DIRECTORY=\"$env:HASURA_PLUGIN_CONNECTOR_CONTEXT_PATH\"; & ndc-bigquery.exe serve".to_string(),
+                        bash: "#!/usr/bin/env bash\nset -eu -o pipefail\nHASURA_CONFIGURATION_DIRECTORY=\"$HASURA_PLUGIN_CONNECTOR_CONTEXT_PATH\" \"$HASURA_DDN_NATIVE_CONNECTOR_DIR/ndc-bigquery\" serve".to_string(),
+                        powershell: "$ErrorActionPreference = \"Stop\"\n$env:HASURA_CONFIGURATION_DIRECTORY=\"$env:HASURA_PLUGIN_CONNECTOR_CONTEXT_PATH\"; & \"$env:HASURA_DDN_NATIVE_CONNECTOR_DIR\\ndc-bigquery.exe\" serve".to_string(),
                     }),
                     ("update".to_string(), metadata::CommandDefinition::ShellScript {
-                        bash: "#!/usr/bin/env bash\nset -eu -o pipefail\n\"$HOME/.ddn/plugins/store/ndc-bigquery/$BIGQUERY_VERSION/hasura-ndc-bigquery\" update".to_string(),
-                        powershell: "$ErrorActionPreference = \"Stop\"\n& \"$env:USERPROFILE\\.ddn\\plugins\\store\\ndc-bigquery\\$env:BIGQUERY_VERSION\\hasura-ndc-bigquery.exe\" update".to_string(),
+                        bash: "#!/usr/bin/env bash\nset -eu -o pipefail\n\"$HASURA_DDN_NATIVE_CONNECTOR_PLUGIN_DIR/hasura-ndc-bigquery\" update".to_string(),
+                        powershell: "$ErrorActionPreference = \"Stop\"\n& \"$env:HASURA_DDN_NATIVE_CONNECTOR_PLUGIN_DIR\\hasura-ndc-bigquery.exe\" update".to_string(),
                     }),
                 ].into_iter().collect(),
             })
