@@ -1,4 +1,4 @@
-#![allow(dead_code)] // required because this is included mulitple times
+#![allow(dead_code)] // required because this is included multiple times
 
 use std::path::Path;
 
