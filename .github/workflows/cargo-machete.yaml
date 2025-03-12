@@ -16,7 +16,7 @@ jobs:
       - name: install tools
         run: |
           rustup show
-          cargo install --version 0.7.1 cargo-machete
+          cargo install --version 0.7.0 cargo-machete
 
       - uses: Swatinem/rust-cache@v2
         with:
