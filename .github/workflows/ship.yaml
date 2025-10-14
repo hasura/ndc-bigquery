@@ -54,7 +54,10 @@ jobs:
     # Only run on the `main` branch or version tags.
     # Note we currently tag the image with 'latest', so will want to stop doing
     # so if we run this on PR branches, etc.
-    if: (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
+    if:
+      (github.ref == 'refs/heads/main' 
+        || startsWith(github.ref, 'refs/tags/v')
+        || ${{ github.event.label.name == 'upload-docker' }})
     permissions:
       contents: read
       id-token: write
