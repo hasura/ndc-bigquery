@@ -13,18 +13,22 @@
 ### Changed
 
 ### Fixed
+
 - Fixed the use of keywords as column names
 
 ## [v2.0.0]
 
 ### Added
+
 - Basic support for struct and range types
 - Proper ndc-spec type representation
 
 ### Changed
+
 - Breaking change: `configuration.json` has changed. Configs prior to v2 need to be deleted and re-initialized
 
 ### Fixed
+
 - Fixed capabilities to match what the connector is capable of
 
 ## [v1.0.0]

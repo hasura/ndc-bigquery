@@ -360,20 +360,27 @@ fn get_scalar_types(type_names: &Vec<TypeItem>, schema_name: String) -> database
         };
         let scalar_type_name = ScalarTypeName::new(type_name_str);
 
-        scalar_types.insert(
-            scalar_type_name.clone(),
-            database::ScalarType {
-                type_name: scalar_type_name.clone(),
-                schema_name: schema.clone(),
-                comparison_operators: get_comparison_operators_for_type(
-                    &type_rep,
-                    &scalar_type_name,
-                ),
-                aggregate_functions: get_aggregate_functions_for_type(&type_rep, &scalar_type_name),
-                description: None,
-                type_representation: type_rep.clone(),
-            },
-        );
+        // Only insert if we haven't seen this type name before
+        // This ensures all struct types get consolidated under the "struct" name
+        if !scalar_types.contains_key(&scalar_type_name) {
+            scalar_types.insert(
+                scalar_type_name.clone(),
+                database::ScalarType {
+                    type_name: scalar_type_name.clone(),
+                    schema_name: schema.clone(),
+                    comparison_operators: get_comparison_operators_for_type(
+                        &type_rep,
+                        &scalar_type_name,
+                    ),
+                    aggregate_functions: get_aggregate_functions_for_type(
+                        &type_rep,
+                        &scalar_type_name,
+                    ),
+                    description: None,
+                    type_representation: type_rep.clone(),
+                },
+            );
+        }
     }
 
     database::ScalarTypes(scalar_types)
@@ -556,5 +563,104 @@ fn get_type_representation(type_item: &TypeItem) -> Option<database::BigQueryTyp
             Some(database::BigQueryType::Struct(struct_fields))
         }
         _ => None,
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use ndc_models::TypeName;
+    use smol_str::SmolStr;
+
+    #[test]
+    fn test_struct_types_get_same_name() {
+        // Create mock type items representing different struct types
+        let type_items = vec![
+            TypeItem {
+                name: ScalarTypeName::new(TypeName::new(SmolStr::new(
+                    "struct<name string, amount float64>",
+                ))),
+            },
+            TypeItem {
+                name: ScalarTypeName::new(TypeName::new(SmolStr::new(
+                    "struct<id int64, value string>",
+                ))),
+            },
+            TypeItem {
+                name: ScalarTypeName::new(TypeName::new(SmolStr::new(
+                    "struct<x float64, y float64, z float64>",
+                ))),
+            },
+            TypeItem {
+                name: ScalarTypeName::new(TypeName::new(SmolStr::new("string"))),
+            },
+            TypeItem {
+                name: ScalarTypeName::new(TypeName::new(SmolStr::new("int64"))),
+            },
+        ];
+
+        let mut scalar_types = BTreeMap::new();
+        let schema = Some("test_schema".to_string());
+
+        // Process the type items using the same logic as the main function
+        for type_item in type_items {
+            let type_rep = get_type_representation(&type_item);
+            let type_name_str = match type_rep.clone() {
+                Some(typerep) => ndc_models::TypeName::from(typerep),
+                None => TypeName::new(SmolStr::new("any")),
+            };
+            let scalar_type_name = ScalarTypeName::new(type_name_str);
+
+            // Only insert if we haven't seen this type name before
+            if !scalar_types.contains_key(&scalar_type_name) {
+                scalar_types.insert(
+                    scalar_type_name.clone(),
+                    database::ScalarType {
+                        type_name: scalar_type_name.clone(),
+                        schema_name: schema.clone(),
+                        comparison_operators: get_comparison_operators_for_type(
+                            &type_rep,
+                            &scalar_type_name,
+                        ),
+                        aggregate_functions: get_aggregate_functions_for_type(
+                            &type_rep,
+                            &scalar_type_name,
+                        ),
+                        description: None,
+                        type_representation: type_rep.clone(),
+                    },
+                );
+            }
+        }
+
+        // Verify that we only have one "struct" type despite having multiple struct definitions
+        let struct_types: Vec<_> = scalar_types
+            .keys()
+            .filter(|name| name.as_str() == "struct")
+            .collect();
+
+        assert_eq!(
+            struct_types.len(),
+            1,
+            "Should have exactly one 'struct' type"
+        );
+
+        // Verify we have the expected types
+        assert!(
+            scalar_types.contains_key(&ScalarTypeName::new(TypeName::new(SmolStr::new("struct"))))
+        );
+        assert!(
+            scalar_types.contains_key(&ScalarTypeName::new(TypeName::new(SmolStr::new("string"))))
+        );
+        assert!(
+            scalar_types.contains_key(&ScalarTypeName::new(TypeName::new(SmolStr::new("int64"))))
+        );
+
+        // Verify total count (struct, string, int64)
+        assert_eq!(
+            scalar_types.len(),
+            3,
+            "Should have exactly 3 distinct scalar types"
+        );
     }
 }
