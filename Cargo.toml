@@ -52,7 +52,7 @@ jsonschema = "0.17"
 multimap = "0.9"
 nonempty = "0.10"
 percent-encoding = "2"
-prometheus = "0.13"
+prometheus = "0.14"
 ref-cast = "1"
 reqwest = { version = "0.11", default-features = false }
 schemars = "0.8"
