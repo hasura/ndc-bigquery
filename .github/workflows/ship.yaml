@@ -14,7 +14,7 @@ jobs:
           - aarch64-linux
     steps:
       - name: Checkout 🛎️
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Install Nix ❄
         uses: cachix/install-nix-action@v30
@@ -61,7 +61,7 @@ jobs:
       packages: write
     steps:
       - name: Checkout 🛎️
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Install Nix ❄
         uses: cachix/install-nix-action@v30
@@ -143,7 +143,7 @@ jobs:
       run:
         shell: bash
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: install protoc
         uses: arduino/setup-protoc@v3
@@ -218,7 +218,7 @@ jobs:
     # We release when a tag is pushed.
     if: startsWith(github.ref, 'refs/tags/v')
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - uses: actions/download-artifact@v5
         with:
