@@ -5,7 +5,67 @@ BigQuery NDC.
 > [!IMPORTANT]
 > Breaking change: As of v2, the configuration format has changed. Configs prior to v2 need to be deleted and re-initialized
 
-## Getting started
+## Features
+
+Below, you'll find a matrix of all supported features for the BigQuery connector:
+
+| Feature                         | Supported | Notes |
+| ------------------------------- | --------- | ----- |
+| Native Queries + Logical Models | ❌        |       |
+| Native Mutations                | ❌        |       |
+| Simple Object Query             | ✅        |       |
+| Filter / Search                 | ✅        |       |
+| Simple Aggregation              | ✅        |       |
+| Sort                            | ✅        |       |
+| Paginate                        | ✅        |       |
+| Table Relationships             | ❌        |       |
+| Views                           | ✅        |       |
+| Remote Relationships            | ❌        |       |
+| Stored Procedures               | ❌        |       |
+| Custom Fields                   | ❌        |       |
+| Mutations                       | ❌        |       |
+| Distinct                        | ✅        |       |
+| Enums                           | ❌        |       |
+| Naming Conventions              | ❌        |       |
+| Default Values                  | ❌        |       |
+| User-defined Functions          | ❌        |       |
+| Variables                       | ❌        |       |
+
+## Before you get started
+
+1. Create a [Hasura Cloud account](https://console.hasura.io)
+2. Please ensure you have the [DDN CLI](https://hasura.io/docs/3.0/cli/installation) and
+   [Docker](https://docs.docker.com/engine/install/) installed
+3. [Create a supergraph](https://hasura.io/docs/3.0/cli/commands/ddn_supergraph_init)
+
+The steps below explain how to initialize and configure a connector on your local machine (typically for development
+purposes).You can learn how to deploy a connector to Hasura DDN — after it's been configured —
+[here](https://hasura.io/docs/3.0/deployment/ddn/deploy-a-connector).
+
+## Using the BigQuery connector
+
+With the [context set](https://hasura.io/docs/3.0/cli/commands/ddn_context_set/) for an existing subgraph, initialize
+the connector by choosing `hasura/bigquery`. When the wizard runs, you'll also be prompted to enter the following env
+vars necessary for your connector to function:
+
+### Environment Variables
+
+| Name                        | Description                                    | Required | Default |
+| --------------------------- | ---------------------------------------------- | -------- | ------- |
+| HASURA_BIGQUERY_SERVICE_KEY | The service key of the BigQuery project        | Yes      | N/A     |
+| HASURA_BIGQUERY_PROJECT_ID  | The project ID of the BigQuery databse project | Yes      | N/A     |
+| HASURA_BIGQUERY_DATASET_ID  | The dataset ID of the BigQuery databse project | Yes      | N/A     |
+
+After the CLI initializes the connector, you'll need to:
+
+- [Introspect](https://hasura.io/docs/3.0/cli/commands/ddn_connector_introspect) the source.
+- Add your [models](https://hasura.io/docs/3.0/cli/commands/ddn_model_add),
+  [commands](https://hasura.io/docs/3.0/cli/commands/ddn_command_add), and
+  [relationships](https://hasura.io/docs/3.0/cli/commands/ddn_relationship_add).
+- Create a [new build](https://hasura.io/docs/3.0/cli/commands/ddn_supergraph_build_local).
+- Test it by [running your project along with the connector](https://hasura.io/docs/3.0/cli/commands/ddn_run#examples).
+
+## Getting started using local development
 
 1. Set up `cargo` and friends for Rust development as per instructions in [ndc-postgres](https://github.com/hasura/ndc-postgres).
 2. Get a BigQuery service account key and put it in the
