@@ -19,6 +19,21 @@ impl From<&str> for ServiceKey {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize, JsonSchema)]
+pub struct WorkloadIdentityAuth(pub Secret);
+
+impl From<String> for WorkloadIdentityAuth {
+    fn from(value: String) -> Self {
+        Self(value.into())
+    }
+}
+
+impl From<&str> for WorkloadIdentityAuth {
+    fn from(value: &str) -> Self {
+        Self::from(value.to_string())
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize, JsonSchema)]
 pub struct ProjectId(pub Secret);
 
 impl From<String> for ProjectId {

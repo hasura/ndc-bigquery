@@ -109,6 +109,11 @@ async fn initialize(with_metadata: bool, context: Context<impl Environment>) -> 
                     default_value: None,
                 },
                 metadata::EnvironmentVariableDefinition {
+                    name: "HASURA_BIGQUERY_WORKLOAD_IDENTITY_AUTH".to_string(),
+                    description: "The BigQuery workload identity auth URL".to_string(),
+                    default_value: None,
+                },
+                metadata::EnvironmentVariableDefinition {
                     name: "HASURA_BIGQUERY_PROJECT_ID".to_string(),
                     description: "The BigQuery project ID/name".to_string(),
                     default_value: None,

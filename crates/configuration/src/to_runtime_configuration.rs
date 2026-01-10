@@ -6,9 +6,8 @@ use std::collections::BTreeMap;
 use super::version1::ParsedConfiguration;
 use crate::environment::Environment;
 use crate::error::MakeRuntimeConfigurationError;
-use crate::values::{DatasetId, ProjectId, Secret, ServiceKey};
+use crate::values::{DatasetId, ProjectId, Secret, ServiceKey, WorkloadIdentityAuth};
 use query_engine_metadata::{self, metadata};
-// use crate::VersionTag;
 
 /// Convert the parsed configuration metadata to internal engine metadata
 /// That can be used by the connector at runtime.
@@ -16,16 +15,35 @@ pub fn make_runtime_configuration(
     parsed_config: ParsedConfiguration,
     environment: impl Environment,
 ) -> Result<crate::Configuration, MakeRuntimeConfigurationError> {
-    let service_key = match parsed_config.connection_settings.service_key {
-        ServiceKey(Secret::Plain(key)) => Ok(key),
-        ServiceKey(Secret::FromEnvironment { variable }) => {
-            environment.read(&variable).map_err(|error| {
+    let auth: (bool, String) = match parsed_config.connection_settings.workload_identity_auth {
+        Some(WorkloadIdentityAuth(Secret::Plain(key))) => Ok((true, key)),
+        Some(WorkloadIdentityAuth(Secret::FromEnvironment { variable })) => {
+            let variable_value = environment.read(&variable).map_err(|error| {
                 MakeRuntimeConfigurationError::MissingEnvironmentVariable {
                     file_path: super::version1::CONFIGURATION_FILENAME.into(),
                     message: error.to_string(),
                 }
-            })
+            })?;
+            Ok((true, variable_value))
         }
+        None => match parsed_config.connection_settings.service_key {
+            Some(ServiceKey(Secret::Plain(key))) => Ok((false, key)),
+            Some(ServiceKey(Secret::FromEnvironment { variable })) => {
+                let variable_value = environment.read(&variable).map_err(|error| {
+                    MakeRuntimeConfigurationError::MissingEnvironmentVariable {
+                        file_path: super::version1::CONFIGURATION_FILENAME.into(),
+                        message: error.to_string(),
+                    }
+                })?;
+                Ok((false, variable_value))
+            }
+            None => {
+                return Err(MakeRuntimeConfigurationError::MissingEnvironmentVariable {
+                    file_path: super::version1::CONFIGURATION_FILENAME.into(),
+                    message: "Neither Workload Identity Auth URL or Service key is provided".into(),
+                });
+            }
+        },
     }?;
 
     let project_id = match parsed_config.connection_settings.project_id {
@@ -53,10 +71,9 @@ pub fn make_runtime_configuration(
     Ok(crate::Configuration {
         metadata: convert_metadata(parsed_config.metadata),
         pool_settings: parsed_config.pool_settings,
-        service_key,
+        auth,
         project_id,
         dataset_id,
-        // mutations_version: convert_mutations_version(parsed_config.mutations_version),
     })
 }
 

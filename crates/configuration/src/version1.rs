@@ -3,7 +3,7 @@
 use crate::connection_settings;
 use crate::environment::Environment;
 use crate::error::WriteParsedConfigurationError;
-use crate::values::{DatasetId, PoolSettings, ProjectId, Secret, ServiceKey};
+use crate::values::{DatasetId, PoolSettings, ProjectId, Secret, ServiceKey, WorkloadIdentityAuth};
 
 use super::error::ParseConfigurationError;
 use gcp_bigquery_client::model::query_request::QueryRequest;
@@ -77,10 +77,54 @@ pub async fn configure(
     args: &ParsedConfiguration,
     environment: impl Environment,
 ) -> anyhow::Result<ParsedConfiguration> {
-    let service_key = match &args.connection_settings.service_key {
-        ServiceKey(Secret::Plain(value)) => Cow::Borrowed(value),
-        ServiceKey(Secret::FromEnvironment { variable }) => Cow::Owned(environment.read(variable)?),
+    let bigquery_client = match &args.connection_settings.workload_identity_auth {
+        Some(WorkloadIdentityAuth(Secret::Plain(value))) => {
+            let url = Cow::Borrowed(value);
+            std::env::set_var("BIG_QUERY_AUTH_URL", url.as_ref());
+            gcp_bigquery_client::Client::with_workload_identity(false)
+                .await
+                .unwrap()
+        }
+        Some(WorkloadIdentityAuth(Secret::FromEnvironment { variable })) => {
+            let url: Cow<'_, String> = Cow::Owned(environment.read(variable)?);
+            std::env::set_var("BIG_QUERY_AUTH_URL", url.as_ref());
+            gcp_bigquery_client::Client::with_workload_identity(false)
+                .await
+                .unwrap()
+        }
+        None => match &args.connection_settings.service_key {
+            Some(ServiceKey(Secret::Plain(value))) => {
+                let service_key = Cow::Borrowed(value);
+                let service_account_key =
+                    yup_oauth2::parse_service_account_key(service_key.as_str()).unwrap();
+                gcp_bigquery_client::Client::from_service_account_key(service_account_key, false)
+                    .await
+                    .unwrap()
+            }
+            Some(ServiceKey(Secret::FromEnvironment { variable })) => {
+                let service_key: Cow<'_, String> = Cow::Owned(environment.read(variable)?);
+                let service_account_key =
+                    yup_oauth2::parse_service_account_key(service_key.as_str()).unwrap();
+                gcp_bigquery_client::Client::from_service_account_key(service_account_key, false)
+                    .await
+                    .unwrap()
+            }
+            None => {
+                return Err(anyhow::anyhow!(
+                    "Neither Workload Identity Auth URL or Service key is provided"
+                ));
+            }
+        },
     };
+    // let service_key = match &args.connection_settings.service_key {
+    //     Some(ServiceKey(Secret::Plain(value))) => Cow::Borrowed(value),
+    //     Some(ServiceKey(Secret::FromEnvironment { variable })) => Cow::Owned(environment.read(variable)?),
+    // };
+
+    // let workload_identity_auth = match &args.connection_settings.workload_identity_auth {
+    //     WorkloadIdentityAuth(Secret::Plain(value)) => Cow::Borrowed(value),
+    //     WorkloadIdentityAuth(Secret::FromEnvironment { variable }) => Cow::Owned(environment.read(variable)?),
+    // };
 
     let project_id_ = match &args.connection_settings.project_id {
         ProjectId(Secret::Plain(value)) => Cow::Borrowed(value),
@@ -92,7 +136,7 @@ pub async fn configure(
         DatasetId(Secret::FromEnvironment { variable }) => Cow::Owned(environment.read(variable)?),
     };
 
-    let service_account_key = yup_oauth2::parse_service_account_key(service_key.as_str()).unwrap();
+    // let service_account_key = yup_oauth2::parse_service_account_key(service_key.as_str()).unwrap();
 
     let project_id = project_id_.as_str();
     let dataset_id = dataset_id_.as_str();
@@ -100,11 +144,29 @@ pub async fn configure(
     let schema_name = format!("{project_id}.{dataset_id}");
     let database_name = schema_name.clone();
 
-    // Init BigQuery client
-    let bigquery_client =
-        gcp_bigquery_client::Client::from_service_account_key(service_account_key, false)
-            .await
-            .unwrap();
+    // let bigquery_client = match
+    // BIG_QUERY_AUTH_URL
+
+    // let big_query_auth_url = match std::env::var("HASURA_BIGQUERY_WORKLOAD_IDENTITY_AUTH") {
+    //     Ok(val) => val,
+    //     Err(_) => {
+    //         return Err(anyhow::anyhow!(
+    //             "Environment variable HASURA_BIGQUERY_WORKLOAD_IDENTITY_AUTH not set"
+    //         ))
+    //     }
+    // };
+
+    // std::env::set_var("BIG_QUERY_AUTH_URL", workload_identity_auth.as_ref());
+
+    // if
+
+    // let bigquery_client_auth = gcp_bigquery_client::Client::with_workload_identity(true).await.unwrap();
+
+    // // Init BigQuery client
+    // let bigquery_client =
+    //     gcp_bigquery_client::Client::from_service_account_key(service_account_key, false)
+    //         .await
+    //         .unwrap();
 
     // get scalar_types
 
@@ -199,6 +261,7 @@ pub async fn configure(
         version: 1,
         connection_settings: connection_settings::DatabaseConnectionSettings {
             service_key: args.connection_settings.service_key.clone(),
+            workload_identity_auth: args.connection_settings.workload_identity_auth.clone(),
             project_id: args.connection_settings.project_id.clone(),
             dataset_id: args.connection_settings.dataset_id.clone(),
         },
