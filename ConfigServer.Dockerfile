@@ -17,7 +17,7 @@ COPY . .
 RUN cargo build --release --bin ndc-postgres
 
 ## Copy the binaries and serve the configuration server
-FROM debian:buster-slim as ndc-postgres
+FROM us-docker.pkg.dev/hasura-container-images/external-images/docker.io/library/debian:buster-slim-stable as ndc-postgres
 ENV PORT=9100
 
 ## Install curl for the health check
